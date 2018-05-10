@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017, Graphenee
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * HMAC-SHA1 implementations
  *
- * @author fijaz
+ * @author ijazfx
  */
 public class HMACSHA1HashProvider extends AbstractHashProvider {
 

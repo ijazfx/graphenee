@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017, Graphenee
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ import io.graphenee.vaadin.util.VaadinUtils;
  * depends on the content of entity. Original form was copied from <a href=
  * "https://github.com/viritin/viritin/wiki/AbstractForm">https://github.com/viritin/viritin/wiki/AbstractForm</a>
  * 
- * @author fijaz
+ * @author ijazfx
  * @param <T> - typically a java bean type
  */
 public abstract class TRAbstractBaseForm<T> extends CustomComponent implements FieldGroupListener<T> {

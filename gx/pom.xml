@@ -378,4 +378,12 @@
 		</license>
 	</licenses>
 
+	<developers>
+		<developer>
+			<id>ijazfx</id>
+			<name>Farrukh Ijaz</name>
+			<email>ijazfx@gmail.com</email>
+		</developer>
+	</developers>
+
 </project>

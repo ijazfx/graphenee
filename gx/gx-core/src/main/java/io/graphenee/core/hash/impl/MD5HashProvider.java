@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017, Graphenee
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.security.MessageDigest;
  * used in the hash process. So the string that is hashed is: prefix + input +
  * secret key
  *
- * @author fijaz
+ * @author ijazfx
  */
 public class MD5HashProvider extends AbstractHashProvider {
 

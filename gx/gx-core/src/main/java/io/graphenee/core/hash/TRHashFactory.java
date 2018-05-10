@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017, Graphenee
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import io.graphenee.core.hash.impl.SCryptHashProvider;
  * provide your custom hashing technique, implement TRHashProvider interface and
  * register using the {@link #register(String, TRHashProvider)} method.
  *
- * @author fijaz
+ * @author ijazfx
  */
 public class TRHashFactory {
 
