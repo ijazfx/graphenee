@@ -21,7 +21,7 @@ import java.io.Serializable;
  * Callback that accepts parameter of type T.
  *
  * @author fijaz
- * @param <T>
+ * @param <T> - input type
  */
 public interface TRParamCallback<T> extends Serializable {
 

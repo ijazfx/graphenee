@@ -22,7 +22,7 @@ import java.util.Locale;
  * This interface is used to get singular and plural values of the strings in
  * specific locales locally.
  * 
- * @author
+ * @author fijaz
  */
 
 public interface LocalizerService {

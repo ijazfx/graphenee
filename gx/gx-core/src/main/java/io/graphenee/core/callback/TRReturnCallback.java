@@ -19,7 +19,7 @@ package io.graphenee.core.callback;
  * Callback that returns object of type R.
  *
  * @author fijaz
- * @param <R>
+ * @param <R> - return type
  */
 public interface TRReturnCallback<R> {
 

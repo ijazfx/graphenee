@@ -54,13 +54,6 @@ public class TRCalenderUtil {
 	public static SimpleDateFormat yyyyMMddHHmmssSSSFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	public static SimpleDateFormat dateWithTimeFormatter = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
 
-	/**
-	 * This method is used to count the minutes between two dates.
-	 *
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
 	public static long minutesBetween(Date startDate, Date endDate) {
 
 		long difference = (startDate.getTime() - endDate.getTime()) / 60000;
@@ -68,13 +61,6 @@ public class TRCalenderUtil {
 		return Math.abs(difference);
 	}
 
-	/**
-	 * This method is used to count the hours between two dates.
-	 *
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
 	public static long hoursBetween(Date startDate, Date endDate) {
 
 		long difference = (startDate.getTime() - endDate.getTime()) / 3600000;
@@ -82,13 +68,6 @@ public class TRCalenderUtil {
 		return Math.abs(difference);
 	}
 
-	/**
-	 * This method is used to count the days between two dates.
-	 *
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
 	public static long daysBetween(Date startDate, Date endDate) {
 
 		long difference = (startDate.getTime() - endDate.getTime()) / 86400000;
@@ -96,46 +75,20 @@ public class TRCalenderUtil {
 		return Math.abs(difference);
 	}
 
-	/**
-	 * This method is used to calculate the years between using ChronoUnit.
-	 *
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
 	public static long yearsBetweenUsingChronoUnit(Date startDate, Date endDate) {
 		return ChronoUnit.YEARS.between(toLocalDateFromDate(startDate), toLocalDateFromDate(endDate));
 	}
 
-	/**
-	 * This method is used to calculate the days between using ChronoUnit.
-	 *
-	 * @param startDate
-	 * @param endDate
-	 * @return
-	 */
 	public static long daysBetweenUsingChronoUnit(Date startDate, Date endDate) {
 		return ChronoUnit.DAYS.between(toLocalDateFromDate(startDate), toLocalDateFromDate(endDate));
 	}
 
-	/**
-	 * This method is used to generate the Date from Local Date
-	 *
-	 * @param localDate
-	 * @return
-	 */
 	public static Date toDateFromLocalDate(LocalDate localDate) {
 
 		return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 
 	}
 
-	/**
-	 * This method is used to generate the Date from Local Date
-	 *
-	 * @param localDate
-	 * @return
-	 */
 	public static Date toDateFromLocalDateTime(LocalDateTime localDateTime) {
 		return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
@@ -145,59 +98,28 @@ public class TRCalenderUtil {
 		return getFormattedDate(getCurrentDate());
 	}
 
-	/**
-	 * This method is used to generate the Date from Local Date
-	 *
-	 * @param localDate
-	 * @return
-	 */
 	public static Date getCurrentDate() {
 
 		return Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 
 	}
 
-	/**
-	 * This method is used to generate the Date from Local Date
-	 *
-	 * @param localDate
-	 * @return
-	 */
 	public static Timestamp getCurrentTimeStamp() {
 
 		return Timestamp.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
 
 	}
 
-	/**
-	 * This method is used to convert the DATE object to LocalDate
-	 *
-	 * @param date
-	 * @return
-	 */
 	public static LocalDate toLocalDateFromDate(Date date) {
 		Instant instant = Instant.ofEpochMilli(date.getTime());
 		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
 	}
 
-	/**
-	 * ChronoUnit.DAYS.between(new LocalDateTi , endDate); This method is used
-	 * to convert the DATE object to LocalDateTime
-	 *
-	 * @param date
-	 * @return
-	 */
 	public static LocalDateTime toLocalDateTimeFromDate(Date date) {
 		Instant instant = Instant.ofEpochMilli(date.getTime());
 		return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 	}
 
-	/**
-	 * This method will return the date formatted as MMM d, yyyy
-	 *
-	 * @param date
-	 * @return
-	 */
 	public static String getFormattedDate(Date date) {
 		if (date == null) {
 			return null;
@@ -237,12 +159,6 @@ public class TRCalenderUtil {
 		return formatter.format(date);
 	}
 
-	/**
-	 * This method will return the date formatted as "MMM d, yyyy hh:mm aaa"
-	 *
-	 * @param date
-	 * @return
-	 */
 	public static String getFormattedTime(Timestamp date) {
 		if (date == null) {
 			return null;
@@ -257,12 +173,6 @@ public class TRCalenderUtil {
 		return dateTimeFormatter.format(date);
 	}
 
-	/**
-	 * This method will return the date formatted as "MMM d, yyyy hh:mm aaa"
-	 *
-	 * @param date
-	 * @return
-	 */
 	public static String getFormattedDate(Timestamp date) {
 		if (date == null) {
 			return null;
@@ -270,12 +180,6 @@ public class TRCalenderUtil {
 		return dateFormatter.format(date);
 	}
 
-	/**
-	 * TODO : name will be replaced.
-	 *
-	 * @param timestamp
-	 * @return
-	 */
 	public static String elapsedTime(Timestamp timestamp) {
 
 		String value = null;
@@ -415,13 +319,6 @@ public class TRCalenderUtil {
 		sinceDate = sinceDate.minusHours(sinceDate.getHour()).minusMinutes(sinceDate.getMinute());
 		return Timestamp.valueOf(sinceDate);
 	}
-
-	/**
-	 * @param calendarField
-	 * @param date
-	 * @return value of the calenderField in give date, for example
-	 * DAY_OF_MONTH, MONTH_OF_YEAR
-	 */
 
 	public static int calendarFieldFromDate(int calendarField, Timestamp date) {
 		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();

@@ -59,22 +59,13 @@ import io.graphenee.vaadin.util.VaadinUtils;
 
 /**
  * This form has been fixed to handle situation where the creation of the form
- * depends on the content of entity. Original form was copied from
- * <a href="https://github.com/viritin/viritin/wiki/AbstractForm">
+ * depends on the content of entity. Original form was copied from <a href=
+ * "https://github.com/viritin/viritin/wiki/AbstractForm">https://github.com/viritin/viritin/wiki/AbstractForm</a>
  * 
  * @author fijaz
- * @param <T>
+ * @param <T> - typically a java bean type
  */
 public abstract class TRAbstractBaseForm<T> extends CustomComponent implements FieldGroupListener<T> {
-
-	/**
-	 * Abstract super class for simple editor forms. See
-	 * {@link #createContent()} for usage information.
-	 *
-	 * @see <a href="https://github.com/viritin/viritin/wiki/AbstractForm">The
-	 * wiki</a>
-	 * @param <T> the type of the bean edited
-	 */
 
 	private boolean binding = false;
 
@@ -303,12 +294,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		return this.setEntity(clone);
 	}
 
-	/**
-	 * @deprecated Use {@link #setEntity(Class, Object)} instead which attempts
-	 * to create clone of the set entity to avoid bug in Viritin.
-	 * @param entity
-	 * @return
-	 */
+	@Deprecated
 	public MBeanFieldGroup<T> setEntity(T entity) {
 		lazyInit();
 		this.entity = entity;

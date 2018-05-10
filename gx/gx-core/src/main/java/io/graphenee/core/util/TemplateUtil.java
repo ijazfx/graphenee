@@ -38,9 +38,10 @@ public class TemplateUtil {
 	 * The method parses template text and replaces all matching keys with
 	 * values found in data map.
 	 *
-	 * @param template
-	 * @param data
-	 * @return
+	 * @param template - A template string such as "Hello #{last_name}"
+	 * @param data - key/value pairs to replace keys with values in template
+	 * string
+	 * @return - Parsed string where keys are replaced with values
 	 */
 	public static String parseTemplateWithMap(String template, Map<String, Object> data) {
 		StringBuffer sb = new StringBuffer();
@@ -65,9 +66,10 @@ public class TemplateUtil {
 	 * The method parses template text and replaces all matching keys with
 	 * matching bean property values.
 	 *
-	 * @param template
-	 * @param bean
-	 * @return
+	 * @param template - A template string such as "Hello #{last_name}"
+	 * @param bean - A bean which is converted to key/value pair and then used
+	 * for template parsing
+	 * @return - Parsed string where keys are replaced with values
 	 */
 	public static String parseTemplateWithBean(String template, Object bean) {
 		@SuppressWarnings("unchecked")

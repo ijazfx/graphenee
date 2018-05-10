@@ -40,7 +40,7 @@ public class DashboardEventBus implements SubscriberExceptionHandler {
 	/**
 	 * The object must implement hashCode() and equals() to work properly.
 	 *
-	 * @param object
+	 * @param object - any object interested to receive event bus notifications
 	 */
 	public void register(final Object object) {
 		if (!registeredObjects.contains(object)) {
@@ -52,7 +52,8 @@ public class DashboardEventBus implements SubscriberExceptionHandler {
 	/**
 	 * The object must implement hashCode() and equals() to work properly.
 	 *
-	 * @param object
+	 * @param object - an object which was previously registered to receive
+	 * notifications
 	 */
 	public void unregister(final Object object) {
 		if (registeredObjects.contains(object)) {

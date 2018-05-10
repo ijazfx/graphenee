@@ -106,9 +106,10 @@ public class TRHashFactory {
 	 * throw exception if there is already a provider registered with the
 	 * encryption.
 	 *
-	 * @param encryption
-	 * @param provider
-	 * @throws TRHashProviderRegisterException
+	 * @param encryption - a unique name for encryption e.g. Scrypt
+	 * @param provider - an implementation of TRHashProvider
+	 * @throws TRHashProviderRegisterException - throws exception if a provider
+	 * is already registered for an encryption.
 	 */
 	public static void register(String encryption, TRHashProvider provider) throws TRHashProviderRegisterException {
 		if (!providers.containsKey(encryption)) {
@@ -165,8 +166,8 @@ public class TRHashFactory {
 	 * The method is used to generate hash for all available providers in
 	 * parallel.
 	 *
-	 * @param input
-	 * @return
+	 * @param input - source content
+	 * @return - generated hash
 	 */
 	public Set<String> generateHashForAllProviders(String input) {
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());

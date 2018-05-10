@@ -15,7 +15,8 @@ public interface FileStorage {
 	 * 
 	 * @param folder - must be a valid folder path where file needs to upload.
 	 * @param filePath - file to upload.
-	 * @return
+	 * @return - depends on implementation and should return logical resource
+	 * path.
 	 */
 	default String resourcePath(String folder, String filePath) {
 		if (folder == null) {

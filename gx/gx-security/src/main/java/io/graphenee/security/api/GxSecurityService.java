@@ -20,7 +20,7 @@ package io.graphenee.security.api;
  * authorize and assert security permissions based on users, groups and
  * policies.
  * 
- * @author
+ * @author fijaz
  */
 
 public interface GxSecurityService {

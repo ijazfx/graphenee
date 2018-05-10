@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.vaadin.easyuploads.FileFactory;
 import org.vaadin.easyuploads.Html5FileInputSettings;
 
 import com.vaadin.data.Buffered;
@@ -77,21 +76,6 @@ import com.vaadin.ui.themes.ValoTheme;
  * <li>String ({@link FieldType#UTF8_STRING}) (Example: field of type String in
  * a pojo, the text is in a text file on end users computer)
  * <li>File ({@link FieldType#FILE}) (Example: fied of type File in a pojo)
- * </ul>
- * <p>
- * Typical use cases: TODO
- * <p>
- * {@link #setStorageMode(StorageMode)} controls how upload file handles the
- * received data. {@link StorageMode#FILE} mode streams uploaded file contents
- * to a file (except possibly committed value to property), the
- * {@link StorageMode#MEMORY} mode keeps everything in memory. If the Field is
- * in {@link StorageMode#FILE} mode, the file creation can be controlled with
- * {@link #setFileFactory(FileFactory)}.
- * <p>
- * Limitations:
- * <ul>
- * <li>Read through modes are not supported properly.
- * <li>{@link StorageMode#FILE} does not support Buffered properly(?).
  * </ul>
  *
  * @author Matti Tahvonen
@@ -153,7 +137,7 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 					throw new IllegalArgumentException("Storage mode cannot be memory if fields type is File!");
 				}
 				receiver = new MemoryBuffer();
-				break;
+			break;
 			default:
 				receiver = new TRFileBuffer() {
 					@Override
@@ -166,7 +150,7 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 						return TRUploadField.this.getFieldType();
 					};
 				};
-				break;
+			break;
 			}
 			if (upload != null) {
 				upload.setReceiver(receiver);
@@ -182,16 +166,13 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 	}
 
 	public enum StorageMode {
-		MEMORY,
-		FILE
+		MEMORY, FILE
 	}
 
 	/**
 	 */
 	public enum FieldType {
-		UTF8_STRING,
-		BYTE_ARRAY,
-		FILE;
+		UTF8_STRING, BYTE_ARRAY, FILE;
 
 		public Class<?> getRawType() {
 			switch (this) {
@@ -236,9 +217,6 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 
 		}
 
-		/**
-		 * @see com.vaadin.ui.Upload.Receiver#receiveUpload(String, String)
-		 */
 		@Override
 		public OutputStream receiveUpload(String filename, String MIMEType) {
 			fileName = filename;
@@ -286,7 +264,7 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					break;
+				break;
 				case UTF8_STRING:
 					try {
 						String newValueStr = (String) newValue;
@@ -295,7 +273,7 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					break;
+				break;
 				default:
 					throw new IllegalStateException();
 				}
@@ -609,7 +587,7 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		removeListener(AbstractField.ValueChangeEvent.class, listener, VALUE_CHANGE_METHOD);
 	}
 
-	/**
+	/*
 	 * Emits the value change event. The value contained in the field is
 	 * validated before the event is created.
 	 */
@@ -634,28 +612,16 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		// }
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.ui.Component.Focusable#focus()
-	 */
 	@Override
 	public void focus() {
 		super.focus();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.ui.Component.Focusable#getTabIndex()
-	 */
 	@Override
 	public int getTabIndex() {
 		return tabIndex;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.ui.Component.Focusable#setTabIndex(int)
-	 */
 	@Override
 	public void setTabIndex(int tabIndex) {
 		this.tabIndex = tabIndex;
@@ -712,16 +678,12 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		requestRepaint();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.ui.Field#getRequiredError()
-	 */
 	@Override
 	public String getRequiredError() {
 		return requiredError;
 	}
 
-	/**
+	/*
 	 * Is the field empty? In general, "empty" state is same as null..
 	 */
 	@Override
@@ -764,28 +726,16 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		requestRepaint();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.BufferedValidatable#isInvalidCommitted()
-	 */
 	@Override
 	public boolean isInvalidCommitted() {
 		return invalidCommitted;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.BufferedValidatable#setInvalidCommitted(boolean)
-	 */
 	@Override
 	public void setInvalidCommitted(boolean isCommitted) {
 		invalidCommitted = isCommitted;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#commit()
-	 */
 	@Override
 	public void commit() throws Buffered.SourceException, InvalidValueException {
 		if (dataSource != null && !dataSource.isReadOnly()) {
@@ -832,10 +782,6 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#discard()
-	 */
 	@Override
 	public void discard() throws Buffered.SourceException {
 		if (dataSource != null) {
@@ -846,27 +792,15 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#isModified()
-	 */
 	@Override
 	public boolean isModified() {
 		return modified;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#isWriteThrough()
-	 */
 	public boolean isWriteThrough() {
 		return writeTroughMode;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#setWriteThrough(boolean)
-	 */
 	public void setWriteThrough(boolean writeTrough) throws Buffered.SourceException, InvalidValueException {
 		if (writeTroughMode == writeTrough) {
 			return;
@@ -877,27 +811,15 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#isReadThrough()
-	 */
 	public boolean isReadThrough() {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Buffered#setReadThrough(boolean)
-	 */
 	public void setReadThrough(boolean readTrough) throws Buffered.SourceException {
 		// TODO implement readthrought somehow ?
 		// throw new UnsupportedOperationException();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.vaadin.data.Validatable#addValidator(com.vaadin.data.Validator)
-	 */
 	@Override
 	public void addValidator(Validator validator) {
 		if (validators == null) {
@@ -1034,7 +956,6 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 	 * because the field otherwise visually forget the user input immediately.
 	 *
 	 * @return true iff the invalid values are allowed.
-	 * @see com.vaadin.data.Validatable#isInvalidAllowed()
 	 */
 	@Override
 	public boolean isInvalidAllowed() {
@@ -1051,8 +972,6 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 	 * values. The validators are automatically copied to the field when the
 	 * datasource is set.
 	 * </p>
-	 *
-	 * @see com.vaadin.data.Validatable#setInvalidAllowed(boolean)
 	 */
 	@Override
 	public void setInvalidAllowed(boolean invalidAllowed) throws UnsupportedOperationException {
@@ -1181,18 +1100,10 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		return html5FileInputSettings;
 	}
 
-	/**
-	 * @see {@link Html5FileInputSettings#setAcceptFilter(String)}
-	 * @param acceptString
-	 */
 	public void setAcceptFilter(String acceptString) {
 		getHtml5FileInputSettings().setAcceptFilter(acceptString);
 	}
 
-	/**
-	 * @see {@link Html5FileInputSettings#setMaxFileSize(Integer)}
-	 * @param maxFileSize
-	 */
 	public void setMaxFileSize(int maxFileSize) {
 		getHtml5FileInputSettings().setMaxFileSize(maxFileSize);
 	}
@@ -1201,11 +1112,6 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 		return displayUpload;
 	}
 
-	/**
-	 * If set to true, the uploaded file is displayed within the component.
-	 *
-	 * @param displayUpload
-	 */
 	public void setDisplayUpload(boolean displayUpload) {
 		this.displayUpload = displayUpload;
 	}

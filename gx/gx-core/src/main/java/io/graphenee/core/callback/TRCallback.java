@@ -19,8 +19,8 @@ package io.graphenee.core.callback;
  * Callback that accepts parameter of type T and returns object of type R.
  *
  * @author fijaz
- * @param <T>
- * @param <R>
+ * @param <T> - input type
+ * @param <R> - return type
  */
 public interface TRCallback<T, R> {
 

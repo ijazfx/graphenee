@@ -49,9 +49,6 @@ public abstract class TRFileBuffer implements TRUploadFieldReceiver {
 		setFieldType(fieldType);
 	}
 
-	/**
-	 * @see com.vaadin.ui.Upload.Receiver#receiveUpload(String, String)
-	 */
 	@Override
 	public OutputStream receiveUpload(String filename, String MIMEType) {
 		fileName = filename;
@@ -66,11 +63,6 @@ public abstract class TRFileBuffer implements TRUploadFieldReceiver {
 		}
 	}
 
-	/**
-	 * Helper method for UploadField.
-	 *
-	 * @see org.vaadin.easyuploads.UploadFieldReceiver#getValue()
-	 */
 	@Override
 	public Object getValue() {
 		if (file == null || !file.exists()) {
@@ -97,10 +89,6 @@ public abstract class TRFileBuffer implements TRUploadFieldReceiver {
 		}
 	}
 
-	/**
-	 * contains default impelmentation to allow usage of this class elsewhere
-	 * (lazy programmer don't have proper class heirarchy...)
-	 */
 	public FieldType getFieldType() {
 		return fieldType;
 	}

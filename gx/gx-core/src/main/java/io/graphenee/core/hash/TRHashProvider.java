@@ -29,10 +29,10 @@ public interface TRHashProvider {
 	/**
 	 * Creates a hash of a prefixed string provided a signing key.
 	 *
-	 * @param prefix
-	 * @param input
-	 * @param signingKey
-	 * @return Hash string
+	 * @param prefix - A prefix e.g. icB
+	 * @param input - source content
+	 * @param signingKey - signing key
+	 * @return - generated hash
 	 */
 	String createHash(String prefix, String input, String signingKey);
 
@@ -41,8 +41,8 @@ public interface TRHashProvider {
 	 * defined by PASSWORD_PREFIX constant. Signing Key is retrieved from
 	 * properties depending on the hashing algorithm.
 	 *
-	 * @param input
-	 * @return Hash string
+	 * @param input - password
+	 * @return - generated hash
 	 */
 	String createPasswordHash(String input);
 
@@ -50,9 +50,9 @@ public interface TRHashProvider {
 	 * Creates a hash of a non-prefixed string provided a signing key.
 	 * properties depending on the hashing algorithm.
 	 *
-	 * @param prefix
-	 * @param input
-	 * @return Hash string
+	 * @param input - source content
+	 * @param signingKey - signing key
+	 * @return - generated hash
 	 */
 	String createHash(String input, String signingKey);
 
