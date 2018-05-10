@@ -10,11 +10,11 @@
   <description>UI components for Namespace, Resources and Actions.</description>
   <dependencies>
   	<dependency>
-  		<groupId>com.graphenee.gx</groupId>
+  		<groupId>io.graphenee</groupId>
   		<artifactId>gx-core</artifactId>
   	</dependency>
   	<dependency>
-  		<groupId>com.graphenee.gx</groupId>
+  		<groupId>io.graphenee</groupId>
   		<artifactId>gx-vaadin</artifactId>
   	</dependency>
   	<dependency>

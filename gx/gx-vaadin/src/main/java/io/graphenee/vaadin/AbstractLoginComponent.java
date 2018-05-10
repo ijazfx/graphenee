@@ -37,8 +37,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 
 @SuppressWarnings("serial")
 public abstract class AbstractLoginComponent extends AbstractSingleComponentContainer {

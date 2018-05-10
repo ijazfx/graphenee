@@ -18,14 +18,14 @@ package io.graphenee.vaadin;
 import java.io.Serializable;
 import java.util.List;
 
-import com.graphenee.core.exception.AuthenticationFailedException;
-import com.graphenee.core.model.bean.GxSupportedLocaleBean;
-import com.graphenee.i18n.api.LocalizerService;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractSingleComponentContainer;
 import com.vaadin.ui.Image;
 
+import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.domain.DashboardUser;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.view.DashboardMenu;

@@ -14,13 +14,13 @@ import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.google.common.eventbus.Subscribe;
-import com.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.vaadin.event.DashboardEventBus;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 
 @SuppressWarnings("serial")
 public class MetroStyleDashboardPanel extends AbstractDashboardPanel {

@@ -11,14 +11,6 @@ import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxSecurityGroupBean;
-import com.graphenee.core.model.bean.GxSecurityPolicyBean;
-import com.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
-import com.graphenee.core.model.bean.GxUserAccountBean;
-import com.graphenee.gx.theme.graphenee.GrapheneeTheme;
-import com.graphenee.vaadin.TRAbstractForm;
-import com.graphenee.vaadin.converter.BeanCollectionFaultToSetConverter;
 import com.vaadin.data.util.NestedMethodProperty;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -29,6 +21,15 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.themes.ValoTheme;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxSecurityGroupBean;
+import io.graphenee.core.model.bean.GxSecurityPolicyBean;
+import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
+import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
+import io.graphenee.vaadin.TRAbstractForm;
+import io.graphenee.vaadin.converter.BeanCollectionFaultToSetConverter;
 
 @SpringComponent
 @Scope("prototype")

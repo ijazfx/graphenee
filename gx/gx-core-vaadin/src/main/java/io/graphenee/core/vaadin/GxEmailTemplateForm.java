@@ -6,12 +6,13 @@ import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextArea;
 import org.vaadin.viritin.fields.MTextField;
 
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxEmailTemplateBean;
-import com.graphenee.vaadin.TRAbstractForm;
-import com.graphenee.vaadin.component.BeanFaultComboBox;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxEmailTemplateBean;
+import io.graphenee.vaadin.TRAbstractForm;
+import io.graphenee.vaadin.component.BeanFaultComboBox;
 
 @SpringComponent
 @Scope("prototype")

@@ -5,10 +5,11 @@ import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextArea;
 import org.vaadin.viritin.fields.MTextField;
 
-import com.graphenee.core.model.bean.GxNamespaceBean;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")

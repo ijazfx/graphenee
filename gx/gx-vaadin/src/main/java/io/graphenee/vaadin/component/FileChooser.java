@@ -29,10 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
-import com.graphenee.core.storage.FileStorage;
-import com.graphenee.core.storage.ResolveFailedException;
-import com.graphenee.core.util.TRFileContentUtil;
-import com.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
@@ -47,6 +43,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.FileTypeResolver;
 
+import io.graphenee.core.storage.FileStorage;
+import io.graphenee.core.storage.ResolveFailedException;
+import io.graphenee.core.util.TRFileContentUtil;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.ResourcePreviewPanel;
 import server.droporchoose.UploadComponent;
 

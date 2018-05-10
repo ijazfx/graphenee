@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.graphenee.gx.workshop.test;
+package io.graphenee.gx.workshop.test;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.graphenee.core.GrapheneeProperties;
+import io.graphenee.core.GrapheneeProperties;
 
 @Configuration
 public class LocalizerConfiguration {

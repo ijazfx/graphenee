@@ -26,8 +26,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxTermBean;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxTermBean;
 
 final class Localizer {
 

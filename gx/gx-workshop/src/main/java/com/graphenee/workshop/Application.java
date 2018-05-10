@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.graphenee.workshop;
+package io.graphenee.workshop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.graphenee.core.GrapheneeProperties;
+import io.graphenee.core.GrapheneeProperties;
 
 @SpringBootApplication
 public class Application {

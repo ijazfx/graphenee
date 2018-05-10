@@ -2,9 +2,10 @@ package io.graphenee.core.vaadin;
 
 import org.vaadin.viritin.fields.MTextField;
 
-import com.graphenee.core.model.bean.GxSavedQueryBean;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.bean.GxSavedQueryBean;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SuppressWarnings("serial")
 public class GxSaveQueryForm extends TRAbstractForm<GxSavedQueryBean> {

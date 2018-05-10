@@ -3,12 +3,13 @@ package io.graphenee.security.vaadin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.graphenee.vaadin.AbstractDashboardPanel;
-import com.graphenee.vaadin.TRView;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
+
+import io.graphenee.vaadin.AbstractDashboardPanel;
+import io.graphenee.vaadin.TRView;
 
 @SpringView(name = SecurityView.VIEW_NAME)
 @Scope("prototype")

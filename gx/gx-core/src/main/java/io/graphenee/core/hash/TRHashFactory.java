@@ -48,8 +48,8 @@ public class TRHashFactory {
 
 	protected static final Logger log = Logger.getLogger(TRHashFactory.class.getName());
 
-	private static final String ENCRYPTION_KEY = "com.graphenee.security.encryption";
-	private static final String SALT_KEY = "com.graphenee.security.encryption.%s.salt";
+	private static final String ENCRYPTION_KEY = "io.graphenee.security.encryption";
+	private static final String SALT_KEY = "io.graphenee.security.encryption.%s.salt";
 	private static final String DEFAULT_SALT = "FEDCBA9876543210";
 
 	private static Map<String, TRHashProvider> providers = new HashMap<>();

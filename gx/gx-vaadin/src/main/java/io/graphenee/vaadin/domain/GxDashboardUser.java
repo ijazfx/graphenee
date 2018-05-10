@@ -1,6 +1,6 @@
 package io.graphenee.vaadin.domain;
 
-import com.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.bean.GxUserAccountBean;
 
 public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 

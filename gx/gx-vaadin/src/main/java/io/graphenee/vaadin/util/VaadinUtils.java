@@ -18,7 +18,6 @@ package io.graphenee.vaadin.util;
 import java.util.Locale;
 
 import com.google.common.base.Strings;
-import com.graphenee.i18n.api.LocalizerService;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinServletService;
@@ -31,6 +30,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
+
+import io.graphenee.i18n.api.LocalizerService;
 
 public class VaadinUtils {
 

@@ -17,10 +17,11 @@ package io.graphenee.vaadin.renderer;
 
 import java.util.Locale;
 
-import com.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.renderers.ImageRenderer;
+
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
 public class BooleanRenderer extends ImageRenderer {
 

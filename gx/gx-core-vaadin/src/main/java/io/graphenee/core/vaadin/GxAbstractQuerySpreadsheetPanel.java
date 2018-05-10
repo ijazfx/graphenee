@@ -20,13 +20,6 @@ import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.DownloadButton.ContentWriter;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.graphenee.core.callback.TRParamCallback;
-import com.graphenee.core.model.bean.GxSavedQueryBean;
-import com.graphenee.core.util.JSONUtils;
-import com.graphenee.vaadin.AbstractDashboardPanel;
-import com.graphenee.vaadin.TRAbstractBaseForm.SavedHandler;
-import com.graphenee.vaadin.TRAbstractQueryForm;
-import com.graphenee.vaadin.TRAbstractQueryForm.QueryFormDelegate;
 import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
@@ -35,6 +28,14 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
+
+import io.graphenee.core.callback.TRParamCallback;
+import io.graphenee.core.model.bean.GxSavedQueryBean;
+import io.graphenee.core.util.JSONUtils;
+import io.graphenee.vaadin.AbstractDashboardPanel;
+import io.graphenee.vaadin.TRAbstractBaseForm.SavedHandler;
+import io.graphenee.vaadin.TRAbstractQueryForm;
+import io.graphenee.vaadin.TRAbstractQueryForm.QueryFormDelegate;
 
 public abstract class GxAbstractQuerySpreadsheetPanel<QB, RB> extends AbstractDashboardPanel implements View, QueryFormDelegate<QB> {
 

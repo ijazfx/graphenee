@@ -20,11 +20,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxCityBean;
-import com.graphenee.vaadin.AbstractEntityListPanel;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.spring.annotation.SpringComponent;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxCityBean;
+import io.graphenee.vaadin.AbstractEntityListPanel;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SuppressWarnings("serial")
 @SpringComponent

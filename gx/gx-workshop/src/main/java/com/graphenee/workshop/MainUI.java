@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.graphenee.workshop;
+package io.graphenee.workshop;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.graphenee.vaadin.AbstractDashboardSetup;
-import com.graphenee.vaadin.AbstractDashboardUI;
-import com.graphenee.workshop.vaadin.WorkshopDashboardSetup;
+import io.graphenee.vaadin.AbstractDashboardSetup;
+import io.graphenee.vaadin.AbstractDashboardUI;
+import io.graphenee.workshop.vaadin.WorkshopDashboardSetup;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Viewport;

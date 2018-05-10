@@ -21,16 +21,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.button.MButton;
 
-import com.graphenee.core.model.BeanFault;
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxEmailTemplateBean;
-import com.graphenee.core.model.bean.GxNamespaceBean;
-import com.graphenee.vaadin.AbstractEntityListPanel;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxEmailTemplateBean;
+import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.vaadin.AbstractEntityListPanel;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")

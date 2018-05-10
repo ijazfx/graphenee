@@ -19,7 +19,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.graphenee.core.GrapheneeCoreConfiguration;
+import io.graphenee.core.GrapheneeCoreConfiguration;
 
 @Configuration
 @AutoConfigureAfter(GrapheneeCoreConfiguration.class)

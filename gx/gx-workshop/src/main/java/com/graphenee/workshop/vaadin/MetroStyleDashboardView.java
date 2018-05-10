@@ -1,10 +1,10 @@
-package com.graphenee.workshop.vaadin;
+package io.graphenee.workshop.vaadin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.viritin.navigator.MView;
 
-import com.graphenee.vaadin.AbstractDashboardSetup;
-import com.graphenee.vaadin.MetroStyleDashboardPanel;
+import io.graphenee.vaadin.AbstractDashboardSetup;
+import io.graphenee.vaadin.MetroStyleDashboardPanel;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 

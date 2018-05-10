@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import com.google.common.eventbus.Subscribe;
-import com.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
@@ -48,13 +47,14 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.domain.DashboardUser;
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
 import io.graphenee.vaadin.event.DashboardEvent.ProfileUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.ReportsCountUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 
 /**
  * A responsive menu component providing user information and the controls for

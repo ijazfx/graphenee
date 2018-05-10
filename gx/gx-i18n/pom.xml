@@ -10,7 +10,7 @@
 	<name>Graphenee i18n</name>
 	<dependencies>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
 		<dependency>

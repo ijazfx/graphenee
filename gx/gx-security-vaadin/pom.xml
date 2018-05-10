@@ -9,15 +9,15 @@
   <name>Graphenee Security Vaadin</name>
   <dependencies>
   	<dependency>
-  		<groupId>com.graphenee.gx</groupId>
+  		<groupId>io.graphenee</groupId>
   		<artifactId>gx-core</artifactId>
   	</dependency>
   	<dependency>
-  		<groupId>com.graphenee.gx</groupId>
+  		<groupId>io.graphenee</groupId>
   		<artifactId>gx-security</artifactId>
   	</dependency>
   	<dependency>
-  		<groupId>com.graphenee.gx</groupId>
+  		<groupId>io.graphenee</groupId>
   		<artifactId>gx-vaadin</artifactId>
   	</dependency>
   </dependencies>

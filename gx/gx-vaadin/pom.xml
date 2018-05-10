@@ -53,15 +53,15 @@
 			<artifactId>vaadin-spring</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-vaadin-theme</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-i18n</artifactId>
 		</dependency>
 		<dependency>

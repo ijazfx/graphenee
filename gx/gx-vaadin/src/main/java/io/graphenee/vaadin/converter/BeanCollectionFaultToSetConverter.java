@@ -5,8 +5,9 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
-import com.graphenee.core.model.BeanCollectionFault;
 import com.vaadin.data.util.converter.Converter;
+
+import io.graphenee.core.model.BeanCollectionFault;
 
 public class BeanCollectionFaultToSetConverter<T> implements Converter<Set<T>, BeanCollectionFault<T>> {
 

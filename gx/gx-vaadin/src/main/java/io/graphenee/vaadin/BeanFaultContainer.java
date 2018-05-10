@@ -3,11 +3,12 @@ package io.graphenee.vaadin;
 import java.util.Collection;
 import java.util.Iterator;
 
-import com.graphenee.core.model.BeanFault;
-import com.graphenee.core.util.KeyValueWrapper;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+
+import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.util.KeyValueWrapper;
 
 @SuppressWarnings("serial")
 public class BeanFaultContainer<ID, BEANTYPE> extends BeanItemContainer<BeanFault<ID, BEANTYPE>> {

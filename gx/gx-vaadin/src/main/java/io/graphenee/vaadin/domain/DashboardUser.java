@@ -15,8 +15,9 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
-import com.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import com.vaadin.server.Resource;
+
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
 public interface DashboardUser {
 

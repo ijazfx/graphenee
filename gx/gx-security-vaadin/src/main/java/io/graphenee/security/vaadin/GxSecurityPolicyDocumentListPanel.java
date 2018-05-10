@@ -22,15 +22,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxSecurityPolicyBean;
-import com.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
-import com.graphenee.vaadin.AbstractEntityListPanel;
-import com.graphenee.vaadin.TRAbstractForm;
-import com.graphenee.vaadin.renderer.BooleanRenderer;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxSecurityPolicyBean;
+import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
+import io.graphenee.vaadin.AbstractEntityListPanel;
+import io.graphenee.vaadin.TRAbstractForm;
+import io.graphenee.vaadin.renderer.BooleanRenderer;
 
 @SpringComponent
 @Scope("prototype")

@@ -5,18 +5,19 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
 
-import com.graphenee.core.model.BeanFault;
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxCityBean;
-import com.graphenee.core.model.bean.GxCountryBean;
-import com.graphenee.core.model.bean.GxStateBean;
-import com.graphenee.vaadin.BeanFaultContainer;
-import com.graphenee.vaadin.TRAbstractForm;
-import com.graphenee.vaadin.component.BeanFaultComboBox;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxCityBean;
+import io.graphenee.core.model.bean.GxCountryBean;
+import io.graphenee.core.model.bean.GxStateBean;
+import io.graphenee.vaadin.BeanFaultContainer;
+import io.graphenee.vaadin.TRAbstractForm;
+import io.graphenee.vaadin.component.BeanFaultComboBox;
 
 @SuppressWarnings("serial")
 @SpringComponent

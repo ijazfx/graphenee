@@ -48,9 +48,9 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.vaadin.domain.DashboardUser;
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.ProfileUpdatedEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 
 @SuppressWarnings("serial")
 public class ProfilePreferencesWindow extends Window {

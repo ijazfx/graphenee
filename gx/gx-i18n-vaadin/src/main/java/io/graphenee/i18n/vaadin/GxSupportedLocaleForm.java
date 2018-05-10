@@ -4,10 +4,11 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
 
-import com.graphenee.core.model.bean.GxSupportedLocaleBean;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")

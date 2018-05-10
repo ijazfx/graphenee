@@ -212,9 +212,9 @@ public class GxSecurityGroupBean implements Serializable {
 						// name
 						// and class, entity, component, method etc.
 						// e.g.
-						// com.graphenee.gx.core.GxSecurityPanel::methodName
+						// io.graphenee.gx.core.GxSecurityPanel::methodName
 						// e.g.
-						// com.graphenee.gx.core.GxSecurityPanel::componentName
+						// io.graphenee.gx.core.GxSecurityPanel::componentName
 
 						String resourceName = parts[3].toLowerCase();
 						Set<String> actionSet = permissionMap.get(resourceName);

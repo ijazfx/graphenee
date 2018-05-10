@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 public class GxNamespaceBean implements Serializable {
 
-	public static final String SYSTEM = "com.graphenee.system";
+	public static final String SYSTEM = "io.graphenee.system";
 
 	private static final long serialVersionUID = 1L;
 	private Integer oid;

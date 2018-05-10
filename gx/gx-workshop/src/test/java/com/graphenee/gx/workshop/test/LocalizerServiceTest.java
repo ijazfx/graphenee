@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.graphenee.gx.workshop.test;
+package io.graphenee.gx.workshop.test;
 
 import static org.junit.Assert.assertNotEquals;
 
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.graphenee.i18n.api.LocalizerService;
+import io.graphenee.i18n.api.LocalizerService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

@@ -28,9 +28,9 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
 
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.view.DashboardMenu;
 
 /*

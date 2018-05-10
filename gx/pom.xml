@@ -126,12 +126,12 @@
 				<version>1.10</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-vaadin</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -146,7 +146,7 @@
 				<version>1.0-alpha-4</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-vaadin-theme</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -168,27 +168,27 @@
 				<version>1.7.25</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-i18n</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-i18n-vaadin</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-security</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-security-vaadin</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-core-vaadin</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -238,7 +238,7 @@
 				<version>0.7.4</version>
 			</dependency>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-aws</artifactId>
 				<version>${project.version}</version>
 			</dependency>

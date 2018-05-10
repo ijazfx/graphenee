@@ -1,20 +1,20 @@
-package com.graphenee.workshop.vaadin;
+package io.graphenee.workshop.vaadin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.graphenee.core.exception.AuthenticationFailedException;
-import com.graphenee.core.vaadin.SystemView;
-import com.graphenee.i18n.vaadin.LocalizationView;
-import com.graphenee.security.vaadin.SecurityView;
-import com.graphenee.vaadin.AbstractDashboardSetup;
-import com.graphenee.vaadin.TRMenuItem;
-import com.graphenee.vaadin.TRSimpleMenuItem;
-import com.graphenee.vaadin.domain.DashboardUser;
-import com.graphenee.vaadin.domain.MockUser;
-import com.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
+import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.vaadin.SystemView;
+import io.graphenee.i18n.vaadin.LocalizationView;
+import io.graphenee.security.vaadin.SecurityView;
+import io.graphenee.vaadin.AbstractDashboardSetup;
+import io.graphenee.vaadin.TRMenuItem;
+import io.graphenee.vaadin.TRSimpleMenuItem;
+import io.graphenee.vaadin.domain.DashboardUser;
+import io.graphenee.vaadin.domain.MockUser;
+import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewProvider;
 import com.vaadin.server.FontAwesome;

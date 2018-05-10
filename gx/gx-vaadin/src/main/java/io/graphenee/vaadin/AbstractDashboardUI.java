@@ -20,9 +20,6 @@ import java.util.Locale;
 import org.vaadin.viritin.button.MButton;
 
 import com.google.common.eventbus.Subscribe;
-import com.graphenee.core.exception.AuthenticationFailedException;
-import com.graphenee.core.model.bean.GxSupportedLocaleBean;
-import com.graphenee.i18n.api.LocalizerService;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.BrowserWindowResizeEvent;
 import com.vaadin.server.Page.BrowserWindowResizeListener;
@@ -40,12 +37,15 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.domain.DashboardUser;
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 @SuppressWarnings("serial")

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.graphenee.workshop;
+package io.graphenee.workshop;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.graphenee.i18n.api.LocalizerService;
-import com.graphenee.vaadin.AbstractDashboardView;
+import io.graphenee.i18n.api.LocalizerService;
+import io.graphenee.vaadin.AbstractDashboardView;
 import com.vaadin.spring.annotation.SpringView;
 
 @SpringView(name = MainDashboardView.VIEW_NAME)

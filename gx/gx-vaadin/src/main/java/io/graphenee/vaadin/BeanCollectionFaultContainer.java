@@ -2,11 +2,12 @@ package io.graphenee.vaadin;
 
 import java.util.Collection;
 
-import com.graphenee.core.model.BeanCollectionFault;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.AbstractBeanContainer;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+
+import io.graphenee.core.model.BeanCollectionFault;
 
 @SuppressWarnings("serial")
 public class BeanCollectionFaultContainer<BEANTYPE> extends BeanItemContainer<BEANTYPE> {

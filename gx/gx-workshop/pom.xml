@@ -12,11 +12,11 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-vaadin</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-vaadin-theme</artifactId>
 		</dependency>
 		<dependency>
@@ -28,7 +28,7 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
 		<dependency>
@@ -45,19 +45,19 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-i18n</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-i18n-vaadin</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-security-vaadin</artifactId>
 		</dependency>
 		<dependency>
@@ -65,7 +65,7 @@
 			<artifactId>vaadin-push</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.graphenee.gx</groupId>
+			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core-vaadin</artifactId>
 		</dependency>
 	</dependencies>
@@ -98,12 +98,12 @@
 	</build>
 
 	<packaging>war</packaging>
-	<groupId>com.graphenee.gx</groupId>
+	<groupId>io.graphenee</groupId>
 	<version>1.0.0-SNAPSHOT</version>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.graphenee.gx</groupId>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
 				<type>pom</type>

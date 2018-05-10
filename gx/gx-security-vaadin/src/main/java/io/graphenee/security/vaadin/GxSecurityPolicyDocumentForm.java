@@ -5,11 +5,12 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextArea;
 
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")

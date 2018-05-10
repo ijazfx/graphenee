@@ -2,10 +2,11 @@ package io.graphenee.vaadin.component;
 
 import java.util.Collection;
 
-import com.graphenee.core.model.BeanFault;
-import com.graphenee.core.util.KeyValueWrapper;
 import com.vaadin.data.Container;
 import com.vaadin.ui.ComboBox;
+
+import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.util.KeyValueWrapper;
 
 public class BeanFaultComboBox extends ComboBox {
 

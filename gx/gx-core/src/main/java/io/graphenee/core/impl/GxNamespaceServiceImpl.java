@@ -10,8 +10,8 @@ import io.graphenee.core.model.bean.GxNamespaceBean;
 @Service
 public class GxNamespaceServiceImpl implements GxNamespaceService {
 
-	private static final String SYSTEM_NAMESPACE = "com.graphenee.system";
-	private static final String APPLICATION_NAMESPACE = "com.graphenee.application";
+	private static final String SYSTEM_NAMESPACE = "io.graphenee.system";
+	private static final String APPLICATION_NAMESPACE = "io.graphenee.application";
 
 	@Autowired
 	GxDataService dataService;

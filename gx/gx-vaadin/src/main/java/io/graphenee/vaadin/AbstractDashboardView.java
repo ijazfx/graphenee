@@ -51,9 +51,9 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.vaadin.domain.DashboardNotification;
 import io.graphenee.vaadin.event.DashboardEvent;
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.NotificationsCountUpdatedEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.view.dashboard.DashboardEdit.DashboardEditListener;
 
 @SuppressWarnings("serial")

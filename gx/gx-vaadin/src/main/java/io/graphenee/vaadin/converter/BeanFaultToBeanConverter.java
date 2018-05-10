@@ -2,9 +2,10 @@ package io.graphenee.vaadin.converter;
 
 import java.util.Locale;
 
-import com.graphenee.core.model.BeanFault;
-import com.graphenee.core.util.KeyValueWrapper;
 import com.vaadin.data.util.converter.Converter;
+
+import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.util.KeyValueWrapper;
 
 public class BeanFaultToBeanConverter<ID, T> implements Converter<T, BeanFault<ID, T>> {
 

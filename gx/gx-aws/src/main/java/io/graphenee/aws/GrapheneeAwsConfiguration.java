@@ -24,7 +24,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.graphenee.core.GrapheneeCoreConfiguration;
+
+import io.graphenee.core.GrapheneeCoreConfiguration;
 
 @Configuration
 @AutoConfigureAfter(GrapheneeCoreConfiguration.class)

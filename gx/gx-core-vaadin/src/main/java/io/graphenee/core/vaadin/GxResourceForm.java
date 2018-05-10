@@ -5,15 +5,16 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
 
-import com.graphenee.core.model.api.GxDataService;
-import com.graphenee.core.model.bean.GxNamespaceBean;
-import com.graphenee.core.model.bean.GxSupportedLocaleBean;
-import com.graphenee.core.model.bean.GxTermBean;
-import com.graphenee.vaadin.TRAbstractForm;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
+
+import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.core.model.bean.GxTermBean;
+import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")
