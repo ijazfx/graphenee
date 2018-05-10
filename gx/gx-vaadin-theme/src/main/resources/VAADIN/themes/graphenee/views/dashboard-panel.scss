@@ -1,0 +1,161 @@
+@mixin dashboard-panel {
+
+  .dashboard-panel {
+  
+    .viewheader {
+      padding: $view-padding;
+	      background-image: url('../images/background.png');
+	      box-shadow: 5px 0px 10px 0px;
+      
+      .h1 {
+      	color: white;
+      	font-weight: 400;
+      }
+      
+      .v-menubar {
+      		background: $gx-base-color;
+			color: white;
+      		border: 2px solid $gx-base-color;
+      }
+      
+    }
+    
+    .viewlayout {
+    	padding-top: $view-padding;
+    	padding-left: $view-padding;
+    	padding-right: $view-padding;
+    	padding-bottom: 0px;
+    	height: 100%;
+    	overflow: scroll;    
+    	
+    	.v-panel-content-color-default {
+    		background-color: #DFE7EA;
+    		* {
+    			color: #212121;
+    		}
+    	}
+    	.v-panel-content-color-1 {
+    		background-color: #79BA47;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-2 {
+    		background-color: #00A475;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-3 {
+    		background-color: #2E61AE;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-4 {
+    		background-color: #7E2F8E;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-5 {
+    		background-color: #B50058;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-6 {
+    		background-color: #E30021;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-7 {
+    		background-color: #E87D00;
+    		* {
+    			color: white;
+    		}
+    	}
+    	.v-panel-content-color-8 {
+    		background-color: #F5B900;
+    		* {
+    			color: white;
+    		}
+    	}
+    	
+    	.metro-tile-1 {
+			width: 150px;
+			height: 150px;
+			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+			transition-duration: 200ms;
+			transition-timing-function: ease-in;
+			border: none;
+			
+			.v-icon {
+				font-size: 48px;
+			}
+		}
+		
+		.metro-tile-1:hover {
+			transition-duration: 100ms;
+			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+			transition-timing-function: ease-out;
+			.v-panel-content  {
+				background: $gx-base-color;
+				transition-duration: 100ms;
+				transition-timing-function: ease-out;
+				* {
+					color: white;
+				}
+			}
+		}
+		
+		.metro-tile-2 {
+			width: 310px;
+			height: 150px;
+			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
+			transition-duration: 200ms;
+			transition-timing-function: ease-in;
+			border: none;
+			
+			.v-icon {
+				font-size: 48px;
+			}
+		}
+		
+		.metro-tile-2:hover {
+			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+			transition-duration: 100ms;
+			transition-timing-function: ease-out;
+			.v-panel-content  {
+				background: $gx-base-color;
+				transition-duration: 100ms;
+				transition-timing-function: ease-out;
+				* {
+					color: white;
+				}
+			}
+		}
+		
+		.v-panel-metro-tile-1 {
+			overflow: hidden;
+		}
+
+		.v-panel-metro-tile-2 {
+			overflow: hidden;
+		}
+    		
+    }
+    
+    .dashlet-content {
+    	padding: 0;
+    	padding-top: $view-padding;
+    	
+    	.v-panel-captionwrap {
+    		display: none;
+    	}
+    }
+    
+  }
+
+}

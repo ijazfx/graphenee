@@ -1,0 +1,156 @@
+package com.graphenee.vaadin.component;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collection;
+import java.util.Date;
+import java.util.function.Supplier;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.vaadin.viritin.button.DownloadButton;
+import org.vaadin.viritin.button.DownloadButton.ContentWriter;
+
+import com.graphenee.core.util.KeyValueWrapper;
+import com.graphenee.core.util.TRCalenderUtil;
+import com.vaadin.addon.spreadsheet.Spreadsheet;
+import com.vaadin.server.FontAwesome;
+
+public class ExportDataSpreadSheetComponent {
+
+	private static final String FILE_EXTENSION_XLS = ".xls";
+	private Collection<String> columnsCaptions;
+	private Collection<String> dataColumns;
+	private Collection<Object> dataItems;
+	private Sheet sheet;
+	private String fileName;
+	private Supplier<Collection<String>> columnsCaptionsSupplier;
+	private Supplier<Collection<String>> dataColumnSupplier;
+	private Supplier<Collection<Object>> dataItemsSupplier;
+	private DownloadButton downloadButton;
+
+	public ExportDataSpreadSheetComponent withFileName(String fileName) {
+		this.fileName = fileName;
+		return this;
+	}
+
+	public ExportDataSpreadSheetComponent withDataColumns(Collection<String> dataColumns) {
+		this.dataColumns = dataColumns;
+		return this;
+	}
+
+	public ExportDataSpreadSheetComponent withColumnsCaptions(Collection<String> columnsCaptions) {
+		this.columnsCaptions = columnsCaptions;
+		return this;
+	}
+
+	public ExportDataSpreadSheetComponent withDataColumns(Supplier<Collection<String>> supplier) {
+		this.dataColumnSupplier = supplier;
+		return this;
+	}
+
+	public ExportDataSpreadSheetComponent withColumnsCaptions(Supplier<Collection<String>> supplier) {
+		this.columnsCaptionsSupplier = supplier;
+		return this;
+	}
+
+	public ExportDataSpreadSheetComponent withDataItems(Supplier<Collection<Object>> supplier) {
+		this.dataItemsSupplier = supplier;
+		return this;
+	}
+
+	public ExportDataSpreadSheetComponent withDataItems(Collection<Object> dataItems) {
+		this.dataItems = dataItems;
+		return this;
+	}
+
+	public DownloadButton getDownloadButton() {
+		if (downloadButton == null) {
+			downloadButton = new DownloadButton();
+			downloadButton.setCaption("Download");
+			downloadButton.setIcon(FontAwesome.FILE_EXCEL_O);
+			if (StringUtils.isEmpty(fileName)) {
+				fileName = TRCalenderUtil.getFormattedDateTime(TRCalenderUtil.getCurrentTimeStamp(), "yyyyMMdd") + FILE_EXTENSION_XLS;
+			}
+			downloadButton.setFileName(fileName);
+			downloadButton.setWriter(new ContentWriter() {
+				@Override
+				public void write(OutputStream stream) {
+					try {
+						writeToOutputStream(stream);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+		return downloadButton;
+	}
+
+	public void writeToOutputStream(OutputStream stream) throws IOException {
+		if (columnsCaptionsSupplier != null) {
+			columnsCaptions = columnsCaptionsSupplier.get();
+		}
+		if (dataColumnSupplier != null) {
+			dataColumns = dataColumnSupplier.get();
+		}
+		if (!CollectionUtils.isEmpty(dataColumns)) {
+			if (dataItemsSupplier != null) {
+				dataItems = dataItemsSupplier.get();
+			}
+			Spreadsheet spreadsheet = new Spreadsheet();
+			Workbook workbook = spreadsheet.getWorkbook();
+			sheet = workbook.getSheetAt(0);
+			buildHeaderRow();
+			buildDataRows();
+			workbook.write(stream);
+		}
+	}
+
+	private void buildHeaderRow() {
+		Row headerRow = sheet.createRow(0);
+		int i = 0;
+		for (String property : columnsCaptions) {
+			headerRow.createCell(i++).setCellValue(camelCaseToRegular(property));
+		}
+	}
+
+	private void buildDataRows() {
+		if (!CollectionUtils.isEmpty(dataItems)) {
+			int i = 1;
+			for (Object dataItem : dataItems) {
+				Row row = sheet.createRow(i++);
+				buildDataRow(row, dataItem);
+			}
+		}
+	}
+
+	private void buildDataRow(Row row, Object item) {
+		int i = 0;
+		KeyValueWrapper kvw = new KeyValueWrapper(item);
+		for (String property : dataColumns) {
+			Object value = kvw.valueForKeyPath(property);
+			if (value instanceof String) {
+				row.createCell(i++).setCellValue(value.toString());
+			} else if (value instanceof Boolean) {
+				row.createCell(i++).setCellValue((Boolean) value);
+			} else if (value instanceof Double) {
+				row.createCell(i++).setCellValue(((Double) value).doubleValue());
+			} else if (value instanceof Number) {
+				row.createCell(i++).setCellValue(((Number) value).intValue());
+			} else if (value instanceof Date) {
+				row.createCell(i++).setCellValue((Date) value);
+			} else {
+				row.createCell(i++).setCellValue("");
+			}
+		}
+	}
+
+	private String camelCaseToRegular(String string) {
+		return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
+	}
+
+}
