@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<packaging>pom</packaging>
 	<name>Graphenee</name>
 	<build>
@@ -288,4 +288,33 @@
 		<version.java.persistence>2.1.1</version.java.persistence>
 		<version.vaadin>7.7.9</version.vaadin>
 	</properties>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+	</distributionManagement>
+
+	<url>https://github.com/ijazfx/graphenee</url>
+	<description>Graphenee is an enterprise application development framework.</description>
+	<scm>
+		<url>https://github.com/ijazfx/graphenee.git</url>
+		<developerConnection>Farrukh Ijaz</developerConnection>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/ijazfx/graphenee/issues</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
 </project>
