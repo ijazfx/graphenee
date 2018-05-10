@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.graphenee.core.vaadin.GrapheneeCoreVaadinConfiguration
+io.graphenee.core.vaadin.GrapheneeCoreVaadinConfiguration

@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.graphenee.aws.GrapheneeAwsConfiguration
+io.graphenee.aws.GrapheneeAwsConfiguration

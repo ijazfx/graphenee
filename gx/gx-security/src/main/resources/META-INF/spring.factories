@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.graphenee.security.GrapheneeSecurityConfiguration
+io.graphenee.security.GrapheneeSecurityConfiguration

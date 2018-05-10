@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="gx-model">
-		<class>com.graphenee.core.model.GxMappedSuperclass</class>
-		<class>com.graphenee.core.model.entity.GxAuditLog</class>
-		<class>com.graphenee.core.model.entity.GxEmailTemplate</class>
-		<class>com.graphenee.core.model.entity.GxGender</class>
-		<class>com.graphenee.core.model.entity.GxNamespace</class>
-		<class>com.graphenee.core.model.entity.GxNamespaceProperty</class>
-		<class>com.graphenee.core.model.entity.GxSecurityGroup</class>
-		<class>com.graphenee.core.model.entity.GxSecurityPolicy</class>
-		<class>com.graphenee.core.model.entity.GxSecurityPolicyDocument</class>
-		<class>com.graphenee.core.model.entity.GxSupportedLocale</class>
-		<class>com.graphenee.core.model.entity.GxTerm</class>
-		<class>com.graphenee.core.model.entity.GxUserAccount</class>
-		<class>com.graphenee.core.model.entity.GxCountry</class>
-		<class>com.graphenee.core.model.entity.GxState</class>
-		<class>com.graphenee.core.model.entity.GxCity</class>
-		<class>com.graphenee.core.model.entity.GxSavedQuery</class>
+		<class>io.graphenee.core.model.GxMappedSuperclass</class>
+		<class>io.graphenee.core.model.entity.GxAuditLog</class>
+		<class>io.graphenee.core.model.entity.GxEmailTemplate</class>
+		<class>io.graphenee.core.model.entity.GxGender</class>
+		<class>io.graphenee.core.model.entity.GxNamespace</class>
+		<class>io.graphenee.core.model.entity.GxNamespaceProperty</class>
+		<class>io.graphenee.core.model.entity.GxSecurityGroup</class>
+		<class>io.graphenee.core.model.entity.GxSecurityPolicy</class>
+		<class>io.graphenee.core.model.entity.GxSecurityPolicyDocument</class>
+		<class>io.graphenee.core.model.entity.GxSupportedLocale</class>
+		<class>io.graphenee.core.model.entity.GxTerm</class>
+		<class>io.graphenee.core.model.entity.GxUserAccount</class>
+		<class>io.graphenee.core.model.entity.GxCountry</class>
+		<class>io.graphenee.core.model.entity.GxState</class>
+		<class>io.graphenee.core.model.entity.GxCity</class>
+		<class>io.graphenee.core.model.entity.GxSavedQuery</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>
