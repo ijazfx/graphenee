@@ -96,6 +96,25 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons/</url>
+		</repository>
+		<repository>
+			<id>jasperreports</id>
+			<url>http://jasperreports.sourceforge.net/maven2/</url>
+		</repository>
+		<repository>
+			<id>jaspersoft</id>
+			<url>https://jaspersoft.artifactoryonline.com/jaspersoft/jr-ce-releases/</url>
+		</repository>
+	</repositories>
 
 	<packaging>war</packaging>
 	<groupId>io.graphenee</groupId>
