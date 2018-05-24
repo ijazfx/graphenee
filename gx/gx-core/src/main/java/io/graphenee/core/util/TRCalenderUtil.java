@@ -47,6 +47,7 @@ public class TRCalenderUtil {
 	public static SimpleDateFormat shortD8Formatter = new SimpleDateFormat("dd/MM/yyyy");
 	public static SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM d, yyyy");
 	public static SimpleDateFormat dayFormatter = new SimpleDateFormat("EEEE");
+	public static SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM");
 	public static SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MMM d, yyyy hh:mm aaa");
 	public static SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mm aaa");
 	public static SimpleDateFormat yyyyMMddFormatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -392,6 +393,29 @@ public class TRCalenderUtil {
 			return null;
 		}
 		return dayFormatter.format(timestamp);
+	}
+
+	public static final Integer getMonth(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.MONTH);
+	}
+
+	public static final String getMonthName(Date date) {
+		if (date == null) {
+			return null;
+		}
+		return monthFormatter.format(date);
+	}
+
+	public static final String getMonthName(Timestamp timestamp) {
+		if (timestamp == null) {
+			return null;
+		}
+		return monthFormatter.format(timestamp);
 	}
 
 	public static Timestamp getTimeOnly(Timestamp timestamp) {
