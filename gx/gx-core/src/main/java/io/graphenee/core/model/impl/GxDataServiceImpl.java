@@ -1131,6 +1131,30 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxEmailTemplateBean findEmailTemplateByTemplateNameActive(String templateName) {
+		GxNamespaceBean namespace = findNamespace(GxNamespaceBean.SYSTEM);
+		GxEmailTemplate emailTemplate = null;
+		if (namespace != null) {
+			emailTemplate = emailTemplateRepository.findTop1ByTemplateNameAndGxNamespaceOidAndIsActive(templateName, namespace.getOid(), true);
+		} else {
+			emailTemplate = emailTemplateRepository.findTop1ByTemplateNameAndIsActive(templateName, true);
+		}
+		if (emailTemplate != null) {
+			return makeEmailTemplateBean(emailTemplate, namespace);
+		}
+		return null;
+	}
+
+	@Override
+	public GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace) {
+		GxEmailTemplate emailTemplate = emailTemplateRepository.findTop1ByTemplateNameAndGxNamespaceOidAndIsActive(templateName, namespace.getOid(), true);
+		if (emailTemplate != null) {
+			return makeEmailTemplateBean(emailTemplate, namespace);
+		}
+		return null;
+	}
+
+	@Override
 	public List<GxEmailTemplateBean> findEmailTemplate() {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
 		beans.addAll(emailTemplateRepository.findAll(new Sort("templateName")).stream().map(template -> {
