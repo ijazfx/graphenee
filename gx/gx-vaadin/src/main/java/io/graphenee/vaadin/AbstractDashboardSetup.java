@@ -106,4 +106,8 @@ public abstract class AbstractDashboardSetup implements Serializable {
 		return true;
 	}
 
+	public boolean shouldShowPoweredByGraphenee() {
+		return true;
+	}
+
 }

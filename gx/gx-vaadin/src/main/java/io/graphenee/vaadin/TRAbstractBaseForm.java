@@ -34,6 +34,7 @@ import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
 import org.vaadin.viritin.button.DeleteButton;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.button.PrimaryButton;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.label.RichText;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
@@ -454,9 +455,17 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	 * @return A default toolbar containing save/cancel/delete buttons
 	 */
 	public HorizontalLayout getToolbar() {
+		MLabel spacer = new MLabel("").withFullWidth();
 		busyIndicator.setVisible(false);
 		busyIndicator.setIndeterminate(true);
-		return new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_RIGHT).with(busyIndicator, getSaveButton(), getResetButton(), getDeleteButton());
+		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+		addButtonsToFooter(layout);
+		layout.addComponents(spacer, busyIndicator, getSaveButton(), getResetButton(), getDeleteButton());
+		layout.setExpandRatio(spacer, 1);
+		return layout;
+	}
+
+	protected void addButtonsToFooter(HorizontalLayout footer) {
 	}
 
 	protected Button createCancelButton() {

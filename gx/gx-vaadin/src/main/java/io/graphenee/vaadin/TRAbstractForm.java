@@ -81,7 +81,6 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 		if (footer == null) {
 			footer = new HorizontalLayout();
 			HorizontalLayout toolbar = getToolbar();
-			addButtonsToFooter(toolbar);
 			dismissButton = new MButton("Dismiss").withListener(event -> {
 				onDismissButtonClick();
 			}).withVisible(shouldShowDismissButton());
@@ -98,9 +97,6 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	protected void onDismissButtonClick() {
 		closePopup();
-	}
-
-	protected void addButtonsToFooter(HorizontalLayout footer) {
 	}
 
 	protected boolean shouldShowDismissButton() {
