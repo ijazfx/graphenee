@@ -19,15 +19,18 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -35,16 +38,17 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ConditionalOnClass({ GrapheneeProperties.class, DataSource.class })
 @ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
 @EnableJpaRepositories(entityManagerFactoryRef = "gxemf", transactionManagerRef = "gxtm")
-// @EnableJpaRepositories(entityManagerFactoryRef = "gxemf")
 @ComponentScan("io.graphenee.core")
 public class GrapheneeCoreConfiguration {
 
+	private DataSource _grapheneeDataSource;
+
 	@Autowired
-	public GrapheneeCoreConfiguration(GrapheneeProperties grapheneeProperties, DataSource dataSource) {
+	public GrapheneeCoreConfiguration(GrapheneeProperties grapheneeProperties) {
 		if (grapheneeProperties.isFlywayMigrationEnabled()) {
 			Flyway flyway = new Flyway();
-			flyway.setDataSource(dataSource);
-			String dbVendor = grapheneeProperties.getDBVendor();
+			flyway.setDataSource(grapheneeDataSource(grapheneeProperties));
+			String dbVendor = grapheneeProperties.getDbVendor();
 			if (dbVendor == null)
 				dbVendor = "postgresql";
 			flyway.setLocations("classpath:db/graphenee/migration/" + dbVendor);
@@ -56,21 +60,35 @@ public class GrapheneeCoreConfiguration {
 	}
 
 	@Bean(name = "gxemf")
-	public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
-		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-		em.setPersistenceUnitName("persistence.graphenee");
-		em.setPackagesToScan(GrapheneeCoreConfiguration.class.getPackage().getName());
-		em.setDataSource(dataSource);
-		em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-		em.afterPropertiesSet();
-		return em.getObject();
+	public EntityManagerFactory entityManagerFactory(GrapheneeProperties grapheneeProperties) {
+		LocalContainerEntityManagerFactoryBean lemfb = new LocalContainerEntityManagerFactoryBean();
+		lemfb.setDataSource(grapheneeDataSource(grapheneeProperties));
+		lemfb.setPersistenceUnitName("persistence.graphenee");
+		lemfb.setPackagesToScan(GrapheneeCoreConfiguration.class.getPackage().getName());
+		lemfb.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+		lemfb.setJpaDialect(new HibernateJpaDialect());
+		lemfb.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+		lemfb.afterPropertiesSet();
+		return lemfb.getObject();
 	}
 
 	@Bean(name = "gxtm")
-	public PlatformTransactionManager transactionManager(DataSource dataSource) {
+	public PlatformTransactionManager transactionManager(GrapheneeProperties grapheneeProperties) {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
-		transactionManager.setEntityManagerFactory(entityManagerFactory(dataSource));
+		transactionManager.setEntityManagerFactory(entityManagerFactory(grapheneeProperties));
 		return transactionManager;
+	}
+
+	private DataSource grapheneeDataSource(GrapheneeProperties grapheneeProperties) {
+		if (_grapheneeDataSource == null) {
+			synchronized (GrapheneeCoreConfiguration.class) {
+				if (_grapheneeDataSource == null) {
+					_grapheneeDataSource = DataSourceBuilder.create().url(grapheneeProperties.getDbUrl()).username(grapheneeProperties.getDbUsername())
+							.password(grapheneeProperties.getDbPassword()).driverClassName(grapheneeProperties.getDbDriverClassName()).build();
+				}
+			}
+		}
+		return _grapheneeDataSource;
 	}
 
 }
