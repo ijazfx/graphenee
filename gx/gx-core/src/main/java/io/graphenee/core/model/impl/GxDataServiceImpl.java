@@ -79,7 +79,6 @@ import io.graphenee.core.util.CryptoUtil;
 
 @Service
 @Transactional("gxtm")
-// @Transactional
 public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
