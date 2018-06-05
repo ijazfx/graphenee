@@ -39,7 +39,7 @@ public class GrapheneeJbpmConfiguration {
 	@Bean(name = "gxjbpmemf")
 	@Qualifier("gxjbpmemf")
 	public EntityManagerFactory getJbpmEntityManagerFactory() {
-		DataSource ds = DataSourceBuilder.create().url("jdbc:h2:mem:jbpmdb").username("sa").password(null).driverClassName("org.h2.Driver").build();
+		DataSource ds = DataSourceBuilder.create().url("jdbc:h2:~/jbpmdb").username("sa").password(null).driverClassName("org.h2.Driver").build();
 		LocalContainerEntityManagerFactoryBean lemfb = new LocalContainerEntityManagerFactoryBean();
 		lemfb.setDataSource(ds);
 		lemfb.setPackagesToScan("org.jbpm", "org.drools");
