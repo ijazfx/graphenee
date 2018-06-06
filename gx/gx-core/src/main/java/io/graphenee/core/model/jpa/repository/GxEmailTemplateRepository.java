@@ -31,8 +31,8 @@ public interface GxEmailTemplateRepository extends JpaRepository<GxEmailTemplate
 
 	List<GxEmailTemplate> findAllByIsActiveOrderByTemplateName(Boolean isActive);
 
-	GxEmailTemplate findTop1ByTemplateNameAndIsActive(String templateName, Boolean isActive);
+	GxEmailTemplate findOneByTemplateNameAndIsActive(String templateName, Boolean isActive);
 
-	GxEmailTemplate findTop1ByTemplateNameAndGxNamespaceOidAndIsActive(String templateName, Integer oidNamespace, Boolean isActive);
+	GxEmailTemplate findOneByTemplateNameAndGxNamespaceOidAndIsActive(String templateName, Integer oidNamespace, Boolean isActive);
 
 }
