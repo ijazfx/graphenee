@@ -55,6 +55,9 @@ public class GxSecurityGroup implements Serializable {
 	@Column(name = "security_group_name")
 	private String securityGroupName;
 
+	@Column(name = "security_group_description")
+	private String securityGroupDescription;
+
 	// bi-directional many-to-one association to GxNamespace
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
@@ -111,6 +114,14 @@ public class GxSecurityGroup implements Serializable {
 
 	public void setSecurityGroupName(String securityGroupName) {
 		this.securityGroupName = securityGroupName;
+	}
+
+	public String getSecurityGroupDescription() {
+		return securityGroupDescription;
+	}
+
+	public void setSecurityGroupDescription(String securityGroupDescription) {
+		this.securityGroupDescription = securityGroupDescription;
 	}
 
 	public GxNamespace getGxNamespace() {

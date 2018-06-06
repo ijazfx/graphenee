@@ -27,6 +27,7 @@ public class GxSecurityPolicyBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
 	private String securityPolicyName;
+	private String securityPolicyDescription;
 	private Integer priority = 0;
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
@@ -49,6 +50,14 @@ public class GxSecurityPolicyBean implements Serializable {
 
 	public void setSecurityPolicyName(String securityPolicyName) {
 		this.securityPolicyName = securityPolicyName;
+	}
+
+	public String getSecurityPolicyDescription() {
+		return securityPolicyDescription;
+	}
+
+	public void setSecurityPolicyDescription(String securityPolicyDescription) {
+		this.securityPolicyDescription = securityPolicyDescription;
 	}
 
 	public Integer getPriority() {

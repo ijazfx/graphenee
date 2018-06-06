@@ -403,4 +403,12 @@ public class GxUserAccountBean implements Serializable {
 		});
 	}
 
+	public String getFullName() {
+		return String.format("%s %s", getFirstName() != null ? getFirstName().trim() : "", getLastName() != null ? getLastName().trim() : "").trim();
+	}
+
+	public String getLastNameFirstName() {
+		return String.format("%s %s", getLastName() != null ? getLastName().trim() : "", getFirstName() != null ? getFirstName().trim() : "").trim();
+	}
+
 }

@@ -40,6 +40,7 @@ public class GxSecurityGroupBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
 	private String securityGroupName;
+	private String securityGroupDescription;
 	private Integer priority = 0;
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
@@ -63,6 +64,14 @@ public class GxSecurityGroupBean implements Serializable {
 
 	public void setSecurityGroupName(String securityGroupName) {
 		this.securityGroupName = securityGroupName;
+	}
+
+	public String getSecurityGroupDescription() {
+		return securityGroupDescription;
+	}
+
+	public void setSecurityGroupDescription(String securityGroupDescription) {
+		this.securityGroupDescription = securityGroupDescription;
 	}
 
 	public Integer getPriority() {

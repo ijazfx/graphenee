@@ -86,7 +86,7 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "securityPolicyName", "priority", "isActive" };
+		return new String[] { "securityPolicyName", "securityPolicyDescription", "priority", "isActive" };
 	}
 
 	@Override

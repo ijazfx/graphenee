@@ -86,7 +86,7 @@ public class GxSecurityGroupListPanel extends AbstractEntityListPanel<GxSecurity
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "securityGroupName", "priority", "isActive" };
+		return new String[] { "securityGroupName", "securityGroupDescription", "priority", "isActive" };
 	}
 
 	@Override
