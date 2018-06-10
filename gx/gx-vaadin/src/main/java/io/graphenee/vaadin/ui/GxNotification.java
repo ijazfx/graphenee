@@ -52,4 +52,14 @@ public class GxNotification extends Notification {
 		return notification;
 	}
 
+	public static GxNotification tray(String description) {
+		GxNotification notification = new GxNotification(null, description, Type.TRAY_NOTIFICATION);
+		return notification;
+	}
+
+	public static GxNotification tray(String caption, String description) {
+		GxNotification notification = new GxNotification(caption, description, Type.TRAY_NOTIFICATION);
+		return notification;
+	}
+
 }
