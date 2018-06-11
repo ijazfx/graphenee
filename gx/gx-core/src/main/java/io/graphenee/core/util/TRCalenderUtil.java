@@ -155,7 +155,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.MONTH, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfLastMonth(Date currentDate) {
@@ -165,7 +165,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.MONTH, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfLastWeek() {
@@ -187,7 +187,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.YEAR, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfLastYear(Date currentDate) {
@@ -197,19 +197,19 @@ public class TRCalenderUtil {
 		cal.add(Calendar.YEAR, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfMonth() {
 		Timestamp ts = new Timestamp(new Date().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfMonth(Date currentDate) {
 		Timestamp ts = new Timestamp(currentDate.getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfNextMonth() {
@@ -219,7 +219,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.MONTH, 1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfNextWeek() {
@@ -241,29 +241,15 @@ public class TRCalenderUtil {
 		cal.add(Calendar.YEAR, 1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfTomorrow() {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.add(Calendar.DAY_OF_MONTH, 1);
-		cal.set(Calendar.HOUR_OF_DAY, 23);
-		cal.set(Calendar.MINUTE, 59);
-		cal.set(Calendar.SECOND, 59);
-		cal.set(Calendar.MILLISECOND, 999);
-		return cal.getTime();
+		return endOfDay(addDaysToDate(new Date(), 1));
 	}
 
 	public static Date endOfTomorrow(Date currentDate) {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(currentDate);
-		cal.add(Calendar.DAY_OF_MONTH, 1);
-		cal.set(Calendar.HOUR_OF_DAY, 23);
-		cal.set(Calendar.MINUTE, 59);
-		cal.set(Calendar.SECOND, 59);
-		cal.set(Calendar.MILLISECOND, 999);
-		return cal.getTime();
+		return endOfDay(addDaysToDate(currentDate, 1));
 	}
 
 	public static Date endOfWeek() {
@@ -293,35 +279,19 @@ public class TRCalenderUtil {
 	public static Date endOfYear() {
 		Timestamp ts = new Timestamp(new Date().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.lastDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return endOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date endOfYesterday() {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.add(Calendar.DAY_OF_MONTH, -1);
-		cal.set(Calendar.HOUR_OF_DAY, 23);
-		cal.set(Calendar.MINUTE, 59);
-		cal.set(Calendar.SECOND, 59);
-		cal.set(Calendar.MILLISECOND, 999);
-		return cal.getTime();
+		return endOfDay(addDaysToDate(new Date(), -1));
 	}
 
 	public static Date endOfYesterday(Date currentDate) {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(currentDate);
-		cal.add(Calendar.DAY_OF_MONTH, -1);
-		cal.set(Calendar.HOUR_OF_DAY, 23);
-		cal.set(Calendar.MINUTE, 59);
-		cal.set(Calendar.SECOND, 59);
-		cal.set(Calendar.MILLISECOND, 999);
-		return cal.getTime();
+		return endOfDay(addDaysToDate(currentDate, -1));
 	}
 
 	public static Date getCurrentDate() {
-
 		return Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-
 	}
 
 	public static String getCurrentFormattedDate() {
@@ -329,9 +299,7 @@ public class TRCalenderUtil {
 	}
 
 	public static Timestamp getCurrentTimeStamp() {
-
 		return Timestamp.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-
 	}
 
 	public static final Integer getDay(Date date) {
@@ -434,21 +402,16 @@ public class TRCalenderUtil {
 	}
 
 	public static long hoursBetween(Date startDate, Date endDate) {
-
 		long difference = (startDate.getTime() - endDate.getTime()) / 3600000;
-
 		return Math.abs(difference);
 	}
 
 	public static long minutesBetween(Date startDate, Date endDate) {
-
 		long difference = (startDate.getTime() - endDate.getTime()) / 60000;
-
 		return Math.abs(difference);
 	}
 
 	public static String remainingTime(Timestamp timestamp) {
-
 		String value = null;
 		if (timestamp == null) {
 			return value;
@@ -493,27 +456,31 @@ public class TRCalenderUtil {
 	}
 
 	public static Date startOfDay() {
-		Timestamp ts = new Timestamp(new Date().getTime());
-		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return new Timestamp(calendar.getTime().getTime());
 	}
 
 	public static Date startOfDay(Date currentDate) {
-		Timestamp ts = new Timestamp(currentDate.getTime());
-		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(currentDate);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return new Timestamp(calendar.getTime().getTime());
 	}
 
 	public static Timestamp startOfDayFuture(Integer numberOfDaysFuture) {
-		LocalDateTime sinceDate = LocalDateTime.now().plus(numberOfDaysFuture, ChronoUnit.DAYS);
-		sinceDate = sinceDate.minusHours(sinceDate.getHour()).minusMinutes(sinceDate.getMinute());
-		return Timestamp.valueOf(sinceDate);
+		return new Timestamp(startOfDay(addDaysToDate(new Date(), Math.abs(numberOfDaysFuture))).getTime());
 	}
 
 	public static Timestamp startOfDayInPast(Integer numberOfDaysAgo) {
-		LocalDateTime sinceDate = LocalDateTime.now().minus(numberOfDaysAgo, ChronoUnit.DAYS);
-		sinceDate = sinceDate.minusHours(sinceDate.getHour()).minusMinutes(sinceDate.getMinute());
-		return Timestamp.valueOf(sinceDate);
+		return new Timestamp(startOfDay(addDaysToDate(new Date(), Math.abs(numberOfDaysAgo) * -1)).getTime());
 	}
 
 	public static Date startOfLastMonth() {
@@ -523,7 +490,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.MONTH, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfLastMonth(Date currentDate) {
@@ -533,7 +500,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.MONTH, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfLastWeek() {
@@ -543,7 +510,7 @@ public class TRCalenderUtil {
 		cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 1);
+		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}
@@ -565,19 +532,19 @@ public class TRCalenderUtil {
 		cal.add(Calendar.YEAR, -1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfMonth() {
 		Timestamp ts = new Timestamp(new Date().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfMonth(Date currentDate) {
 		Timestamp ts = new Timestamp(currentDate.getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfNextMonth() {
@@ -587,7 +554,7 @@ public class TRCalenderUtil {
 		cal.add(Calendar.MONTH, 1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfMonth());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfNextWeek() {
@@ -597,7 +564,7 @@ public class TRCalenderUtil {
 		cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 1);
+		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}
@@ -609,29 +576,15 @@ public class TRCalenderUtil {
 		cal.add(Calendar.YEAR, 1);
 		Timestamp ts = new Timestamp(cal.getTime().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfTomorrow() {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.add(Calendar.DAY_OF_MONTH, 1);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime();
+		return startOfDay(addDaysToDate(new Date(), 1));
 	}
 
 	public static Date startOfTomorrow(Date currentDate) {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(currentDate);
-		cal.add(Calendar.DAY_OF_MONTH, 1);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime();
+		return startOfDay(addDaysToDate(currentDate, 1));
 	}
 
 	public static Date startOfWeek() {
@@ -641,7 +594,7 @@ public class TRCalenderUtil {
 		cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 1);
+		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}
@@ -653,7 +606,7 @@ public class TRCalenderUtil {
 		cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 1);
+		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
 		return cal.getTime();
 	}
@@ -661,35 +614,21 @@ public class TRCalenderUtil {
 	public static Date startOfYear() {
 		Timestamp ts = new Timestamp(new Date().getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfYear(Date currentDate) {
 		Timestamp ts = new Timestamp(currentDate.getTime());
 		LocalDateTime from = LocalDateTime.ofInstant(ts.toInstant(), ZoneId.systemDefault()).with(TemporalAdjusters.firstDayOfYear());
-		return Date.from(from.toInstant(ZoneOffset.UTC));
+		return startOfDay(Date.from(from.toInstant(ZoneOffset.UTC)));
 	}
 
 	public static Date startOfYesterday() {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(new Date());
-		cal.add(Calendar.DAY_OF_MONTH, -1);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime();
+		return startOfDay(addDaysToDate(new Date(), -1));
 	}
 
 	public static Date startOfYesterday(Date currentDate) {
-		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
-		cal.setTime(currentDate);
-		cal.add(Calendar.DAY_OF_MONTH, -1);
-		cal.set(Calendar.HOUR_OF_DAY, 0);
-		cal.set(Calendar.MINUTE, 0);
-		cal.set(Calendar.SECOND, 0);
-		cal.set(Calendar.MILLISECOND, 0);
-		return cal.getTime();
+		return startOfDay(addDaysToDate(currentDate, -1));
 	}
 
 	public static Date toDateFromLocalDate(LocalDate localDate) {

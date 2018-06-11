@@ -33,6 +33,7 @@ import org.vaadin.gridutil.cell.GridCellFilter;
 import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.grid.MGrid;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
@@ -44,6 +45,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -69,7 +71,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private boolean isBuilt;
 	private MGrid<T> mainGrid;
 	private BeanItemContainer<T> mainGridContainer;
-	private Component toolbar;
+	private AbstractLayout toolbar;
+	private AbstractLayout secondaryToolbar;
 	private TRAbstractForm<T> cachedForm;
 	private MButton addButton;
 	private MButton editButton;
@@ -87,6 +90,12 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private TRAbstractSearchForm<?> searchForm = null;
 
 	private ExportDataSpreadSheetComponent exportDataSpreadSheetComponent;
+
+	private DownloadButton exportDataDownloadButton;
+
+	private MVerticalLayout rootLayout;
+
+	private boolean rootLayoutMargin = false;
 
 	public AbstractEntityListPanel(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -114,13 +123,104 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			setCaption(panelCaption());
 
 			mainGrid = buildMainGrid();
-			toolbar = buildToolbar();
 
-			MVerticalLayout layout = new MVerticalLayout();
-			layout.setSizeFull();
-			layout.addComponents(toolbar, mainGrid);
-			layout.setExpandRatio(mainGrid, 1);
-			setContent(layout);
+			addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("New"), event -> {
+				try {
+					onAddButtonClick(initializeEntity(entityClass.newInstance()));
+				} catch (Exception e) {
+					L.warn(e.getMessage(), e);
+				}
+			}).withStyleName(ValoTheme.BUTTON_PRIMARY);
+			editButton = new MButton(FontAwesome.EDIT, localizedSingularValue("Modify"), event -> {
+				Collection<T> items = mainGrid.getSelectedRowsWithType();
+				if (items.size() == 1) {
+					T item = items.iterator().next();
+					preEdit(item);
+					openEditorForm(item);
+				}
+			});
+			editButton.setEnabled(false);
+			deleteButton = new MButton(FontAwesome.REMOVE, localizedSingularValue("Remove"), event -> {
+				Collection<T> issues = mainGrid.getSelectedRowsWithType();
+				if (issues.size() > 0) {
+					if (shouldShowDeleteConfirmation()) {
+						ConfirmDialog.show(UI.getCurrent(), "Are you sure to remove selected records?", e -> {
+							if (e.isConfirmed()) {
+								for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
+									T item = itemIterator.next();
+									try {
+										if (onDeleteEntity(item)) {
+											mainGridContainer.removeItem(item);
+											if (delegate != null) {
+												delegate.onDelete(item);
+											}
+										}
+									} catch (Exception e1) {
+										if (e1.getMessage().contains("ConstraintViolationException"))
+											MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
+										else
+											MNotification.tray("Operation Failed", e1.getMessage());
+									}
+								}
+								// refresh();
+								deselectAll();
+								mainGrid.refreshAllRows();
+							}
+						});
+					}
+
+					else {
+						for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
+							T item = itemIterator.next();
+							if (onDeleteEntity(item)) {
+								mainGridContainer.removeItem(item);
+							}
+						}
+						// refresh();
+						deselectAll();
+						mainGrid.refreshAllRows();
+					}
+
+				}
+			});
+			deleteButton.withStyleName(ValoTheme.BUTTON_DANGER);
+			deleteButton.setEnabled(false);
+			searchButton = new MButton(FontAwesome.SEARCH, localizedSingularValue("Search"), event -> {
+				try {
+					searchForm.openInModalPopup();
+				} catch (Exception e) {
+					L.warn(e.getMessage(), e);
+				}
+			});
+			exportDataSpreadSheetComponent = new ExportDataSpreadSheetComponent();
+			exportDataSpreadSheetComponent.withColumnsCaptions(() -> {
+				return getGridHeaderCaptionList();
+			});
+			exportDataSpreadSheetComponent.withDataColumns(() -> {
+				return Arrays.asList(visibleProperties());
+			}).withDataItems(() -> {
+				Collection<Object> selectedRows = entityGrid().getSelectedRows();
+				if (selectedRows.size() > 0) {
+					return selectedRows;
+				}
+				return new ArrayList<>(mainGridContainer.getItemIds());
+			});
+			exportDataDownloadButton = exportDataSpreadSheetComponent.getDownloadButton();
+			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
+
+			toolbar = buildToolbar();
+			if (toolbar.getComponentCount() == 0)
+				toolbar.setVisible(false);
+
+			secondaryToolbar = buildSecondaryToolbar();
+			if (secondaryToolbar.getComponentCount() == 0)
+				secondaryToolbar.setVisible(false);
+
+			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin);
+			rootLayout.setSizeFull();
+			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
+			rootLayout.setExpandRatio(mainGrid, 1);
+			setContent(rootLayout);
 
 			postBuild();
 			isBuilt = true;
@@ -280,121 +380,66 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		return true;
 	}
 
-	private Component buildToolbar() {
+	private AbstractLayout buildToolbar() {
 		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
 				.withSpacing(true);
-		addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("Add"), event -> {
-			try {
-				onAddButtonClick(initializeEntity(entityClass.newInstance()));
-			} catch (Exception e) {
-				L.warn(e.getMessage(), e);
-			}
-		}).withStyleName(ValoTheme.BUTTON_PRIMARY);
-		layout.add(addButton);
 
-		editButton = new MButton(FontAwesome.PENCIL, localizedSingularValue("Edit"), event -> {
-			Collection<T> items = mainGrid.getSelectedRowsWithType();
-			if (items.size() == 1) {
-				T item = items.iterator().next();
-				preEdit(item);
-				openEditorForm(item);
-			}
-		});
-		editButton.setEnabled(false);
-		layout.add(editButton);
-
-		deleteButton = new MButton(FontAwesome.TRASH, localizedSingularValue("Delete"), event -> {
-			Collection<T> issues = mainGrid.getSelectedRowsWithType();
-			if (issues.size() > 0) {
-				if (shouldShowDeleteConfirmation()) {
-					ConfirmDialog.show(UI.getCurrent(), "Are you sure to delete selected records?", e -> {
-						if (e.isConfirmed()) {
-							for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
-								T item = itemIterator.next();
-								try {
-									if (onDeleteEntity(item)) {
-										mainGridContainer.removeItem(item);
-										if (delegate != null) {
-											delegate.onDelete(item);
-										}
-									}
-								} catch (Exception e1) {
-									MNotification.tray("Delete Failed", "Delete failed because of dependencies");
-								}
-							}
-							// refresh();
-							deselectAll();
-							mainGrid.refreshAllRows();
-						}
-					});
-				}
-
-				else {
-					for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
-						T item = itemIterator.next();
-						if (onDeleteEntity(item)) {
-							mainGridContainer.removeItem(item);
-						}
-					}
-					// refresh();
-					deselectAll();
-					mainGrid.refreshAllRows();
-				}
-
-			}
-		});
-		deleteButton.setEnabled(false);
-		layout.add(deleteButton);
-
-		searchButton = new MButton(FontAwesome.SEARCH, localizedSingularValue("Search"), event -> {
-			try {
-				searchForm.openInModalPopup();
-			} catch (Exception e) {
-				L.warn(e.getMessage(), e);
-			}
-		});
-		layout.add(searchButton);
-		searchButton.setVisible(false);
-
-		// layout.setExpandRatio(deleteButton, 1.0f);
 		addButtonsToToolbar(layout);
+
+		boolean addSpacer = true;
 		Iterator<Component> iter = layout.iterator();
-		boolean shouldExpand = true;
 		while (iter.hasNext()) {
-			Component component = iter.next();
-			if (layout.getExpandRatio(component) >= 1) {
-				shouldExpand = false;
+			Component c = iter.next();
+			if (layout.getExpandRatio(c) > 0) {
+				addSpacer = false;
 				break;
 			}
 		}
-		if (shouldExpand) {
-			try {
-				layout.setExpandRatio(deleteButton, 1.0f);
-			} catch (Exception e) {
-				// just in case if layout does not contain deleteButton because
-				// user implemented his/her own toolbar.
-			}
-		}
 
-		exportDataSpreadSheetComponent = new ExportDataSpreadSheetComponent();
-		exportDataSpreadSheetComponent.withColumnsCaptions(() -> {
-			return getGridHeaderCaptionList();
-		});
-		exportDataSpreadSheetComponent.withDataColumns(() -> {
-			return Arrays.asList(visibleProperties());
-		}).withDataItems(() -> {
-			Collection<Object> selectedRows = entityGrid().getSelectedRows();
-			if (selectedRows.size() > 0) {
-				return selectedRows;
-			}
-			return new ArrayList<>(mainGridContainer.getItemIds());
-		});
-		DownloadButton exportDataDownloadButton = exportDataSpreadSheetComponent.getDownloadButton();
-		exportDataDownloadButton.setVisible(shouldShowExportDataButton());
-		layout.add(exportDataDownloadButton);
+		if (addSpacer) {
+			MLabel spacerLabel = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN);
+			layout.addComponent(spacerLabel);
+			layout.setExpandRatio(spacerLabel, 1);
+		}
 
 		// localize...
 		localizeRecursively(layout);
+		VaadinUtils.applyStyleRecursively(layout, "small");
+
+		return layout;
+	}
+
+	private AbstractLayout buildSecondaryToolbar() {
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
+				.withSpacing(true);
+
+		layout.add(addButton);
+		layout.add(editButton);
+		layout.add(deleteButton);
+		layout.add(searchButton);
+		searchButton.setVisible(false);
+		layout.add(exportDataDownloadButton);
+		addButtonsToSecondaryToolbar(layout);
+
+		boolean addSpacer = true;
+		Iterator<Component> iter = layout.iterator();
+		while (iter.hasNext()) {
+			Component c = iter.next();
+			if (layout.getExpandRatio(c) > 0) {
+				addSpacer = false;
+				break;
+			}
+		}
+
+		if (addSpacer) {
+			MLabel spacerLabel = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN);
+			layout.addComponent(spacerLabel);
+			layout.setExpandRatio(spacerLabel, 1);
+		}
+
+		// localize...
+		localizeRecursively(layout);
+		VaadinUtils.applyStyleRecursively(layout, "small");
 
 		return layout;
 	}
@@ -563,6 +608,9 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
 	}
 
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
+	}
+
 	protected void onGridItemClicked(T item) {
 		preEdit(item);
 		openEditorForm(item);
@@ -595,6 +643,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	public AbstractEntityListPanel<T> withSelectionEnabled(boolean isSelectionEnabled) {
 		this.isSelectionEnabled = isSelectionEnabled;
 		mainGrid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
+		return this;
+	}
+
+	public AbstractEntityListPanel<T> withMargin(boolean margins) {
+		this.rootLayoutMargin = margins;
+		if (rootLayout != null)
+			rootLayout.setMargin(margins);
 		return this;
 	}
 
@@ -661,6 +716,32 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			entityGrid().deselectAll();
 		} catch (Exception e) {
 		}
+	}
+
+	public void showToolbar() {
+		toolbar.setVisible(true);
+	}
+
+	public void hideToolbar() {
+		toolbar.setVisible(false);
+	}
+
+	public void showSecondaryToolbar() {
+		secondaryToolbar.setVisible(true);
+	}
+
+	public void hideSecondaryToolbar() {
+		secondaryToolbar.setVisible(false);
+	}
+
+	public void showMargin() {
+		rootLayoutMargin = true;
+		rootLayout.setMargin(true);
+	}
+
+	public void hideMargin() {
+		rootLayoutMargin = false;
+		rootLayout.setMargin(false);
 	}
 
 }
