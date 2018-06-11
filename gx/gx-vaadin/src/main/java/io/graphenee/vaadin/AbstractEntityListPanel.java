@@ -324,6 +324,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	protected void applyRendererForColumn(Column column) {
 		if (column.getPropertyId() != null) {
 			if (column.getPropertyId().toString().matches("(is|should|has)[A-Z].*")) {
+				column.setMaximumWidth(150);
 				column.setRenderer(new BooleanRenderer(event -> {
 					if (event.getPropertyId() != null) {
 						onGridItemClicked((T) event.getItemId(), event.getPropertyId().toString());
@@ -351,7 +352,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	protected Alignment alignmentForProperty(String propertyId) {
 		if (propertyId.matches("(is|should|has)[A-Z].*")) {
-			return Alignment.MIDDLE_CENTER;
+			return Alignment.MIDDLE_LEFT;
+		}
+		if (propertyId.matches("(cost|price|sum|amount|percent)")) {
+			return Alignment.MIDDLE_RIGHT;
 		}
 		if (propertyId.matches("(cost|price|sum|amount|percent)[A-Z].*")) {
 			return Alignment.MIDDLE_RIGHT;
@@ -377,13 +381,19 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	protected boolean isGridCellFilterEnabled() {
-		return true;
+		return false;
 	}
 
 	private AbstractLayout buildToolbar() {
 		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
 				.withSpacing(true);
 
+		layout.add(addButton);
+		layout.add(editButton);
+		layout.add(deleteButton);
+		layout.add(searchButton);
+		searchButton.setVisible(false);
+		layout.add(exportDataDownloadButton);
 		addButtonsToToolbar(layout);
 
 		boolean addSpacer = true;
@@ -413,16 +423,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
 				.withSpacing(true);
 
-		layout.add(addButton);
-		layout.add(editButton);
-		layout.add(deleteButton);
-		layout.add(searchButton);
-		searchButton.setVisible(false);
-		layout.add(exportDataDownloadButton);
 		addButtonsToSecondaryToolbar(layout);
 
 		boolean addSpacer = true;
 		Iterator<Component> iter = layout.iterator();
+
+		layout.setVisible(layout.getComponentCount() > 0);
+
 		while (iter.hasNext()) {
 			Component c = iter.next();
 			if (layout.getExpandRatio(c) > 0) {
