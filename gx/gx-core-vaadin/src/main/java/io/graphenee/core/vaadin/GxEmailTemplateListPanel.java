@@ -55,9 +55,7 @@ public class GxEmailTemplateListPanel extends AbstractEntityListPanel<GxEmailTem
 	}
 
 	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
-		super.addButtonsToToolbar(toolbar);
-
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
 		MButton activeButton = new MButton("Active");
 		MButton inactiveButton = new MButton("Inactive");
 

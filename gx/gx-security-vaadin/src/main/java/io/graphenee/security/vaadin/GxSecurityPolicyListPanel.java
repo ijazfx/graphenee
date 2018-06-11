@@ -95,7 +95,7 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 	}
 
 	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
 		namespaceComboBox = new ComboBox("Namespace");
 		namespaceComboBox.setTextInputAllowed(false);
 		namespaceComboBox.addItems(dataService.findNamespace());
