@@ -40,7 +40,7 @@ public class GxAwsServiceImpl implements GxAwsService {
 	public String sendTransactionalSMSMessage(String phone, String message) {
 		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(awsCredentialProvider).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
-		smsAttributes.put("AWS.SNS.SMS.SenderID", new MessageAttributeValue().withStringValue("ADConnect").withDataType("String"));
+		smsAttributes.put("AWS.SNS.SMS.SenderID", new MessageAttributeValue().withStringValue("93223").withDataType("String"));
 		smsAttributes.put("AWS.SNS.SMS.MaxPrice", new MessageAttributeValue().withStringValue("0.50").withDataType("Number"));
 		smsAttributes.put("AWS.SNS.SMS.SMSType", new MessageAttributeValue().withStringValue("Transactional").withDataType("String"));
 		PublishResult publish = snsClient.publish(new PublishRequest().withMessage(message).withPhoneNumber(phone).withMessageAttributes(smsAttributes));
@@ -53,7 +53,7 @@ public class GxAwsServiceImpl implements GxAwsService {
 	public String sendPromotionalSMSMessage(String phone, String message) {
 		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(awsCredentialProvider).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
-		smsAttributes.put("AWS.SNS.SMS.SenderID", new MessageAttributeValue().withStringValue("ADConnect").withDataType("String"));
+		smsAttributes.put("AWS.SNS.SMS.SenderID", new MessageAttributeValue().withStringValue("93223").withDataType("String"));
 		smsAttributes.put("AWS.SNS.SMS.MaxPrice", new MessageAttributeValue().withStringValue("0.50").withDataType("Number"));
 		smsAttributes.put("AWS.SNS.SMS.SMSType", new MessageAttributeValue().withStringValue("Promotional").withDataType("String"));
 		PublishResult publish = snsClient.publish(new PublishRequest().withMessage(message).withPhoneNumber(phone).withMessageAttributes(smsAttributes));
