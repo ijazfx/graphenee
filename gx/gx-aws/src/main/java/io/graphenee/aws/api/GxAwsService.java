@@ -21,4 +21,8 @@ public interface GxAwsService {
 
 	String sendPromotionalSMSMessage(String phone, String message);
 
+	String sendTransactionalSMSMessage(String senderId, String phone, String message);
+
+	String sendPromotionalSMSMessage(String senderId, String phone, String message);
+
 }
