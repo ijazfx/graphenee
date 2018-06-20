@@ -49,7 +49,7 @@ public class GrapheneeJbpmConfiguration {
 		lemfb.setMappingResources("META-INF/JBPMorm.xml", "META-INF/Taskorm.xml", "META-INF/TaskAuditorm.xml");
 		lemfb.getJpaPropertyMap().put("hibernate.max_fetch_depth", "3");
 		lemfb.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "update");
-		lemfb.getJpaPropertyMap().put("hibernate.show_sql", "true");
+		lemfb.getJpaPropertyMap().put("hibernate.show_sql", "false");
 		lemfb.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
 		lemfb.getJpaPropertyMap().put("hibernate.id.new_generator_mappings", "false");
 		lemfb.getJpaPropertyMap().put("hibernate.transaction.jta.platform", "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
