@@ -110,6 +110,7 @@ public class FileChooser extends CustomField<String> {
 
 	public void setRootFolder(String rootFolder) {
 		this.rootFolder = rootFolder;
+		fireValueChange(true);
 	}
 
 	private void preview(String filePath) {
