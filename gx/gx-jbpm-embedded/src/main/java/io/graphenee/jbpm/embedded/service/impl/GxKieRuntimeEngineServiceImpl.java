@@ -24,12 +24,12 @@ import io.graphenee.jbpm.embedded.service.GxKieRuntimeEngineService;
 public class GxKieRuntimeEngineServiceImpl implements GxKieRuntimeEngineService {
 
 	@Autowired
-	@Qualifier("gxjbpmtm")
-	JpaTransactionManager jbpmTransactionManager;
+	@Qualifier("jbpmEntityManagerFactory")
+	EntityManagerFactory jbpmEntityManagerFactory;
 
 	@Autowired
-	@Qualifier("gxjbpmemf")
-	EntityManagerFactory jbpmEntityManagerFactory;
+	@Qualifier("jbpmTransactionManager")
+	JpaTransactionManager jbpmTransactionManager;
 
 	@Autowired
 	UserGroupCallback userGroupCallback;

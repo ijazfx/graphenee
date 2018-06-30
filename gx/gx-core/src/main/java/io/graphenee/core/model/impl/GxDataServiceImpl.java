@@ -23,10 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -78,12 +75,8 @@ import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
 
 @Service
-@Transactional("gxtm")
+@Transactional("transactionManager")
 public class GxDataServiceImpl implements GxDataService {
-
-	@Autowired
-	@Qualifier("gxemf")
-	EntityManager em;
 
 	@Autowired
 	GxGenderRepository genderRepo;
@@ -261,6 +254,7 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespaceBean bean = new GxNamespaceBean();
 		bean.setOid(entity.getOid());
 		bean.setNamespace(entity.getNamespace());
+		bean.setNamespaceDescription(entity.getNamespaceDescription());
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsProtected(entity.getIsProtected());
 		return bean;

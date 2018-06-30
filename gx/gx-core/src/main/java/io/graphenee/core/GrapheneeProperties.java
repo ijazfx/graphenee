@@ -17,15 +17,18 @@ package io.graphenee.core;
 
 import java.io.Serializable;
 
+import org.springframework.boot.jdbc.DatabaseDriver;
+
+import io.graphenee.core.util.DataSourceUtil.JdbcUrlSplitter;
+
 public class GrapheneeProperties implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private boolean flywayMigrationEnabled;
-	private String dbVendor;
-	private String dbUrl;
-	private String dbUsername;
-	private String dbPassword;
-	private String dbDriverClassName;
+	// private DataSource dataSource;
+	private String url;
+	private String username;
+	private String password;
 
 	public boolean isFlywayMigrationEnabled() {
 		return flywayMigrationEnabled;
@@ -40,69 +43,70 @@ public class GrapheneeProperties implements Serializable {
 		return this;
 	}
 
-	public String getDbVendor() {
-		return dbVendor;
+	// public DataSource getDataSource() {
+	// return dataSource;
+	// }
+	//
+	// public void setDataSource(DataSource dataSource) {
+	// this.dataSource = dataSource;
+	// }
+	//
+	// public GrapheneeProperties withDataSource(DataSource dataSource) {
+	// setDataSource(dataSource);
+	// return this;
+	// }
+
+	public String getUrl() {
+		return url;
 	}
 
-	public void setDbVendor(String dbVendor) {
-		this.dbVendor = dbVendor;
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
-	public String getDbUrl() {
-		return dbUrl;
-	}
-
-	public void setDbUrl(String dbUrl) {
-		this.dbUrl = dbUrl;
-	}
-
-	public String getDbUsername() {
-		return dbUsername;
-	}
-
-	public void setDbUsername(String dbUsername) {
-		this.dbUsername = dbUsername;
-	}
-
-	public String getDbPassword() {
-		return dbPassword;
-	}
-
-	public void setDbPassword(String dbPassword) {
-		this.dbPassword = dbPassword;
-	}
-
-	public String getDbDriverClassName() {
-		return dbDriverClassName;
-	}
-
-	public void setDbDriverClassName(String dbDriverClassName) {
-		this.dbDriverClassName = dbDriverClassName;
-	}
-
-	public GrapheneeProperties withDbVendor(String dbVendor) {
-		setDbVendor(dbVendor);
+	public GrapheneeProperties withUrl(String url) {
+		setUrl(url);
 		return this;
 	}
 
-	public GrapheneeProperties withDbDriverClassName(String dbDriverClassName) {
-		setDbDriverClassName(dbDriverClassName);
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public GrapheneeProperties withUsername(String username) {
+		setUsername(username);
 		return this;
 	}
 
-	public GrapheneeProperties withDbUrl(String dbUrl) {
-		setDbUrl(dbUrl);
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public GrapheneeProperties withPassword(String password) {
+		setPassword(password);
 		return this;
 	}
 
-	public GrapheneeProperties withDbUsername(String dbUsername) {
-		setDbUsername(dbUsername);
-		return this;
+	public String driverClassName() {
+		return DatabaseDriver.fromJdbcUrl(url).getDriverClassName();
 	}
 
-	public GrapheneeProperties withDbPassword(String dbPassword) {
-		setDbPassword(dbPassword);
-		return this;
+	public String xaDriverClassName() {
+		return DatabaseDriver.fromJdbcUrl(url).getXaDataSourceClassName();
+
+	}
+
+	public String driverName() {
+		JdbcUrlSplitter jdbc = new JdbcUrlSplitter(getUrl());
+		return jdbc.driverName;
 	}
 
 }
