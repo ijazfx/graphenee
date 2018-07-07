@@ -3,6 +3,7 @@ package io.graphenee.jbpm.embedded;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -25,6 +26,9 @@ import io.graphenee.core.util.DataSourceUtil;
 @AutoConfigureAfter(io.graphenee.core.GrapheneeCoreConfiguration.class)
 public class GrapheneeJbpmConfiguration {
 
+	@Autowired(required = false)
+	GrapheneeJbpmProperties grapheneeJbpmProperties;
+
 	@Bean("jbpmTransactionManager")
 	public JpaTransactionManager jbpmTransactionManager(@Qualifier("jbpmEntityManagerFactory") EntityManagerFactory jbpmEntityManagerFactory) {
 		JpaTransactionManager tm = new JpaTransactionManager(jbpmEntityManagerFactory);
@@ -32,8 +36,9 @@ public class GrapheneeJbpmConfiguration {
 	}
 
 	@Bean("jbpmEntityManagerFactory")
-	public EntityManagerFactory jbpmEntityManagerFactory() {
-		DataSource ds = DataSourceUtil.createXaDataSource("dbJbpm", "jdbc:h2:/Users/fijaz/jbpm/jbpm.db", "sa", null, 5);
+	public EntityManagerFactory jbpmEntityManagerFactory(GrapheneeJbpmProperties properties) {
+
+		DataSource ds = DataSourceUtil.createXaDataSource("dbJbpm", "jdbc:h2:" + grapheneeJbpmProperties().getDbFilePath(), "sa", null, 5);
 		// DataSource ds =
 		// DataSourceBuilder.create().url("jdbc:h2:~/jbpm/jbpmdb").username("sa").password(null).driverClassName("org.h2.Driver").build();
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
@@ -66,6 +71,13 @@ public class GrapheneeJbpmConfiguration {
 		// "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
 		// em.afterPropertiesSet();
 		// return em.getObject();
+	}
+
+	private GrapheneeJbpmProperties grapheneeJbpmProperties() {
+		if (grapheneeJbpmProperties == null) {
+			grapheneeJbpmProperties = new GrapheneeJbpmProperties();
+		}
+		return grapheneeJbpmProperties;
 	}
 
 }

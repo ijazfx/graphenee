@@ -10,12 +10,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 import com.vaadin.server.Page;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -44,6 +46,14 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	public Set<GxTaskActionListener> listeners = new HashSet<>();
 
+	private String completeCaption = "Complete";
+	private String approveCaption = "Approve";
+	private String rejectCaption = "Reject";
+
+	private String completeConfirmation = "Do you confirm your decision to complete this task?";
+	private String approveConfirmation = "Do you confirm your decision to approve this task?";
+	private String rejectConfirmation = "Do you confirm your decision to reject this task?";
+
 	@Override
 	protected boolean eagerValidationEnabled() {
 		return true;
@@ -51,8 +61,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	@Override
 	protected String formTitle() {
-		if (userTask != null)
-			return userTask.getName();
+		if (getUserTask() != null)
+			return getUserTask().getName();
 		return "User Task";
 	}
 
@@ -60,68 +70,109 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		this.userTask = userTask;
 	}
 
+	public void setCompleteCaptionAndMessage(String caption, String message) {
+		this.completeCaption = caption;
+		this.completeConfirmation = message;
+	}
+
+	public void setApproveCaptionAndMessage(String caption, String message) {
+		this.approveCaption = caption;
+		this.approveConfirmation = message;
+	}
+
+	public void setRejectCaptionAndMessage(String caption, String message) {
+		this.rejectCaption = caption;
+		this.rejectConfirmation = message;
+	}
+
 	@Override
 	protected void addButtonsToFooter(HorizontalLayout footer) {
-		approveButton = new MButton("Approve").withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			try {
-				approve();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to approve", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+		approveButton = new MButton(approveCaption).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.approveConfirmation, "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						approve();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to approve", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+
 		});
-		rejectButton = new MButton("Reject").withStyleName(ValoTheme.BUTTON_DANGER).withListener(event -> {
-			try {
-				reject();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to reject", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+
+		rejectButton = new MButton(rejectCaption).withStyleName(ValoTheme.BUTTON_DANGER).withListener(event -> {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.rejectConfirmation, "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						reject();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to reject", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
 		});
-		completeButton = new MButton("Complete").withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			try {
-				complete();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to complete", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+
+		completeButton = new MButton(completeCaption).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", completeConfirmation, "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						complete();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to complete", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
 		});
 
 		skipButton = new MButton("Skip").withListener(event -> {
-			try {
-				skip();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to skip", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to skip", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to skip this task?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						skip();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to skip", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to skip", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
 		});
 
 		assignButton = new MButton("Assign").withListener(event -> {
-			try {
-				assign(null);
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to assign", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to assign this task to someone else?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						assign(null);
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to assign", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+
 		});
 
 		MHorizontalLayout taskButtonsLayout = new MHorizontalLayout();
-		if (isApprovalForm()) {
+		if (
+
+		isApprovalForm()) {
 			taskButtonsLayout.addComponents(approveButton, rejectButton, skipButton, assignButton);
 		} else {
 			taskButtonsLayout.addComponents(completeButton, skipButton, assignButton);
@@ -133,18 +184,18 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	private void reject() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
 		onReject(taskData, getEntity());
-		userTask.complete(taskData);
+		getUserTask().complete(taskData);
 		onPostReject(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.REJECTED, userTask, getEntity());
+		notifyGxTaskActionListeners(GxTaskAction.REJECTED, getUserTask(), getEntity());
 		closePopup();
 	}
 
 	private void approve() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
 		onApprove(taskData, getEntity());
-		userTask.complete(taskData);
+		getUserTask().complete(taskData);
 		onPostApprove(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.APPROVED, userTask, getEntity());
+		notifyGxTaskActionListeners(GxTaskAction.APPROVED, getUserTask(), getEntity());
 		closePopup();
 	}
 
@@ -161,9 +212,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 			assigneeForm.setSavedHandler(holder -> {
 				GxAssignee assignee = holder.getAssignee();
 				try {
-					userTask.assign(assignee.getUsername());
+					getUserTask().assign(assignee.getUsername());
 					GxUserTaskForm.this.onPostAssign(assignee, getEntity());
-					notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, userTask, getEntity());
+					notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
 					assigneeForm.closePopup();
 					closePopup();
 				} catch (GxAssignTaskException ex) {
@@ -178,9 +229,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	@Transactional
 	private void skip() throws GxSkipTaskException {
 		onSkip(getEntity());
-		userTask.skip();
+		getUserTask().skip();
 		onPostSkip(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.SKIPPED, userTask, getEntity());
+		notifyGxTaskActionListeners(GxTaskAction.SKIPPED, getUserTask(), getEntity());
 		closePopup();
 	}
 
@@ -188,9 +239,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	private void complete() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
 		onComplete(taskData, getEntity());
-		userTask.complete(taskData);
+		getUserTask().complete(taskData);
 		onPostComplete(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.COMPLETED, userTask, getEntity());
+		notifyGxTaskActionListeners(GxTaskAction.COMPLETED, getUserTask(), getEntity());
 		closePopup();
 	}
 
@@ -204,11 +255,12 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	@Override
 	public Window openInModalPopup() {
 		Window popup = super.openInModalPopup();
-		approveButton.setVisible(userTask != null);
-		rejectButton.setVisible(userTask != null);
-		completeButton.setVisible(userTask != null);
-		skipButton.setVisible(userTask != null && userTask.isSkipable());
-		assignButton.setVisible(userTask != null);
+		approveButton.setVisible(getUserTask() != null);
+		rejectButton.setVisible(getUserTask() != null);
+		completeButton.setVisible(getUserTask() != null);
+		skipButton.setVisible(getUserTask() != null && getUserTask().isSkipable());
+		assignButton.setVisible(getUserTask() != null && isAssignable());
+		completeButton.setCaption(completeCaption);
 		return popup;
 	}
 
@@ -255,5 +307,22 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	}
 
 	protected abstract boolean isApprovalForm();
+
+	protected abstract boolean isAssignable();
+
+	public GxUserTask getUserTask() {
+		assert userTask != null;
+		return userTask;
+	}
+
+	@Override
+	protected String popupHeight() {
+		return "350px";
+	}
+
+	@Override
+	protected String popupWidth() {
+		return "450px";
+	}
 
 }

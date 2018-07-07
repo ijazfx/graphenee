@@ -582,6 +582,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 			Iterator<Component> iterator = cc.iterator();
 			while (iterator.hasNext()) {
 				Component component = iterator.next();
+				if (component.isReadOnly())
+					continue;
 				if (component instanceof AbstractTextField) {
 					AbstractTextField abstractTextField = (AbstractTextField) component;
 					abstractTextField.selectAll();
