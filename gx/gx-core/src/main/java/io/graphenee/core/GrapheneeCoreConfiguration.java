@@ -65,10 +65,10 @@ public class GrapheneeCoreConfiguration {
 
 	@PostConstruct
 	public void init() {
-		if (grapheneeProperties.isFlywayMigrationEnabled()) {
+		if (grapheneeProperties().isFlywayMigrationEnabled()) {
 			Flyway flyway = new Flyway();
 			flyway.setDataSource(grapheneeDataSource);
-			flyway.setLocations("classpath:db/graphenee/migration/" + grapheneeProperties.driverName());
+			flyway.setLocations("classpath:db/graphenee/migration/" + grapheneeProperties().driverName());
 			flyway.setTable("graphenee_schema_version");
 			flyway.setBaselineOnMigrate(true);
 			flyway.setBaselineVersionAsString("0");
@@ -128,7 +128,7 @@ public class GrapheneeCoreConfiguration {
 		return DataSourceUtil.createDataSource(gp.getUrl(), gp.getUsername(), gp.getPassword());
 	}
 
-	public GrapheneeProperties grapheneeProperties() {
+	private GrapheneeProperties grapheneeProperties() {
 		if (grapheneeProperties == null) {
 			grapheneeProperties = new GrapheneeProperties().withUrl(dbUrl).withUsername(dbUsername).withPassword(dbPassword).withFlywayMigrationEnabled(true);
 		}

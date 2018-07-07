@@ -10,12 +10,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 import com.vaadin.server.Page;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -44,6 +46,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	public Set<GxTaskActionListener> listeners = new HashSet<>();
 
+	private String completeButtonCaption = "Complete";
+
 	@Override
 	protected boolean eagerValidationEnabled() {
 		return true;
@@ -60,68 +64,98 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		this.userTask = userTask;
 	}
 
+	public void setCompleteButtonCaption(String completeButtonCaption) {
+		this.completeButtonCaption = completeButtonCaption;
+	}
+
 	@Override
 	protected void addButtonsToFooter(HorizontalLayout footer) {
 		approveButton = new MButton("Approve").withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			try {
-				approve();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to approve", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to approve this task?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						approve();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to approve", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+
 		});
+
 		rejectButton = new MButton("Reject").withStyleName(ValoTheme.BUTTON_DANGER).withListener(event -> {
-			try {
-				reject();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to reject", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to reject this task?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						reject();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to reject", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
 		});
-		completeButton = new MButton("Complete").withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			try {
-				complete();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to complete", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+
+		completeButton = new MButton(completeButtonCaption).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to complete this task?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						complete();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to complete", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
 		});
 
 		skipButton = new MButton("Skip").withListener(event -> {
-			try {
-				skip();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to skip", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to skip", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to skip this task?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						skip();
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to skip", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to skip", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
 		});
 
 		assignButton = new MButton("Assign").withListener(event -> {
-			try {
-				assign(null);
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			} catch (Exception ex) {
-				GxNotification.closable("Unable to assign", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to assign this task to someone else?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						assign(null);
+					} catch (GxTaskException ex) {
+						GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to assign", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+
 		});
 
 		MHorizontalLayout taskButtonsLayout = new MHorizontalLayout();
-		if (isApprovalForm()) {
+		if (
+
+		isApprovalForm()) {
 			taskButtonsLayout.addComponents(approveButton, rejectButton, skipButton, assignButton);
 		} else {
 			taskButtonsLayout.addComponents(completeButton, skipButton, assignButton);
@@ -209,6 +243,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		completeButton.setVisible(userTask != null);
 		skipButton.setVisible(userTask != null && userTask.isSkipable());
 		assignButton.setVisible(userTask != null);
+		completeButton.setCaption(completeButtonCaption);
 		return popup;
 	}
 

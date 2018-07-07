@@ -24,7 +24,8 @@ public class GxUserTask implements TaskSummary {
 
 	private TaskSummary task;
 	WeakReference<TaskService> taskService;
-	private Task internalTask;
+	private volatile Task internalTask;
+	private String taskOwner;
 
 	public GxUserTask(TaskService taskService, TaskSummary task) {
 		this.taskService = new WeakReference<>(taskService);
@@ -131,6 +132,10 @@ public class GxUserTask implements TaskSummary {
 		return task.getActualOwner();
 	}
 
+	public User getTaskInitiator() {
+		return getTask().getPeopleAssignments().getTaskInitiator();
+	}
+
 	@Override
 	public User getCreatedBy() {
 		return task.getCreatedBy();
@@ -190,13 +195,17 @@ public class GxUserTask implements TaskSummary {
 
 	public Task getTask() {
 		if (internalTask == null)
-			internalTask = getTaskService().getTaskById(getId());
+			synchronized (GxUserTask.this) {
+				if (internalTask == null) {
+					internalTask = getTaskService().getTaskById(getId());
+				}
+			}
 		return internalTask;
 	}
 
 	public void complete(Map<String, Object> taskData) throws GxCompleteTaskException {
 		try {
-			getTaskService().complete(getId(), getActualOwnerId(), taskData);
+			getTaskService().complete(getId(), getTaskOwner(), taskData);
 		} catch (Exception ex) {
 			throw new GxCompleteTaskException("Faild to complete task", ex);
 		}
@@ -204,7 +213,7 @@ public class GxUserTask implements TaskSummary {
 
 	public void skip() throws GxSkipTaskException {
 		try {
-			getTaskService().skip(getId(), getActualOwnerId());
+			getTaskService().skip(getId(), getTaskOwner());
 		} catch (Exception ex) {
 			throw new GxSkipTaskException("Failed to skip task", ex);
 		}
@@ -212,10 +221,23 @@ public class GxUserTask implements TaskSummary {
 
 	public void assign(String assignToUserId) throws GxAssignTaskException {
 		try {
-			getTaskService().delegate(getId(), getActualOwnerId(), assignToUserId);
+			getTaskService().delegate(getId(), getTaskOwner(), assignToUserId);
 		} catch (Exception ex) {
 			throw new GxAssignTaskException("Failed to assign task", ex);
 		}
+	}
+
+	public String getTaskOwner() {
+		User user = getActualOwner();
+		if (user == null)
+			user = getTaskInitiator();
+		if (user != null)
+			return user.getId();
+		return taskOwner;
+	}
+
+	public void setTaskOwner(String taskOwner) {
+		this.taskOwner = taskOwner;
 	}
 
 }
