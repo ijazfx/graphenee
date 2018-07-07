@@ -33,7 +33,7 @@ public class GrapheneeJbpmConfiguration {
 
 	@Bean("jbpmEntityManagerFactory")
 	public EntityManagerFactory jbpmEntityManagerFactory() {
-		DataSource ds = DataSourceUtil.createXaDataSource("dbJbpm", "jdbc:h2:~/jbpm/jbpmdb", "sa", null, 5);
+		DataSource ds = DataSourceUtil.createXaDataSource("dbJbpm", "jdbc:h2:/Users/fijaz/jbpm/jbpm.db", "sa", null, 5);
 		// DataSource ds =
 		// DataSourceBuilder.create().url("jdbc:h2:~/jbpm/jbpmdb").username("sa").password(null).driverClassName("org.h2.Driver").build();
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();

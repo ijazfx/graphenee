@@ -87,6 +87,10 @@
 			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.graphenee</groupId>
+			<artifactId>gx-vaadin</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
