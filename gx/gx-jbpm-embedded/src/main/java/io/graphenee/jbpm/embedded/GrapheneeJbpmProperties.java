@@ -17,23 +17,44 @@ package io.graphenee.jbpm.embedded;
 
 import java.io.Serializable;
 
+import javax.sql.DataSource;
+
+import io.graphenee.core.util.DataSourceUtil;
+
 public class GrapheneeJbpmProperties implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String dbFilePath = "~/jbpm/jbpm.db";
+	private String h2dbFilePath = System.getProperty("user.home") + "/jbpm/jbpm.db";
+	private DataSource dataSource;
 
-	public String getDbFilePath() {
-		return dbFilePath;
-	}
-
-	public void setDbFilePath(String dbFilePath) {
-		this.dbFilePath = dbFilePath;
-	}
-
-	public GrapheneeJbpmProperties withDbFilePath(String dbFilePath) {
-		setDbFilePath(dbFilePath);
+	public GrapheneeJbpmProperties withH2dbFilePath(String dbFilePath) {
+		setH2dbFilePath(dbFilePath);
 		return this;
+	}
+
+	public DataSource getDataSource() {
+		if (dataSource == null) {
+			synchronized (GrapheneeJbpmProperties.class) {
+				if (dataSource == null) {
+					dataSource = DataSourceUtil.createDataSource("jdbc:h2:" + getH2dbFilePath(), "sa", null);
+				}
+				return dataSource;
+			}
+		}
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public String getH2dbFilePath() {
+		return h2dbFilePath;
+	}
+
+	public void setH2dbFilePath(String h2dbFilePath) {
+		this.h2dbFilePath = h2dbFilePath;
 	}
 
 }

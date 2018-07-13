@@ -75,7 +75,7 @@ import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
 
 @Service
-@Transactional("transactionManager")
+@Transactional
 public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
@@ -504,6 +504,7 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setFullNameNative(entity.getFullNameNative());
 		bean.setIsLocked(entity.getIsLocked());
 		bean.setIsActive(entity.getIsActive());
+		bean.setIsPasswordChangeRequired(entity.getIsPasswordChangeRequired());
 		bean.setIsProtected(entity.getIsProtected());
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
@@ -600,6 +601,7 @@ public class GxDataServiceImpl implements GxDataService {
 		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
+	@Transactional
 	private GxSecurityPolicyBean makeSecurityPolicyBean(GxSecurityPolicy entity) {
 		GxSecurityPolicyBean bean = new GxSecurityPolicyBean();
 		bean.setOid(entity.getOid());
