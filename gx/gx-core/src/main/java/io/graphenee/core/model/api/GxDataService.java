@@ -161,6 +161,10 @@ public interface GxDataService {
 
 	GxSavedQueryBean save(GxSavedQueryBean bean);
 
+	GxEmailTemplateBean findEmailTemplateByTemplateNameActive(String templateName);
+
+	GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace);
+
 	List<GxEmailTemplateBean> findEmailTemplate();
 
 	List<GxEmailTemplateBean> findEmailTemplateByNamespace(GxNamespaceBean namespace);

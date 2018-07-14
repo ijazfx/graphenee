@@ -13,28 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.core;
+package io.graphenee.jbpm.embedded;
 
 import java.io.Serializable;
 
 import javax.sql.DataSource;
 
-public class GrapheneeProperties implements Serializable {
+import io.graphenee.core.util.DataSourceUtil;
+
+public class GrapheneeJbpmProperties implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private boolean flywayMigrationEnabled;
+
+	private String h2dbFilePath = System.getProperty("user.home") + "/jbpm/jbpm.db";
 	private DataSource dataSource;
-	private String dbVendor;
 
-	public boolean isFlywayMigrationEnabled() {
-		return flywayMigrationEnabled;
-	}
-
-	public void setFlywayMigrationEnabled(boolean flywayMigrationEnabled) {
-		this.flywayMigrationEnabled = flywayMigrationEnabled;
+	public GrapheneeJbpmProperties withH2dbFilePath(String dbFilePath) {
+		setH2dbFilePath(dbFilePath);
+		return this;
 	}
 
 	public DataSource getDataSource() {
+		if (dataSource == null) {
+			synchronized (GrapheneeJbpmProperties.class) {
+				if (dataSource == null) {
+					dataSource = DataSourceUtil.createDataSource("jdbc:h2:" + getH2dbFilePath(), "sa", null);
+				}
+				return dataSource;
+			}
+		}
 		return dataSource;
 	}
 
@@ -42,23 +49,12 @@ public class GrapheneeProperties implements Serializable {
 		this.dataSource = dataSource;
 	}
 
-	public GrapheneeProperties withFlywayMigrationEnabled(boolean flywayMigrationEnabled) {
-		setFlywayMigrationEnabled(flywayMigrationEnabled);
-		return this;
+	public String getH2dbFilePath() {
+		return h2dbFilePath;
 	}
 
-	public void setDBVendor(String dbVendor) {
-		this.dbVendor = dbVendor;
-	}
-
-	public String getDBVendor() {
-		return dbVendor;
-	}
-
-	public GrapheneeProperties withDBVendor(String dbVendor) {
-		setDBVendor(dbVendor);
-		return this;
-
+	public void setH2dbFilePath(String h2dbFilePath) {
+		this.h2dbFilePath = h2dbFilePath;
 	}
 
 }

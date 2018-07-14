@@ -49,6 +49,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 
 	// ComboBox namespaceFault;
 	MTextField securityGroupName;
+	MTextField securityGroupDescription;
 	MTextField priority;
 	MCheckBox isActive;
 
@@ -66,11 +67,14 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 		// namespaceFault.setRequired(true);
 
 		securityGroupName = new MTextField("Group Name").withRequired(true);
+		securityGroupName.setMaxLength(50);
+		securityGroupDescription = new MTextField("Group Description").withRequired(true);
+		securityGroupDescription.setMaxLength(200);
 		priority = new MTextField("Priority").withRequired(true);
 		isActive = new MCheckBox("Is Active?");
 		// form.addComponents(namespaceFault, securityGroupName, priority,
 		// isActive);
-		form.addComponents(securityGroupName, priority, isActive);
+		form.addComponents(securityGroupName, securityGroupDescription, priority, isActive);
 
 		// users
 		userAccountCollectionFault = new TwinColSelect();

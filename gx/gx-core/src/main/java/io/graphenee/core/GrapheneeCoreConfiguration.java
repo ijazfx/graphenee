@@ -15,62 +15,46 @@
  *******************************************************************************/
 package io.graphenee.core;
 
-import javax.persistence.EntityManagerFactory;
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.transaction.PlatformTransactionManager;
+
+import io.graphenee.core.util.DataSourceUtil;
 
 @Configuration
-@ConditionalOnClass({ GrapheneeProperties.class, DataSource.class })
+@ConditionalOnClass(DataSource.class)
 @ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
-@EnableJpaRepositories(entityManagerFactoryRef = "gxemf", transactionManagerRef = "gxtm")
-// @EnableJpaRepositories(entityManagerFactoryRef = "gxemf")
 @ComponentScan("io.graphenee.core")
 public class GrapheneeCoreConfiguration {
 
+	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
+	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
+
 	@Autowired
-	public GrapheneeCoreConfiguration(GrapheneeProperties grapheneeProperties, DataSource dataSource) {
-		if (grapheneeProperties.isFlywayMigrationEnabled()) {
+	DataSource dataSource;
+
+	@Value("${flyway.enabled:false}")
+	boolean flywayEnabled;
+
+	@PostConstruct
+	public void init() {
+		if (flywayEnabled) {
 			Flyway flyway = new Flyway();
 			flyway.setDataSource(dataSource);
-			String dbVendor = grapheneeProperties.getDBVendor();
-			if (dbVendor == null)
-				dbVendor = "postgresql";
+			String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
 			flyway.setLocations("classpath:db/graphenee/migration/" + dbVendor);
 			flyway.setTable("graphenee_schema_version");
 			flyway.setBaselineOnMigrate(true);
 			flyway.setBaselineVersionAsString("0");
 			flyway.migrate();
 		}
-	}
-
-	@Bean(name = "gxemf")
-	public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
-		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-		em.setPersistenceUnitName("persistence.graphenee");
-		em.setPackagesToScan(GrapheneeCoreConfiguration.class.getPackage().getName());
-		em.setDataSource(dataSource);
-		em.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-		em.afterPropertiesSet();
-		return em.getObject();
-	}
-
-	@Bean(name = "gxtm")
-	public PlatformTransactionManager transactionManager(DataSource dataSource) {
-		JpaTransactionManager transactionManager = new JpaTransactionManager();
-		transactionManager.setEntityManagerFactory(entityManagerFactory(dataSource));
-		return transactionManager;
 	}
 
 }

@@ -71,6 +71,8 @@ public class GxSecurityGroupListPanel extends AbstractEntityListPanel<GxSecurity
 
 	@Override
 	protected List<GxSecurityGroupBean> fetchEntities() {
+		if (namespaceBean != null)
+			return dataService.findSecurityGroupByNamespace(namespaceBean);
 		return dataService.findSecurityGroup();
 	}
 
@@ -84,7 +86,7 @@ public class GxSecurityGroupListPanel extends AbstractEntityListPanel<GxSecurity
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "securityGroupName", "priority", "isActive" };
+		return new String[] { "securityGroupName", "securityGroupDescription", "priority", "isActive" };
 	}
 
 	@Override
@@ -93,7 +95,7 @@ public class GxSecurityGroupListPanel extends AbstractEntityListPanel<GxSecurity
 	}
 
 	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
 		namespaceComboBox = new ComboBox("Namespace");
 		namespaceComboBox.setTextInputAllowed(false);
 		namespaceComboBox.addItems(dataService.findNamespace());
@@ -107,9 +109,9 @@ public class GxSecurityGroupListPanel extends AbstractEntityListPanel<GxSecurity
 	@Override
 	protected void preEdit(GxSecurityGroupBean item) {
 		if (item.getOid() == null) {
-			GxNamespaceBean namespaceBean = (GxNamespaceBean) namespaceComboBox.getValue();
-			if (namespaceBean != null) {
-				item.setNamespaceFault(BeanFault.beanFault(namespaceBean.getOid(), namespaceBean));
+			GxNamespaceBean selectedNamespaceBean = namespaceBean != null ? namespaceBean : (GxNamespaceBean) namespaceComboBox.getValue();
+			if (selectedNamespaceBean != null) {
+				item.setNamespaceFault(BeanFault.beanFault(selectedNamespaceBean.getOid(), selectedNamespaceBean));
 			}
 		}
 	}

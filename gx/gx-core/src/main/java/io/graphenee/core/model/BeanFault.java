@@ -19,7 +19,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BeanFault<ID, T> {
+
+	private static final Logger L = LoggerFactory.getLogger(BeanFault.class);
 
 	private boolean isFault = true;
 	private ID oid;
@@ -95,6 +100,7 @@ public class BeanFault<ID, T> {
 					lastHashcode = bean.hashCode();
 				}
 			} catch (Exception ex) {
+				L.warn(ex.getMessage());
 				bean = null;
 			}
 		}

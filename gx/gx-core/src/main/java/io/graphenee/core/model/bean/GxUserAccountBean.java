@@ -17,11 +17,22 @@ package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 
 public class GxUserAccountBean implements Serializable {
+
+	private static final Logger L = LoggerFactory.getLogger(GxUserAccountBean.class);
 
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
@@ -48,6 +59,9 @@ public class GxUserAccountBean implements Serializable {
 	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 
 	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
+
+	private Map<String, Set<String>> grantMap;
+	private Map<String, Set<String>> revokeMap;
 
 	public Integer getOid() {
 		return oid;
@@ -261,6 +275,140 @@ public class GxUserAccountBean implements Serializable {
 	@Override
 	public String toString() {
 		return username;
+	}
+
+	public boolean canDoAction(String resource, String action) {
+		return canDoAction(resource, action, false);
+	}
+
+	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+		if (forceRefresh) {
+			loadMaps();
+		}
+
+		String checkForResource = resource != null ? resource.toLowerCase() : "all";
+		String actionLowerCase = action.toLowerCase();
+		Set<String> grantActionSet = grantMap().get(checkForResource);
+		Set<String> revokeActionSet = revokeMap().get(checkForResource);
+
+		if (revokeActionSet != null && revokeActionSet.contains(actionLowerCase))
+			return false;
+
+		if (revokeActionSet != null && revokeActionSet.contains("all"))
+			return false;
+
+		if (grantActionSet != null && grantActionSet.contains(actionLowerCase))
+			return true;
+
+		if (grantActionSet != null && grantActionSet.contains("all"))
+			return true;
+
+		if (resource.contains("/")) {
+			resource = resource.substring(0, resource.lastIndexOf('/') - 1);
+			return canDoAction(resource, actionLowerCase, false);
+		}
+
+		grantActionSet = grantMap().get("all");
+		revokeActionSet = revokeMap().get("all");
+
+		if (revokeActionSet != null && revokeActionSet.contains("all"))
+			return false;
+
+		if (grantActionSet != null && grantActionSet.contains("all"))
+			return true;
+
+		return false;
+	}
+
+	protected Map<String, Set<String>> grantMap() {
+		if (grantMap == null) {
+			loadMaps();
+		}
+		return grantMap;
+	}
+
+	protected Map<String, Set<String>> revokeMap() {
+		if (revokeMap == null) {
+			loadMaps();
+		}
+		return revokeMap;
+	}
+
+	private void loadMaps() {
+		grantMap = new ConcurrentHashMap<>();
+		revokeMap = new ConcurrentHashMap<>();
+		TreeSet<GxSecurityPolicyDocumentBean> documents = new TreeSet<>(new Comparator<GxSecurityPolicyDocumentBean>() {
+
+			@Override
+			public int compare(GxSecurityPolicyDocumentBean doc1, GxSecurityPolicyDocumentBean doc2) {
+				return doc1.getSecurityPolicyBeanFault().getBean().getPriority().intValue() < doc2.getSecurityPolicyBeanFault().getBean().getPriority().intValue() ? -1 : 1;
+			}
+		});
+
+		getSecurityGroupCollectionFault().getBeans().forEach(group -> {
+			group.getSecurityPolicyCollectionFault().getBeans().forEach(policy -> {
+				if (policy.getDefaultSecurityPolicyDocumentBean() != null) {
+					documents.add(policy.getDefaultSecurityPolicyDocumentBean());
+				}
+			});
+		});
+
+		getSecurityPolicyCollectionFault().getBeans().forEach(policy -> {
+			if (policy.getDefaultSecurityPolicyDocumentBean() != null) {
+				documents.add(policy.getDefaultSecurityPolicyDocumentBean());
+			}
+		});
+
+		documents.forEach(document -> {
+			String documentJson = document.getDocumentJson();
+			String[] statements = documentJson.split("(;|\n)");
+			for (String statement : statements) {
+				String[] parts = statement.trim().toLowerCase().split("\\s");
+				if (parts.length == 4) {
+					String resourceName = parts[3];
+					// initialize action set for grants
+					Set<String> grantActionSet = grantMap.get(resourceName);
+					if (grantActionSet == null) {
+						grantActionSet = new HashSet<>();
+						grantMap.put(resourceName, grantActionSet);
+					}
+					// initialize action set for revokes
+					Set<String> revokeActionSet = revokeMap.get(resourceName);
+					if (revokeActionSet == null) {
+						revokeActionSet = new HashSet<>();
+						revokeMap.put(resourceName, revokeActionSet);
+					}
+					// update grants and revokes such that if statement starts
+					// with grant, add to grants map and remove from revokes map
+					// and if statement starts with revoke, add to revokes map
+					// and remove from grants map.
+					String[] actions = parts[1].split(",");
+					if (parts[0].equalsIgnoreCase("grant")) {
+						for (String action : actions) {
+							grantActionSet.add(action);
+							revokeActionSet.remove(action);
+						}
+					} else if (parts[0].equalsIgnoreCase("revoke")) {
+						for (String action : actions) {
+							revokeActionSet.add(action);
+							grantActionSet.remove(action);
+						}
+					} else {
+						L.warn(String.format("%s is not a valid permission type.", parts[0]));
+					}
+				} else {
+					L.warn(String.format("[%s] is not a valid statement.", statement));
+				}
+			}
+		});
+	}
+
+	public String getFullName() {
+		return String.format("%s %s", getFirstName() != null ? getFirstName().trim() : "", getLastName() != null ? getLastName().trim() : "").trim();
+	}
+
+	public String getLastNameFirstName() {
+		return String.format("%s %s", getLastName() != null ? getLastName().trim() : "", getFirstName() != null ? getFirstName().trim() : "").trim();
 	}
 
 }

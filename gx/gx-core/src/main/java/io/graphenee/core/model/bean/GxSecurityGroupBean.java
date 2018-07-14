@@ -40,13 +40,15 @@ public class GxSecurityGroupBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
 	private String securityGroupName;
+	private String securityGroupDescription;
 	private Integer priority = 0;
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
 	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
 	private BeanCollectionFault<GxUserAccountBean> userAccountCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
-	private Map<String, Set<String>> permissionMap;
+	private Map<String, Set<String>> grantMap;
+	private Map<String, Set<String>> revokeMap;
 
 	public Integer getOid() {
 		return oid;
@@ -62,6 +64,14 @@ public class GxSecurityGroupBean implements Serializable {
 
 	public void setSecurityGroupName(String securityGroupName) {
 		this.securityGroupName = securityGroupName;
+	}
+
+	public String getSecurityGroupDescription() {
+		return securityGroupDescription;
+	}
+
+	public void setSecurityGroupDescription(String securityGroupDescription) {
+		this.securityGroupDescription = securityGroupDescription;
 	}
 
 	public Integer getPriority() {
@@ -147,101 +157,116 @@ public class GxSecurityGroupBean implements Serializable {
 	}
 
 	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
-		if (forceRefresh)
-			permissionMap = null;
+		if (forceRefresh) {
+			loadMaps();
+		}
+
 		String checkForResource = resource != null ? resource.toLowerCase() : "all";
 		String actionLowerCase = action.toLowerCase();
-		Set<String> actionSet = permissionMap().get(checkForResource);
-		if (actionSet != null)
-			return actionSet.contains(actionLowerCase) || actionSet.contains("all") || actionSet.contains("*");
-		String[] parts = resource.split("::");
-		// parts[0] = fqcn or fully qualified component/class name
-		// parts[1] = method name, variable name, property name etc.
-		// remove last part of fqcn;
-		if (parts[0].contains(".")) {
-			checkForResource = parts[0].substring(0, parts[0].lastIndexOf('.'));
-			if (canDoAction(checkForResource, action, false))
-				return true;
+		Set<String> grantActionSet = grantMap().get(checkForResource);
+		Set<String> revokeActionSet = revokeMap().get(checkForResource);
+
+		if (revokeActionSet != null && revokeActionSet.contains(actionLowerCase))
+			return false;
+
+		if (revokeActionSet != null && revokeActionSet.contains("all"))
+			return false;
+
+		if (grantActionSet != null && grantActionSet.contains(actionLowerCase))
+			return true;
+
+		if (grantActionSet != null && grantActionSet.contains("all"))
+			return true;
+
+		if (resource.contains("/")) {
+			resource = resource.substring(0, resource.lastIndexOf('/') - 1);
+			return canDoAction(resource, actionLowerCase, false);
 		}
-		checkForResource = parts[0] + "::*";
-		actionSet = permissionMap().get(checkForResource);
-		if (actionSet != null)
-			return actionSet.contains(actionLowerCase) || actionSet.contains("all") || actionSet.contains("*");
 
-		checkForResource = parts[0] + "::all";
-		actionSet = permissionMap().get(checkForResource);
-		if (actionSet != null)
-			return actionSet.contains(actionLowerCase) || actionSet.contains("all") || actionSet.contains("*");
+		grantActionSet = grantMap().get("all");
+		revokeActionSet = revokeMap().get("all");
 
-		checkForResource = "all";
-		actionSet = permissionMap().get(checkForResource);
-		if (actionSet != null)
-			return actionSet.contains(actionLowerCase) || actionSet.contains("all") || actionSet.contains("*");
+		if (revokeActionSet != null && revokeActionSet.contains("all"))
+			return false;
+
+		if (grantActionSet != null && grantActionSet.contains("all"))
+			return true;
 
 		return false;
 	}
 
-	protected Map<String, Set<String>> permissionMap() {
-		if (permissionMap == null) {
-			permissionMap = new ConcurrentHashMap<>();
-			TreeSet<GxSecurityPolicyDocumentBean> documents = new TreeSet<>(new Comparator<GxSecurityPolicyDocumentBean>() {
+	protected Map<String, Set<String>> grantMap() {
+		if (grantMap == null) {
+			loadMaps();
+		}
+		return grantMap;
+	}
 
-				@Override
-				public int compare(GxSecurityPolicyDocumentBean doc1, GxSecurityPolicyDocumentBean doc2) {
-					return doc1.getSecurityPolicyBeanFault().getBean().getPriority().intValue() < doc2.getSecurityPolicyBeanFault().getBean().getPriority().intValue() ? -1 : 1;
-				}
-			});
-			getSecurityPolicyCollectionFault().getBeans().forEach(policy -> {
-				if (policy.getDefaultSecurityPolicyDocumentBean() != null) {
-					documents.add(policy.getDefaultSecurityPolicyDocumentBean());
-				}
-			});
+	protected Map<String, Set<String>> revokeMap() {
+		if (revokeMap == null) {
+			loadMaps();
+		}
+		return revokeMap;
+	}
 
-			documents.forEach(document -> {
-				String documentJson = document.getDocumentJson();
-				String[] statements = documentJson.split(";");
-				for (String statement : statements) {
-					String[] parts = statement.trim().split("\\s");
-					if (parts.length == 4) {
-						// parts[0] = grant/revoke
+	private void loadMaps() {
+		grantMap = new ConcurrentHashMap<>();
+		revokeMap = new ConcurrentHashMap<>();
+		TreeSet<GxSecurityPolicyDocumentBean> documents = new TreeSet<>(new Comparator<GxSecurityPolicyDocumentBean>() {
 
-						// parts[1] = all/* list of actions e.g.
-						// create,update,delete etc.
-						// parts[2] = on
-						// parts[3] = resource name that consists of package
-						// name
-						// and class, entity, component, method etc.
-						// e.g.
-						// io.graphenee.gx.core.GxSecurityPanel::methodName
-						// e.g.
-						// io.graphenee.gx.core.GxSecurityPanel::componentName
+			@Override
+			public int compare(GxSecurityPolicyDocumentBean doc1, GxSecurityPolicyDocumentBean doc2) {
+				return doc1.getSecurityPolicyBeanFault().getBean().getPriority().intValue() < doc2.getSecurityPolicyBeanFault().getBean().getPriority().intValue() ? -1 : 1;
+			}
+		});
+		getSecurityPolicyCollectionFault().getBeans().forEach(policy -> {
+			if (policy.getDefaultSecurityPolicyDocumentBean() != null) {
+				documents.add(policy.getDefaultSecurityPolicyDocumentBean());
+			}
+		});
 
-						String resourceName = parts[3].toLowerCase();
-						Set<String> actionSet = permissionMap.get(resourceName);
-						if (actionSet == null) {
-							actionSet = new HashSet<>();
-							permissionMap.put(resourceName, actionSet);
+		documents.forEach(document -> {
+			String documentJson = document.getDocumentJson();
+			String[] statements = documentJson.split(";");
+			for (String statement : statements) {
+				String[] parts = statement.trim().toLowerCase().split("\\s");
+				if (parts.length == 4) {
+					String resourceName = parts[3];
+					// initialize action set for grants
+					Set<String> grantActionSet = grantMap.get(resourceName);
+					if (grantActionSet == null) {
+						grantActionSet = new HashSet<>();
+						grantMap.put(resourceName, grantActionSet);
+					}
+					// initialize action set for revokes
+					Set<String> revokeActionSet = revokeMap.get(resourceName);
+					if (revokeActionSet == null) {
+						revokeActionSet = new HashSet<>();
+						revokeMap.put(resourceName, revokeActionSet);
+					}
+					// update grants and revokes such that if statement starts
+					// with grant, add to grants map and remove from revokes map
+					// and if statement starts with revoke, add to revokes map
+					// and remove from grants map.
+					String[] actions = parts[1].split(",");
+					if (parts[0].equalsIgnoreCase("grant")) {
+						for (String action : actions) {
+							grantActionSet.add(action);
+							revokeActionSet.remove(action);
 						}
-
-						String[] actions = parts[1].split(",");
-						if (parts[0].equalsIgnoreCase("grant")) {
-							for (String action : actions) {
-								actionSet.add(action.toLowerCase());
-							}
-						} else if (parts[0].equalsIgnoreCase("revoke")) {
-							for (String action : actions) {
-								actionSet.remove(action.toLowerCase());
-							}
-						} else {
-							L.warn(String.format("%s is not a valid permission type.", parts[0]));
+					} else if (parts[0].equalsIgnoreCase("revoke")) {
+						for (String action : actions) {
+							revokeActionSet.add(action);
+							grantActionSet.remove(action);
 						}
 					} else {
-						L.warn(String.format("[%s] is not a valid statement.", statement));
+						L.warn(String.format("%s is not a valid permission type.", parts[0]));
 					}
+				} else {
+					L.warn(String.format("[%s] is not a valid statement.", statement));
 				}
-			});
-		}
-		return permissionMap;
+			}
+		});
 	}
 
 }

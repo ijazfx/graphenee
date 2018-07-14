@@ -15,17 +15,9 @@
  *******************************************************************************/
 package io.graphenee.gx.workshop.test;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import io.graphenee.core.GrapheneeProperties;
 
 @Configuration
 public class LocalizerConfiguration {
-
-	@Bean
-	public GrapheneeProperties grapheneeProperties() {
-		return new GrapheneeProperties().withFlywayMigrationEnabled(true);
-	}
 
 }

@@ -113,6 +113,7 @@ public abstract class AbstractDashboardUI extends UI {
 			poweredByLabel.setStyleName("powered-by");
 			poweredByLabel.setContentMode(ContentMode.HTML);
 			poweredByLabel.setValue("Powered by <strong>Graphenee&trade;</strong>");
+			poweredByLabel.setVisible(dashboardSetup().shouldShowPoweredByGraphenee());
 
 			rootLayout.addComponent(poweredByLabel);
 

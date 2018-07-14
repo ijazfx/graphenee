@@ -57,6 +57,9 @@ public class GxSecurityPolicy implements Serializable {
 	@Column(name = "security_policy_name")
 	private String securityPolicyName;
 
+	@Column(name = "security_policy_description")
+	private String securityPolicyDescription;
+
 	// bi-directional many-to-many association to GxSecurityGroup
 	@ManyToMany
 	@JoinTable(name = "gx_security_group_security_policy_join", joinColumns = { @JoinColumn(name = "oid_security_policy") }, inverseJoinColumns = {
@@ -118,6 +121,14 @@ public class GxSecurityPolicy implements Serializable {
 
 	public void setSecurityPolicyName(String securityPolicyName) {
 		this.securityPolicyName = securityPolicyName;
+	}
+
+	public String getSecurityPolicyDescription() {
+		return securityPolicyDescription;
+	}
+
+	public void setSecurityPolicyDescription(String securityPolicyDescription) {
+		this.securityPolicyDescription = securityPolicyDescription;
 	}
 
 	public List<GxSecurityGroup> getGxSecurityGroups() {

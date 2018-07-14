@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Graphenee</name>
 	<build>
@@ -100,6 +100,7 @@
 		<module>gx-security-vaadin</module>
 		<module>gx-core-vaadin</module>
 		<module>gx-aws</module>
+		<module>gx-jbpm-embedded</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
@@ -321,6 +322,11 @@
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
 				<version>6.4.0.jre8</version>
+			</dependency>
+			<dependency>
+				<groupId>io.graphenee</groupId>
+				<artifactId>gx-jbpm-embedded</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

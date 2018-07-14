@@ -74,4 +74,14 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 	public void setGender(GenderEnum gender) {
 	}
 
+	@Override
+	public boolean canDoAction(String resource, String action) {
+		return getUser().canDoAction(resource, action);
+	}
+
+	@Override
+	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+		return getUser().canDoAction(resource, action, forceRefresh);
+	}
+
 }

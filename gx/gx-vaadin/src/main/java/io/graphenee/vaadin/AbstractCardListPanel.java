@@ -63,6 +63,10 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 	private CssLayout contentLayout;
 
+	private boolean rootLayoutMargin = false;
+
+	private MVerticalLayout rootLayout;
+
 	public AbstractCardListPanel(Class<T> entityClass) {
 		this.entityClass = entityClass;
 		contentLayout = new CssLayout();
@@ -91,15 +95,15 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 			setStyleName(ValoTheme.PANEL_BORDERLESS);
 			setCaption(panelCaption());
 
-			MVerticalLayout layout = new MVerticalLayout();
+			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin);
 			if (shouldShowToolbar()) {
 				toolbar = buildToolbar();
-				layout.addComponent(toolbar);
+				rootLayout.addComponent(toolbar);
 			}
-			layout.addComponent(contentLayout);
-			layout.setExpandRatio(contentLayout, 1);
-			layout.setHeightUndefined();
-			setContent(layout);
+			rootLayout.addComponent(contentLayout);
+			rootLayout.setExpandRatio(contentLayout, 1);
+			rootLayout.setHeightUndefined();
+			setContent(rootLayout);
 
 			postBuild();
 			isBuilt = true;
@@ -358,4 +362,30 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	protected void localizeRecursively(Locale locale, Component component) {
 		VaadinUtils.localizeRecursively(component);
 	}
+
+	public AbstractCardListPanel<T> withMargin(boolean margins) {
+		this.rootLayoutMargin = margins;
+		if (rootLayout != null)
+			rootLayout.setMargin(margins);
+		return this;
+	}
+
+	public void showMargin() {
+		rootLayoutMargin = true;
+		rootLayout.setMargin(true);
+	}
+
+	public void hideMargin() {
+		rootLayoutMargin = false;
+		rootLayout.setMargin(false);
+	}
+
+	public void showToolbar() {
+		toolbar.setVisible(true);
+	}
+
+	public void hideToolbar() {
+		toolbar.setVisible(false);
+	}
+
 }

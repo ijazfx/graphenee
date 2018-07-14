@@ -118,13 +118,13 @@
 
 	<packaging>war</packaging>
 	<groupId>io.graphenee</groupId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.2-SNAPSHOT</version>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>io.graphenee</groupId>
 				<artifactId>gx</artifactId>
-				<version>0.1.1-SNAPSHOT</version>
+				<version>0.1.2-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

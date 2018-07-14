@@ -27,6 +27,8 @@ import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.AbstractSingleComponentContainer;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
@@ -147,6 +149,56 @@ public class VaadinUtils {
 		if (locale == null || localizer() == null)
 			return key;
 		return localizer().getPluralValue(locale, key);
+	}
+
+	public static void applyStyleRecursively(MenuItem component, String style) {
+		if (component == null)
+			return;
+		component.setStyleName(component.getStyleName() + " " + style);
+		if (component.hasChildren()) {
+			component.getChildren().forEach(child -> {
+				applyStyleRecursively(child, style);
+			});
+		}
+	}
+
+	public static void applyStyleRecursively(Component component, String style) {
+		if (component == null)
+			return;
+		component.setStyleName(component.getStyleName() + " " + style);
+		if (component instanceof MenuBar) {
+			((MenuBar) component).getItems().forEach(menuItem -> {
+				applyStyleRecursively(menuItem, style);
+			});
+		}
+		if (component instanceof TabSheet) {
+			TabSheet ts = (TabSheet) component;
+			for (int i = 0; i < ts.getComponentCount(); i++) {
+				Tab tab = ts.getTab(i);
+				applyStyleRecursively(tab.getComponent(), style);
+			}
+		}
+		if (component instanceof CustomComponent) {
+			((CustomComponent) component).iterator().forEachRemaining(child -> {
+				applyStyleRecursively(child, style);
+			});
+		}
+		if (component instanceof AbstractComponentContainer) {
+			((AbstractComponentContainer) component).iterator().forEachRemaining(child -> {
+				applyStyleRecursively(child, style);
+			});
+		}
+		if (component instanceof AbstractOrderedLayout) {
+			((AbstractOrderedLayout) component).iterator().forEachRemaining(child -> {
+				applyStyleRecursively(child, style);
+			});
+		}
+		if (component instanceof AbstractSingleComponentContainer) {
+			applyStyleRecursively(((AbstractSingleComponentContainer) component).getContent(), style);
+		}
+		if (component instanceof AbstractSingleComponentContainer) {
+			applyStyleRecursively(((AbstractSingleComponentContainer) component).getContent(), style);
+		}
 	}
 
 }

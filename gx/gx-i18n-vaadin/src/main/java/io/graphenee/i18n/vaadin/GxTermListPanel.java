@@ -49,6 +49,8 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 	private GxNamespaceBean selectedNamespace;
 	private GxSupportedLocaleBean selectedSupportedLocale;
 
+	private ComboBox namespaceComboBox;
+
 	public GxTermListPanel() {
 		super(GxTermBean.class);
 	}
@@ -87,8 +89,8 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 	}
 
 	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
-		ComboBox namespaceComboBox = new ComboBox("Namespace");
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
+		namespaceComboBox = new ComboBox("Namespace");
 		namespaceComboBox.addItems(dataService.findNamespace());
 		namespaceComboBox.addValueChangeListener(event -> {
 			selectedNamespace = (GxNamespaceBean) event.getProperty().getValue();
@@ -118,6 +120,11 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 			entity.setSupportedLocaleFault(null);
 		}
 		super.onAddButtonClick(entity);
+	}
+
+	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
+		this.selectedNamespace = namespaceBean;
+		namespaceComboBox.setVisible(namespaceBean == null);
 	}
 
 }

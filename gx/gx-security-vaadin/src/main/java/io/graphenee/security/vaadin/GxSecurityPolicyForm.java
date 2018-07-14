@@ -55,6 +55,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
 	// ComboBox namespaceFault;
 	MTextField securityPolicyName;
+	MTextField securityPolicyDescription;
 	MTextField priority;
 	MCheckBox isActive;
 	ComboBox securityPolicyDocumentComboBox;
@@ -82,6 +83,9 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		// namespaceFault.setRequired(true);
 
 		securityPolicyName = new MTextField("Policy Name").withRequired(true);
+		securityPolicyName.setMaxLength(50);
+		securityPolicyDescription = new MTextField("Policy Description").withRequired(true);
+		securityPolicyDescription.setMaxLength(200);
 		priority = new MTextField("Priority").withRequired(true);
 		isActive = new MCheckBox("Is Active?");
 
@@ -166,7 +170,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
 		// form.addComponents(namespaceFault, securityPolicyName, priority,
 		// isActive, documentLayout, jsonDocumentTextArea);
-		form.addComponents(securityPolicyName, priority, isActive, documentLayout, jsonDocumentTextArea);
+		form.addComponents(securityPolicyName, securityPolicyDescription, priority, isActive, documentLayout, jsonDocumentTextArea);
 
 		// users
 		userAccountCollectionFault = new TwinColSelect();
