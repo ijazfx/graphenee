@@ -43,9 +43,6 @@ public class GrapheneeJbpmConfiguration {
 	@Autowired(required = false)
 	GrapheneeJbpmProperties grapheneeJbpmProperties;
 
-	@Autowired(required = false)
-	DataSource dataSource;
-
 	@Value("${flyway.enabled:false}")
 	boolean flywayEnabled;
 

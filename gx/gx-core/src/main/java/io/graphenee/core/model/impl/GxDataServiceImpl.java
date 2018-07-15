@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,12 +24,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
@@ -73,6 +80,7 @@ import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
+import io.graphenee.core.util.TRCalenderUtil;
 
 @Service
 @Transactional
@@ -116,6 +124,67 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxEmailTemplateRepository emailTemplateRepository;
+
+	@Autowired
+	PlatformTransactionManager transactionManager;
+
+	@PostConstruct
+	public void initialize() {
+		TransactionTemplate tran = new TransactionTemplate(transactionManager);
+		tran.execute(new TransactionCallback<Void>() {
+
+			@Override
+			public Void doInTransaction(TransactionStatus status) {
+				GxUserAccount admin = userAccountRepo.findByUsername("admin");
+				if (admin == null) {
+					admin = new GxUserAccount();
+					admin.setUsername("admin");
+					admin.setPassword("change_on_install");
+					admin.setIsActive(true);
+					admin.setIsProtected(true);
+				}
+
+				String namespaceName = "io.graphenee.system";
+				GxNamespace namespace = namespaceRepo.findByNamespace(namespaceName);
+				GxSecurityGroup adminGroup = securityGroupRepo.findAllBySecurityGroupNameAndGxNamespaceNamespace("Admin", namespaceName);
+				if (adminGroup == null) {
+					adminGroup = new GxSecurityGroup();
+					adminGroup.setGxNamespace(namespace);
+					adminGroup.setSecurityGroupName("Admin");
+					adminGroup.setIsActive(true);
+					adminGroup.setIsProtected(true);
+					adminGroup.setPriority(-1);
+					adminGroup.setSecurityGroupDescription("-- Auto Generated --");
+				}
+
+				admin.getGxSecurityGroups().add(adminGroup);
+
+				GxSecurityPolicy adminPolicy = securityPolicyRepo.findAllBySecurityPolicyNameAndGxNamespaceNamespace("Admin Policy", namespaceName);
+				if (adminPolicy == null) {
+					adminPolicy = new GxSecurityPolicy();
+					adminPolicy.setGxNamespace(namespace);
+					adminPolicy.setSecurityPolicyDescription("-- Auto Generated --");
+					adminPolicy.setIsActive(true);
+					adminPolicy.setIsProtected(true);
+
+					GxSecurityPolicyDocument document = new GxSecurityPolicyDocument();
+					document.setIsDefault(true);
+					document.setDocumentJson("grant all on all;");
+					document.setTag(TRCalenderUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
+					adminPolicy.getGxSecurityPolicyDocuments().add(document);
+
+					adminGroup.getGxSecurityPolicies().add(adminPolicy);
+				} else {
+					if (!adminGroup.getGxSecurityPolicies().contains(adminPolicy))
+						adminGroup.getGxSecurityPolicies().add(adminPolicy);
+				}
+
+				userAccountRepo.save(admin);
+				return null;
+			}
+		});
+
+	}
 
 	@Override
 	public List<GxGenderBean> findGender() {
