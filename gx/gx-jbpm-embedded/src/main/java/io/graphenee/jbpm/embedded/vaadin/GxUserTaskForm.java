@@ -1,6 +1,5 @@
 package io.graphenee.jbpm.embedded.vaadin;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,100 +72,69 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	public void setCompleteCaptionAndMessage(String caption, String message) {
 		this.completeCaption = caption;
 		this.completeConfirmation = message;
+		if (completeButton != null)
+			completeButton.setCaption(caption);
 	}
 
 	public void setApproveCaptionAndMessage(String caption, String message) {
 		this.approveCaption = caption;
 		this.approveConfirmation = message;
+		if (approveButton != null)
+			approveButton.setCaption(caption);
 	}
 
 	public void setRejectCaptionAndMessage(String caption, String message) {
 		this.rejectCaption = caption;
 		this.rejectConfirmation = message;
+		if (rejectButton != null)
+			rejectButton.setCaption(caption);
 	}
 
 	@Override
 	protected void addButtonsToFooter(HorizontalLayout footer) {
 		approveButton = new MButton(approveCaption).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.approveConfirmation, "Yes", "No", dlg -> {
-				if (dlg.isConfirmed()) {
-					try {
-						approve();
-					} catch (GxTaskException ex) {
-						GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					} catch (Exception ex) {
-						GxNotification.closable("Unable to approve", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					}
-				}
-			});
-
+			try {
+				approve();
+			} catch (GxCompleteTaskException ex) {
+				GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+				L.error(ex.getMessage());
+			}
 		});
 
 		rejectButton = new MButton(rejectCaption).withStyleName(ValoTheme.BUTTON_DANGER).withListener(event -> {
-			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.rejectConfirmation, "Yes", "No", dlg -> {
-				if (dlg.isConfirmed()) {
-					try {
-						reject();
-					} catch (GxTaskException ex) {
-						GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					} catch (Exception ex) {
-						GxNotification.closable("Unable to reject", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					}
-				}
-			});
+			try {
+				reject();
+			} catch (GxCompleteTaskException ex) {
+				GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+				L.error(ex.getMessage());
+			}
 		});
 
 		completeButton = new MButton(completeCaption).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			ConfirmDialog.show(UI.getCurrent(), "Confirmation", completeConfirmation, "Yes", "No", dlg -> {
-				if (dlg.isConfirmed()) {
-					try {
-						complete();
-					} catch (GxTaskException ex) {
-						GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					} catch (Exception ex) {
-						GxNotification.closable("Unable to complete", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					}
-				}
-			});
+			try {
+				complete();
+			} catch (GxCompleteTaskException ex) {
+				GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+				L.error(ex.getMessage());
+			}
 		});
 
 		skipButton = new MButton("Skip").withListener(event -> {
-			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to skip this task?", "Yes", "No", dlg -> {
-				if (dlg.isConfirmed()) {
-					try {
-						skip();
-					} catch (GxTaskException ex) {
-						GxNotification.closable("Unable to skip", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					} catch (Exception ex) {
-						GxNotification.closable("Unable to skip", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					}
-				}
-			});
+			try {
+				skip();
+			} catch (GxTaskException ex) {
+				GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+				L.error(ex.getMessage());
+			}
 		});
 
 		assignButton = new MButton("Assign").withListener(event -> {
-			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to assign this task to someone else?", "Yes", "No", dlg -> {
-				if (dlg.isConfirmed()) {
-					try {
-						assign(null);
-					} catch (GxTaskException ex) {
-						GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					} catch (Exception ex) {
-						GxNotification.closable("Unable to assign", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-						L.error(ex.getMessage());
-					}
-				}
-			});
-
+			try {
+				assign(null);
+			} catch (GxTaskException ex) {
+				GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+				L.error(ex.getMessage());
+			}
 		});
 
 		MHorizontalLayout taskButtonsLayout = new MHorizontalLayout();
@@ -183,66 +151,117 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	private void reject() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
-		onReject(taskData, getEntity());
-		getUserTask().complete(taskData);
-		onPostReject(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.REJECTED, getUserTask(), getEntity());
-		closePopup();
+		if (onReject(taskData, getEntity())) {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.rejectConfirmation, "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						getUserTask().complete(taskData);
+						onPostReject(getEntity());
+						notifyGxTaskActionListeners(GxTaskAction.REJECTED, getUserTask(), getEntity());
+						closePopup();
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to reject", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+		} else {
+			closePopup();
+		}
 	}
 
 	private void approve() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
-		onApprove(taskData, getEntity());
-		getUserTask().complete(taskData);
-		onPostApprove(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.APPROVED, getUserTask(), getEntity());
-		closePopup();
+		if (onApprove(taskData, getEntity())) {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.approveConfirmation, "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						getUserTask().complete(taskData);
+						onPostApprove(getEntity());
+						notifyGxTaskActionListeners(GxTaskAction.APPROVED, getUserTask(), getEntity());
+						closePopup();
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to approve", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+		} else {
+			closePopup();
+		}
 	}
 
 	@Transactional
 	private void assign(String assignToUserId) throws GxAssignTaskException {
-		List<GxAssignee> assignees = new ArrayList<>();
-		onAssign(assignees, getEntity());
-		if (assignees.isEmpty()) {
-			throw new GxAssignTaskException("No assignees are available to assign this task");
-		} else {
+		List<GxAssignee> assignees = onAssign(getEntity());
+		if (assignees != null && !assignees.isEmpty()) {
 			GxSelectAssigneeForm assigneeForm = new GxSelectAssigneeForm();
 			assigneeForm.setEntity(GxAssigneeHolder.class, new GxAssigneeHolder());
 			assigneeForm.initializeWithAssignees(assignees);
 			assigneeForm.setSavedHandler(holder -> {
-				GxAssignee assignee = holder.getAssignee();
-				try {
-					getUserTask().assign(assignee.getUsername());
-					GxUserTaskForm.this.onPostAssign(assignee, getEntity());
-					notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
-					assigneeForm.closePopup();
-					closePopup();
-				} catch (GxAssignTaskException ex) {
-					GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-					L.error(ex.getMessage());
-				}
+				ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to assign this task to " + holder.getAssignee(), "Yes", "No", dlg -> {
+					if (dlg.isConfirmed()) {
+						GxAssignee assignee = holder.getAssignee();
+						try {
+							getUserTask().assign(assignee.getUsername());
+							GxUserTaskForm.this.onPostAssign(assignee, getEntity());
+							notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
+							assigneeForm.closePopup();
+							closePopup();
+						} catch (GxAssignTaskException ex) {
+							GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
+							L.error(ex.getMessage());
+						}
+					}
+				});
 			});
 			assigneeForm.openInModalPopup();
+		} else {
+			GxNotification.closable(null, "No potential assignees are available to handle this task.", Type.WARNING_MESSAGE).show(Page.getCurrent());
 		}
 	}
 
 	@Transactional
 	private void skip() throws GxSkipTaskException {
-		onSkip(getEntity());
-		getUserTask().skip();
-		onPostSkip(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.SKIPPED, getUserTask(), getEntity());
-		closePopup();
+		if (onSkip(getEntity())) {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to skip this task?", "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						getUserTask().skip();
+						onPostSkip(getEntity());
+						notifyGxTaskActionListeners(GxTaskAction.SKIPPED, getUserTask(), getEntity());
+						closePopup();
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to skip", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+		} else {
+			closePopup();
+		}
 	}
 
 	@Transactional
 	private void complete() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
-		onComplete(taskData, getEntity());
-		getUserTask().complete(taskData);
-		onPostComplete(getEntity());
-		notifyGxTaskActionListeners(GxTaskAction.COMPLETED, getUserTask(), getEntity());
-		closePopup();
+		if (onComplete(taskData, getEntity())) {
+			ConfirmDialog.show(UI.getCurrent(), "Confirmation", completeConfirmation, "Yes", "No", dlg -> {
+				if (dlg.isConfirmed()) {
+					try {
+						getUserTask().complete(taskData);
+						onPostComplete(getEntity());
+						notifyGxTaskActionListeners(GxTaskAction.COMPLETED, getUserTask(), getEntity());
+						closePopup();
+					} catch (Exception ex) {
+						GxNotification.closable("Unable to complete", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+						L.error(ex.getMessage());
+					}
+				}
+			});
+		} else {
+			closePopup();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -264,31 +283,36 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		return popup;
 	}
 
-	protected void onApprove(Map<String, Object> taskData, T entity) throws GxCompleteTaskException {
+	protected boolean onApprove(Map<String, Object> taskData, T entity) throws GxCompleteTaskException {
+		return true;
 	}
 
 	protected void onPostApprove(T entity) throws GxCompleteTaskException {
 	}
 
-	protected void onReject(Map<String, Object> taskData, T entity) throws GxCompleteTaskException {
+	protected boolean onReject(Map<String, Object> taskData, T entity) throws GxCompleteTaskException {
+		return true;
 	}
 
 	protected void onPostReject(T entity) throws GxCompleteTaskException {
 	}
 
-	protected void onComplete(Map<String, Object> taskData, T entity) throws GxCompleteTaskException {
+	protected boolean onComplete(Map<String, Object> taskData, T entity) throws GxCompleteTaskException {
+		return true;
 	}
 
 	protected void onPostComplete(T entity) throws GxCompleteTaskException {
 	}
 
-	protected void onAssign(List<GxAssignee> assignee, T entity) throws GxAssignTaskException {
+	protected List<GxAssignee> onAssign(T entity) throws GxAssignTaskException {
+		return null;
 	}
 
 	protected void onPostAssign(GxAssignee assignee, T entity) throws GxAssignTaskException {
 	}
 
-	protected void onSkip(T entity) throws GxSkipTaskException {
+	protected boolean onSkip(T entity) throws GxSkipTaskException {
+		return true;
 	}
 
 	protected void onPostSkip(T entity) throws GxSkipTaskException {
