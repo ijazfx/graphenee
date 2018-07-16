@@ -84,7 +84,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
 		securityPolicyName = new MTextField("Policy Name").withRequired(true);
 		securityPolicyName.setMaxLength(50);
-		securityPolicyDescription = new MTextField("Policy Description").withRequired(true);
+		securityPolicyDescription = new MTextField("Policy Description");
 		securityPolicyDescription.setMaxLength(200);
 		priority = new MTextField("Priority").withRequired(true);
 		isActive = new MCheckBox("Is Active?");

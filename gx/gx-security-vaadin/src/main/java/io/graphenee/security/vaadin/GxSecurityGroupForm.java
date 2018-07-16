@@ -68,7 +68,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 
 		securityGroupName = new MTextField("Group Name").withRequired(true);
 		securityGroupName.setMaxLength(50);
-		securityGroupDescription = new MTextField("Group Description").withRequired(true);
+		securityGroupDescription = new MTextField("Group Description");
 		securityGroupDescription.setMaxLength(200);
 		priority = new MTextField("Priority").withRequired(true);
 		isActive = new MCheckBox("Is Active?");
