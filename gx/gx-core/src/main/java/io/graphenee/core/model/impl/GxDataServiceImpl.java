@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -82,7 +81,7 @@ import io.graphenee.core.util.CryptoUtil;
 import io.graphenee.core.util.TRCalenderUtil;
 
 @Service
-@DependsOn("grapheneeCore")
+// @DependsOn("grapheneeCore")
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
 
