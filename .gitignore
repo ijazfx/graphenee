@@ -11,6 +11,5 @@ target
 .DS_Store
 *.scss.cache
 .designer
-.settings
 .factorypath
 .metadata
