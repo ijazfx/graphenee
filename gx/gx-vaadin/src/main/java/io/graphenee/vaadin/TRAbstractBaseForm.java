@@ -356,10 +356,14 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c, String... nestedProperties) {
+		preBinding(entity);
 		MBeanFieldGroup<T> beanFieldGroup = BeanBinder.bind(entity, c, nestedProperties);
 		beanFieldGroup.setValidateAllProperties(false);
 		postBinding(entity);
 		return beanFieldGroup;
+	}
+
+	protected void preBinding(T entity) {
 	}
 
 	protected void postBinding(T entity) {
