@@ -20,6 +20,12 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.ViewProvider;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.spring.annotation.UIScope;
+import com.vaadin.ui.Image;
+
 import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.vaadin.SystemView;
 import io.graphenee.i18n.vaadin.LocalizationView;
@@ -30,11 +36,6 @@ import io.graphenee.vaadin.TRSimpleMenuItem;
 import io.graphenee.vaadin.domain.DashboardUser;
 import io.graphenee.vaadin.domain.MockUser;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
-import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.ViewProvider;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.spring.annotation.UIScope;
-import com.vaadin.ui.Image;
 
 @Service
 @UIScope

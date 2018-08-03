@@ -41,14 +41,20 @@ public interface GxDataService {
 
 	List<GxTermBean> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale);
 
-	List<GxTermBean> findTermByLocale(Locale locale);
+	List<GxTermBean> findDistinctTermByNamespaceAndSupportedLocale(GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale);
 
+	List<GxTermBean> findTermByLocale(Locale locale);
+	
+	List<GxTermBean> findTermByTermKey(String termKey);
+	
 	List<GxTermBean> findTermByTermKeyAndLocale(String termKey, Locale locale);
 
 	GxTermBean findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale);
 
 	GxTermBean save(GxTermBean entity);
-
+	
+	void deleteTermByTermKey(String termKey);
+	
 	void delete(GxTermBean entity);
 
 	GxSupportedLocaleBean save(GxSupportedLocaleBean entity);
