@@ -197,7 +197,7 @@ public class KeyValueWrapper {
 		}
 	}
 
-	public Short shortForKeyPaht(String keyPath) {
+	public Short shortForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
 			if (value instanceof Number) {
