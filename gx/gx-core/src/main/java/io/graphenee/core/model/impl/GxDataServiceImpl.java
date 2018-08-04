@@ -183,8 +183,8 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Transactional
 	@Override
-	public void deleteTermByTermKey(String termKey) {
-		termRepo.deleteByTermKey(termKey);
+	public void deleteTermByTermKeyAndOidNameSpace(String termKey, Integer oidNamespace) {
+		termRepo.deleteByTermKeyAndOidNameSpace(termKey, oidNamespace);
 	}
 
 	private GxTermBean makeTermBean(GxTerm entity) {

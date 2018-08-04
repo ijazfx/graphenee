@@ -62,7 +62,7 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 
 	@Override
 	protected boolean onDeleteEntity(GxTermBean entity) {
-		dataService.deleteTermByTermKey(entity.getTermKey());
+		dataService.deleteTermByTermKeyAndOidNameSpace(entity.getTermKey(), entity.getNamespaceFault().getOid());
 		return true;
 	}
 

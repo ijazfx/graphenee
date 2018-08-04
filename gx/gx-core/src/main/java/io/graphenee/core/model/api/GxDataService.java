@@ -53,7 +53,7 @@ public interface GxDataService {
 
 	GxTermBean save(GxTermBean entity);
 	
-	void deleteTermByTermKey(String termKey);
+	void deleteTermByTermKeyAndOidNameSpace(String termKey,  Integer oidNamespace);
 	
 	void delete(GxTermBean entity);
 

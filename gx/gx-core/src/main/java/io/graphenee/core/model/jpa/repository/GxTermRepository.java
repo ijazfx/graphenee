@@ -38,8 +38,8 @@ public interface GxTermRepository extends JpaRepository<GxTerm, Integer> {
 	
 	
 	@Modifying
-	@Query("Delete from GxTerm t WHERE t.termKey = :termKey")
-	void deleteByTermKey(@Param("termKey") String termKey);
+	@Query("Delete from GxTerm t WHERE t.termKey = :termKey AND t.gxNamespace.oid = :oidNamespace")
+	void deleteByTermKeyAndOidNameSpace(@Param("termKey") String termKey, @Param("oidNamespace") Integer oidNamespace);
 	
 	Page<GxTerm> findByGxNamespaceOid(Pageable pageable, Integer oidNamespace);
 

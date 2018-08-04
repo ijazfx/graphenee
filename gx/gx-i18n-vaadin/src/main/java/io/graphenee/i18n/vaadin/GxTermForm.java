@@ -110,6 +110,9 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 		namespaceFaultComboBox.setRequired(true);
 		namespaceFaultComboBox.addValueChangeListener(event -> {
 			namespaceBean = (GxNamespaceBean) event.getProperty().getValue();
+			for (GxTermBean gxTermBeans : availableTerms) {
+				gxTermBeans.setNamespaceFault(BeanFault.beanFault(namespaceBean.getOid(), namespaceBean));
+			}
 			if (namespaceBean != null) {
 				if (!isBinding())
 					getEntity().setNamespaceFault(
