@@ -1242,11 +1242,13 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setOid(entity.getOid());
 		bean.setBccList(entity.getBccList());
 		bean.setBody(entity.getBody());
+		bean.setSmsBody(entity.getSmsBody());
 		bean.setCcList(entity.getCcList());
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsProtected(entity.getIsProtected());
 		bean.setSubject(entity.getSubject());
 		bean.setTemplateName(entity.getTemplateName());
+		bean.setTemplateCode(entity.getTemplateCode());
 
 		if (entity.getGxNamespace() != null) {
 			if (namespace != null) {
@@ -1271,11 +1273,13 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceBeanFault().getOid()));
 		entity.setBccList(bean.getBccList());
 		entity.setBody(bean.getBody());
+		entity.setSmsBody(bean.getSmsBody());
 		entity.setCcList(bean.getCcList());
 		entity.setIsActive(bean.getIsActive());
 		entity.setIsProtected(bean.getIsProtected());
 		entity.setSubject(bean.getSubject());
 		entity.setTemplateName(bean.getTemplateName());
+		entity.setTemplateCode(bean.getTemplateCode());
 		return entity;
 	}
 

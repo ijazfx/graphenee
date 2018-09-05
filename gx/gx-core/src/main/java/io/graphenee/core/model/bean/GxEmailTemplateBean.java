@@ -25,12 +25,13 @@ public class GxEmailTemplateBean implements Serializable {
 
 	private Integer oid;
 	private String bccList;
-	private String body;
+	private String body, smsBody;
 	private String ccList;
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
 	private String subject;
 	private String templateName;
+	private String templateCode;
 	private BeanFault<Integer, GxNamespaceBean> namespaceBeanFault;
 
 	public Integer getOid() {
@@ -55,6 +56,14 @@ public class GxEmailTemplateBean implements Serializable {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public String getSmsBody() {
+		return smsBody;
+	}
+
+	public void setSmsBody(String smsBody) {
+		this.smsBody = smsBody;
 	}
 
 	public String getCcList() {
@@ -95,6 +104,14 @@ public class GxEmailTemplateBean implements Serializable {
 
 	public void setTemplateName(String templateName) {
 		this.templateName = templateName;
+	}
+
+	public String getTemplateCode() {
+		return templateCode;
+	}
+
+	public void setTemplateCode(String templateCode) {
+		this.templateCode = templateCode;
 	}
 
 	public BeanFault<Integer, GxNamespaceBean> getNamespaceBeanFault() {

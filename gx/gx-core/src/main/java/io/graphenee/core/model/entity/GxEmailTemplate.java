@@ -27,43 +27,48 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-
 /**
  * The persistent class for the gx_email_template database table.
  * 
  */
 @Entity
-@Table(name="gx_email_template")
-@NamedQuery(name="GxEmailTemplate.findAll", query="SELECT g FROM GxEmailTemplate g")
+@Table(name = "gx_email_template")
+@NamedQuery(name = "GxEmailTemplate.findAll", query = "SELECT g FROM GxEmailTemplate g")
 public class GxEmailTemplate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
-	@Column(name="bcc_list")
+	@Column(name = "bcc_list")
 	private String bccList;
 
 	private String body;
 
-	@Column(name="cc_list")
+	@Column(name = "sms_body")
+	private String smsBody;
+
+	@Column(name = "cc_list")
 	private String ccList;
 
-	@Column(name="is_active")
+	@Column(name = "is_active")
 	private Boolean isActive;
 
-	@Column(name="is_protected")
+	@Column(name = "is_protected")
 	private Boolean isProtected;
 
 	private String subject;
 
-	@Column(name="template_name")
+	@Column(name = "template_name")
 	private String templateName;
+
+	@Column(name = "template_code")
+	private String templateCode;
 
 	//bi-directional many-to-one association to GxNamespace
 	@ManyToOne
-	@JoinColumn(name="oid_namespace")
+	@JoinColumn(name = "oid_namespace")
 	private GxNamespace gxNamespace;
 
 	public GxEmailTemplate() {
@@ -91,6 +96,14 @@ public class GxEmailTemplate implements Serializable {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public String getSmsBody() {
+		return smsBody;
+	}
+
+	public void setSmsBody(String smsBody) {
+		this.smsBody = smsBody;
 	}
 
 	public String getCcList() {
@@ -131,6 +144,14 @@ public class GxEmailTemplate implements Serializable {
 
 	public void setTemplateName(String templateName) {
 		this.templateName = templateName;
+	}
+
+	public String getTemplateCode() {
+		return templateCode;
+	}
+
+	public void setTemplateCode(String templateCode) {
+		this.templateCode = templateCode;
 	}
 
 	public GxNamespace getGxNamespace() {

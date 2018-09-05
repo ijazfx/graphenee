@@ -141,4 +141,8 @@ public class GxEmailTemplateListPanel extends AbstractEntityListPanel<GxEmailTem
 		super.onAddButtonClick(entity);
 	}
 
+	public void initializeWithNamespace(GxNamespaceBean namespace) {
+		this.namespace = namespace;
+	}
+
 }
