@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.validation.groups.Default;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.vaadin.viritin.BeanBinder;
 import org.vaadin.viritin.MBeanFieldGroup;
 import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
@@ -278,27 +279,9 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		this.eagerValidation = eagerValidation;
 	}
 
-	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T entity) {
-		T clone = entity;
-		// try {
-		// // clone = entityClass.newInstance();
-		// // BeanUtilsBean.getInstance().getConvertUtils().register(false,
-		// // true, 0);
-		// // BeanUtilsBean.getInstance().copyProperties(clone, entity);
-		// // BeanUtils.copyProperties(clone, entity);
-		// } catch (Exception e) {
-		// // failed to clone so fall back. This though does not harm the
-		// // data in the original container as only call to save method
-		// // persists new values.
-		// clone = entity;
-		// }
-		return this.setEntity(clone);
-	}
-
-	@Deprecated
-	public MBeanFieldGroup<T> setEntity(T entity) {
+	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T originalEntity) {
 		lazyInit();
-		this.entity = entity;
+		this.entity = cloneEntity(entityClass, originalEntity);
 		if (entity != null) {
 			setCompositionRoot(createContent());
 			if (isBound()) {
@@ -334,6 +317,22 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 			setVisible(false);
 			return null;
 		}
+	}
+
+	private T cloneEntity(Class<T> entityClass, T originalEntity) {
+		BeanUtilsBean.getInstance().getConvertUtils().register(false, true, 0);
+		try {
+			return (T) BeanUtilsBean.getInstance().cloneBean(originalEntity);
+		} catch (Exception e) {
+			return originalEntity;
+		}
+	}
+
+	@Deprecated
+	public MBeanFieldGroup<T> setEntity(T originalEntity) {
+		if (originalEntity != null)
+			return this.setEntity((Class<T>) originalEntity.getClass(), originalEntity);
+		return this.setEntity(null, null);
 	}
 
 	protected Component getBindingComponent() {
