@@ -281,7 +281,9 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T originalEntity) {
 		lazyInit();
-		this.entity = cloneEntity(entityClass, originalEntity);
+		//		Cloning does not work for deep relationships to do not use it please!
+		//		this.entity = cloneEntity(entityClass, originalEntity);
+		this.entity = originalEntity;
 		if (entity != null) {
 			setCompositionRoot(createContent());
 			if (isBound()) {
@@ -322,7 +324,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	private T cloneEntity(Class<T> entityClass, T originalEntity) {
 		BeanUtilsBean.getInstance().getConvertUtils().register(false, true, 0);
 		try {
-			return (T) BeanUtilsBean.getInstance().cloneBean(originalEntity);
+			Object cloned = BeanUtilsBean.getInstance().cloneBean(originalEntity);
+			return (T) cloned;
 		} catch (Exception e) {
 			return originalEntity;
 		}
