@@ -149,7 +149,12 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		footer.addComponentAsFirst(taskButtonsLayout);
 	}
 
-	private void reject() throws GxCompleteTaskException {
+	/**
+	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.reject() in your implementation.
+	 * @throws GxCompleteTaskException
+	 */
+	@Transactional
+	protected void reject() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
 		if (onReject(taskData, getEntity())) {
 			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.rejectConfirmation, "Yes", "No", dlg -> {
@@ -170,7 +175,12 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		}
 	}
 
-	private void approve() throws GxCompleteTaskException {
+	/**
+	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.approve() in your implementation.
+	 * @throws GxCompleteTaskException
+	 */
+	@Transactional
+	protected void approve() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
 		if (onApprove(taskData, getEntity())) {
 			ConfirmDialog.show(UI.getCurrent(), "Confirmation", GxUserTaskForm.this.approveConfirmation, "Yes", "No", dlg -> {
@@ -191,15 +201,19 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		}
 	}
 
+	/**
+	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.assign(...) in your implementation.
+	 * @throws GxCompleteTaskException
+	 */
 	@Transactional
-	private void assign(String assignToUserId) throws GxAssignTaskException {
+	protected void assign(String assignToUserId) throws GxAssignTaskException {
 		List<GxAssignee> assignees = onAssign(getEntity());
 		if (assignees != null && !assignees.isEmpty()) {
 			GxSelectAssigneeForm assigneeForm = new GxSelectAssigneeForm();
 			assigneeForm.setEntity(GxAssigneeHolder.class, new GxAssigneeHolder());
 			assigneeForm.initializeWithAssignees(assignees);
 			assigneeForm.setSavedHandler(holder -> {
-				ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to assign this task to " + holder.getAssignee(), "Yes", "No", dlg -> {
+				ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Are you sure to assign the task to " + holder.getAssignee() + "?", "Yes", "No", dlg -> {
 					if (dlg.isConfirmed()) {
 						GxAssignee assignee = holder.getAssignee();
 						try {
@@ -221,8 +235,12 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		}
 	}
 
+	/**
+	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.skip() in your implementation.
+	 * @throws GxCompleteTaskException
+	 */
 	@Transactional
-	private void skip() throws GxSkipTaskException {
+	protected void skip() throws GxSkipTaskException {
 		if (onSkip(getEntity())) {
 			ConfirmDialog.show(UI.getCurrent(), "Confirmation", "Do you confirm your decision to skip this task?", "Yes", "No", dlg -> {
 				if (dlg.isConfirmed()) {
@@ -242,8 +260,12 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		}
 	}
 
+	/**
+	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.complete() in your implementation.
+	 * @throws GxCompleteTaskException
+	 */
 	@Transactional
-	private void complete() throws GxCompleteTaskException {
+	protected void complete() throws GxCompleteTaskException {
 		Map<String, Object> taskData = new HashMap<>();
 		if (onComplete(taskData, getEntity())) {
 			ConfirmDialog.show(UI.getCurrent(), "Confirmation", completeConfirmation, "Yes", "No", dlg -> {
@@ -327,7 +349,11 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	}
 
 	public static enum GxTaskAction {
-		APPROVED, REJECTED, COMPLETED, ASSIGNED, SKIPPED
+		APPROVED,
+		REJECTED,
+		COMPLETED,
+		ASSIGNED,
+		SKIPPED
 	}
 
 	protected abstract boolean isApprovalForm();

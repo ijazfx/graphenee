@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Window;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
 import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm.GxAssigneeHolder;
@@ -14,27 +13,27 @@ import io.graphenee.vaadin.TRAbstractForm;
 @SuppressWarnings("serial")
 public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 
-	ComboBox assignees;
+	ComboBox assignee;
 	private BeanItemContainer<GxAssignee> assigneeDataSource;
 
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
-		assignees = new ComboBox("Assignee");
+		assignee = new ComboBox("Assign to");
 		assigneeDataSource = new BeanItemContainer<>(GxAssignee.class);
-		assignees.setContainerDataSource(assigneeDataSource);
-		assignees.setItemCaptionPropertyId("fullName");
-		assignees.addValueChangeListener(event -> {
+		assignee.setContainerDataSource(assigneeDataSource);
+		assignee.setItemCaptionPropertyId("fullName");
+		assignee.addValueChangeListener(event -> {
 			if (!isBinding())
 				getEntity().setAssignee((GxAssignee) event.getProperty().getValue());
 		});
-		assignees.setRequired(true);
-		form.addComponent(assignees);
+		assignee.setRequired(true);
+		form.addComponent(assignee);
 	}
 
 	@Override
-	public Window openInModalPopup() {
-		setSaveCaption("Select");
-		return super.openInModalPopup();
+	protected void postBinding(GxAssigneeHolder entity) {
+		super.postBinding(entity);
+		getSaveButton().setCaption("Assign");
 	}
 
 	public void initializeWithAssignees(Collection<GxAssignee> assignees) {
@@ -49,7 +48,7 @@ public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 
 	@Override
 	protected String formTitle() {
-		return "Select Assignee...";
+		return "Assign Task";
 	}
 
 	@Override
