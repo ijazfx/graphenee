@@ -80,7 +80,7 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 	}
 
 	private FormLayout constructTemplateInfoForm() {
-		FormLayout templateInfoForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+		FormLayout templateInfoForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
 
 		templateName = new MTextField("Name").withRequired(true);
 		templateName.setMaxLength(50);
