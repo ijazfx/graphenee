@@ -48,7 +48,7 @@ public class GxAwsServiceImpl implements GxAwsService {
 
 	@Override
 	public String sendTransactionalSMSMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(awsCredentialProvider).build();
+		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion("eu-west-1").withCredentials(awsCredentialProvider).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
