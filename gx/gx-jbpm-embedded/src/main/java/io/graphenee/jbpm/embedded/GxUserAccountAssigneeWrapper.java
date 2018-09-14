@@ -50,4 +50,9 @@ public class GxUserAccountAssigneeWrapper implements GxAssignee {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return getFullName();
+	}
+
 }
