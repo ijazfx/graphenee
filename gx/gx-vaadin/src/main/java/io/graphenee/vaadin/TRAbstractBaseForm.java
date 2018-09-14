@@ -282,8 +282,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T originalEntity) {
 		lazyInit();
 		//		Cloning does not work for deep relationships to do not use it please!
-		//		this.entity = cloneEntity(entityClass, originalEntity);
-		this.entity = originalEntity;
+		this.entity = cloneEntity(entityClass, originalEntity);
+		//		this.entity = originalEntity;
 		if (entity != null) {
 			setCompositionRoot(createContent());
 			if (isBound()) {

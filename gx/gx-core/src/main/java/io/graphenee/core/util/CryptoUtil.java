@@ -33,6 +33,8 @@ public class CryptoUtil {
 	}
 
 	public static String decode(String input) {
+		if (input == null)
+			return input;
 		try {
 			byte[] decodedHex = Hex.decodeHex(input.toCharArray());
 			byte[] decodedString = Base64.decodeBase64(decodedHex);
@@ -43,6 +45,8 @@ public class CryptoUtil {
 	}
 
 	public static String createPasswordHash(String password) {
+		if (password == null)
+			return password;
 		try {
 			String hash = TRHashFactory.getInstance().createPasswordHash(password);
 			return Hex.encodeHexString(hash.getBytes());
