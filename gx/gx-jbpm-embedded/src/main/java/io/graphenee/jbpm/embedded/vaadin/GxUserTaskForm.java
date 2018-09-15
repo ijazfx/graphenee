@@ -151,7 +151,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	/**
 	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.reject() in your implementation.
-	 * @throws GxCompleteTaskException
+	 * @throws GxCompleteTaskException exception in case of failure
 	 */
 	@Transactional
 	protected void reject() throws GxCompleteTaskException {
@@ -177,7 +177,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	/**
 	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.approve() in your implementation.
-	 * @throws GxCompleteTaskException
+	 * @throws GxCompleteTaskException exception in case of failure
 	 */
 	@Transactional
 	protected void approve() throws GxCompleteTaskException {
@@ -203,7 +203,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	/**
 	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.assign(...) in your implementation.
-	 * @throws GxCompleteTaskException
+	 * @param assignToUserId the user id of the user to assign the task
+	 * @throws GxAssignTaskException exception in case of failure
 	 */
 	@Transactional
 	protected void assign(String assignToUserId) throws GxAssignTaskException {
@@ -237,7 +238,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	/**
 	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.skip() in your implementation.
-	 * @throws GxCompleteTaskException
+	 * @throws GxSkipTaskException exception in case of failure
 	 */
 	@Transactional
 	protected void skip() throws GxSkipTaskException {
@@ -262,7 +263,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	/**
 	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.complete() in your implementation.
-	 * @throws GxCompleteTaskException
+	 * @throws GxCompleteTaskException exception in case of failure
 	 */
 	@Transactional
 	protected void complete() throws GxCompleteTaskException {
