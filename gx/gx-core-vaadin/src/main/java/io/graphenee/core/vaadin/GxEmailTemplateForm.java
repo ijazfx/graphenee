@@ -86,7 +86,7 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 		templateName.setMaxLength(50);
 		templateName.setNullRepresentation(null);
 		templateCode = new MTextField("Code").withRequired(true);
-		templateCode.setMaxLength(10);
+		templateCode.setMaxLength(100);
 		templateCode.setNullRepresentation(null);
 		isActive = new MCheckBox("Is Active?");
 		templateInfoForm.addComponents(templateName, templateCode, isActive);

@@ -232,7 +232,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		if (entities.isEmpty()) {
 			contentLayout.removeAllComponents();
 			MPanel cardPanel = new MPanel().withStyleName("card-item");
-			cardPanel.setContent(new MVerticalLayout(new MLabel("No records found").withStyleName(ValoTheme.LABEL_NO_MARGIN)));
+			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)));
 			contentLayout.addComponent(cardPanel);
 		} else {
 			contentLayout.removeAllComponents();

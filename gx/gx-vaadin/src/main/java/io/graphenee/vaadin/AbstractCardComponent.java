@@ -78,6 +78,7 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 
 	public AbstractCardComponent<T> buildFooter(T item) {
 		HorizontalLayout footer = new HorizontalLayout();
+		footer.setMargin(false);
 		HorizontalLayout toolbar = getToolbar(entity);
 		addButtonsToFooter(toolbar);
 		if (shouldShowDeleteButton() || shouldShowEditButton() || toolbar.getComponentCount() > 1) {
@@ -106,7 +107,6 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 		if (shouldShowDeleteButton()) {
 			if (toolBar != null && deleteButton != null) {
 				deleteButton.setStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
-				deleteButton.addStyleName(ValoTheme.BUTTON_SMALL);
 				toolBar.addComponent(deleteButton);
 			}
 		}
@@ -117,7 +117,6 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 		if (shouldShowEditButton()) {
 			if (toolBar != null && editButton != null) {
 				editButton.setStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
-				editButton.addStyleName(ValoTheme.BUTTON_SMALL);
 				toolBar.addComponent(editButton);
 			}
 		}

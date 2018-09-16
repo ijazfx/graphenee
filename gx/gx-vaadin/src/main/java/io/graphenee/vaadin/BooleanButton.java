@@ -32,6 +32,11 @@ public abstract class BooleanButton extends Image {
 		});
 	}
 
+	public void setButtonState(boolean state) {
+		currentState = state;
+		updateImage();
+	}
+
 	private void updateImage() {
 		if (currentState) {
 			setSource(trueStateResource());

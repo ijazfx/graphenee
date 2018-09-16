@@ -125,7 +125,7 @@ public class GxEmailTemplateListPanel extends AbstractEntityListPanel<GxEmailTem
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "templateName", "subject" };
+		return new String[] { "templateCode", "templateName", "subject" };
 	}
 
 	@Override
