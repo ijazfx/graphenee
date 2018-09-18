@@ -117,7 +117,7 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 		bccList.setMaxLength(500);
 
 		senderEmailAddress = new MTextField("Sender").withRequired(true);
-		senderEmailAddress.setMaxLength(500);
+		senderEmailAddress.setMaxLength(200);
 
 		//		senderEmailAddress.setValue(SchoolDashboardUtils.getLoggedInSchool().getSenderEmailAddress());
 
