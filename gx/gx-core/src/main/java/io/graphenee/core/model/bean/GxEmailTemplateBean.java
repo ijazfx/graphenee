@@ -33,6 +33,7 @@ public class GxEmailTemplateBean implements Serializable {
 	private String templateName;
 	private String templateCode;
 	private BeanFault<Integer, GxNamespaceBean> namespaceBeanFault;
+	private String senderEmailAddress;
 
 	public Integer getOid() {
 		return oid;
@@ -151,6 +152,14 @@ public class GxEmailTemplateBean implements Serializable {
 		if (namespaceBeanFault != null)
 			return namespaceBeanFault.getBean().getNamespace();
 		return null;
+	}
+
+	public String getSenderEmailAddress() {
+		return senderEmailAddress;
+	}
+
+	public void setSenderEmailAddress(String senderEmailAddress) {
+		this.senderEmailAddress = senderEmailAddress;
 	}
 
 }

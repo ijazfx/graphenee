@@ -1249,6 +1249,7 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setSubject(entity.getSubject());
 		bean.setTemplateName(entity.getTemplateName());
 		bean.setTemplateCode(entity.getTemplateCode());
+		bean.setSenderEmailAddress(entity.getSenderEmailAddress());
 
 		if (entity.getGxNamespace() != null) {
 			if (namespace != null) {
@@ -1280,6 +1281,7 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setSubject(bean.getSubject());
 		entity.setTemplateName(bean.getTemplateName());
 		entity.setTemplateCode(bean.getTemplateCode());
+		entity.setSenderEmailAddress(bean.getSenderEmailAddress());
 		return entity;
 	}
 
