@@ -68,11 +68,17 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		// detail form
 		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
 		username = new MTextField("Username").withRequired(true);
+		username.setMaxLength(50);
 		firstName = new MTextField("First Name").withRequired(false);
+		firstName.setMaxLength(30);
 		lastName = new MTextField("Last Name").withRequired(false);
+		lastName.setMaxLength(30);
 		fullNameNative = new MTextField("Full Name (Native)").withRequired(false);
+		fullNameNative.setMaxLength(100);
 		email = new MTextField("Email").withRequired(false);
+		email.setMaxLength(200);
 		password = new MPasswordField("Password").withRequired(false);
+		password.setMaxLength(200);
 		isPasswordChangeRequired = new MCheckBox("Password Change Required?");
 		isLocked = new MCheckBox("Is Locked?");
 		isActive = new MCheckBox("Is Active?");

@@ -49,8 +49,11 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
 		termKey = new MTextField("Term Key").withRequired(true);
+		termKey.setMaxLength(100);
 		termSingular = new MTextField("Singular").withRequired(true);
+		termSingular.setMaxLength(1000);
 		termPlural = new MTextField("Plural");
+		termPlural.setMaxLength(1000);
 		isActive = new MCheckBox("Is Active?", true);
 
 		supportedLocaleComboBox = new ComboBox("Supported Locale");
