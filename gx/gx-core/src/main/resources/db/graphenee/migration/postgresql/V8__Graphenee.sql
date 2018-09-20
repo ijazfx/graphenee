@@ -1,1 +1,1 @@
-alter table gx_email_template add column sender_email_address varchar(200) not null;
+alter table gx_email_template add column sender_email_address varchar(200);
