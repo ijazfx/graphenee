@@ -48,6 +48,7 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 	MTextArea body, smsBody;
 	MTextArea ccList;
 	MTextArea bccList;
+	MTextField senderEmailAddress;
 
 	MCheckBox isActive;
 
@@ -115,7 +116,12 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 		bccList.setRows(2);
 		bccList.setMaxLength(500);
 
-		emailForm.addComponents(subject, body, ccList, bccList);
+		senderEmailAddress = new MTextField("Sender");
+		senderEmailAddress.setMaxLength(200);
+
+		//		senderEmailAddress.setValue(SchoolDashboardUtils.getLoggedInSchool().getSenderEmailAddress());
+
+		emailForm.addComponents(subject, body, ccList, bccList, senderEmailAddress);
 
 		return emailForm;
 	}

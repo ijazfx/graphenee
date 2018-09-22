@@ -71,6 +71,9 @@ public class GxEmailTemplate implements Serializable {
 	@JoinColumn(name = "oid_namespace")
 	private GxNamespace gxNamespace;
 
+	@Column(name = "sender_email_address")
+	private String senderEmailAddress;
+
 	public GxEmailTemplate() {
 	}
 
@@ -160,6 +163,14 @@ public class GxEmailTemplate implements Serializable {
 
 	public void setGxNamespace(GxNamespace gxNamespace) {
 		this.gxNamespace = gxNamespace;
+	}
+
+	public String getSenderEmailAddress() {
+		return senderEmailAddress;
+	}
+
+	public void setSenderEmailAddress(String senderEmailAddress) {
+		this.senderEmailAddress = senderEmailAddress;
 	}
 
 }
