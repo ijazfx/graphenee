@@ -17,9 +17,6 @@ package io.graphenee.workshop;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import io.graphenee.vaadin.AbstractDashboardSetup;
-import io.graphenee.vaadin.AbstractDashboardUI;
-import io.graphenee.workshop.vaadin.WorkshopDashboardSetup;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Viewport;
@@ -27,6 +24,10 @@ import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
+
+import io.graphenee.vaadin.AbstractDashboardSetup;
+import io.graphenee.vaadin.AbstractDashboardUI;
+import io.graphenee.workshop.vaadin.WorkshopDashboardSetup;
 
 @SpringUI
 @Theme("graphenee")

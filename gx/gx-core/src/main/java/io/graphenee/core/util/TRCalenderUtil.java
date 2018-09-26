@@ -138,6 +138,10 @@ public class TRCalenderUtil {
 		return cal.getTime();
 	}
 
+	public static Timestamp endOfDayAsTimestamp() {
+		return new Timestamp(endOfDay().getTime());
+	}
+
 	public static Date endOfDay(Date currentDate) {
 		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 		cal.setTime(currentDate);
@@ -146,6 +150,10 @@ public class TRCalenderUtil {
 		cal.set(Calendar.SECOND, 59);
 		cal.set(Calendar.MILLISECOND, 999);
 		return cal.getTime();
+	}
+
+	public static Timestamp endOfDayAsTimestamp(Date currentDate) {
+		return new Timestamp(endOfDay(currentDate).getTime());
 	}
 
 	public static Date endOfLastMonth() {
@@ -462,7 +470,11 @@ public class TRCalenderUtil {
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return new Timestamp(calendar.getTime().getTime());
+		return calendar.getTime();
+	}
+
+	public static Timestamp startOfDayAsTimestamp() {
+		return new Timestamp(startOfDay().getTime());
 	}
 
 	public static Date startOfDay(Date currentDate) {
@@ -472,7 +484,11 @@ public class TRCalenderUtil {
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return new Timestamp(calendar.getTime().getTime());
+		return calendar.getTime();
+	}
+
+	public static Timestamp startOfDayAsTimestamp(Date currentDate) {
+		return new Timestamp(startOfDay(currentDate).getTime());
 	}
 
 	public static Timestamp startOfDayFuture(Integer numberOfDaysFuture) {
@@ -654,6 +670,24 @@ public class TRCalenderUtil {
 
 	public static long yearsBetweenUsingChronoUnit(Date startDate, Date endDate) {
 		return ChronoUnit.YEARS.between(toLocalDateFromDate(startDate), toLocalDateFromDate(endDate));
+	}
+
+	public static Date justTimeAsDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.YEAR, cal.getActualMinimum(Calendar.YEAR));
+		cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
+		cal.set(Calendar.DAY_OF_YEAR, cal.getActualMinimum(Calendar.DAY_OF_YEAR));
+		return cal.getTime();
+	}
+
+	public static Timestamp justTimeFromTimestamp(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.YEAR, cal.getActualMinimum(Calendar.YEAR));
+		cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
+		cal.set(Calendar.DAY_OF_YEAR, cal.getActualMinimum(Calendar.DAY_OF_YEAR));
+		return new Timestamp(cal.getTime().getTime());
 	}
 
 }

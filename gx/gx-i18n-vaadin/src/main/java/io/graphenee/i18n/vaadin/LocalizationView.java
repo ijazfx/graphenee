@@ -42,7 +42,7 @@ public class LocalizationView extends AbstractDashboardPanel implements TRView {
 	protected String panelTitle() {
 		return "Localization";
 	}
-
+ 
 	@Override
 	protected void postInitialize() {
 		MenuBar menuBar = new MenuBar();

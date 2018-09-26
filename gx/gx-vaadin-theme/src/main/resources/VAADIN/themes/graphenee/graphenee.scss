@@ -95,10 +95,6 @@ $view-padding: round($v-unit-size * 0.75) !default;
 	right: 10px;
   }
   
-  * {
-    box-sizing: border-box;
-  }
-  
   .banner {
   		background-color: red;
   }
