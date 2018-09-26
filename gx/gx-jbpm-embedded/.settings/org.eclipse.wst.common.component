@@ -2,5 +2,7 @@
     <wb-module deploy-name="fuegoondemand-jbpm">
         <wb-resource deploy-path="/" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/.apt_generated"/>
+        <wb-resource deploy-path="/" source-path="/target/generated-sources/annotations"/>
+        <wb-resource deploy-path="/" source-path="/.apt_generated_tests"/>
     </wb-module>
 </project-modules>
