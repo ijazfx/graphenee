@@ -18,9 +18,6 @@ package io.graphenee.aws.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
@@ -30,11 +27,9 @@ import com.amazonaws.services.sns.model.PublishResult;
 
 import io.graphenee.aws.api.GxAwsService;
 
-@Service
 public class GxAwsServiceImpl implements GxAwsService {
 
-	@Autowired
-	AWSCredentialsProvider awsCredentialProvider;
+	private AWSCredentialsProvider awsCredentialProvider;
 
 	@Override
 	public String sendPromotionalSMSMessage(String phone, String message) {
@@ -48,7 +43,7 @@ public class GxAwsServiceImpl implements GxAwsService {
 
 	@Override
 	public String sendTransactionalSMSMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(awsCredentialProvider).build();
+		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion("eu-west-1").withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
@@ -64,7 +59,7 @@ public class GxAwsServiceImpl implements GxAwsService {
 
 	@Override
 	public String sendPromotionalSMSMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(awsCredentialProvider).build();
+		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
@@ -76,6 +71,14 @@ public class GxAwsServiceImpl implements GxAwsService {
 		if (publish != null)
 			return publish.getMessageId();
 		return null;
+	}
+
+	public AWSCredentialsProvider getAwsCredentialProvider() {
+		return awsCredentialProvider;
+	}
+
+	public void setAwsCredentialProvider(AWSCredentialsProvider awsCredentialProvider) {
+		this.awsCredentialProvider = awsCredentialProvider;
 	}
 
 }

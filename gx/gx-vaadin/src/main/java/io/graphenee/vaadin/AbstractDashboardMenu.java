@@ -18,7 +18,7 @@ package io.graphenee.vaadin;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Stack;
 
 import javax.annotation.PostConstruct;
 
@@ -47,6 +47,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.callback.TRVoidCallback;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.domain.DashboardUser;
 import io.graphenee.vaadin.event.DashboardEvent.NotificationsCountUpdatedEvent;
@@ -71,7 +72,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	private Label reportsBadge;
 	private MenuItem userMenuItem;
 	private List<Component> menuItems;
-	private Map<TRMenuItem, ValoMenuItemButton> menuItemValoMenuItemButtonMap = new HashMap<>();
 	private boolean isBuilt;
 
 	public AbstractDashboardMenu() {
@@ -236,61 +236,65 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		CssLayout menuItemsLayout = new CssLayout();
 		menuItemsLayout.addStyleName("valo-menuitems");
 		Collection<TRMenuItem> items = menuItems();
-		generateValoMenuItemButtons(menuItemsLayout, items);
-		items.forEach(item -> {
-			ValoMenuItemButton valoMenuItemButton = menuItemValoMenuItemButtonMap.get(item);
-			valoMenuItemButton.addStyleName("show");
+		backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON);
+		backButton.setVisible(false);
+		backButton.addClickListener(event -> {
+			if (!backStack.isEmpty())
+				backStack.pop().execute();
 		});
+		generateValoMenuItemButtons(menuItemsLayout, items);
+		menuItemsLayout.addComponent(backButton, 0);
 		return menuItemsLayout;
 
 	}
 
+	HashMap<TRMenuItem, ValoMenuItemButton> buttonsMap = new HashMap<>();
+	private ValoMenuItemButton backButton;
+	private Stack<TRVoidCallback> backStack = new Stack<>();
+
 	private void generateValoMenuItemButtons(CssLayout menuItemsLayout, Collection<TRMenuItem> items) {
+		buttonsMap.values().forEach(button -> {
+			button.setVisible(false);
+		});
 		if (items != null && !items.isEmpty()) {
 			for (TRMenuItem menuItem : items) {
+				if (buttonsMap.containsKey(menuItem))
+					continue;
+				ValoMenuItemButton valoMenuItemButton = null;
+
 				if (menuItem.hasChildren()) {
-					ValoMenuItemButton valoMenuItemButton = new ValoMenuItemButton(menuItem.caption(), menuItem.icon()).withListener(event -> {
-						ValoMenuItemButton backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON).withListener(event2 -> {
-							menuItemsLayout.removeComponent(menuItemsLayout.getComponent(0));
-							menuItemValoMenuItemButtonMap.values().forEach(item -> {
-								item.removeStyleName("show");
-							});
+					valoMenuItemButton = new ValoMenuItemButton(menuItem.caption(), menuItem.icon()).withListener(event -> {
+						backStack.push(() -> {
 							if (menuItem.getParent() != null) {
-								menuItem.getParent().getChildren().forEach(item -> {
-									ValoMenuItemButton valoMenuItemButton2 = menuItemValoMenuItemButtonMap.get(item);
-									if (valoMenuItemButton2 != null)
-										valoMenuItemButton2.addStyleName("show");
+								generateValoMenuItemButtons(menuItemsLayout, menuItem.getParent().getChildren());
+								menuItem.getParent().getChildren().forEach(child -> {
+									buttonsMap.get(child).setVisible(true);
 								});
+								backButton.setVisible(true);
 							} else {
-								menuItems().forEach(item -> {
-									ValoMenuItemButton valoMenuItemButton2 = menuItemValoMenuItemButtonMap.get(item);
-									if (valoMenuItemButton2 != null)
-										valoMenuItemButton2.addStyleName("show");
+								generateValoMenuItemButtons(menuItemsLayout, menuItems());
+								menuItems().forEach(child -> {
+									buttonsMap.get(child).setVisible(true);
 								});
+								backButton.setVisible(false);
 							}
 						});
-						menuItemsLayout.addComponent(backButton, 0);
-						menuItemValoMenuItemButtonMap.values().forEach(item -> {
-							item.removeStyleName("show");
+						generateValoMenuItemButtons(menuItemsLayout, menuItem.getChildren());
+						menuItem.getChildren().forEach(child -> {
+							buttonsMap.get(child).setVisible(true);
 						});
-						menuItem.getChildren().forEach(item -> {
-							ValoMenuItemButton valoMenuItemButton2 = menuItemValoMenuItemButtonMap.get(item);
-							if (valoMenuItemButton2 != null)
-								valoMenuItemButton2.addStyleName("show");
-						});
+						backButton.setVisible(true);
 					});
-					valoMenuItemButton.addStyleName("hide");
-					menuItemValoMenuItemButtonMap.put(menuItem, valoMenuItemButton);
 					menuItemsLayout.addComponent(valoMenuItemButton);
-					generateValoMenuItemButtons(menuItemsLayout, menuItem.getChildren());
+					buttonsMap.put(menuItem, valoMenuItemButton);
 				} else {
-					ValoMenuItemButton valoMenuItemButton = new ValoMenuItemButton(menuItem.viewName(), menuItem.caption(), menuItem.icon()).withListener(event -> {
+					valoMenuItemButton = new ValoMenuItemButton(menuItem.viewName(), menuItem.caption(), menuItem.icon()).withListener(event -> {
 						UI.getCurrent().getNavigator().navigateTo(menuItem.viewName());
 					});
 					menuItemsLayout.addComponent(valoMenuItemButton);
-					valoMenuItemButton.addStyleName("hide");
-					menuItemValoMenuItemButtonMap.put(menuItem, valoMenuItemButton);
 				}
+
+				buttonsMap.put(menuItem, valoMenuItemButton);
 			}
 		}
 	}
@@ -399,6 +403,19 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 					addStyleName(STYLE_SELECTED);
 			}
 		}
+
+		@Override
+		public void setVisible(boolean visible) {
+			super.setVisible(visible);
+			if (visible) {
+				addStyleName("show");
+				removeStyleName("hide");
+			} else {
+				removeStyleName("show");
+				addStyleName("hide");
+			}
+		}
+
 	}
 
 }

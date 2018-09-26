@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,12 +27,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
@@ -76,8 +81,10 @@ import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
+import io.graphenee.core.util.TRCalenderUtil;
 
 @Service
+// @DependsOn("grapheneeCore")
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
 
@@ -119,6 +126,56 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxEmailTemplateRepository emailTemplateRepository;
+
+	@Autowired
+	PlatformTransactionManager transactionManager;
+
+	@PostConstruct
+	public void initialize() {
+		TransactionTemplate tran = new TransactionTemplate(transactionManager);
+		tran.execute(status -> {
+			// create default namespace
+			GxNamespaceBean namespace = findOrCreateNamespace("io.graphenee.core");
+			// create admin security group
+			GxSecurityGroupBean adminGroup = findOrCreateSecurityGroup("Admin", namespace);
+			// create admin security policy
+			GxSecurityPolicyBean adminPolicy = findOrCreateSecurityPolicy("Admin Policy", namespace);
+			// create admin security policy document
+			GxSecurityPolicyDocumentBean document = adminPolicy.getDefaultSecurityPolicyDocumentBean();
+			if (document == null) {
+				document = new GxSecurityPolicyDocumentBean();
+				document.setIsDefault(true);
+				document.setDocumentJson("grant all on all;");
+				document.setTag(TRCalenderUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
+				adminPolicy.getSecurityPolicyDocumentCollectionFault().add(document);
+				// save policy with document
+				save(adminPolicy);
+			}
+			// assign admin security policy to admin group
+			if (!adminGroup.getSecurityPolicyCollectionFault().getBeans().contains(adminPolicy)) {
+				adminGroup.getSecurityPolicyCollectionFault().add(adminPolicy);
+				// save admin group with policy
+				save(adminGroup);
+			}
+			// create admin user
+			GxUserAccountBean admin = findUserAccountByUsername("admin");
+			if (admin == null) {
+				admin = new GxUserAccountBean();
+				admin.setUsername("admin");
+				admin.setPassword("change_on_install");
+				admin.setIsActive(true);
+				admin.setIsProtected(true);
+				// save admin user
+				save(admin);
+			}
+			// assign admin group to admin
+			if (!admin.getSecurityGroupCollectionFault().getBeans().contains(adminGroup)) {
+				admin.getSecurityGroupCollectionFault().add(adminGroup);
+				save(admin);
+			}
+			return null;
+		});
+	}
 
 	@Override
 	public List<GxGenderBean> findGender() {
@@ -1267,11 +1324,14 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setOid(entity.getOid());
 		bean.setBccList(entity.getBccList());
 		bean.setBody(entity.getBody());
+		bean.setSmsBody(entity.getSmsBody());
 		bean.setCcList(entity.getCcList());
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsProtected(entity.getIsProtected());
 		bean.setSubject(entity.getSubject());
 		bean.setTemplateName(entity.getTemplateName());
+		bean.setTemplateCode(entity.getTemplateCode());
+		bean.setSenderEmailAddress(entity.getSenderEmailAddress());
 
 		if (entity.getGxNamespace() != null) {
 			if (namespace != null) {
@@ -1296,11 +1356,14 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceBeanFault().getOid()));
 		entity.setBccList(bean.getBccList());
 		entity.setBody(bean.getBody());
+		entity.setSmsBody(bean.getSmsBody());
 		entity.setCcList(bean.getCcList());
 		entity.setIsActive(bean.getIsActive());
 		entity.setIsProtected(bean.getIsProtected());
 		entity.setSubject(bean.getSubject());
 		entity.setTemplateName(bean.getTemplateName());
+		entity.setTemplateCode(bean.getTemplateCode());
+		entity.setSenderEmailAddress(bean.getSenderEmailAddress());
 		return entity;
 	}
 

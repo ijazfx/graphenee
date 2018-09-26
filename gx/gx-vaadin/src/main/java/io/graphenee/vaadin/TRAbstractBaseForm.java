@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.validation.groups.Default;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.vaadin.viritin.BeanBinder;
 import org.vaadin.viritin.MBeanFieldGroup;
 import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
@@ -278,27 +279,11 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		this.eagerValidation = eagerValidation;
 	}
 
-	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T entity) {
-		T clone = entity;
-		// try {
-		// // clone = entityClass.newInstance();
-		// // BeanUtilsBean.getInstance().getConvertUtils().register(false,
-		// // true, 0);
-		// // BeanUtilsBean.getInstance().copyProperties(clone, entity);
-		// // BeanUtils.copyProperties(clone, entity);
-		// } catch (Exception e) {
-		// // failed to clone so fall back. This though does not harm the
-		// // data in the original container as only call to save method
-		// // persists new values.
-		// clone = entity;
-		// }
-		return this.setEntity(clone);
-	}
-
-	@Deprecated
-	public MBeanFieldGroup<T> setEntity(T entity) {
+	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T originalEntity) {
 		lazyInit();
-		this.entity = entity;
+		//		Cloning does not work for deep relationships to do not use it please!
+		this.entity = cloneEntity(entityClass, originalEntity);
+		//		this.entity = originalEntity;
 		if (entity != null) {
 			setCompositionRoot(createContent());
 			if (isBound()) {
@@ -336,6 +321,23 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		}
 	}
 
+	private T cloneEntity(Class<T> entityClass, T originalEntity) {
+		BeanUtilsBean.getInstance().getConvertUtils().register(false, true, 0);
+		try {
+			Object cloned = BeanUtilsBean.getInstance().cloneBean(originalEntity);
+			return (T) cloned;
+		} catch (Exception e) {
+			return originalEntity;
+		}
+	}
+
+	@Deprecated
+	public MBeanFieldGroup<T> setEntity(T originalEntity) {
+		if (originalEntity != null)
+			return this.setEntity((Class<T>) originalEntity.getClass(), originalEntity);
+		return this.setEntity(null, null);
+	}
+
 	protected Component getBindingComponent() {
 		return this;
 	}
@@ -356,10 +358,14 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c, String... nestedProperties) {
+		preBinding(entity);
 		MBeanFieldGroup<T> beanFieldGroup = BeanBinder.bind(entity, c, nestedProperties);
 		beanFieldGroup.setValidateAllProperties(false);
 		postBinding(entity);
 		return beanFieldGroup;
+	}
+
+	protected void preBinding(T entity) {
 	}
 
 	protected void postBinding(T entity) {

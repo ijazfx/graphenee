@@ -17,6 +17,8 @@ package io.graphenee.vaadin;
 
 import java.util.Locale;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
 
 import com.google.common.eventbus.Subscribe;
@@ -26,6 +28,7 @@ import com.vaadin.server.Page.BrowserWindowResizeListener;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WrappedSession;
 import com.vaadin.shared.Position;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
@@ -50,6 +53,8 @@ import io.graphenee.vaadin.util.VaadinUtils;
 
 @SuppressWarnings("serial")
 public abstract class AbstractDashboardUI extends UI {
+
+	private static Logger L = LoggerFactory.getLogger(AbstractDashboardUI.class);
 
 	@Override
 	protected void init(final VaadinRequest request) {
@@ -161,17 +166,14 @@ public abstract class AbstractDashboardUI extends UI {
 
 	@Subscribe
 	public void userLoggedOut(final UserLoggedOutEvent event) {
-		// When the user logs out, current VaadinSession gets closed and the
-		// page gets reloaded on the login screen. Do notice the this doesn't
-		// invalidate the current HttpSession.
 		try {
-			VaadinSession.getCurrent().getSession().invalidate();
+			WrappedSession session = VaadinSession.getCurrent().getSession();
+			if (session != null)
+				session.invalidate();
 			VaadinSession.getCurrent().close();
 		} catch (Exception ex) {
-			// To avoid NPE, most likely user UI unattended for longer and
-			// session got terminated.
+			L.error(ex.getMessage(), ex);
 		}
-		// Page.getCurrent().reload();
 		Page.getCurrent().setLocation("/");
 	}
 

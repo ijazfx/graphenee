@@ -15216,10 +15216,6 @@ div.v-layout.v-horizontal.v-widget {
 	right: 10px;
 }
 
-.graphenee * {
-	box-sizing: border-box;
-}
-
 .graphenee .banner {
 	background-color: red;
 }

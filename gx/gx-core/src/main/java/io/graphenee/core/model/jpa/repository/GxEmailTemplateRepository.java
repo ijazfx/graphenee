@@ -35,4 +35,6 @@ public interface GxEmailTemplateRepository extends JpaRepository<GxEmailTemplate
 
 	GxEmailTemplate findOneByTemplateNameAndGxNamespaceOidAndIsActive(String templateName, Integer oidNamespace, Boolean isActive);
 
+	GxEmailTemplate findOneByTemplateCodeAndGxNamespaceOidAndIsActive(String templateCode, Integer oidNamespace, Boolean isActive);
+
 }
