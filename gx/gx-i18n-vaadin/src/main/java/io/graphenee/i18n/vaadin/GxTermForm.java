@@ -93,9 +93,7 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	protected Component getFormComponent() {
-
 		MFormLayout termKeyForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
-
 		termKey = new MTextField("Term Key").withRequired(true);
 		termKey.addValueChangeListener(event -> {
 			for (GxTermBean gxTermBeans : availableTerms) {
