@@ -15,9 +15,6 @@
  *******************************************************************************/
 package io.graphenee.i18n.vaadin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +24,11 @@ import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -60,6 +55,9 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 
 	@Autowired
 	GxSupportedLocaleRepository supportedLocaleRepo;
+	
+	@Autowired
+	GxTermTablePanel gxTermTablePanel;
 
 	@Autowired
 	LocalizerService localizer;
@@ -69,24 +67,12 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	MCheckBox isActive;
 	ComboBox supportedLocaleComboBox;
 	ComboBox namespaceFaultComboBox;
-
-	private Table table;
-
-	List<GxTermBean> gxTermBeansList;
-
-	private GxTermBean gxTermBean;
-
-	private List<GxSupportedLocaleBean> availableLocales;
-
-	private List<GxTermBean> availableTerms;
-
+	
 	private GxNamespaceBean namespaceBean;
 
 	private Button saveButton;
 
 	private ProgressBar busyIndicator = new ProgressBar();
-
-	private BeanItemContainer<GxTermBean> termDataSource;
 
 	Map<GxSupportedLocaleBean, GxTermBean> terms;
 
@@ -95,12 +81,6 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	protected Component getFormComponent() {
 		MFormLayout termKeyForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
 		termKey = new MTextField("Term Key").withRequired(true);
-		termKey.addValueChangeListener(event -> {
-			for (GxTermBean gxTermBeans : availableTerms) {
-				gxTermBeans.setTermKey(termKey.getValue());
-			}
-		});
-
 		isActive = new MCheckBox("Is Active?", true);
 
 		namespaceFaultComboBox = new ComboBox("Namespace");
@@ -108,44 +88,32 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 		namespaceFaultComboBox.setRequired(true);
 		namespaceFaultComboBox.addValueChangeListener(event -> {
 			namespaceBean = (GxNamespaceBean) event.getProperty().getValue();
-			for (GxTermBean gxTermBeans : availableTerms) {
-				gxTermBeans.setNamespaceFault(BeanFault.beanFault(namespaceBean.getOid(), namespaceBean));
-			}
 			if (namespaceBean != null) {
 				if (!isBinding())
 					getEntity().setNamespaceFault(
 							new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
 			}
 		});
-
+		
+		gxTermTablePanel.initializeWithEntity(getEntity());
+		gxTermTablePanel.build().withMargin(true);
+		
 		termKeyForm.addComponents(namespaceFaultComboBox, termKey, isActive);
-
-		table = new Table("Terms Table");
-		table.setSizeFull();
-		table.setPageLength(table.size());
-		table.setEditable(true);
-		table.setRequired(true);
-		table.setResponsive(true);
-
-		availableLocales = dataService.findSupportedLocale();
-		availableTerms = dataService.findTermByTermKey(getEntity().getTermKey());
-
-		termDataSource = new BeanItemContainer<>(GxTermBean.class);
-		table.setContainerDataSource(termDataSource);
-
-		table.setVisibleColumns("language", "termSingular", "termPlural");
-		table.setColumnHeader("language", "Language");
-		table.setColumnHeader("termSingular", "Singular");
-		table.setColumnHeader("termPlural", "Plural");
-		MVerticalLayout layout = new MVerticalLayout(termKeyForm, table);
+		
+		MVerticalLayout layout = new MVerticalLayout();
+		layout.addComponents(termKeyForm, gxTermTablePanel);
+		
 		return layout;
 	}
 
 	public void saveGxTermEntities() {
-		for (GxTermBean gxTermBeans : availableTerms) {
-			dataService.save(gxTermBeans);
-			localizer.invalidateTerm(gxTermBeans.getTermKey());
-		}
+		gxTermTablePanel.availableTerms.forEach(term -> {
+			term.setTermKey(termKey.getValue());
+			term.setNamespaceFault(new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
+			term.setIsActive(isActive.getValue());
+			dataService.save(term);
+			localizer.invalidateTerm(term.getTermKey());
+		});
 	}
 
 	@Override
@@ -166,24 +134,7 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 		if (entity.getNamespaceFault() != null) {
 			namespaceFaultComboBox.setValue(entity.getNamespaceFault().getBean());
 		}
-		terms = new HashMap<>();
-		availableTerms.forEach(term -> {
-			terms.put(term.getSupportedLocaleFault().getBean(), term);
-		});
-
-		for (GxSupportedLocaleBean locale : availableLocales) {
-			if (!terms.containsKey(locale)) {
-				GxTermBean term = new GxTermBean();
-				term.setTermKey(termKey.getValue());
-				term.setNamespaceFault(BeanFault.beanFault(namespaceBean.getOid(), namespaceBean));
-				term.setSupportedLocaleFault(BeanFault.beanFault(locale.getOid(), locale));
-				terms.put(locale, term);
-			}
-		}
-
-		availableTerms = new ArrayList<>(terms.values());
-
-		termDataSource.addAll(availableTerms);
+		gxTermTablePanel.refresh();
 	}
 
 	@Override
