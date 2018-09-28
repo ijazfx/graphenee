@@ -28,7 +28,6 @@ import java.util.Set;
 
 import javax.validation.groups.Default;
 
-import org.apache.commons.beanutils.BeanUtilsBean;
 import org.vaadin.viritin.BeanBinder;
 import org.vaadin.viritin.MBeanFieldGroup;
 import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
@@ -281,9 +280,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T originalEntity) {
 		lazyInit();
-		//		Cloning does not work for deep relationships to do not use it please!
-		this.entity = cloneEntity(entityClass, originalEntity);
-		//		this.entity = originalEntity;
+		this.entity = originalEntity;
 		if (entity != null) {
 			setCompositionRoot(createContent());
 			if (isBound()) {
@@ -318,16 +315,6 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		} else {
 			setVisible(false);
 			return null;
-		}
-	}
-
-	private T cloneEntity(Class<T> entityClass, T originalEntity) {
-		BeanUtilsBean.getInstance().getConvertUtils().register(false, true, 0);
-		try {
-			Object cloned = BeanUtilsBean.getInstance().cloneBean(originalEntity);
-			return (T) cloned;
-		} catch (Exception e) {
-			return originalEntity;
 		}
 	}
 
