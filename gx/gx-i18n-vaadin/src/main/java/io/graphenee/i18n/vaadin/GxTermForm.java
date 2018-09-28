@@ -55,7 +55,7 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 
 	@Autowired
 	GxSupportedLocaleRepository supportedLocaleRepo;
-	
+
 	@Autowired
 	GxTermTablePanel gxTermTablePanel;
 
@@ -67,7 +67,7 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	MCheckBox isActive;
 	ComboBox supportedLocaleComboBox;
 	ComboBox namespaceFaultComboBox;
-	
+
 	private GxNamespaceBean namespaceBean;
 
 	private Button saveButton;
@@ -90,19 +90,18 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 			namespaceBean = (GxNamespaceBean) event.getProperty().getValue();
 			if (namespaceBean != null) {
 				if (!isBinding())
-					getEntity().setNamespaceFault(
-							new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
+					getEntity().setNamespaceFault(new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
 			}
 		});
-		
+
 		gxTermTablePanel.initializeWithEntity(getEntity());
 		gxTermTablePanel.build().withMargin(true);
-		
+
 		termKeyForm.addComponents(namespaceFaultComboBox, termKey, isActive);
-		
+
 		MVerticalLayout layout = new MVerticalLayout();
 		layout.addComponents(termKeyForm, gxTermTablePanel);
-		
+
 		return layout;
 	}
 
@@ -118,7 +117,7 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 
 	@Override
 	protected boolean eagerValidationEnabled() {
-		return false;
+		return true;
 	}
 
 	@Override
