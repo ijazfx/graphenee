@@ -49,4 +49,8 @@ public class ConversionUtil {
 		return NUMBER_RANK_TO_WORD_MAP.get(number);
 	}
 
+	public static String textToHtml(String text) {
+		return text.replace("\n", "<br/>").replaceAll("\\s", "&nbsp;");
+	}
+
 }

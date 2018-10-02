@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +24,11 @@ import io.graphenee.core.model.entity.GxAuditLog;
 
 @Repository
 public interface GxAuditLogRepository extends JpaRepository<GxAuditLog, Integer> {
+
+	List<GxAuditLog> findAllByGxUserAccountOidOrderByAuditDateDesc(Integer oidUserAccount);
+
+	List<GxAuditLog> findAllByAuditEntityOrderByAuditDateDesc(String auditEntity);
+
+	List<GxAuditLog> findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(String auditEntity, Integer oidAuditEntity);
 
 }

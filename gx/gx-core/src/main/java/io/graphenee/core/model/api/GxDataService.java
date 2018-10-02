@@ -18,6 +18,7 @@ package io.graphenee.core.model.api;
 import java.util.List;
 import java.util.Locale;
 
+import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
 import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
@@ -44,17 +45,17 @@ public interface GxDataService {
 	List<GxTermBean> findDistinctTermByNamespaceAndSupportedLocale(GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale);
 
 	List<GxTermBean> findTermByLocale(Locale locale);
-	
+
 	List<GxTermBean> findTermByTermKey(String termKey);
-	
+
 	List<GxTermBean> findTermByTermKeyAndLocale(String termKey, Locale locale);
 
 	GxTermBean findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale);
 
 	GxTermBean save(GxTermBean entity);
-	
-	void deleteTermByTermKeyAndOidNameSpace(String termKey,  Integer oidNamespace);
-	
+
+	void deleteTermByTermKeyAndOidNameSpace(String termKey, Integer oidNamespace);
+
 	void delete(GxTermBean entity);
 
 	GxSupportedLocaleBean save(GxSupportedLocaleBean entity);
@@ -228,5 +229,19 @@ public interface GxDataService {
 	GxSecurityPolicyBean findOrCreateSecurityPolicy(String policyName, GxNamespaceBean namespaceBean);
 
 	GxSecurityPolicyBean createOrUpdate(GxSecurityPolicyBean bean);
+
+	GxAuditLogBean createOrUpdate(GxAuditLogBean bean);
+
+	GxAuditLogBean auditEvent(String auditEvent);
+
+	GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean);
+
+	GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean);
+
+	List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity);
+
+	List<GxAuditLogBean> findAuditLogByAuditEntity(String auditEntity);
+
+	List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean);
 
 }
