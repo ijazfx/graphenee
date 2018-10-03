@@ -51,9 +51,13 @@ public class GxAwsServiceImpl implements GxAwsService {
 		}
 		smsAttributes.put("AWS.SNS.SMS.MaxPrice", new MessageAttributeValue().withStringValue("0.50").withDataType("Number"));
 		smsAttributes.put("AWS.SNS.SMS.SMSType", new MessageAttributeValue().withStringValue("Transactional").withDataType("String"));
-		PublishResult publish = snsClient.publish(new PublishRequest().withMessage(message).withPhoneNumber(phone).withMessageAttributes(smsAttributes));
-		if (publish != null)
-			return publish.getMessageId();
+		try {
+			PublishResult publish = snsClient.publish(new PublishRequest().withMessage(message).withPhoneNumber(phone).withMessageAttributes(smsAttributes));
+			if (publish != null)
+				return publish.getMessageId();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 		return null;
 	}
 

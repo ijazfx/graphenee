@@ -16,11 +16,20 @@
 package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+
+import io.graphenee.core.model.BeanFault;
 
 public class GxAuditLogBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
+	private Timestamp auditDate;
+	private String auditEntity;
+	private String auditEvent;
+	private Integer oidAuditEntity;
+
+	private BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault;
 
 	public Integer getOid() {
 		return oid;
@@ -28,6 +37,54 @@ public class GxAuditLogBean implements Serializable {
 
 	public void setOid(Integer oid) {
 		this.oid = oid;
+	}
+
+	public Timestamp getAuditDate() {
+		return auditDate;
+	}
+
+	public void setAuditDate(Timestamp auditDate) {
+		this.auditDate = auditDate;
+	}
+
+	public String getAuditEntity() {
+		return auditEntity;
+	}
+
+	public void setAuditEntity(String auditEntity) {
+		this.auditEntity = auditEntity;
+	}
+
+	public String getAuditEvent() {
+		return auditEvent;
+	}
+
+	public void setAuditEvent(String auditEvent) {
+		this.auditEvent = auditEvent;
+	}
+
+	public Integer getOidAuditEntity() {
+		return oidAuditEntity;
+	}
+
+	public void setOidAuditEntity(Integer oidAuditEntity) {
+		this.oidAuditEntity = oidAuditEntity;
+	}
+
+	public BeanFault<Integer, GxUserAccountBean> getGxUserAccountBeanFault() {
+		return gxUserAccountBeanFault;
+	}
+
+	public void setGxUserAccountBeanFault(BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault) {
+		this.gxUserAccountBeanFault = gxUserAccountBeanFault;
+	}
+
+	public String getUsername() {
+		return getGxUserAccountBeanFault() != null ? getGxUserAccountBeanFault().getBean().getUsername() : null;
+	}
+
+	public String getFullName() {
+		return getGxUserAccountBeanFault() != null ? getGxUserAccountBeanFault().getBean().getFullName() : null;
 	}
 
 	@Override
