@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
+import io.graphenee.core.enums.GenderEnum;
+
 public final class MockUser implements DashboardUser {
 
 	String firstName;
