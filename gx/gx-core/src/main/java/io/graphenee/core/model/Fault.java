@@ -22,13 +22,13 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Fault<ID, T> {
+public class Fault<KEY, T> {
 
 	private static final Logger L = LoggerFactory.getLogger(Fault.class);
 
 	private boolean isFault = true;
-	private ID oid;
-	private Function<ID, T> resolver;
+	private KEY key;
+	private Function<KEY, T> resolver;
 	private T value;
 	private int lastHashcode;
 	private Set<ModificationListener> modificationListeners;
@@ -37,40 +37,40 @@ public class Fault<ID, T> {
 	Fault() {
 	}
 
-	public static <ID, T> Fault<ID, T> fault(ID id, T t) {
-		return new Fault<>(id, t);
+	public static <KEY, T> Fault<KEY, T> fault(KEY key, T t) {
+		return new Fault<>(key, t);
 	}
 
-	public static <ID, T> Fault<ID, T> fault(ID id, Function<ID, T> resolver) {
-		return new Fault<>(id, resolver);
+	public static <KEY, T> Fault<KEY, T> fault(KEY key, Function<KEY, T> resolver) {
+		return new Fault<>(key, resolver);
 	}
 
-	public static <ID, T> Fault<ID, T> fault(ID id, T t, ModificationListener... modificationListeners) {
-		return new Fault<>(id, t, modificationListeners);
+	public static <KEY, T> Fault<KEY, T> fault(KEY key, T t, ModificationListener... modificationListeners) {
+		return new Fault<>(key, t, modificationListeners);
 	}
 
-	public static <ID, T> Fault<ID, T> fault(ID id, Function<ID, T> resolver, ModificationListener... modificationListeners) {
-		return new Fault<>(id, resolver, modificationListeners);
+	public static <KEY, T> Fault<KEY, T> fault(KEY key, Function<KEY, T> resolver, ModificationListener... modificationListeners) {
+		return new Fault<>(key, resolver, modificationListeners);
 	}
 
-	public static <ID, T> Fault<ID, T> nullFault() {
+	public static <KEY, T> Fault<KEY, T> nullFault() {
 		return new Fault<>(null, null);
 	}
 
-	public Fault(ID oid, Function<ID, T> resolver) {
-		this.oid = oid;
+	public Fault(KEY key, Function<KEY, T> resolver) {
+		this.key = key;
 		this.resolver = resolver;
 	}
 
-	public Fault(ID oid, T value) {
-		this.oid = oid;
+	public Fault(KEY key, T value) {
+		this.key = key;
 		this.resolver = (x) -> {
 			return value;
 		};
 	}
 
-	public Fault(ID oid, Function<ID, T> resolver, ModificationListener... modificationListeners) {
-		this.oid = oid;
+	public Fault(KEY key, Function<KEY, T> resolver, ModificationListener... modificationListeners) {
+		this.key = key;
 		this.resolver = resolver;
 		if (modificationListeners != null) {
 			for (ModificationListener modificationListener : modificationListeners) {
@@ -79,8 +79,8 @@ public class Fault<ID, T> {
 		}
 	}
 
-	public Fault(ID oid, T value, ModificationListener... modificationListeners) {
-		this.oid = oid;
+	public Fault(KEY key, T value, ModificationListener... modificationListeners) {
+		this.key = key;
 		this.resolver = (x) -> {
 			return value;
 		};
@@ -95,7 +95,7 @@ public class Fault<ID, T> {
 		isFault = false;
 		if (value == null) {
 			try {
-				value = resolver.apply(oid);
+				value = resolver.apply(key);
 				if (value != null) {
 					lastHashcode = value.hashCode();
 				}
@@ -118,15 +118,15 @@ public class Fault<ID, T> {
 	}
 
 	public boolean isNull() {
-		return oid == null && resolver == null;
+		return key == null && resolver == null;
 	}
 
 	public boolean isNotNull() {
-		return oid != null || resolver != null;
+		return key != null || resolver != null;
 	}
 
-	public ID getOid() {
-		return oid;
+	public KEY getKey() {
+		return key;
 	}
 
 	public boolean isModified() {
@@ -137,7 +137,7 @@ public class Fault<ID, T> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((oid == null) ? 0 : oid.hashCode());
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
 		return result;
 	}
 
@@ -150,10 +150,10 @@ public class Fault<ID, T> {
 		if (getClass() != obj.getClass())
 			return false;
 		Fault other = (Fault) obj;
-		if (oid == null) {
-			if (other.oid != null)
+		if (key == null) {
+			if (other.key != null)
 				return false;
-		} else if (!oid.equals(other.oid))
+		} else if (!key.equals(other.key))
 			return false;
 		return true;
 	}

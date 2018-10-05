@@ -32,9 +32,9 @@ public class CollectionFault<T> {
 	private boolean isFault = true;
 	private boolean isModified = false;
 	private Supplier<Collection<T>> resolver;
-	private Collection<T> valueAdded;
-	private Collection<T> valueRemoved;
-	private Collection<T> valueUpdated;
+	private Collection<T> valuesAdded;
+	private Collection<T> valuesRemoved;
+	private Collection<T> valuesUpdated;
 	private Collection<T> values;
 	private Set<ModificationListener> modificationListeners;
 
@@ -103,12 +103,12 @@ public class CollectionFault<T> {
 		isFault = true;
 		isModified = false;
 		values = null;
-		valueAdded = null;
-		valueRemoved = null;
-		valueUpdated = null;
+		valuesAdded = null;
+		valuesRemoved = null;
+		valuesUpdated = null;
 	}
 
-	public Collection<T> getCollections() {
+	public Collection<T> getCollection() {
 		isFault = false;
 		_initializeCollection();
 		return Collections.unmodifiableCollection(values);
@@ -125,77 +125,76 @@ public class CollectionFault<T> {
 
 	public Collection<T> getAdded() {
 		_initializeAddedCollection();
-		return Collections.unmodifiableCollection(valueAdded);
+		return Collections.unmodifiableCollection(valuesAdded);
 	}
 
 	private void _initializeAddedCollection() {
-		if (valueAdded == null) {
-			valueAdded = new ArrayList<>();
+		if (valuesAdded == null) {
+			valuesAdded = new ArrayList<>();
 		}
 	}
 
 	public Collection<T> getUpdated() {
 		_initializeUpdatedCollection();
-		return Collections.unmodifiableCollection(valueUpdated);
+		return Collections.unmodifiableCollection(valuesUpdated);
 	}
 
 	private void _initializeUpdatedCollection() {
-		if (valueUpdated == null) {
-			valueUpdated = new ArrayList<>();
+		if (valuesUpdated == null) {
+			valuesUpdated = new ArrayList<>();
 		}
 	}
 
 	public Collection<T> getRemoved() {
 		_initializeRemovedCollection();
-		return Collections.unmodifiableCollection(valueRemoved);
+		return Collections.unmodifiableCollection(valuesRemoved);
 	}
 
 	private void _initializeRemovedCollection() {
-		if (valueRemoved == null) {
-			valueRemoved = new ArrayList<>();
+		if (valuesRemoved == null) {
+			valuesRemoved = new ArrayList<>();
 		}
 	}
 
 	public void add(T value) {
 		_initializeCollection();
-		if (!values.contains(value)) {
-			values.add(value);
-		}
+		values.add(value);
 		_initializeAddedCollection();
-		if (!valueAdded.contains(value)) {
-			valueAdded.add(value);
+		if (!valuesAdded.contains(value)) {
+			valuesAdded.add(value);
 		}
 		_initializeRemovedCollection();
-		if (valueRemoved.contains(value)) {
-			valueRemoved.remove(value);
+		if (valuesRemoved.contains(value)) {
+			valuesRemoved.remove(value);
 		}
 		notificationModificationListeners();
 	}
 
 	public void update(T value) {
+		_initializeCollection();
+		values.remove(value);
+		values.add(value);
 		_initializeUpdatedCollection();
-		if (!valueUpdated.contains(value)) {
-			valueUpdated.add(value);
+		if (!valuesUpdated.contains(value)) {
+			valuesUpdated.add(value);
 		}
 		notificationModificationListeners();
 	}
 
 	public void remove(T value) {
 		_initializeCollection();
-		if (values.contains(value)) {
-			values.remove(value);
-		}
+		values.remove(value);
 		_initializeRemovedCollection();
-		if (!valueRemoved.contains(value)) {
-			valueRemoved.add(value);
+		if (!valuesRemoved.contains(value)) {
+			valuesRemoved.add(value);
 		}
 		_initializeAddedCollection();
-		if (valueAdded.contains(value)) {
-			valueAdded.remove(value);
+		if (valuesAdded.contains(value)) {
+			valuesAdded.remove(value);
 		}
 		_initializeUpdatedCollection();
-		if (valueUpdated.contains(value)) {
-			valueUpdated.remove(value);
+		if (valuesUpdated.contains(value)) {
+			valuesUpdated.remove(value);
 		}
 		notificationModificationListeners();
 	}
@@ -205,8 +204,8 @@ public class CollectionFault<T> {
 	}
 
 	public boolean isModified() {
-		return isModified || (valueAdded != null && !valueAdded.isEmpty())
-				|| (valueRemoved != null && !valueRemoved.isEmpty() || (valueUpdated != null && !valueUpdated.isEmpty()));
+		return isModified || (valuesAdded != null && !valuesAdded.isEmpty())
+				|| (valuesRemoved != null && !valuesRemoved.isEmpty() || (valuesUpdated != null && !valuesUpdated.isEmpty()));
 	}
 
 	public void markAsModified() {
