@@ -23,9 +23,9 @@ import org.vaadin.viritin.fields.MTextField;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
+import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.domain.DashboardUser;
-import io.graphenee.vaadin.domain.DashboardUser.GenderEnum;
 
 public class DashboardUserProfileForm extends TRAbstractForm<DashboardUser> {
 
