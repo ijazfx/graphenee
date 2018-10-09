@@ -67,6 +67,12 @@ public class TRCalenderUtil {
 		return toDateFromLocalDateTime(now);
 	}
 
+	public static Date addMonthsToDate(Date currentDate, int months) {
+		LocalDateTime now = toLocalDateTimeFromDate(currentDate);
+		now = now.plusMonths(months);
+		return toDateFromLocalDateTime(now);
+	}
+
 	public static int calendarFieldFromDate(int calendarField, Date date) {
 		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 		cal.setTime(date);
