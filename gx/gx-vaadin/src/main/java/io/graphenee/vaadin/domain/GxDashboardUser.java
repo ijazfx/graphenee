@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
+import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 
 public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {

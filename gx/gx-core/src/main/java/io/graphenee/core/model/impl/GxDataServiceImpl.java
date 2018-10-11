@@ -1520,4 +1520,9 @@ public class GxDataServiceImpl implements GxDataService {
 		return bean;
 	}
 
+	@Override
+	public GxNamespaceBean findSystemNamespace() {
+		return findOrCreateNamespace(SYSTEM_NAMESPACE);
+	}
+
 }

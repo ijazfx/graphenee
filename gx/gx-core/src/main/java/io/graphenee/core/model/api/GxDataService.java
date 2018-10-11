@@ -34,9 +34,15 @@ import io.graphenee.core.model.bean.GxUserAccountBean;
 
 public interface GxDataService {
 
+	public static final String CORE_NAMESPACE = "io.graphenee.core";
+
+	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
+
 	List<GxGenderBean> findGender();
 
 	List<GxNamespaceBean> findNamespace();
+
+	GxNamespaceBean findSystemNamespace();
 
 	List<GxSupportedLocaleBean> findSupportedLocale();
 

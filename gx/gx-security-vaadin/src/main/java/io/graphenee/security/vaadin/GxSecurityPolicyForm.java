@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.security.vaadin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,7 +118,8 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		});
 		MButton makeDefaultButton = new MButton("Make Default").withListener(event -> {
 			if (selectedDocumentBean != null) {
-				getEntity().getSecurityPolicyDocumentCollectionFault().getBeans().forEach(bean -> {
+				List<GxSecurityPolicyDocumentBean> documents = new ArrayList<>(getEntity().getSecurityPolicyDocumentCollectionFault().getBeans());
+				documents.forEach(bean -> {
 					bean.setIsDefault(false);
 					getEntity().getSecurityPolicyDocumentCollectionFault().update(bean);
 				});

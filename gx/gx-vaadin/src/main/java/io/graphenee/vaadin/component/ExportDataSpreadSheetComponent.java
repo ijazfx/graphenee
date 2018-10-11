@@ -25,11 +25,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.DownloadButton.ContentWriter;
 
-import com.vaadin.addon.spreadsheet.Spreadsheet;
 import com.vaadin.server.FontAwesome;
 
 import io.graphenee.core.util.KeyValueWrapper;
@@ -117,12 +116,12 @@ public class ExportDataSpreadSheetComponent {
 			if (dataItemsSupplier != null) {
 				dataItems = dataItemsSupplier.get();
 			}
-			Spreadsheet spreadsheet = new Spreadsheet();
-			Workbook workbook = spreadsheet.getWorkbook();
-			sheet = workbook.getSheetAt(0);
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			sheet = workbook.createSheet();
 			buildHeaderRow();
 			buildDataRows();
 			workbook.write(stream);
+			workbook.close();
 		}
 	}
 

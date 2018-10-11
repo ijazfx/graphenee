@@ -17,24 +17,10 @@ package io.graphenee.vaadin.domain;
 
 import com.vaadin.server.Resource;
 
+import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
 public interface DashboardUser {
-
-	enum GenderEnum {
-		Male("M"), Female("F"), Undisclosed("X");
-
-		private String genderCode;
-
-		private GenderEnum(String genderCode) {
-			this.genderCode = genderCode;
-		}
-
-		public String getGenderCode() {
-			return genderCode;
-		}
-
-	}
 
 	default Resource getProfilePhoto() {
 		if (getGender() != null && getGender() == GenderEnum.Female) {
