@@ -34,6 +34,14 @@ public class DataSourceUtil {
 	public static String determineDbVendor(DataSource dataSource) {
 		String vendor = null;
 		try (Connection c = dataSource.getConnection()) {
+			vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
+			if(vendor.contains("postgresql"))
+				vendor = "postgresql";
+			else if(vendor.contains("sqlserver"))
+				vendor = "sqlserver";
+			else if(vendor.contains("h2"))
+				vendor = "h2";
+			else
 			vendor = c.getMetaData().getDatabaseProductName().toLowerCase();
 		} catch (SQLException e) {
 			vendor = "unknown";
@@ -44,21 +52,16 @@ public class DataSourceUtil {
 	public static Dialect determineDialect(DataSource dataSource) {
 		String vendor = null;
 		try (Connection c = dataSource.getConnection()) {
-			vendor = c.getMetaData().getDatabaseProductName().toLowerCase();
+			vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
 			String hibernateDialect = null;
-			switch (vendor) {
-			case "postgresql":
+			if(vendor.contains("postgresql"))
 				hibernateDialect = "org.hibernate.dialect.PostgreSQL82Dialect";
-			break;
-			case "sqlserver":
-				hibernateDialect = "org.hibernate.dialect.SQLServerDialect";
-			break;
-			case "h2":
+			else if(vendor.contains("sqlserver"))
+				hibernateDialect = "org.hibernate.dialect.SQLServer2012Dialect";
+			else if(vendor.contains("h2"))
 				hibernateDialect = "org.hibernate.dialect.H2Dialect";
-			break;
-			default:
+			else
 				throw new Error("Unable to determine dialect from datasource.");
-			}
 			Properties props = new Properties();
 			props.put(Environment.DIALECT, hibernateDialect);
 			return Dialect.getDialect(props);
