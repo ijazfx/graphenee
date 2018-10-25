@@ -31,4 +31,8 @@ public interface GxSecurityPolicyRepository extends JpaRepository<GxSecurityPoli
 
 	GxSecurityPolicy findAllBySecurityPolicyNameAndGxNamespaceNamespace(String policyName, String namespace);
 
+	List<GxSecurityPolicy> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
+
+	GxSecurityPolicy findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(Integer oidAccessKey);
+
 }

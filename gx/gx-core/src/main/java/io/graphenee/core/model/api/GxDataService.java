@@ -15,9 +15,11 @@
  *******************************************************************************/
 package io.graphenee.core.model.api;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 
+import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
 import io.graphenee.core.model.bean.GxCountryBean;
@@ -31,6 +33,8 @@ import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxAccessKey;
+import io.graphenee.core.model.entity.GxResource;
 
 public interface GxDataService {
 
@@ -250,4 +254,15 @@ public interface GxDataService {
 
 	List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean);
 
+	void log(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
+
+	List<GxAccessKeyBean> findAccessKey();
+
+	GxAccessKeyBean save(GxAccessKeyBean bean);
+
+	void delete(GxAccessKeyBean bean);
+
+	List<GxAccessKeyBean> findAccessKeyByIsActive(Boolean isActive);
+
+	List<GxAccessKeyBean> findAccessKeyByIsActiveAndGxUserAccountIsNull(Boolean isActive);
 }

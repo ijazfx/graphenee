@@ -73,6 +73,11 @@ public class GxSecurityGroup implements Serializable {
 			@JoinColumn(name = "oid_user_account") })
 	private List<GxUserAccount> gxUserAccounts = new ArrayList<>();
 
+	@ManyToMany
+	@JoinTable(name = "gx_access_key_security_group_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
+			@JoinColumn(name = "oid_access_key") })
+	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
+
 	public GxSecurityGroup() {
 	}
 
@@ -146,6 +151,14 @@ public class GxSecurityGroup implements Serializable {
 
 	public void setGxUserAccounts(List<GxUserAccount> gxUserAccounts) {
 		this.gxUserAccounts = gxUserAccounts;
+	}
+
+	public List<GxAccessKey> getGxAccessKeys() {
+		return gxAccessKeys;
+	}
+
+	public void setGxAccessKeys(List<GxAccessKey> gxAccessKeys) {
+		this.gxAccessKeys = gxAccessKeys;
 	}
 
 }

@@ -39,6 +39,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
@@ -63,6 +64,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 	MTextArea jsonDocumentTextArea;
 
 	GxSecurityPolicyDocumentBean selectedDocumentBean;
+	TwinColSelect accessKeyCollectionFault;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -188,6 +190,13 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		securityGroupCollectionFault.setLeftColumnCaption("Available");
 		securityGroupCollectionFault.setRightColumnCaption("Applied To");
 
+		// keys
+		accessKeyCollectionFault = new TwinColSelect();
+		accessKeyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxAccessKeyBean>());
+		accessKeyCollectionFault.setSizeFull();
+		accessKeyCollectionFault.setLeftColumnCaption("Available");
+		accessKeyCollectionFault.setRightColumnCaption("Members");
+
 		TabSheet mainTabSheet = new TabSheet();
 		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 		mainTabSheet.setWidth("100%");
@@ -196,6 +205,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		mainTabSheet.addTab(form, "Details");
 		mainTabSheet.addTab(userAccountCollectionFault, "Users");
 		mainTabSheet.addTab(securityGroupCollectionFault, "Security Groups");
+		mainTabSheet.addTab(accessKeyCollectionFault, "Keys");
 
 		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
@@ -224,6 +234,9 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		jsonDocumentTextArea.clear();
 		securityPolicyDocumentComboBox.addItems(entity.getSecurityPolicyDocumentCollectionFault().getBeans());
 		securityPolicyDocumentComboBox.select(entity.getDefaultSecurityPolicyDocumentBean());
+
+		List<GxAccessKeyBean> accessKeyBeans = dataService.findAccessKeyByIsActive(true);
+		accessKeyCollectionFault.addItems(accessKeyBeans);
 	}
 
 }
