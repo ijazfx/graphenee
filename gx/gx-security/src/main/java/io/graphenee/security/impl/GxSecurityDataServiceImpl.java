@@ -50,6 +50,7 @@ import io.graphenee.core.model.jpa.repository.GxSecurityPolicyDocumentRepository
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.security.api.GxSecurityDataService;
+import io.graphenee.security.exception.GxPermissionException;
 
 @Service
 @ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
@@ -78,45 +79,51 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	GxResourceRepository resourceRepo;
 
 	@Override
-	public void access(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) {
+	public void access(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) throws GxPermissionException {
 		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
 		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
 
-		if (gxUserAccount != null || sg.getGxUserAccounts().size() > 0) {
+		if (gxUserAccount != null || (sg != null && sg.getGxUserAccounts().size() > 0)) {
 			if (canAccessResource(gxAccessKey, gxResource, timeStamp)) {
 				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
 			} else {
 				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
+				throw new GxPermissionException("access failed");
 			}
-		}
+		} else
+			throw new GxPermissionException("access failed");
 	}
 
 	@Override
-	public void checkIn(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) {
+	public void checkIn(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) throws GxPermissionException {
 		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
 		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
 
-		if (gxUserAccount != null || sg.getGxUserAccounts().size() > 0) {
+		if (gxUserAccount != null || (sg != null && sg.getGxUserAccounts().size() > 0)) {
 			if (canAccessResource(gxAccessKey, gxResource, timeStamp)) {
 				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
 			} else {
 				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
+				throw new GxPermissionException("check-in failed");
 			}
-		}
+		} else
+			throw new GxPermissionException("check-in failed");
 	}
 
 	@Override
-	public void checkOut(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) {
+	public void checkOut(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) throws GxPermissionException {
 		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
 		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
 
-		if (gxUserAccount != null || sg.getGxUserAccounts().size() > 0) {
+		if (gxUserAccount != null || (sg != null && sg.getGxUserAccounts().size() > 0)) {
 			if (canAccessResource(gxAccessKey, gxResource, timeStamp)) {
 				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
 			} else {
 				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
+				throw new GxPermissionException("check-out failed");
 			}
-		}
+		} else
+			throw new GxPermissionException("check-out failed");
 	}
 
 	private GxNamespaceBean makeNamespaceBean(GxNamespace entity) {

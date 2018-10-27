@@ -101,7 +101,10 @@ public class GxAccessLog implements Serializable {
 	public String getStatus() {
 		if (getAccessType() == 1)
 			return "check in";
-		return "check out";
+		else if (getAccessType() == 2)
+			return "check out";
+		else
+			return "access";
 	}
 	/***/
 }
