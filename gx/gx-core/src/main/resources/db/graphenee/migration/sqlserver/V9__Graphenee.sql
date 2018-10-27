@@ -1,1 +1,1 @@
-alter table gx_audit_log alter column audit_event type nvarchar(500);
+alter table gx_audit_log alter column audit_event nvarchar(500);
