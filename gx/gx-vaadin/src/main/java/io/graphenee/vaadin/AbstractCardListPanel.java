@@ -41,6 +41,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class AbstractCardListPanel<T> extends MPanel {
@@ -395,6 +396,10 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 	public void hideToolbar() {
 		toolbar.setVisible(false);
+	}
+
+	protected String cardStyleName() {
+		return GrapheneeTheme.STYLE_CARD_ITEM;
 	}
 
 }

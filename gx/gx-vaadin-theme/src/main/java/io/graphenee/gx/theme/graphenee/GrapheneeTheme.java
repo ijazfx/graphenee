@@ -51,6 +51,7 @@ public class GrapheneeTheme extends BaseTheme {
 		return new ThemeResource("./../" + THEME_NAME + "/" + fileName);
 	}
 
+	public static String STYLE_CARD_ITEM = "card-item";
 	public static String STYLE_HOVER_ELEVATED = "hover-elevated";
 	public static String STYLE_ELEVATED = "elevated";
 	public static String STYLE_CODE = "code";
