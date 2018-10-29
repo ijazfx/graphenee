@@ -231,14 +231,14 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	private void buildCardList(List<T> entities) {
 		if (entities.isEmpty()) {
 			contentLayout.removeAllComponents();
-			MPanel cardPanel = new MPanel().withStyleName("card-item");
+			MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
 			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)));
 			contentLayout.addComponent(cardPanel);
 		} else {
 			contentLayout.removeAllComponents();
 			if (entities != null) {
 				entities.forEach(entity -> {
-					MPanel cardPanel = new MPanel().withStyleName("card-item");
+					MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
 					MButton editButton = new MButton(FontAwesome.PENCIL, localizedSingularValue("Edit"), event -> {
 						preEdit(entity);
 						openEditorForm(entity);
@@ -274,6 +274,10 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 				contentLayout.addComponent(dummyLabel);
 			}
 		}
+	}
+
+	protected String cardStyleName() {
+		return "card-item";
 	}
 
 	protected abstract AbstractCardComponent<T> getCardComponent(T entity);
