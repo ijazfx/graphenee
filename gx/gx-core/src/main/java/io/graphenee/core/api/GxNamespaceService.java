@@ -25,4 +25,6 @@ public interface GxNamespaceService {
 
 	GxNamespaceBean namespace(String namespace);
 
+	GxNamespaceBean findByOid(Integer oidNamespace);
+
 }

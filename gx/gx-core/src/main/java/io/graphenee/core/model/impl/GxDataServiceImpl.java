@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -64,7 +65,6 @@ import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
-import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
@@ -348,6 +348,14 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxNamespaceBean> findNamespace() {
 		return namespaceRepo.findAll().stream().map(this::makeNamespaceBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxNamespaceBean findNamespace(Integer oidNamespace) {
+		GxNamespace namespace = namespaceRepo.findOne(oidNamespace);
+		if (namespace != null)
+			return makeNamespaceBean(namespace);
+		return null;
 	}
 
 	private GxNamespaceBean makeNamespaceBean(GxNamespace entity) {
@@ -1573,14 +1581,13 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public void log(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp, Integer accessType, Boolean isSuccess) {
+	public void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess) {
 		GxAccessLog accessLog = new GxAccessLog();
 		accessLog.setIsSuccess(isSuccess);
 		accessLog.setAccessTime(timeStamp);
-		if (gxAccessKey != null)
-			accessLog.setGxAccessKey(gxAccessKeyRepository.findByKey(gxAccessKey.getKey()));
-		if (gxResource != null)
-			accessLog.setGxResource(resourceRepo.findByName(gxResource.getName()));
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		accessLog.setGxAccessKey(gxAccessKeyRepository.findByKey(accessKeyUuid));
+		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespace(resourceName, gxNamespaceBean.getNamespace()));
 		accessLog.setAccessType(accessType);
 		accessLogRepo.save(accessLog);
 	}

@@ -91,7 +91,7 @@ public class GxAccessLog implements Serializable {
 	}
 
 	public String getResource() {
-		return getGxResource().getName();
+		return getGxResource().getResourceName();
 	}
 
 	public Timestamp getTime() {

@@ -16,6 +16,7 @@
 package io.graphenee.security.impl;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import io.graphenee.core.api.GxNamespaceService;
 import io.graphenee.core.enums.AccessTypeStatus;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
@@ -78,16 +80,20 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	@Autowired
 	GxResourceRepository resourceRepo;
 
+	@Autowired
+	GxNamespaceService namespaceService;
+
 	@Override
-	public void access(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) throws GxPermissionException {
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
-		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
+	public void access(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(accessKeyUuid);
+		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(accessKeyUuid);
 
 		if (gxUserAccount != null || (sg != null && sg.getGxUserAccounts().size() > 0)) {
-			if (canAccessResource(gxAccessKey, gxResource, timeStamp)) {
-				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
+			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
+				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
 			} else {
-				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
+				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
 				throw new GxPermissionException("access failed");
 			}
 		} else
@@ -95,15 +101,18 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	}
 
 	@Override
-	public void checkIn(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) throws GxPermissionException {
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
-		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
+	public void checkIn(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+		//TODO: 1. a key is valid if it is assigned to a user. Through exception with "Key not in use" when no user assigned.
+		//TODO: 2. if user is assigned, call key's canAccessResource(...) and perform log(...)
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(accessKeyUuid);
+		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(accessKeyUuid);
 
 		if (gxUserAccount != null || (sg != null && sg.getGxUserAccounts().size() > 0)) {
-			if (canAccessResource(gxAccessKey, gxResource, timeStamp)) {
-				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
+			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
+				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
 			} else {
-				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
+				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
 				throw new GxPermissionException("check-in failed");
 			}
 		} else
@@ -111,15 +120,16 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	}
 
 	@Override
-	public void checkOut(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) throws GxPermissionException {
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
-		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(gxAccessKey.getKey());
+	public void checkOut(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(accessKeyUuid);
+		GxSecurityGroup sg = securityGroupRepo.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(accessKeyUuid);
 
 		if (gxUserAccount != null || (sg != null && sg.getGxUserAccounts().size() > 0)) {
-			if (canAccessResource(gxAccessKey, gxResource, timeStamp)) {
-				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
+			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
+				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
 			} else {
-				dataService.log(gxAccessKey, gxResource, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
+				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
 				throw new GxPermissionException("check-out failed");
 			}
 		} else
@@ -192,16 +202,20 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	}
 
 	@Override
-	public boolean canAccessResource(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp) {
-		GxAccessKeyBean accessKeyBean = makeAccessKeyBean(gxAccessKeyRepository.findByKey(gxAccessKey.getKey()));
-		GxResourceBean resourceBean = makeResourceBean(gxResourceRepository.findByName(gxResource.getName()));
-		return accessKeyBean.canDoAction(resourceBean.getName(), "access");
+	public boolean canAccessResource(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) {
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		GxAccessKeyBean accessKeyBean = makeAccessKeyBean(gxAccessKeyRepository.findByKey(accessKeyUuid));
+		GxResourceBean resourceBean = makeResourceBean(gxResourceRepository.findOneByResourceNameAndGxNamespaceNamespace(resourceName, gxNamespaceBean.getNamespace()));
+		return accessKeyBean.canDoAction(resourceBean.getResourceName(), "access");
 	}
 
 	private GxResourceBean makeResourceBean(GxResource gxResource) {
 		GxResourceBean bean = new GxResourceBean();
 		bean.setOid(gxResource.getOid());
-		bean.setName(gxResource.getName());
+		bean.setResourceName(gxResource.getResourceName());
+		bean.setGxNamespaceBeanFault(BeanFault.beanFault(gxResource.getGxNamespace().getOid(), oid -> {
+			return namespaceService.namespace(gxResource.getResourceName());
+		}));
 		return bean;
 	}
 

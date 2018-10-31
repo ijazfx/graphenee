@@ -2,10 +2,13 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
@@ -18,7 +21,16 @@ public class GxResource extends io.graphenee.core.model.GxMappedSuperclass imple
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
-	private String name;
+
+	@Column(name = "resource_name")
+	private String resourceName;
+
+	@Column(name = "is_active")
+	private Boolean isActive;
+
+	@ManyToOne
+	@JoinColumn(name = "oid_namespace")
+	private GxNamespace gxNamespace;
 
 	public Integer getOid() {
 		return oid;
@@ -28,12 +40,28 @@ public class GxResource extends io.graphenee.core.model.GxMappedSuperclass imple
 		this.oid = oid;
 	}
 
-	public String getName() {
-		return name;
+	public String getResourceName() {
+		return resourceName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setResourceName(String resourceName) {
+		this.resourceName = resourceName;
+	}
+
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public GxNamespace getGxNamespace() {
+		return gxNamespace;
+	}
+
+	public void setGxNamespace(GxNamespace gxNamespace) {
+		this.gxNamespace = gxNamespace;
 	}
 
 }

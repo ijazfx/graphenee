@@ -239,4 +239,9 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		accessKeyCollectionFault.addItems(accessKeyBeans);
 	}
 
+	@Override
+	protected String popupWidth() {
+		return "700px";
+	}
+
 }

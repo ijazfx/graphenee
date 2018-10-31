@@ -33,8 +33,6 @@ import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
-import io.graphenee.core.model.entity.GxAccessKey;
-import io.graphenee.core.model.entity.GxResource;
 
 public interface GxDataService {
 
@@ -45,6 +43,8 @@ public interface GxDataService {
 	List<GxGenderBean> findGender();
 
 	List<GxNamespaceBean> findNamespace();
+
+	GxNamespaceBean findNamespace(Integer oidNamespace);
 
 	GxNamespaceBean findSystemNamespace();
 
@@ -254,7 +254,7 @@ public interface GxDataService {
 
 	List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean);
 
-	void log(GxAccessKey gxAccessKey, GxResource gxResource, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
+	void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
 
 	List<GxAccessKeyBean> findAccessKey();
 

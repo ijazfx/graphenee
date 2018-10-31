@@ -91,6 +91,7 @@ public class GxAccessKeyBean implements Serializable {
 	}
 
 	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+		// TODO: if this canDoAction returns false then check assigned user's canDoAction.
 		if (forceRefresh) {
 			loadMaps();
 		}
