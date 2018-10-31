@@ -408,7 +408,6 @@ public class TRCalenderUtil {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.YEAR, 1970);
-		calendar.set(Calendar.MONTH, 1);
 		calendar.set(Calendar.DATE, 1);
 		calendar.set(Calendar.MILLISECOND, 0);
 		calendar.set(Calendar.SECOND, 0);
