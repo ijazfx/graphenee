@@ -115,6 +115,10 @@ public class GxUserAccount implements Serializable {
 			@JoinColumn(name = "oid_security_policy") })
 	private List<GxSecurityPolicy> gxSecurityPolicies = new ArrayList<>();
 
+	@OneToMany
+	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
+	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
+
 	public GxUserAccount() {
 	}
 
@@ -306,6 +310,14 @@ public class GxUserAccount implements Serializable {
 
 	public void setGxSecurityPolicies(List<GxSecurityPolicy> gxSecurityPolicies) {
 		this.gxSecurityPolicies = gxSecurityPolicies;
+	}
+
+	public List<GxAccessKey> getGxAccessKeys() {
+		return gxAccessKeys;
+	}
+
+	public void setGxAccessKeys(List<GxAccessKey> gxAccessKeys) {
+		this.gxAccessKeys = gxAccessKeys;
 	}
 
 }
