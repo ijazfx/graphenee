@@ -12,6 +12,7 @@ public class GxResourceBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
 	private String resourceName;
+	private String resourceDescription;
 	private Boolean isActive = true;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 
@@ -45,5 +46,13 @@ public class GxResourceBean implements Serializable {
 
 	public void setGxNamespaceBeanFault(BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault) {
 		this.gxNamespaceBeanFault = gxNamespaceBeanFault;
+	}
+
+	public String getResourceDescription() {
+		return resourceDescription;
+	}
+
+	public void setResourceDescription(String resourceDescription) {
+		this.resourceDescription = resourceDescription;
 	}
 }

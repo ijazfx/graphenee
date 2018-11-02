@@ -1587,7 +1587,7 @@ public class GxDataServiceImpl implements GxDataService {
 		accessLog.setAccessTime(timeStamp);
 		UUID accessKeyUuid = UUID.fromString(accessKey);
 		accessLog.setGxAccessKey(gxAccessKeyRepository.findByKey(accessKeyUuid));
-		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespace(resourceName, gxNamespaceBean.getNamespace()));
+		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName, gxNamespaceBean.getNamespace()));
 		accessLog.setAccessType(accessType);
 		accessLogRepo.save(accessLog);
 	}
