@@ -19,11 +19,10 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.graphenee.core.api.GxNamespaceService;
 import io.graphenee.core.enums.AccessKeyType;

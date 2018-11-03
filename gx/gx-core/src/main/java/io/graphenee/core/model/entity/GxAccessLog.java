@@ -2,7 +2,6 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -84,27 +83,4 @@ public class GxAccessLog implements Serializable {
 		this.accessType = accessType;
 	}
 
-	// remove below methods after testing
-	/***/
-	public UUID getKey() {
-		return getGxAccessKey().getKey();
-	}
-
-	public String getResource() {
-		return getGxResource().getResourceName();
-	}
-
-	public Timestamp getTime() {
-		return getAccessTime();
-	}
-
-	public String getStatus() {
-		if (getAccessType() == 1)
-			return "check in";
-		else if (getAccessType() == 2)
-			return "check out";
-		else
-			return "access";
-	}
-	/***/
 }

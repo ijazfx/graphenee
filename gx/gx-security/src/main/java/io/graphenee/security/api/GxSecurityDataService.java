@@ -27,7 +27,6 @@ import io.graphenee.security.exception.GxPermissionException;
  * 
  * @author ijazfx
  */
-
 public interface GxSecurityDataService {
 	void checkIn(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
 
