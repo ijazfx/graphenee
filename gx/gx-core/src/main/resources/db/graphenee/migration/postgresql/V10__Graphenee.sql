@@ -5,9 +5,9 @@ create sequence gx_access_log_sequence;
 create table gx_access_key(
     oid integer not null default nextval('gx_access_key_seq'::regclass),
     key uuid not null,
-    secret uuid not null,
-    is_active boolean,
-    type integer,
+    secret varchar(200) not null,
+    is_active boolean not null default true,
+    access_key_type integer,
     primary key(oid)
 ); 
 

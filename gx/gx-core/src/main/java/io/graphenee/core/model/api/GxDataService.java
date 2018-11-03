@@ -26,6 +26,7 @@ import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
@@ -265,4 +266,11 @@ public interface GxDataService {
 	List<GxAccessKeyBean> findAccessKeyByIsActive(Boolean isActive);
 
 	List<GxAccessKeyBean> findAccessKeyByIsActiveAndGxUserAccountIsNull(Boolean isActive);
+
+	GxResourceBean createOrUpdate(GxResourceBean bean);
+
+	List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean);
+
+	void delete(GxResourceBean bean);
+
 }

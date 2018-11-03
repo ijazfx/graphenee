@@ -55,7 +55,7 @@ public class GxAccessKeyPanel extends AbstractEntityListPanel<GxAccessKeyBean> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "key", "isActive" };
+		return new String[] { "key", "accessKeyType", "isActive" };
 	}
 
 	@Override
@@ -98,6 +98,11 @@ public class GxAccessKeyPanel extends AbstractEntityListPanel<GxAccessKeyBean> {
 
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
+	}
+
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
 	}
 
 }

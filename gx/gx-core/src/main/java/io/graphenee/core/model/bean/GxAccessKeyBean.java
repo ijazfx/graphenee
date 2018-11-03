@@ -9,9 +9,11 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 
@@ -22,15 +24,19 @@ public class GxAccessKeyBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
 	private UUID key = UUID.randomUUID();
-	private UUID secret = UUID.randomUUID();
+	private String secret;
 	private Boolean isActive = true;
-	private Integer type;
+	private Integer accessKeyType;
 	private BeanCollectionFault<GxSecurityGroupBean> securityGroupCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanFault<Integer, GxUserAccountBean> userAccountBeanFault;
 
 	private Map<String, Set<String>> grantMap;
 	private Map<String, Set<String>> revokeMap;
+
+	public GxAccessKeyBean() {
+		secret = RandomStringUtils.randomAlphanumeric(64);
+	}
 
 	public Integer getOid() {
 		return oid;
@@ -48,11 +54,11 @@ public class GxAccessKeyBean implements Serializable {
 		this.key = key;
 	}
 
-	public UUID getSecret() {
+	public String getSecret() {
 		return secret;
 	}
 
-	public void setSecret(UUID secret) {
+	public void setSecret(String secret) {
 		this.secret = secret;
 	}
 
@@ -62,14 +68,6 @@ public class GxAccessKeyBean implements Serializable {
 
 	public void setIsActive(Boolean isActive) {
 		this.isActive = isActive;
-	}
-
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
 	}
 
 	public BeanCollectionFault<GxSecurityGroupBean> getSecurityGroupCollectionFault() {
@@ -244,31 +242,21 @@ public class GxAccessKeyBean implements Serializable {
 		return true;
 	}
 
-	public String getTypeStatus() {
-		if (getType() != null)
-			switch (getType()) {
+	public AccessKeyType getAccessKeyType() {
+		if (accessKeyType != null)
+			switch (accessKeyType) {
 			case 0:
-				return "RETINA";
+				return AccessKeyType.RETINASCAN;
 			case 1:
-				return "FINGERPRINT";
+				return AccessKeyType.FINGERPRINT;
 			default:
-				return "CARD";
+				return AccessKeyType.CARD;
 			}
 		return null;
 	}
 
-	public void setTypeStatus(String v) {
-		switch (v) {
-		case "RETINA":
-			setType(0);
-		break;
-		case "FINGERPRINT":
-			setType(1);
-		break;
-		default:
-			setType(2);
-		break;
-		}
+	public void setAccessKeyType(AccessKeyType v) {
+		accessKeyType = v.typeCode();
 	}
 
 	public BeanFault<Integer, GxUserAccountBean> getUserAccountBeanFault() {

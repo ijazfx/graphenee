@@ -27,10 +27,12 @@ public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass impl
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 	private UUID key;
-	private UUID secret;
+	private String secret;
 	@Column(name = "is_Active")
 	private Boolean isActive;
-	private Integer type;
+
+	@Column(name = "access_key_type")
+	private Integer accessKeyType;
 
 	@ManyToMany
 	@JoinTable(name = "gx_access_key_security_group_join", joinColumns = { @JoinColumn(name = "oid_access_key") }, inverseJoinColumns = {
@@ -61,11 +63,11 @@ public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass impl
 		this.key = key;
 	}
 
-	public UUID getSecret() {
+	public String getSecret() {
 		return secret;
 	}
 
-	public void setSecret(UUID secret) {
+	public void setSecret(String secret) {
 		this.secret = secret;
 	}
 
@@ -77,12 +79,12 @@ public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass impl
 		this.isActive = isActive;
 	}
 
-	public Integer getType() {
-		return type;
+	public Integer getAccessKeyType() {
+		return accessKeyType;
 	}
 
-	public void setType(Integer type) {
-		this.type = type;
+	public void setAccessKeyType(Integer accessKeyType) {
+		this.accessKeyType = accessKeyType;
 	}
 
 	public List<GxSecurityGroup> getGxSecurityGroups() {

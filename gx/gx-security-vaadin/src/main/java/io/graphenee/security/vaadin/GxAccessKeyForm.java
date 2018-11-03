@@ -1,5 +1,6 @@
 package io.graphenee.security.vaadin;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
@@ -32,7 +34,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 
 	@Autowired
 	GxDataService dataService;
-	ComboBox typeStatus;
+	ComboBox accessKeyType;
 	MLabel key, secret;
 	MCheckBox isActive;
 
@@ -44,13 +46,13 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 	@Override
 	protected Component getFormComponent() {
 		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
-		key = new MLabel().withCaption("key");
-		secret = new MLabel().withCaption("secret");
-		typeStatus = new ComboBox("type");
-		typeStatus.setRequired(true);
+		key = new MLabel().withCaption("Key");
+		secret = new MLabel().withCaption("Secret");
+		accessKeyType = new ComboBox("Key Type");
+		accessKeyType.setRequired(true);
 		isActive = new MCheckBox("Is Active?");
 
-		form.addComponents(key, secret, typeStatus, isActive);
+		form.addComponents(key, secret, accessKeyType, isActive);
 
 		// security groups
 		securityGroupCollectionFault = new TwinColSelect();
@@ -84,7 +86,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 	protected void postBinding(GxAccessKeyBean entity) {
 		key.setValue(entity.getKey().toString());
 		secret.setValue(entity.getSecret().toString());
-		typeStatus.addItems("RETINA", "FINGERPRINT", "CARD");
+		accessKeyType.addItems(Arrays.asList(AccessKeyType.values()));
 		List<GxSecurityGroupBean> securityGroups = namespaceBean != null ? dataService.findSecurityGroupByNamespace(namespaceBean) : dataService.findSecurityGroup();
 		securityGroupCollectionFault.addItems(securityGroups);
 
@@ -113,7 +115,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 
 	@Override
 	protected String popupWidth() {
-		return "550px";
+		return "700px";
 	}
 
 }

@@ -16,8 +16,6 @@
 package io.graphenee.security.impl;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,13 +26,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import io.graphenee.core.api.GxNamespaceService;
+import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.enums.AccessTypeStatus;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
@@ -96,7 +94,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
 			} else {
 				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
-				throw new GxPermissionException("access permission denied.");
+				throw new GxPermissionException("Access permission denied.");
 			}
 		} else
 			throw new GxPermissionException("Key not in use.");
@@ -112,7 +110,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
 			} else {
 				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
-				throw new GxPermissionException("check-in permission denied.");
+				throw new GxPermissionException("Check-in permission denied.");
 			}
 		} else
 			throw new GxPermissionException("Key not in use.");
@@ -128,10 +126,10 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
 			} else {
 				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
-				throw new GxPermissionException("check-out permission denied.");
+				throw new GxPermissionException("Check-out permission denied.");
 			}
 		} else
-			throw new GxPermissionException("key not in use.");
+			throw new GxPermissionException("Key not in use.");
 	}
 
 	@Override
@@ -140,9 +138,8 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 		GxAccessKeyBean accessKeyBean = makeAccessKeyBean(gxAccessKeyRepository.findByKey(accessKeyUuid));
 		GxResource gxResource = gxResourceRepository.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName, gxNamespaceBean.getNamespace());
 		if (gxResource == null)
-			throw new GxPermissionException("rescource not found.");
-		GxResourceBean resourceBean = makeResourceBean(gxResource);
-		return accessKeyBean.canDoAction(resourceBean.getResourceName(), "access");
+			throw new GxPermissionException("Rescource not found.");
+		return accessKeyBean.canDoAction(resourceName, "access");
 	}
 
 	private GxNamespaceBean makeNamespaceBean(GxNamespace entity) {
@@ -210,26 +207,6 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 		return bean;
 	}
 
-	private GxResourceBean makeResourceBean(GxResource gxResource) {
-		GxResourceBean bean = new GxResourceBean();
-		bean.setOid(gxResource.getOid());
-		bean.setResourceName(gxResource.getResourceName());
-		bean.setResourceDescription(gxResource.getResourceDescription());
-		bean.setIsActive(gxResource.getIsActive());
-		bean.setGxNamespaceBeanFault(BeanFault.beanFault(gxResource.getGxNamespace().getOid(), oid -> {
-			return namespaceService.namespace(gxResource.getResourceName());
-		}));
-		return bean;
-	}
-
-	private List<GxResourceBean> makeResourceBean(List<GxResource> resources) {
-		List<GxResourceBean> beans = new ArrayList<>();
-		resources.forEach(resource -> {
-			beans.add(makeResourceBean(resource));
-		});
-		return beans;
-	}
-
 	private GxUserAccountBean makeUserAccountBean(GxUserAccount entity) {
 		GxUserAccountBean bean = new GxUserAccountBean();
 		bean.setOid(entity.getOid());
@@ -260,7 +237,10 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 		bean.setKey(gxAccessKey.getKey());
 		bean.setSecret(gxAccessKey.getSecret());
 		bean.setIsActive(gxAccessKey.getIsActive());
-		bean.setType(gxAccessKey.getType());
+		if (gxAccessKey.getAccessKeyType() != null)
+			bean.setAccessKeyType(AccessKeyType.accessKeyType(gxAccessKey.getAccessKeyType()));
+		else
+			bean.setAccessKeyType(null);
 
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityGroupRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
@@ -273,38 +253,6 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 				return makeUserAccountBean(gxUserAccountRepository.findOne(oid));
 			}));
 		return bean;
-	}
-
-	private GxResource toEntity(GxResourceBean bean, GxResource entity) {
-		entity.setResourceName(bean.getResourceName());
-		entity.setResourceDescription(bean.getResourceDescription());
-		entity.setIsActive(bean.getIsActive());
-		if (bean.getGxNamespaceBeanFault() != null) {
-			entity.setGxNamespace(namespaceRepo.findOne(bean.getGxNamespaceBeanFault().getOid()));
-		}
-		return entity;
-	}
-
-	@Override
-	public GxResourceBean createOrUpdate(GxResourceBean bean) {
-		GxResource gxResource;
-		if (bean.getOid() == null)
-			gxResource = new GxResource();
-		else
-			gxResource = gxResourceRepository.findOne(bean.getOid());
-		gxResource = gxResourceRepository.save(toEntity(bean, gxResource));
-		bean.setOid(gxResource.getOid());
-		return bean;
-	}
-
-	@Override
-	public List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean) {
-		return makeResourceBean(resourceRepo.findAllByGxNamespaceNamespace(gxNamespaceBean.getNamespace()));
-	}
-
-	@Override
-	public void delete(GxResourceBean bean) {
-		gxResourceRepository.delete(bean.getOid());
 	}
 
 }
