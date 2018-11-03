@@ -8,7 +8,8 @@ import io.graphenee.core.model.entity.GxResource;
 
 public interface GxResourceRepository extends JpaRepository<GxResource, Integer> {
 
-	GxResource findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(String resourceName, String namespace);
+  GxResource findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(String resourceName, String namespace);
 
-	List<GxResource> findAllByGxNamespaceNamespace(String namespace);
+  List<GxResource> findAllByGxNamespaceNamespace(String namespace);
+
 }
