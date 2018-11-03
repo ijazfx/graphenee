@@ -25,6 +25,9 @@ public class GxResource extends io.graphenee.core.model.GxMappedSuperclass imple
 	@Column(name = "resource_name")
 	private String resourceName;
 
+	@Column(name = "resource_desription")
+	private String resourceDescription;
+
 	@Column(name = "is_active")
 	private Boolean isActive;
 
@@ -62,6 +65,14 @@ public class GxResource extends io.graphenee.core.model.GxMappedSuperclass imple
 
 	public void setGxNamespace(GxNamespace gxNamespace) {
 		this.gxNamespace = gxNamespace;
+	}
+
+	public String getResourceDescription() {
+		return resourceDescription;
+	}
+
+	public void setResourceDescription(String resourceDescription) {
+		this.resourceDescription = resourceDescription;
 	}
 
 }

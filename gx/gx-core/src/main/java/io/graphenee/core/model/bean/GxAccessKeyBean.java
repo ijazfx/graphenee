@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.graphenee.core.model.BeanCollectionFault;
+import io.graphenee.core.model.BeanFault;
 
 public class GxAccessKeyBean implements Serializable {
 
@@ -26,6 +27,7 @@ public class GxAccessKeyBean implements Serializable {
 	private Integer type;
 	private BeanCollectionFault<GxSecurityGroupBean> securityGroupCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
+	private BeanFault<Integer, GxUserAccountBean> userAccountBeanFault;
 
 	private Map<String, Set<String>> grantMap;
 	private Map<String, Set<String>> revokeMap;
@@ -91,7 +93,6 @@ public class GxAccessKeyBean implements Serializable {
 	}
 
 	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
-		// TODO: if this canDoAction returns false then check assigned user's canDoAction.
 		if (forceRefresh) {
 			loadMaps();
 		}
@@ -127,7 +128,7 @@ public class GxAccessKeyBean implements Serializable {
 		if (grantActionSet != null && grantActionSet.contains("all"))
 			return true;
 
-		return false;
+		return getUserAccountBeanFault().getBean().canDoAction(resource, action, false);
 	}
 
 	protected Map<String, Set<String>> grantMap() {
@@ -268,6 +269,14 @@ public class GxAccessKeyBean implements Serializable {
 			setType(2);
 		break;
 		}
+	}
+
+	public BeanFault<Integer, GxUserAccountBean> getUserAccountBeanFault() {
+		return userAccountBeanFault;
+	}
+
+	public void setUserAccountBeanFault(BeanFault<Integer, GxUserAccountBean> userAccountBeanFault) {
+		this.userAccountBeanFault = userAccountBeanFault;
 	}
 
 }

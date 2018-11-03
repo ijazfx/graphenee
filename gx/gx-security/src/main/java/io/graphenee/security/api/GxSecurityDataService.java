@@ -16,8 +16,10 @@
 package io.graphenee.security.api;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.security.exception.GxPermissionException;
 
 /**
@@ -35,5 +37,11 @@ public interface GxSecurityDataService {
 
 	void access(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
 
-	boolean canAccessResource(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp);
+	boolean canAccessResource(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+
+	GxResourceBean createOrUpdate(GxResourceBean bean);
+
+	List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean);
+
+	void delete(GxResourceBean bean);
 }
