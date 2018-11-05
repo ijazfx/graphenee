@@ -15,15 +15,18 @@
  *******************************************************************************/
 package io.graphenee.core.model.api;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 
+import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
 import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
@@ -41,6 +44,8 @@ public interface GxDataService {
 	List<GxGenderBean> findGender();
 
 	List<GxNamespaceBean> findNamespace();
+
+	GxNamespaceBean findNamespace(Integer oidNamespace);
 
 	GxNamespaceBean findSystemNamespace();
 
@@ -249,5 +254,23 @@ public interface GxDataService {
 	List<GxAuditLogBean> findAuditLogByAuditEntity(String auditEntity);
 
 	List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean);
+
+	void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
+
+	List<GxAccessKeyBean> findAccessKey();
+
+	GxAccessKeyBean save(GxAccessKeyBean bean);
+
+	void delete(GxAccessKeyBean bean);
+
+	List<GxAccessKeyBean> findAccessKeyByIsActive(Boolean isActive);
+
+	List<GxAccessKeyBean> findAccessKeyByIsActiveAndGxUserAccountIsNull(Boolean isActive);
+
+	GxResourceBean createOrUpdate(GxResourceBean bean);
+
+	List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean);
+
+	void delete(GxResourceBean bean);
 
 }

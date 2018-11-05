@@ -15,6 +15,11 @@
  *******************************************************************************/
 package io.graphenee.security.api;
 
+import java.sql.Timestamp;
+
+import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.security.exception.GxPermissionException;
+
 /**
  * This is the core security interface offered by Graphenee. You authenticate,
  * authorize and assert security permissions based on users, groups and
@@ -22,7 +27,13 @@ package io.graphenee.security.api;
  * 
  * @author ijazfx
  */
+public interface GxSecurityDataService {
+	void checkIn(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
 
-public interface GxSecurityService {
+	void checkOut(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+
+	void access(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+
+	boolean canAccessResource(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
 
 }

@@ -33,6 +33,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
@@ -61,6 +62,7 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 
 	TwinColSelect securityGroupCollectionFault;
 	TwinColSelect securityPolicyCollectionFault;
+	TwinColSelect accessKeyCollectionFault;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -98,6 +100,13 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		securityPolicyCollectionFault.setLeftColumnCaption("Available");
 		securityPolicyCollectionFault.setRightColumnCaption("Applied");
 
+		// keys
+		accessKeyCollectionFault = new TwinColSelect();
+		accessKeyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxAccessKeyBean>());
+		accessKeyCollectionFault.setSizeFull();
+		accessKeyCollectionFault.setLeftColumnCaption("Available");
+		accessKeyCollectionFault.setRightColumnCaption("Members");
+
 		TabSheet mainTabSheet = new TabSheet();
 		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 		mainTabSheet.setWidth("100%");
@@ -106,6 +115,7 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		mainTabSheet.addTab(form, "Details");
 		mainTabSheet.addTab(securityGroupCollectionFault, "Security Groups");
 		mainTabSheet.addTab(securityPolicyCollectionFault, "Security Policies");
+		mainTabSheet.addTab(accessKeyCollectionFault, "Keys");
 
 		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
@@ -123,6 +133,11 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 
 		List<GxSecurityPolicyBean> securityPolicies = namespace != null ? dataService.findSecurityPolicyByNamespace(namespace) : dataService.findSecurityPolicy();
 		securityPolicyCollectionFault.addItems(securityPolicies);
+
+		List<GxAccessKeyBean> accessKeyBeans = dataService.findAccessKeyByIsActiveAndGxUserAccountIsNull(true);
+		accessKeyBeans.addAll(entity.getAccessKeyCollectionFault().getBeans());
+		accessKeyCollectionFault.addItems(accessKeyBeans);
+
 	}
 
 	@Override

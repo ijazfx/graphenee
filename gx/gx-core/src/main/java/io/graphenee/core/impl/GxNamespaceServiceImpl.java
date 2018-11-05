@@ -46,4 +46,9 @@ public class GxNamespaceServiceImpl implements GxNamespaceService {
 		return dataService.findNamespace(namespace);
 	}
 
+	@Override
+	public GxNamespaceBean findByOid(Integer oidNamespace) {
+		return dataService.findNamespace(oidNamespace);
+	}
+
 }

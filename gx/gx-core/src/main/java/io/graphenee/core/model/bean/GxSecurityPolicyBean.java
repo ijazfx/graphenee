@@ -35,6 +35,7 @@ public class GxSecurityPolicyBean implements Serializable {
 	private BeanCollectionFault<GxSecurityGroupBean> securityGroupCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxUserAccountBean> userAccountCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxSecurityPolicyDocumentBean> securityPolicyDocumentCollectionFault = BeanCollectionFault.emptyCollectionFault();
+	private BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 
 	public Integer getOid() {
 		return oid;
@@ -155,6 +156,14 @@ public class GxSecurityPolicyBean implements Serializable {
 	@Override
 	public String toString() {
 		return securityPolicyName;
+	}
+
+	public BeanCollectionFault<GxAccessKeyBean> getAccessKeyCollectionFault() {
+		return accessKeyCollectionFault;
+	}
+
+	public void setAccessKeyCollectionFault(BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault) {
+		this.accessKeyCollectionFault = accessKeyCollectionFault;
 	}
 
 }

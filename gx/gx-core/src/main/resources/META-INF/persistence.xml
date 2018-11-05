@@ -17,6 +17,9 @@
 		<class>io.graphenee.core.model.entity.GxState</class>
 		<class>io.graphenee.core.model.entity.GxCity</class>
 		<class>io.graphenee.core.model.entity.GxSavedQuery</class>
+		<class>io.graphenee.core.model.entity.GxAccessKey</class>
+		<class>io.graphenee.core.model.entity.GxResource</class>
+		<class>io.graphenee.core.model.entity.GxAccessLog</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>
