@@ -35,7 +35,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 	@Autowired
 	GxDataService dataService;
 	ComboBox accessKeyType;
-	MLabel key, secret;
+	MLabel accessKey, secret;
 	MCheckBox isActive;
 
 	TwinColSelect securityGroupCollectionFault;
@@ -46,13 +46,13 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 	@Override
 	protected Component getFormComponent() {
 		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
-		key = new MLabel().withCaption("Key");
+		accessKey = new MLabel().withCaption("Access Key");
 		secret = new MLabel().withCaption("Secret");
 		accessKeyType = new ComboBox("Key Type");
 		accessKeyType.setRequired(true);
 		isActive = new MCheckBox("Is Active?");
 
-		form.addComponents(key, secret, accessKeyType, isActive);
+		form.addComponents(accessKey, secret, accessKeyType, isActive);
 
 		// security groups
 		securityGroupCollectionFault = new TwinColSelect();
@@ -84,7 +84,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 
 	@Override
 	protected void postBinding(GxAccessKeyBean entity) {
-		key.setValue(entity.getKey().toString());
+		accessKey.setValue(entity.getAccessKey().toString());
 		secret.setValue(entity.getSecret().toString());
 		accessKeyType.addItems(Arrays.asList(AccessKeyType.values()));
 		List<GxSecurityGroupBean> securityGroups = namespaceBean != null ? dataService.findSecurityGroupByNamespace(namespaceBean) : dataService.findSecurityGroup();

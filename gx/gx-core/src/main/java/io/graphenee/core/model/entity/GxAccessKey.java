@@ -26,8 +26,12 @@ public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass impl
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
-	private UUID key;
+
+	@Column(name = "access_key")
+	private UUID accessKey;
+
 	private String secret;
+
 	@Column(name = "is_Active")
 	private Boolean isActive;
 
@@ -55,12 +59,12 @@ public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass impl
 		this.oid = oid;
 	}
 
-	public UUID getKey() {
-		return key;
+	public UUID getAccessKey() {
+		return accessKey;
 	}
 
-	public void setKey(UUID key) {
-		this.key = key;
+	public void setAccessKey(UUID accessKey) {
+		this.accessKey = accessKey;
 	}
 
 	public String getSecret() {

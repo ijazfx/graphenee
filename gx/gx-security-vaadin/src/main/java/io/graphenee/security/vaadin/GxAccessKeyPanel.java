@@ -55,7 +55,7 @@ public class GxAccessKeyPanel extends AbstractEntityListPanel<GxAccessKeyBean> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "key", "accessKeyType", "isActive" };
+		return new String[] { "accessKey", "accessKeyType", "isActive" };
 	}
 
 	@Override

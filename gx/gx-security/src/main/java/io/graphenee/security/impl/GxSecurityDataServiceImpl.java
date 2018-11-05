@@ -86,7 +86,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	@Override
 	public void access(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
 		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
+		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
 
 		if (gxUserAccount != null) {
 			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
@@ -102,7 +102,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	@Override
 	public void checkIn(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
 		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
+		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
 
 		if (gxUserAccount != null) {
 			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
@@ -118,7 +118,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	@Override
 	public void checkOut(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
 		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
+		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
 
 		if (gxUserAccount != null) {
 			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
@@ -134,7 +134,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	@Override
 	public boolean canAccessResource(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
 		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxAccessKeyBean accessKeyBean = makeAccessKeyBean(gxAccessKeyRepository.findByKey(accessKeyUuid));
+		GxAccessKeyBean accessKeyBean = makeAccessKeyBean(gxAccessKeyRepository.findByAccessKey(accessKeyUuid));
 		GxResource gxResource = gxResourceRepository.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName, gxNamespaceBean.getNamespace());
 		if (gxResource == null)
 			throw new GxPermissionException("Rescource not found.");
@@ -233,7 +233,7 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {
 		GxAccessKeyBean bean = new GxAccessKeyBean();
 		bean.setOid(gxAccessKey.getOid());
-		bean.setKey(gxAccessKey.getKey());
+		bean.setAccessKey(gxAccessKey.getAccessKey());
 		bean.setSecret(gxAccessKey.getSecret());
 		bean.setIsActive(gxAccessKey.getIsActive());
 		if (gxAccessKey.getAccessKeyType() != null)

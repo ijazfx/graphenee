@@ -1,6 +1,6 @@
 create table gx_access_key(
-	oid integer primary key not null identity(1,1),
-    key uniqueidentifier not null,
+	oid integer not null identity(1,1),
+    access_key uniqueidentifier not null,
     secret nvarchar(200) not null,
     is_active bit not null default 1,
     access_key_type integer,
@@ -29,17 +29,17 @@ create table gx_access_key_security_policy_join(
 );
 
 create table gx_resource(
-	oid integer primary key not null identity(1,1),
+	oid integer not null identity(1,1),
     resource_name nvarchar(50),
     resource_desription nvarchar(100),
     is_active bit not null default 1,
     oid_namespace integer not null,
-    foreign key(oid_namespace) references gx_namespace(oid) on delete restrict,
+    foreign key(oid_namespace) references gx_namespace(oid),
     primary key(oid)
 );
 
 create table gx_access_log(
-	oid integer primary key not null identity(1,1),
+	oid integer not null identity(1,1),
 	oid_access_key integer not null,
     oid_resource integer not null,
     access_time datetime not null,
