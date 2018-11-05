@@ -277,10 +277,6 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		}
 	}
 
-	protected String cardStyleName() {
-		return "card-item";
-	}
-
 	protected abstract AbstractCardComponent<T> getCardComponent(T entity);
 
 	protected abstract String panelCaption();
