@@ -1596,7 +1596,7 @@ public class GxDataServiceImpl implements GxDataService {
 		accessLog.setIsSuccess(isSuccess);
 		accessLog.setAccessTime(timeStamp);
 		UUID accessKeyUuid = UUID.fromString(accessKey);
-		accessLog.setGxAccessKey(gxAccessKeyRepository.findByKey(accessKeyUuid));
+		accessLog.setGxAccessKey(gxAccessKeyRepository.findByAccessKey(accessKeyUuid));
 		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName, gxNamespaceBean.getNamespace()));
 		accessLog.setAccessType(accessType);
 		accessLogRepo.save(accessLog);
@@ -1610,7 +1610,7 @@ public class GxDataServiceImpl implements GxDataService {
 	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {
 		GxAccessKeyBean bean = new GxAccessKeyBean();
 		bean.setOid(gxAccessKey.getOid());
-		bean.setKey(gxAccessKey.getKey());
+		bean.setAccessKey(gxAccessKey.getAccessKey());
 		bean.setSecret(gxAccessKey.getSecret());
 		bean.setIsActive(gxAccessKey.getIsActive());
 		if (gxAccessKey.getAccessKeyType() != null)
@@ -1642,7 +1642,7 @@ public class GxDataServiceImpl implements GxDataService {
 		} else {
 			entity = new GxAccessKey();
 		}
-		entity.setKey(bean.getKey());
+		entity.setAccessKey(bean.getAccessKey());
 		entity.setSecret(bean.getSecret());
 		entity.setIsActive(bean.getIsActive());
 		if (bean.getAccessKeyType() != null)

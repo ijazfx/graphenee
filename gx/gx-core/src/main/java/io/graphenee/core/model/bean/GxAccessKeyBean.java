@@ -23,7 +23,7 @@ public class GxAccessKeyBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
-	private UUID key = UUID.randomUUID();
+	private UUID accessKey = UUID.randomUUID();
 	private String secret;
 	private Boolean isActive = true;
 	private Integer accessKeyType;
@@ -46,12 +46,12 @@ public class GxAccessKeyBean implements Serializable {
 		this.oid = oid;
 	}
 
-	public UUID getKey() {
-		return key;
+	public UUID getAccessKey() {
+		return accessKey;
 	}
 
-	public void setKey(UUID key) {
-		this.key = key;
+	public void setAccessKey(UUID accessKey) {
+		this.accessKey = accessKey;
 	}
 
 	public String getSecret() {
@@ -214,7 +214,7 @@ public class GxAccessKeyBean implements Serializable {
 
 	@Override
 	public String toString() {
-		return getKey().toString();
+		return getAccessKey().toString();
 	}
 
 	@Override

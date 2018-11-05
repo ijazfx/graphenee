@@ -11,7 +11,7 @@ public interface GxAccessKeyRepository extends JpaRepository<GxAccessKey, Intege
 
 	List<GxAccessKey> findAllByGxSecurityPolicysOidEquals(Integer oidSecurityPolicy);
 
-	GxAccessKey findByKey(UUID key);
+	GxAccessKey findByAccessKey(UUID accessKey);
 
 	List<GxAccessKey> findAllByIsActive(Boolean isActive);
 
