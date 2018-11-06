@@ -69,15 +69,15 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 		securityPolicyCollectionFault.setRightColumnCaption("Applied");
 
 		TabSheet mainTabSheet = new TabSheet();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
+		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
 		mainTabSheet.setWidth("100%");
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(securityGroupCollectionFault, "Security Groups");
-		mainTabSheet.addTab(securityPolicyCollectionFault, "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -106,11 +106,6 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "400px";
 	}
 
 	@Override

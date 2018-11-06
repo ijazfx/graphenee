@@ -1604,7 +1604,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxAccessKeyBean> findAccessKey() {
-		return accessKeyRepo.findAll(new Sort("key")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		return accessKeyRepo.findAll(new Sort("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 	}
 
 	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {

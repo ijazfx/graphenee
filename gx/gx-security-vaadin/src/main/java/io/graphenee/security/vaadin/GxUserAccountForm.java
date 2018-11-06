@@ -108,16 +108,16 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		accessKeyCollectionFault.setRightColumnCaption("Members");
 
 		TabSheet mainTabSheet = new TabSheet();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
+		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
 		mainTabSheet.setWidth("100%");
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(securityGroupCollectionFault, "Security Groups");
-		mainTabSheet.addTab(securityPolicyCollectionFault, "Security Policies");
-		mainTabSheet.addTab(accessKeyCollectionFault, "Keys");
+		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -151,13 +151,8 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "400px";
-	}
-
-	@Override
 	protected String popupWidth() {
-		return "550px";
+		return "700px";
 	}
 
 }
