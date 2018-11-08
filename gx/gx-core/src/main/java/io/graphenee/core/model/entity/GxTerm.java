@@ -27,44 +27,43 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-
 /**
  * The persistent class for the gx_term database table.
  * 
  */
 @Entity
-@Table(name="gx_term")
-@NamedQuery(name="GxTerm.findAll", query="SELECT g FROM GxTerm g")
+@Table(name = "gx_term")
+@NamedQuery(name = "GxTerm.findAll", query = "SELECT g FROM GxTerm g")
 public class GxTerm implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
-	@Column(name="is_active")
+	@Column(name = "is_active")
 	private Boolean isActive;
 
-	@Column(name="is_protected")
+	@Column(name = "is_protected")
 	private Boolean isProtected;
 
-	@Column(name="term_key")
+	@Column(name = "term_key")
 	private String termKey;
 
-	@Column(name="term_plural")
+	@Column(name = "term_plural")
 	private String termPlural;
 
-	@Column(name="term_singular")
+	@Column(name = "term_singular")
 	private String termSingular;
 
 	//bi-directional many-to-one association to GxNamespace
 	@ManyToOne
-	@JoinColumn(name="oid_namespace")
+	@JoinColumn(name = "oid_namespace")
 	private GxNamespace gxNamespace;
 
 	//bi-directional many-to-one association to GxSupportedLocale
 	@ManyToOne
-	@JoinColumn(name="oid_supported_locale")
+	@JoinColumn(name = "oid_supported_locale")
 	private GxSupportedLocale gxSupportedLocale;
 
 	public GxTerm() {
