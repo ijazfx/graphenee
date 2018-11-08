@@ -102,6 +102,7 @@
 		<module>gx-core-vaadin</module>
 		<module>gx-aws</module>
 		<module>gx-jbpm-embedded</module>
+		<module>gx-sms</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
@@ -343,6 +344,11 @@
 				<groupId>org.zeromq</groupId>
 				<artifactId>jeromq</artifactId>
 				<version>0.4.3</version>
+			</dependency>
+			<dependency>
+				<groupId>io.graphenee</groupId>
+				<artifactId>gx-sms</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
