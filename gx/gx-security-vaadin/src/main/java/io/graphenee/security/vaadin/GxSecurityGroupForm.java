@@ -97,19 +97,19 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 		accessKeyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxAccessKeyBean>());
 		accessKeyCollectionFault.setSizeFull();
 		accessKeyCollectionFault.setLeftColumnCaption("Available");
-		accessKeyCollectionFault.setRightColumnCaption("Members");
+		accessKeyCollectionFault.setRightColumnCaption("Included");
 
 		TabSheet mainTabSheet = new TabSheet();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
+		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
 		mainTabSheet.setWidth("100%");
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(userAccountCollectionFault, "Users");
-		mainTabSheet.addTab(securityPolicyCollectionFault, "Security Policies");
-		mainTabSheet.addTab(accessKeyCollectionFault, "Keys");
+		mainTabSheet.addTab(new MVerticalLayout(userAccountCollectionFault).withFullHeight(), "Users");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -136,13 +136,8 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "400px";
-	}
-
-	@Override
 	protected String popupWidth() {
-		return "550px";
+		return "700px";
 	}
 
 }

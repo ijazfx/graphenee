@@ -33,14 +33,13 @@ public interface GxTermRepository extends JpaRepository<GxTerm, Integer> {
 	List<GxTerm> findByTermKeyAndGxSupportedLocaleLocaleCodeStartingWith(String termKey, String localeCode);
 
 	GxTerm findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(String termKey, String localeCode);
-	
+
 	List<GxTerm> findByTermKey(String termKey);
-	
-	
+
 	@Modifying
 	@Query("Delete from GxTerm t WHERE t.termKey = :termKey AND t.gxNamespace.oid = :oidNamespace")
 	void deleteByTermKeyAndOidNameSpace(@Param("termKey") String termKey, @Param("oidNamespace") Integer oidNamespace);
-	
+
 	Page<GxTerm> findByGxNamespaceOid(Pageable pageable, Integer oidNamespace);
 
 	List<GxTerm> findByGxNamespaceOid(Integer oidNamespace);

@@ -166,13 +166,16 @@ public class TRUploadField extends VerticalLayout implements Field, StartedListe
 	}
 
 	public enum StorageMode {
-		MEMORY, FILE
+		MEMORY,
+		FILE
 	}
 
 	/**
 	 */
 	public enum FieldType {
-		UTF8_STRING, BYTE_ARRAY, FILE;
+		UTF8_STRING,
+		BYTE_ARRAY,
+		FILE;
 
 		public Class<?> getRawType() {
 			switch (this) {

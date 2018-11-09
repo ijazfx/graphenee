@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package io.graphenee.security.vaadin;
 
 import java.util.Arrays;
@@ -69,15 +84,15 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 		securityPolicyCollectionFault.setRightColumnCaption("Applied");
 
 		TabSheet mainTabSheet = new TabSheet();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
+		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
 		mainTabSheet.setWidth("100%");
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(securityGroupCollectionFault, "Security Groups");
-		mainTabSheet.addTab(securityPolicyCollectionFault, "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -106,11 +121,6 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "400px";
 	}
 
 	@Override
