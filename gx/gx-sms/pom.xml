@@ -22,6 +22,10 @@
 			<artifactId>retrofit</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>converter-scalars</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
