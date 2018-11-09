@@ -16,6 +16,7 @@ Graphenee consists of following modules:
 * gx-security & gx-security-vaadin - Security module for creating and managing users, groups and policies
 * gx-vaadin - Core Vaadin components to build dashboard, forms, panels and data grids quickly
 * gx-aws - Easy access to AWS services such as SMS
+* gx-sms - Easy access to SMS service providers such as AWS SMS, Twilio, Eocean, etc.
 * gx-jbpm-embedded - Embedded jBPM engine support
 
 Copyright &copy; Farrukh Ijaz, all rights reserved.
