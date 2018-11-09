@@ -113,4 +113,12 @@ public class TRCalenderUtilTest {
 		assertTrue(h == 23 && m == 59 && s == 59 && ms == 999);
 	}
 
+	@Test
+	public void testJustTimeAsDate() {
+		Date today = new Date();
+		Date past = TRCalenderUtil.justTimeAsDate(today);
+		System.out.println(today + " => " + past);
+		assert (today.after(past));
+	}
+
 }

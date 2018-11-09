@@ -680,18 +680,18 @@ public class TRCalenderUtil {
 	public static Date justTimeAsDate(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		cal.set(Calendar.YEAR, cal.getActualMinimum(Calendar.YEAR));
-		cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
-		cal.set(Calendar.DAY_OF_YEAR, cal.getActualMinimum(Calendar.DAY_OF_YEAR));
+		cal.set(Calendar.YEAR, 1970);
+		cal.set(Calendar.MONTH, 1);
+		cal.set(Calendar.DAY_OF_YEAR, 1);
 		return cal.getTime();
 	}
 
 	public static Timestamp justTimeFromTimestamp(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
-		cal.set(Calendar.YEAR, cal.getActualMinimum(Calendar.YEAR));
-		cal.set(Calendar.MONTH, cal.getActualMinimum(Calendar.MONTH));
-		cal.set(Calendar.DAY_OF_YEAR, cal.getActualMinimum(Calendar.DAY_OF_YEAR));
+		cal.set(Calendar.YEAR, 1970);
+		cal.set(Calendar.MONTH, 1);
+		cal.set(Calendar.DAY_OF_YEAR, 1);
 		return new Timestamp(cal.getTime().getTime());
 	}
 
