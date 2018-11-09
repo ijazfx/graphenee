@@ -42,6 +42,11 @@
 			<artifactId>aws-java-sdk-sns</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>7.30.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
 		</dependency>

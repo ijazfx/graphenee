@@ -3,6 +3,7 @@ package io.graphenee.sms.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
@@ -11,10 +12,16 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 
 import io.graphenee.sms.api.GxSmsService;
+import io.graphenee.sms.proto.GxSmsConfigProtos;
+import io.graphenee.sms.proto.GxSmsConfigProtos.AwsSmsConfig;
 
 public class AwsSmsServiceImpl implements GxSmsService {
 
-	private AWSCredentialsProvider awsCredentialProvider;
+	private AwsSmsConfig smsConfig;
+
+	public AwsSmsServiceImpl(GxSmsConfigProtos.AwsSmsConfig smsConfig) {
+		this.smsConfig = smsConfig;
+	}
 
 	@Override
 	public String sendPromotionalMessage(String phone, String message) {
@@ -28,7 +35,7 @@ public class AwsSmsServiceImpl implements GxSmsService {
 
 	@Override
 	public String sendTransactionalMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion("eu-west-1").withCredentials(getAwsCredentialProvider()).build();
+		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion(smsConfig.getAwsRegion()).withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
@@ -48,7 +55,7 @@ public class AwsSmsServiceImpl implements GxSmsService {
 
 	@Override
 	public String sendPromotionalMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(getAwsCredentialProvider()).build();
+		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion(smsConfig.getAwsRegion()).withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
@@ -63,11 +70,29 @@ public class AwsSmsServiceImpl implements GxSmsService {
 	}
 
 	public AWSCredentialsProvider getAwsCredentialProvider() {
-		return awsCredentialProvider;
-	}
 
-	public void setAwsCredentialProvider(AWSCredentialsProvider awsCredentialProvider) {
-		this.awsCredentialProvider = awsCredentialProvider;
+		return new AWSCredentialsProvider() {
+
+			@Override
+			public void refresh() {
+			}
+
+			@Override
+			public AWSCredentials getCredentials() {
+				return new AWSCredentials() {
+
+					@Override
+					public String getAWSSecretKey() {
+						return smsConfig.getAwsAccessKeyId();
+					}
+
+					@Override
+					public String getAWSAccessKeyId() {
+						return smsConfig.getAwsSecretKey();
+					}
+				};
+			}
+		};
 	}
 
 }

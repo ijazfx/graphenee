@@ -1,8 +1,8 @@
 package io.graphenee.sms.impl;
 
 import io.graphenee.sms.api.GxSmsService;
-import io.graphenee.sms.proto.EoceanSmsConfigProtos;
-import io.graphenee.sms.proto.EoceanSmsConfigProtos.ConfigMessage;
+import io.graphenee.sms.proto.GxSmsConfigProtos;
+import io.graphenee.sms.proto.GxSmsConfigProtos.EoceanConfig;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -11,13 +11,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class EoceanSmsServiceImpl implements GxSmsService {
 
-	private ConfigMessage configMessage;
 	private EoceanService eoceanService;
+	private EoceanConfig smsConfig;
 
-	public EoceanSmsServiceImpl(EoceanSmsConfigProtos.ConfigMessage configMessage) {
-		this.configMessage = configMessage;
+	public EoceanSmsServiceImpl(GxSmsConfigProtos.EoceanConfig smsConfig) {
+		this.smsConfig = smsConfig;
 		eoceanService = new Retrofit.Builder().addConverterFactory(ScalarsConverterFactory.create()).addConverterFactory(GsonConverterFactory.create())
-				.baseUrl(configMessage.getBaseUrl()).build().create(EoceanService.class);
+				.baseUrl(smsConfig.getBaseUrl()).build().create(EoceanService.class);
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 	}
 
 	private String sendMessage(String senderId, String phone, String message) {
-		Call<String> call = eoceanService.requestAPI(configMessage.getUser(), configMessage.getPwd(), senderId, phone, message);
+		Call<String> call = eoceanService.requestAPI(smsConfig.getUser(), smsConfig.getPassword(), senderId, phone, message);
 		try {
 			Response<String> response = call.execute();
 			if (response.isSuccessful()) {

@@ -2,10 +2,10 @@ import org.junit.Test;
 
 import io.graphenee.sms.api.GxSmsService;
 import io.graphenee.sms.impl.EoceanSmsServiceImpl;
-import io.graphenee.sms.proto.EoceanSmsConfigProtos;
-import io.graphenee.sms.proto.EoceanSmsConfigProtos.ConfigMessage.Builder;
+import io.graphenee.sms.proto.GxSmsConfigProtos;
+import io.graphenee.sms.proto.GxSmsConfigProtos.EoceanConfig.Builder;
 
-public class EoceanServiceTest {
+public class EoceanSmsServiceTest {
 
 	String baseUrl = "https://pk.eocean.us";
 	String user = "your_account";
@@ -13,13 +13,13 @@ public class EoceanServiceTest {
 	String mask = "your_mask";
 	String receiver = "your_number";
 
-	public EoceanServiceTest() {
+	public EoceanSmsServiceTest() {
 	}
 
 	@Test
 	public void testSendTransactionalMessageString() {
-		Builder builder = EoceanSmsConfigProtos.ConfigMessage.newBuilder();
-		builder.setBaseUrl(baseUrl).setUser(user).setPwd(pwd);
+		Builder builder = GxSmsConfigProtos.EoceanConfig.newBuilder();
+		builder.setBaseUrl(baseUrl).setUser(user).setPassword(pwd);
 
 		GxSmsService service = new EoceanSmsServiceImpl(builder.build());
 		String output = service.sendPromotionalMessage(mask, receiver, "Hello World! This message is from TRIGSOFT, testing Eocean SMS service.");
