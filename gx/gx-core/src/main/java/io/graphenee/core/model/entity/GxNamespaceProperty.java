@@ -27,33 +27,32 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-
 /**
  * The persistent class for the gx_namespace_property database table.
  * 
  */
 @Entity
-@Table(name="gx_namespace_property")
-@NamedQuery(name="GxNamespaceProperty.findAll", query="SELECT g FROM GxNamespaceProperty g")
+@Table(name = "gx_namespace_property")
+@NamedQuery(name = "GxNamespaceProperty.findAll", query = "SELECT g FROM GxNamespaceProperty g")
 public class GxNamespaceProperty implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
-	@Column(name="property_default_value")
+	@Column(name = "property_default_value")
 	private String propertyDefaultValue;
 
-	@Column(name="property_key")
+	@Column(name = "property_key")
 	private String propertyKey;
 
-	@Column(name="property_value")
+	@Column(name = "property_value")
 	private String propertyValue;
 
 	//bi-directional many-to-one association to GxNamespace
 	@ManyToOne
-	@JoinColumn(name="oid_namespace")
+	@JoinColumn(name = "oid_namespace")
 	private GxNamespace gxNamespace;
 
 	public GxNamespaceProperty() {

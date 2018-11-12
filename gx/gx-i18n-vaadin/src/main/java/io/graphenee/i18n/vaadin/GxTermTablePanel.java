@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package io.graphenee.i18n.vaadin;
 
 import java.util.ArrayList;
@@ -26,7 +41,7 @@ import io.graphenee.vaadin.TRAbstractForm;
 public class GxTermTablePanel extends AbstractEntityTablePanel<GxTermBean> {
 
 	private GxTermBean gxTermBean;
-	
+
 	@Autowired
 	GxDataService dataService;
 
@@ -62,25 +77,23 @@ public class GxTermTablePanel extends AbstractEntityTablePanel<GxTermBean> {
 	protected List<GxTermBean> fetchEntities() {
 		return findAvailableLocalesAndTerms();
 	}
-	
-	
-	
+
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] {"language", "termSingular", "termPlural"};
+		return new String[] { "language", "termSingular", "termPlural" };
 	}
 
 	@Override
 	protected TRAbstractForm<GxTermBean> editorForm() {
 		return null;
 	}
-	
+
 	@Override
 	protected boolean isTableEditable() {
 		return true;
 	}
-	
-	private List<GxTermBean> findAvailableLocalesAndTerms(){
+
+	private List<GxTermBean> findAvailableLocalesAndTerms() {
 		availableLocales = dataService.findSupportedLocale();
 		availableTerms = dataService.findTermByTermKey(gxTermBean.getTermKey());
 		terms = new HashMap<>();
@@ -101,17 +114,17 @@ public class GxTermTablePanel extends AbstractEntityTablePanel<GxTermBean> {
 		availableTerms = new ArrayList<>(terms.values());
 		return availableTerms;
 	}
-	
+
 	@Override
 	protected Field<?> propertyField(GxTermBean itemId, String propertyId) {
-		if(propertyId.matches("(termSingular)")) {
+		if (propertyId.matches("(termSingular)")) {
 			MTextField termSingular = new MTextField().withFullWidth();
 			termSingular.addFocusListener(event -> {
 				termSingular.selectAll();
 			});
 			return termSingular;
 		}
-		if(propertyId.matches("(termPlural)")) {
+		if (propertyId.matches("(termPlural)")) {
 			MTextField termPlural = new MTextField().withFullWidth();
 			termPlural.addFocusListener(event -> {
 				termPlural.selectAll();
@@ -120,15 +133,15 @@ public class GxTermTablePanel extends AbstractEntityTablePanel<GxTermBean> {
 		}
 		return super.propertyField(itemId, propertyId);
 	}
-	
+
 	@Override
 	protected void postBuild() {
 		hideToolbar();
 		entityTable().setHeight("250px");
 	}
-	
+
 	public void initializeWithEntity(GxTermBean gxTermBean) {
 		this.gxTermBean = gxTermBean;
 	}
-	
+
 }

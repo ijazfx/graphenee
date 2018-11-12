@@ -28,36 +28,35 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
-
 /**
  * The persistent class for the gx_audit_log database table.
  * 
  */
 @Entity
-@Table(name="gx_audit_log")
-@NamedQuery(name="GxAuditLog.findAll", query="SELECT g FROM GxAuditLog g")
+@Table(name = "gx_audit_log")
+@NamedQuery(name = "GxAuditLog.findAll", query = "SELECT g FROM GxAuditLog g")
 public class GxAuditLog implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
-	@Column(name="audit_date")
+	@Column(name = "audit_date")
 	private Timestamp auditDate;
 
-	@Column(name="audit_entity")
+	@Column(name = "audit_entity")
 	private String auditEntity;
 
-	@Column(name="audit_event")
+	@Column(name = "audit_event")
 	private String auditEvent;
 
-	@Column(name="oid_audit_entity")
+	@Column(name = "oid_audit_entity")
 	private Integer oidAuditEntity;
 
 	//bi-directional many-to-one association to GxUserAccount
 	@ManyToOne
-	@JoinColumn(name="oid_user_account")
+	@JoinColumn(name = "oid_user_account")
 	private GxUserAccount gxUserAccount;
 
 	public GxAuditLog() {

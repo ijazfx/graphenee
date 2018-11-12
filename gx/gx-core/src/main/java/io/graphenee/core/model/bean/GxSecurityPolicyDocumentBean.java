@@ -29,7 +29,7 @@ public class GxSecurityPolicyDocumentBean implements Serializable {
 	private String tag;
 	private String documentJson;
 	private Boolean isDefault = false;
-	private BeanFault<Integer, GxSecurityPolicyBean> securityPolicyBeanFault ;
+	private BeanFault<Integer, GxSecurityPolicyBean> securityPolicyBeanFault;
 
 	public GxSecurityPolicyDocumentBean() {
 		tag = SDF.format(new java.util.Date());

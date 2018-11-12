@@ -56,20 +56,17 @@ public final class OptionalSelect<T> extends CustomField<T> {
 		comboBox.setEnabled(false);
 		comboBox.addValueChangeListener(new ValueChangeListener() {
 			@Override
-			public void valueChange(
-					final com.vaadin.data.Property.ValueChangeEvent event) {
+			public void valueChange(final com.vaadin.data.Property.ValueChangeEvent event) {
 				setValue((T) event.getProperty().getValue());
 			}
 		});
 		content.addComponent(comboBox);
 
 		checkBox = new CheckBox("Subscribe to newsletter", false);
-		checkBox.setPropertyDataSource(new MethodProperty<Boolean>(comboBox,
-				"enabled"));
+		checkBox.setPropertyDataSource(new MethodProperty<Boolean>(comboBox, "enabled"));
 		checkBox.addValueChangeListener(new ValueChangeListener() {
 			@Override
-			public void valueChange(
-					final com.vaadin.data.Property.ValueChangeEvent event) {
+			public void valueChange(final com.vaadin.data.Property.ValueChangeEvent event) {
 				if ((Boolean) event.getProperty().getValue()) {
 					if (comboBox.getValue() == null) {
 						Iterator<?> iterator = comboBox.getItemIds().iterator();

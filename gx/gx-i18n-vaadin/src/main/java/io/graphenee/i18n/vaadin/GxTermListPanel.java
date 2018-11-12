@@ -117,8 +117,7 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 			entity.setNamespaceFault(null);
 		}
 		if (selectedSupportedLocale != null) {
-			entity.setSupportedLocaleFault(
-					BeanFault.beanFault(selectedSupportedLocale.getOid(), selectedSupportedLocale));
+			entity.setSupportedLocaleFault(BeanFault.beanFault(selectedSupportedLocale.getOid(), selectedSupportedLocale));
 		} else {
 			entity.setSupportedLocaleFault(null);
 		}

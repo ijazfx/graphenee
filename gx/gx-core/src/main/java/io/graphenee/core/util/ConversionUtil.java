@@ -50,7 +50,9 @@ public class ConversionUtil {
 	}
 
 	public static String textToHtml(String text) {
-		return text.replace("\n", "<br/>").replaceAll("\\s", "&nbsp;");
+		if (text != null)
+			return text.replace("\n", "<br/>").replaceAll("\\s", "&nbsp;");
+		return text;
 	}
 
 }

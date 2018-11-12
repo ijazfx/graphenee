@@ -28,8 +28,8 @@ public class GxTermBean implements Serializable {
 	private String termPlural;
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
-	private BeanFault<Integer, GxSupportedLocaleBean> supportedLocaleFault ;
-	private BeanFault<Integer, GxNamespaceBean> namespaceFault ;
+	private BeanFault<Integer, GxSupportedLocaleBean> supportedLocaleFault;
+	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
 
 	public Integer getOid() {
 		return oid;
@@ -94,12 +94,12 @@ public class GxTermBean implements Serializable {
 	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
 		this.namespaceFault = namespaceFault;
 	}
-	
+
 	public String getLanguage() {
-        if (getSupportedLocaleFault() != null)
-            return getSupportedLocaleFault().getBean().getLocaleName();
-        return null;
-    }
+		if (getSupportedLocaleFault() != null)
+			return getSupportedLocaleFault().getBean().getLocaleName();
+		return null;
+	}
 
 	@Override
 	public int hashCode() {
@@ -137,6 +137,5 @@ public class GxTermBean implements Serializable {
 			return false;
 		return true;
 	}
-	
-	
+
 }

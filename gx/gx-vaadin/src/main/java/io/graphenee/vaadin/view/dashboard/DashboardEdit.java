@@ -36,8 +36,7 @@ public class DashboardEdit extends Window {
 	private final TextField nameField = new TextField("Name");
 	private final DashboardEditListener listener;
 
-	public DashboardEdit(final DashboardEditListener listener,
-			final String currentName) {
+	public DashboardEdit(final DashboardEditListener listener, final String currentName) {
 		this.listener = listener;
 		setCaption("Edit Dashboard");
 		setModal(true);
