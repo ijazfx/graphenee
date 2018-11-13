@@ -32,7 +32,7 @@ public interface GxSecurityGroupRepository extends JpaRepository<GxSecurityGroup
 
 	List<GxSecurityGroup> findAllByIsActive(Boolean isActive);
 
-	GxSecurityGroup findAllBySecurityGroupNameAndGxNamespaceNamespace(String groupName, String namespace);
+	GxSecurityGroup findOneBySecurityGroupNameAndGxNamespaceNamespace(String groupName, String namespace);
 
 	List<GxSecurityGroup> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
 

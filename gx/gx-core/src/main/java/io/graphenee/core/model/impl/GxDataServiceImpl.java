@@ -1463,7 +1463,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean) {
-		GxSecurityGroup entity = securityGroupRepo.findAllBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
+		GxSecurityGroup entity = securityGroupRepo.findOneBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
 		if (entity != null) {
 			return makeSecurityGroupBean(entity);
 		}
