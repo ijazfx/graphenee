@@ -17,6 +17,7 @@
 		<class>io.graphenee.core.model.entity.GxSecurityGroup</class>
 		<class>io.graphenee.core.model.entity.GxSecurityPolicy</class>
 		<class>io.graphenee.core.model.entity.GxSecurityPolicyDocument</class>
+		<class>io.graphenee.core.model.entity.GxSmsProvider</class>
 		<class>io.graphenee.core.model.entity.GxState</class>
 		<class>io.graphenee.core.model.entity.GxSupportedLocale</class>
 		<class>io.graphenee.core.model.entity.GxTerm</class>

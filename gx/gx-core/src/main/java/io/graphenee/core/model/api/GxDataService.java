@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 
+import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
@@ -31,10 +32,12 @@ import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
+import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 
 public interface GxDataService {
 
@@ -287,5 +290,19 @@ public interface GxDataService {
 	List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean);
 
 	void delete(GxResourceBean bean);
+
+	GxSmsProviderBean createOrUpdate(GxSmsProviderBean bean);
+
+	void delete(GxSmsProvider bean);
+
+	List<GxSmsProviderBean> findSmsProvider();
+
+	GxSmsProviderBean findSmsProvider(Integer oid);
+
+	List<GxSmsProviderBean> findSmsProviderActive();
+
+	GxSmsProviderBean findSmsProviderPrimary();
+
+	GxSmsProviderBean findSmsProviderByProvider(SmsProvider smsProvider);
 
 }

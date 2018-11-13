@@ -103,6 +103,7 @@
 		<module>gx-aws</module>
 		<module>gx-jbpm-embedded</module>
 		<module>gx-sms</module>
+		<module>gx-sms-vaadin</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
@@ -353,6 +354,11 @@
 			<dependency>
 				<groupId>io.graphenee</groupId>
 				<artifactId>gx-sms</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.graphenee</groupId>
+				<artifactId>gx-sms-vaadin</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>

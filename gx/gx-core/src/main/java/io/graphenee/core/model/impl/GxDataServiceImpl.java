@@ -43,6 +43,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.AccessKeyType;
+import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
@@ -59,6 +60,7 @@ import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
+import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
@@ -77,6 +79,7 @@ import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
@@ -95,6 +98,7 @@ import io.graphenee.core.model.jpa.repository.GxSavedQueryRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityGroupRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyRepository;
+import io.graphenee.core.model.jpa.repository.GxSmsProviderRepository;
 import io.graphenee.core.model.jpa.repository.GxStateRepository;
 import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
@@ -167,6 +171,9 @@ public class GxDataServiceImpl implements GxDataService {
 	@Autowired
 	GxAccessKeyRepository accessKeyRepo;
 
+	@Autowired
+	GxSmsProviderRepository smsProviderRepo;
+
 	@PostConstruct
 	public void initialize() {
 		TransactionTemplate tran = new TransactionTemplate(transactionManager);
@@ -210,6 +217,7 @@ public class GxDataServiceImpl implements GxDataService {
 				admin.getSecurityGroupCollectionFault().add(adminGroup);
 				save(admin);
 			}
+
 			return null;
 		});
 	}
@@ -1812,6 +1820,81 @@ public class GxDataServiceImpl implements GxDataService {
 		GxCurrency entity = currencyRepository.findOneByAlpha3Code(alpha3Code);
 		if (entity != null)
 			return makeCurrencyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean createOrUpdate(GxSmsProviderBean bean) {
+		GxSmsProvider gxSmsProvider;
+		if (bean.getOid() == null)
+			gxSmsProvider = new GxSmsProvider();
+		else
+			gxSmsProvider = smsProviderRepo.findOne(bean.getOid());
+		gxSmsProvider = smsProviderRepo.save(toEntity(bean, gxSmsProvider));
+		bean.setOid(gxSmsProvider.getOid());
+		return bean;
+	}
+
+	private GxSmsProvider toEntity(GxSmsProviderBean bean, GxSmsProvider entity) {
+		entity.setConfigData(bean.getConfigData());
+		entity.setImplementationClass(bean.getImplementationClass());
+		entity.setIsActive(bean.getIsActive());
+		entity.setIsPrimary(bean.getIsPrimary());
+		entity.setProviderName(bean.getProviderName());
+		return entity;
+	}
+
+	@Override
+	public void delete(GxSmsProvider bean) {
+		smsProviderRepo.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxSmsProviderBean> findSmsProvider() {
+		return makeSmsProviderBean(smsProviderRepo.findAll(new Sort("providerName")));
+	}
+
+	@Override
+	public List<GxSmsProviderBean> findSmsProviderActive() {
+		return makeSmsProviderBean(smsProviderRepo.findAllByIsActiveTrueOrderByProviderNameAsc());
+	}
+
+	private List<GxSmsProviderBean> makeSmsProviderBean(List<GxSmsProvider> entities) {
+		return entities.stream().map(this::makeSmsProviderBean).collect(Collectors.toList());
+	}
+
+	private GxSmsProviderBean makeSmsProviderBean(GxSmsProvider entity) {
+		GxSmsProviderBean bean = new GxSmsProviderBean();
+		bean.setOid(entity.getOid());
+		bean.setConfigData(entity.getConfigData());
+		bean.setImplementationClass(entity.getImplementationClass());
+		bean.setIsActive(entity.getIsActive());
+		bean.setIsPrimary(entity.getIsPrimary());
+		bean.setProviderName(entity.getProviderName());
+		return bean;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProvider(Integer oid) {
+		GxSmsProvider entity = smsProviderRepo.findOne(oid);
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderByProvider(SmsProvider smsProvider) {
+		GxSmsProvider entity = smsProviderRepo.findOneByProviderName(smsProvider.getProviderName());
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderPrimary() {
+		GxSmsProvider entity = smsProviderRepo.findOneByIsActiveTrueAndIsPrimaryTrue();
+		if (entity != null)
+			return makeSmsProviderBean(entity);
 		return null;
 	}
 
