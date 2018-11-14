@@ -17,7 +17,6 @@ package io.graphenee.vaadin;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +72,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private BeanItemContainer<T> mainGridContainer;
 	private AbstractLayout toolbar;
 	private AbstractLayout secondaryToolbar;
-	private TRAbstractForm<T> cachedForm;
 	private MButton addButton;
 	private MButton editButton;
 	private MButton deleteButton;
@@ -197,7 +195,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				return getGridHeaderCaptionList();
 			});
 			exportDataSpreadSheetComponent.withDataColumns(() -> {
-				return Arrays.asList(visibleProperties());
+				List<String> columnList = new ArrayList<>();
+				entityGrid().getColumns().forEach(column -> {
+					if (!column.isHidden()) {
+						columnList.add(column.getPropertyId().toString());
+					}
+				});
+				return columnList;
 			}).withDataItems(() -> {
 				Collection<Object> selectedRows = entityGrid().getSelectedRows();
 				if (selectedRows.size() > 0) {
@@ -250,6 +254,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		}
 
 		grid.getColumns().forEach(column -> {
+			column.setHidable(true);
 			applyRendererForColumn(column);
 		});
 
@@ -452,13 +457,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private List<String> getGridHeaderCaptionList() {
-		List<String> headerCaptionList = new ArrayList<>();
-		mainGrid.getColumns().forEach(column -> {
-			if (column.getPropertyId() != null) {
-				headerCaptionList.add(column.getHeaderCaption());
+		List<String> columnList = new ArrayList<>();
+		entityGrid().getColumns().forEach(column -> {
+			if (!column.isHidden()) {
+				columnList.add(column.getHeaderCaption());
 			}
 		});
-		return headerCaptionList;
+		return columnList;
 	}
 
 	protected DownloadButton getDownloadButton() {
@@ -485,21 +490,21 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private void openEditorForm(T item) {
-		if (cachedForm() != null) {
+		if (editorForm() != null) {
 			// BeanItem<T> beanItem = mainGridContainer.getItem(item);
 			// if (beanItem == null) {
 			// cachedForm().setEntity(entityClass, item);
 			// } else {
 			// cachedForm().setEntity(entityClass, beanItem.getBean());
 			// }
-			cachedForm().setEntity(entityClass, item);
-			cachedForm().setSavedHandler(entity -> {
+			editorForm().setEntity(entityClass, item);
+			editorForm().setSavedHandler(entity -> {
 				try {
 					if (onSaveEntity(entity)) {
 						if (delegate != null) {
 							delegate.onSave(entity);
 						}
-						cachedForm().closePopup();
+						editorForm().closePopup();
 						// UI.getCurrent().access(() -> {
 						// if (!mainGridContainer.containsId(entity)) {
 						// mainGridContainer.addBean(entity);
@@ -513,7 +518,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 					L.warn(e.getMessage(), e);
 				}
 			});
-			cachedForm().openInModalPopup();
+			editorForm().openInModalPopup();
 		}
 	}
 
@@ -566,14 +571,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	protected abstract String[] visibleProperties();
 
 	protected abstract TRAbstractForm<T> editorForm();
-
-	private TRAbstractForm<T> cachedForm() {
-		// if (cachedForm == null) {
-		// cachedForm = editorForm();
-		// }
-		// return cachedForm;
-		return editorForm();
-	}
 
 	protected void postBuild() {
 	}

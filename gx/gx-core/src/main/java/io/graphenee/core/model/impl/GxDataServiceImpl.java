@@ -50,6 +50,7 @@ import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
 import io.graphenee.core.model.bean.GxCountryBean;
+import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
@@ -67,6 +68,7 @@ import io.graphenee.core.model.entity.GxAccessLog;
 import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxCity;
 import io.graphenee.core.model.entity.GxCountry;
+import io.graphenee.core.model.entity.GxCurrency;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -84,6 +86,7 @@ import io.graphenee.core.model.jpa.repository.GxAccessLogRepository;
 import io.graphenee.core.model.jpa.repository.GxAuditLogRepository;
 import io.graphenee.core.model.jpa.repository.GxCityRepository;
 import io.graphenee.core.model.jpa.repository.GxCountryRepository;
+import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
@@ -130,6 +133,9 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxCountryRepository countryRepository;
+
+	@Autowired
+	GxCurrencyRepository currencyRepository;
 
 	@Autowired
 	GxStateRepository stateRepository;
@@ -1457,7 +1463,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean) {
-		GxSecurityGroup entity = securityGroupRepo.findAllBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
+		GxSecurityGroup entity = securityGroupRepo.findOneBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
 		if (entity != null) {
 			return makeSecurityGroupBean(entity);
 		}
@@ -1732,6 +1738,81 @@ public class GxDataServiceImpl implements GxDataService {
 			entity.setGxNamespace(namespaceRepo.findOne(bean.getGxNamespaceBeanFault().getOid()));
 		}
 		return entity;
+	}
+
+	@Override
+	public GxCurrencyBean createOrUpdate(GxCurrencyBean bean) {
+		GxCurrency gxCurrency;
+		if (bean.getOid() == null)
+			gxCurrency = new GxCurrency();
+		else
+			gxCurrency = currencyRepository.findOne(bean.getOid());
+		gxCurrency = currencyRepository.save(toEntity(bean, gxCurrency));
+		bean.setOid(gxCurrency.getOid());
+		return bean;
+	}
+
+	private GxCurrency toEntity(GxCurrencyBean bean, GxCurrency entity) {
+		entity.setAlpha3Code(bean.getAlpha3Code());
+		entity.setCurrencyName(bean.getCurrencyName());
+		entity.setCurrencySymbol(bean.getCurrencySymbol());
+		entity.setIsActive(bean.getIsActive());
+		entity.setNumericCode(bean.getNumericCode());
+		return entity;
+	}
+
+	@Override
+	public void delete(GxCurrencyBean bean) {
+		currencyRepository.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxCurrencyBean> findCurrency() {
+		return makeCurrencyBean(currencyRepository.findAll());
+	}
+
+	@Override
+	public List<GxCurrencyBean> findCurrencyActive() {
+		return makeCurrencyBean(currencyRepository.findAllByIsActiveTrueOrderByCurrencyNameAsc());
+	}
+
+	private List<GxCurrencyBean> makeCurrencyBean(List<GxCurrency> entities) {
+		return entities.stream().map(this::makeCurrencyBean).collect(Collectors.toList());
+	}
+
+	private GxCurrencyBean makeCurrencyBean(GxCurrency entity) {
+		GxCurrencyBean bean = new GxCurrencyBean();
+		bean.setOid(entity.getOid());
+		bean.setAlpha3Code(entity.getAlpha3Code());
+		bean.setCurrencyName(entity.getCurrencyName());
+		bean.setCurrencySymbol(entity.getCurrencySymbol());
+		bean.setIsActive(entity.getIsActive());
+		bean.setNumericCode(entity.getNumericCode());
+		return bean;
+	}
+
+	@Override
+	public GxCurrencyBean findCurrency(Integer oid) {
+		GxCurrency entity = currencyRepository.findOne(oid);
+		if (entity != null)
+			return makeCurrencyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxCurrencyBean findCurrencyByCurrencyNumericCode(Integer numericCode) {
+		GxCurrency entity = currencyRepository.findOneByNumericCode(numericCode);
+		if (entity != null)
+			return makeCurrencyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxCurrencyBean findCurrencyByCurrencyAlpha3Code(String alpha3Code) {
+		GxCurrency entity = currencyRepository.findOneByAlpha3Code(alpha3Code);
+		if (entity != null)
+			return makeCurrencyBean(entity);
+		return null;
 	}
 
 }

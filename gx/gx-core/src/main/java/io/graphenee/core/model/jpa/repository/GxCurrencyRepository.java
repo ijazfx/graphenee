@@ -16,27 +16,19 @@
 package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxCurrency;
 
 @Repository
-public interface GxSecurityGroupRepository extends JpaRepository<GxSecurityGroup, Integer> {
+public interface GxCurrencyRepository extends JpaRepository<GxCurrency, Integer> {
 
-	List<GxSecurityGroup> findAllByGxUserAccountsOidEquals(Integer oidUserAccount);
+	List<GxCurrency> findAllByIsActiveTrueOrderByCurrencyNameAsc();
 
-	List<GxSecurityGroup> findAllByGxSecurityPoliciesOidEquals(Integer oidSecurityPolicy);
+	GxCurrency findOneByNumericCode(Integer numericCode);
 
-	List<GxSecurityGroup> findAllByIsActive(Boolean isActive);
+	GxCurrency findOneByAlpha3Code(String alpha3Code);
 
-	GxSecurityGroup findOneBySecurityGroupNameAndGxNamespaceNamespace(String groupName, String namespace);
-
-	List<GxSecurityGroup> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
-
-	GxSecurityGroup findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
-
-	GxSecurityGroup findOneBySecurityGroupNameAndGxNamespaceNamespace(String groupName, String namespace);
 }

@@ -23,6 +23,7 @@ import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
 import io.graphenee.core.model.bean.GxCountryBean;
+import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
@@ -168,6 +169,20 @@ public interface GxDataService {
 	List<GxCityBean> findCityByCountryNumericCode(Integer numericCode);
 
 	List<GxCityBean> findCityByStateCode(String stateCode);
+
+	GxCurrencyBean createOrUpdate(GxCurrencyBean bean);
+
+	void delete(GxCurrencyBean bean);
+
+	List<GxCurrencyBean> findCurrency();
+
+	List<GxCurrencyBean> findCurrencyActive();
+
+	GxCurrencyBean findCurrency(Integer oid);
+
+	GxCurrencyBean findCurrencyByCurrencyNumericCode(Integer numericCode);
+
+	GxCurrencyBean findCurrencyByCurrencyAlpha3Code(String alpha3Code);
 
 	GxSavedQueryBean findSavedQuery(Integer oid);
 

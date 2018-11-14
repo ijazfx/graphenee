@@ -23,5 +23,10 @@ import io.graphenee.core.model.entity.GxAccessLog;
 
 public interface GxAccessLogRepository extends JpaRepository<GxAccessLog, Integer> {
 
+<<<<<<< HEAD
 	List<GxAccessLog> findAllByGxAccessKeyOid(Integer oidAccessKey);
+=======
+	List<GxAccessLog> findAllByGxAccessKeyOid(Integer oid);
+
+>>>>>>> trigsoft/master
 }

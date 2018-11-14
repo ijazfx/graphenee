@@ -1632,10 +1632,10 @@ div.v-layout.v-horizontal.v-widget {
 
 .graphenee {
 	@media screen and (max-width: 480px) {
-		.notifications.v-window {
-			right: 12px;
-		}
+	.notifications.v-window {
+		right: 12px;
 	}
+}
 }
 
 .graphenee.v-app, .graphenee.v-app-loading {
@@ -8991,6 +8991,7 @@ div.v-layout.v-horizontal.v-widget {
 	position: relative;
 	background: #fafafa;
 	color: #464646;
+	overflow: hidden;
 }
 
 .graphenee .v-table-header table, .graphenee .v-table-footer table, .graphenee .v-table-table {
@@ -9048,9 +9049,8 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .graphenee .v-table-caption-container, .graphenee .v-table-header-drag {
-	padding: 10px 10px 9px 15px;
-    border-left: 1px solid #e2e2e2;
-    font-weight: bold;
+	padding: 10px 10px 9px;
+	border-left: 1px solid #e2e2e2;
 }
 
 .graphenee .v-table-caption-container-align-right {
@@ -9094,7 +9094,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .graphenee .v-table-cell-wrapper  > .v-widget {
-	margin: 3px 0px 3px -1px;
+	margin: 3px -5px;
 }
 
 .graphenee .v-table-cell-wrapper  > .v-widget.v-label, .graphenee .v-table-cell-wrapper  > .v-widget.v-checkbox, .graphenee .v-table-cell-wrapper  > .v-widget.v-select-optiongroup {
@@ -9105,29 +9105,6 @@ div.v-layout.v-horizontal.v-widget {
 	margin-left: 0;
 	margin-right: 0;
 }
-
-.graphenee .v-table-cell-wrapper .v-textfield-readonly {
-    border: none;
-    background-color: transparent;
-}
-
-.graphenee .v-table-cell-wrapper .v-textfield{
-	width : 100%;
-    background-color: transparent;
-    box-shadow: none;
-    border:none;
-}
-
-.graphenee .v-table-cell-wrapper .v-textfield:focus{
-	border: 2px solid #249969;
-	border-radius: 2px;
-}
-
-.graphenee .v-table-cell-wrapper .v-textfield-readonly:focus {
-    border: none;
-    background-color: transparent;
-}
-
 
 .graphenee .v-table-body {
 	border: 1px solid #e2e2e2;
@@ -13183,7 +13160,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .graphenee .valo-menu-item .valo-menu-item-wrap img {
-	width: 16px;
+	width: 20px;
 	min-width: 1em;
 	margin-right: 20px;
 	text-align: center;
@@ -13243,11 +13220,11 @@ div.v-layout.v-horizontal.v-widget {
 	width: 200px;
 }
 
-.graphenee .v-ui[width-range~="801px-1100px"] .valo-menu {
+.graphenee .v-ui[width-range~="801px-"] .valo-menu {
 	width: inherit;
 }
 
-.graphenee .v-ui[width-range~="801px-1100px"] .valo-menu-item {
+.graphenee .v-ui[width-range~="801px-"] .valo-menu-item {
 	width: inherit;
 	padding-top: 0px !important;
 	padding-bottom: 0px !important;

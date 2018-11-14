@@ -112,7 +112,7 @@
     	}
     	
     	img {
-    		width: 16px;
+    		width: 20px;
 	    	min-width: 1em;
 		    margin-right: 20px;
 		    text-align: center;
@@ -178,7 +178,7 @@
     
   }
   
-  .v-ui[width-range~="801px-1100px"] {
+  .v-ui[width-range~="801px-"] {
   	.valo-menu {
   		width: inherit;
   	}
