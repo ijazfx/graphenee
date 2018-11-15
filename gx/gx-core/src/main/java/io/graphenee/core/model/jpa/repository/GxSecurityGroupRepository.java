@@ -37,4 +37,5 @@ public interface GxSecurityGroupRepository extends JpaRepository<GxSecurityGroup
 	List<GxSecurityGroup> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
 
 	GxSecurityGroup findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
+
 }
