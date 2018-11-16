@@ -1023,7 +1023,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.7.9";
+	content: "7.7.15";
 }
 
 .v-widget {
@@ -1778,6 +1778,61 @@ div.v-layout.v-horizontal.v-widget {
 	content: "!";
 }
 
+.graphenee .v-errorindicator-info {
+	color: #00a7f5;
+	font-weight: 600;
+	width: 15px;
+	text-align: center;
+}
+
+.graphenee .v-errorindicator-info:before {
+	content: "!";
+}
+
+.graphenee .v-errorindicator-warning {
+	color: #fc9c00;
+	font-weight: 600;
+	width: 15px;
+	text-align: center;
+}
+
+.graphenee .v-errorindicator-warning:before {
+	content: "!";
+}
+
+.graphenee .v-errorindicator-error {
+	color: #ed473b;
+	font-weight: 600;
+	width: 15px;
+	text-align: center;
+}
+
+.graphenee .v-errorindicator-error:before {
+	content: "!";
+}
+
+.graphenee .v-errorindicator-critical {
+	color: #fa007d;
+	font-weight: 600;
+	width: 15px;
+	text-align: center;
+}
+
+.graphenee .v-errorindicator-critical:before {
+	content: "!";
+}
+
+.graphenee .v-errorindicator-system {
+	color: #bb00ff;
+	font-weight: 600;
+	width: 15px;
+	text-align: center;
+}
+
+.graphenee .v-errorindicator-system:before {
+	content: "!";
+}
+
 .graphenee .v-required-field-indicator {
 	color: #ed473b;
 	padding: 0 0.2em;
@@ -1876,6 +1931,26 @@ div.v-layout.v-horizontal.v-widget {
 	line-height: inherit;
 }
 
+.graphenee .v-tooltip .v-errormessage-info {
+	color: #00a7f5;
+}
+
+.graphenee .v-tooltip .v-errormessage-warning {
+	color: #fc9c00;
+}
+
+.graphenee .v-tooltip .v-errormessage-error {
+	color: #ed473b;
+}
+
+.graphenee .v-tooltip .v-errormessage-critical {
+	color: #fa007d;
+}
+
+.graphenee .v-tooltip .v-errormessage-system {
+	color: #bb00ff;
+}
+
 .graphenee .v-tooltip .v-tooltip-text {
 	max-height: 10em;
 	overflow: auto;
@@ -1888,6 +1963,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .graphenee .v-tooltip h1, .graphenee .v-tooltip h2, .graphenee .v-tooltip h3, .graphenee .v-tooltip h4 {
 	color: inherit;
+}
+
+.graphenee .v-tooltip pre.v-tooltip-pre {
+	font: inherit;
+	white-space: pre-wrap;
+	margin: 0;
 }
 
 .graphenee .v-contextmenu {
@@ -3155,6 +3236,61 @@ div.v-layout.v-horizontal.v-widget {
 .graphenee .v-filterselect-error .v-filterselect-button {
 	color: #ed473b;
 	border-color: #ed473b;
+}
+
+.graphenee .v-filterselect-error-info .v-filterselect-input {
+	border-color: #00a7f5 !important;
+	background: #fafdff;
+	color: #195774;
+}
+
+.graphenee .v-filterselect-error-info .v-filterselect-button {
+	color: #00a7f5;
+	border-color: #00a7f5;
+}
+
+.graphenee .v-filterselect-error-warning .v-filterselect-input {
+	border-color: #fc9c00 !important;
+	background: #fffdfa;
+	color: #745119;
+}
+
+.graphenee .v-filterselect-error-warning .v-filterselect-button {
+	color: #fc9c00;
+	border-color: #fc9c00;
+}
+
+.graphenee .v-filterselect-error-error .v-filterselect-input {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
+}
+
+.graphenee .v-filterselect-error-error .v-filterselect-button {
+	color: #ed473b;
+	border-color: #ed473b;
+}
+
+.graphenee .v-filterselect-error-critical .v-filterselect-input {
+	border-color: #fa007d !important;
+	background: #fffafc;
+	color: #741947;
+}
+
+.graphenee .v-filterselect-error-critical .v-filterselect-button {
+	color: #fa007d;
+	border-color: #fa007d;
+}
+
+.graphenee .v-filterselect-error-system .v-filterselect-input {
+	border-color: #bb00ff !important;
+	background: #fefaff;
+	color: #5c1974;
+}
+
+.graphenee .v-filterselect-error-system .v-filterselect-button {
+	color: #bb00ff;
+	border-color: #bb00ff;
 }
 
 .graphenee .v-filterselect-suggestpopup {
@@ -5189,6 +5325,36 @@ div.v-layout.v-horizontal.v-widget {
 	color: #6c2621;
 }
 
+.graphenee .v-textfield-error-info {
+	border-color: #00a7f5 !important;
+	background: #fafdff;
+	color: #195774;
+}
+
+.graphenee .v-textfield-error-warning {
+	border-color: #fc9c00 !important;
+	background: #fffdfa;
+	color: #745119;
+}
+
+.graphenee .v-textfield-error-error {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
+}
+
+.graphenee .v-textfield-error-critical {
+	border-color: #fa007d !important;
+	background: #fffafc;
+	color: #741947;
+}
+
+.graphenee .v-textfield-error-system {
+	border-color: #bb00ff !important;
+	background: #fefaff;
+	color: #5c1974;
+}
+
 .graphenee .v-textfield-borderless {
 	border: none;
 	border-radius: 0;
@@ -6025,6 +6191,61 @@ div.v-layout.v-horizontal.v-widget {
 .graphenee .v-datefield-error .v-datefield-button {
 	color: #ed473b;
 	border-color: #ed473b;
+}
+
+.graphenee .v-datefield-error-info .v-datefield-textfield {
+	border-color: #00a7f5 !important;
+	background: #fafdff;
+	color: #195774;
+}
+
+.graphenee .v-datefield-error-info .v-datefield-button {
+	color: #00a7f5;
+	border-color: #00a7f5;
+}
+
+.graphenee .v-datefield-error-warning .v-datefield-textfield {
+	border-color: #fc9c00 !important;
+	background: #fffdfa;
+	color: #745119;
+}
+
+.graphenee .v-datefield-error-warning .v-datefield-button {
+	color: #fc9c00;
+	border-color: #fc9c00;
+}
+
+.graphenee .v-datefield-error-error .v-datefield-textfield {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
+}
+
+.graphenee .v-datefield-error-error .v-datefield-button {
+	color: #ed473b;
+	border-color: #ed473b;
+}
+
+.graphenee .v-datefield-error-critical .v-datefield-textfield {
+	border-color: #fa007d !important;
+	background: #fffafc;
+	color: #741947;
+}
+
+.graphenee .v-datefield-error-critical .v-datefield-button {
+	color: #fa007d;
+	border-color: #fa007d;
+}
+
+.graphenee .v-datefield-error-system .v-datefield-textfield {
+	border-color: #bb00ff !important;
+	background: #fefaff;
+	color: #5c1974;
+}
+
+.graphenee .v-datefield-error-system .v-datefield-button {
+	color: #bb00ff;
+	border-color: #bb00ff;
 }
 
 .graphenee .v-datefield-full {
@@ -9108,6 +9329,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .graphenee .v-table-body {
 	border: 1px solid #e2e2e2;
+	overflow-anchor: none;
 	-webkit-user-select: text;
 	-moz-user-select: text;
 	-ms-user-select: text;
@@ -11051,6 +11273,36 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #ed473b !important;
 	background: #fffbfb;
 	color: #6c2621;
+}
+
+.graphenee .v-select-twincol-error-info .v-select-twincol-options, .graphenee .v-select-twincol-error-info .v-select-twincol-selections {
+	border-color: #00a7f5 !important;
+	background: #fafdff;
+	color: #195774;
+}
+
+.graphenee .v-select-twincol-error-warning .v-select-twincol-options, .graphenee .v-select-twincol-error-warning .v-select-twincol-selections {
+	border-color: #fc9c00 !important;
+	background: #fffdfa;
+	color: #745119;
+}
+
+.graphenee .v-select-twincol-error-error .v-select-twincol-options, .graphenee .v-select-twincol-error-error .v-select-twincol-selections {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
+}
+
+.graphenee .v-select-twincol-error-critical .v-select-twincol-options, .graphenee .v-select-twincol-error-critical .v-select-twincol-selections {
+	border-color: #fa007d !important;
+	background: #fffafc;
+	color: #741947;
+}
+
+.graphenee .v-select-twincol-error-system .v-select-twincol-options, .graphenee .v-select-twincol-error-system .v-select-twincol-selections {
+	border-color: #bb00ff !important;
+	background: #fefaff;
+	color: #5c1974;
 }
 
 .graphenee .v-select select {
