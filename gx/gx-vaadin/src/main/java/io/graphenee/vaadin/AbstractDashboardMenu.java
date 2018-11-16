@@ -32,7 +32,6 @@ import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
@@ -56,6 +55,7 @@ import io.graphenee.vaadin.event.DashboardEvent.ProfileUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.ReportsCountUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
+import io.graphenee.vaadin.event.TRButtonClickListener;
 
 /**
  * A responsive menu component providing user information and the controls for
@@ -215,9 +215,10 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	}
 
 	private Component buildToggleButton() {
-		Button valoMenuToggleButton = new Button("Menu", new ClickListener() {
+		Button valoMenuToggleButton = new Button("Menu", new TRButtonClickListener() {
+
 			@Override
-			public void buttonClick(final ClickEvent event) {
+			public void onButtonClick(ClickEvent event) {
 				if (getCompositionRoot().getStyleName().contains(STYLE_VISIBLE)) {
 					getCompositionRoot().removeStyleName(STYLE_VISIBLE);
 				} else {
@@ -238,9 +239,13 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		Collection<TRMenuItem> items = menuItems();
 		backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON);
 		backButton.setVisible(false);
-		backButton.addClickListener(event -> {
-			if (!backStack.isEmpty())
-				backStack.pop().execute();
+		backButton.addClickListener(new TRButtonClickListener() {
+
+			@Override
+			public void onButtonClick(ClickEvent event) {
+				if (!backStack.isEmpty())
+					backStack.pop().execute();
+			}
 		});
 		generateValoMenuItemButtons(menuItemsLayout, items);
 		menuItemsLayout.addComponent(backButton, 0);

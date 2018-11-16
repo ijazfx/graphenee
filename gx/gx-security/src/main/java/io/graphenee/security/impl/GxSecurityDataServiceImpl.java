@@ -85,50 +85,32 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 
 	@Override
 	public void access(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
-		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
-
-		if (gxUserAccount != null) {
-			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
-				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
-			} else {
-				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
-				throw new GxPermissionException("Access permission denied.");
-			}
-		} else
-			throw new GxPermissionException("Key not in use.");
+		if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
+			dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
+		} else {
+			dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
+			throw new GxPermissionException("Access denied");
+		}
 	}
 
 	@Override
 	public void checkIn(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
-		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
-
-		if (gxUserAccount != null) {
-			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
-				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
-			} else {
-				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
-				throw new GxPermissionException("Check-in permission denied.");
-			}
-		} else
-			throw new GxPermissionException("Key not in use.");
+		if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
+			dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
+		} else {
+			dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
+			throw new GxPermissionException("Check-in denied");
+		}
 	}
 
 	@Override
 	public void checkOut(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
-		UUID accessKeyUuid = UUID.fromString(accessKey);
-		GxUserAccount gxUserAccount = gxUserAccountRepository.findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(accessKeyUuid);
-
-		if (gxUserAccount != null) {
-			if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
-				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
-			} else {
-				dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
-				throw new GxPermissionException("Check-out permission denied.");
-			}
-		} else
-			throw new GxPermissionException("Key not in use.");
+		if (canAccessResource(gxNamespaceBean, accessKey, resourceName, timeStamp)) {
+			dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
+		} else {
+			dataService.log(gxNamespaceBean, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
+			throw new GxPermissionException("Check-out denied");
+		}
 	}
 
 	@Override

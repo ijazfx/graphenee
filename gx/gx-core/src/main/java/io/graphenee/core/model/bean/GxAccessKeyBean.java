@@ -141,7 +141,7 @@ public class GxAccessKeyBean implements Serializable {
 		if (grantActionSet != null && grantActionSet.contains("all"))
 			return true;
 
-		return getUserAccountBeanFault().getBean().canDoAction(resource, action, false);
+		return getUserAccountBeanFault() != null && getUserAccountBeanFault().getBean().canDoAction(resource, action, false);
 	}
 
 	protected Map<String, Set<String>> grantMap() {

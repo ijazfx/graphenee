@@ -386,7 +386,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.java.persistence>2.1.1</version.java.persistence>
-		<version.vaadin>7.7.9</version.vaadin>
+		<version.vaadin>7.7.15</version.vaadin>
 	</properties>
 
 	<distributionManagement>

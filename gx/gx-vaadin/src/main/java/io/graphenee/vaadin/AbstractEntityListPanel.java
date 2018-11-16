@@ -41,6 +41,7 @@ import org.vaadin.viritin.ui.MNotification;
 import com.google.common.base.Strings;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -59,6 +60,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.graphenee.core.util.TRCalenderUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
+import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.renderer.BooleanRenderer;
 import io.graphenee.vaadin.util.VaadinUtils;
 
@@ -259,16 +261,20 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		});
 
 		grid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
-		grid.addItemClickListener(event -> {
-			if (event.getPropertyId() != null) {
-				BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
-				if (onItemClick != null) {
-					Boolean value = onItemClick.apply(item.getBean());
-					if (value != null && value == true) {
+		grid.addItemClickListener(new TRItemClickListener() {
+
+			@Override
+			public void onItemClick(ItemClickEvent event) {
+				if (event.getPropertyId() != null) {
+					BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
+					if (onItemClick != null) {
+						Boolean value = onItemClick.apply(item.getBean());
+						if (value != null && value == true) {
+							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+						}
+					} else {
 						onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 					}
-				} else {
-					onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 				}
 			}
 		});
