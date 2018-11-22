@@ -1832,6 +1832,8 @@ public class GxDataServiceImpl implements GxDataService {
 			gxSmsProvider = smsProviderRepo.findOne(bean.getOid());
 		gxSmsProvider = smsProviderRepo.save(toEntity(bean, gxSmsProvider));
 		bean.setOid(gxSmsProvider.getOid());
+		if (bean.getIsPrimary())
+			markAsPrimary(bean);
 		return bean;
 	}
 
@@ -1896,6 +1898,19 @@ public class GxDataServiceImpl implements GxDataService {
 		if (entity != null)
 			return makeSmsProviderBean(entity);
 		return null;
+	}
+
+	@Override
+	public void markAsPrimary(GxSmsProviderBean bean) {
+		List<GxSmsProvider> allProviders = smsProviderRepo.findAll();
+		allProviders.forEach(provider -> {
+			if (bean.getOid().equals(provider.getOid()))
+				provider.setIsPrimary(true);
+			else
+				provider.setIsPrimary(false);
+
+		});
+		smsProviderRepo.save(allProviders);
 	}
 
 }

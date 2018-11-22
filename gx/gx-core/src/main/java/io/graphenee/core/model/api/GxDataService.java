@@ -293,6 +293,8 @@ public interface GxDataService {
 
 	GxSmsProviderBean createOrUpdate(GxSmsProviderBean bean);
 
+	void markAsPrimary(GxSmsProviderBean bean);
+
 	void delete(GxSmsProvider bean);
 
 	List<GxSmsProviderBean> findSmsProvider();
