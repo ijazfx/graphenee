@@ -22,12 +22,12 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 
 	@Override
 	public String sendTransactionalMessage(String phone, String message) {
-		throw new UnsupportedOperationException("Please use method with senderId.");
+		return sendTransactionalMessage(smsConfig.getSenderId(), phone, message);
 	}
 
 	@Override
 	public String sendPromotionalMessage(String phone, String message) {
-		throw new UnsupportedOperationException("Please use method with senderId.");
+		return sendPromotionalMessage(smsConfig.getSenderId(), phone, message);
 	}
 
 	@Override

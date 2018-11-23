@@ -42,6 +42,7 @@ public class GxTwilioSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 
 	GxSmsConfigProtos.TwilioConfig.Builder configBuilder;
 
+	private MTextField senderId;
 	private MTextField accountSid;
 	private MPasswordField authToken;
 
@@ -51,27 +52,36 @@ public class GxTwilioSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 		isPrimary = new MCheckBox("Is Primary?");
 		form.addComponents(providerNameLabel, isPrimary);
 		accountSid = new MTextField("Account SID");
-		accountSid.addValueChangeListener(event -> {
+		accountSid.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setAccountSid(value.toString());
+					configBuilder.setAccountSid(value);
 				else
 					configBuilder.clearAccountSid();
 			}
 		});
 		authToken = new MPasswordField("Auth Token");
-		authToken.addValueChangeListener(event -> {
+		authToken.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setAuthToken(value.toString());
+					configBuilder.setAuthToken(value);
 				else
 					configBuilder.clearAuthToken();
 			}
 		});
-
-		form.addComponents(accountSid, authToken);
+		senderId = new MTextField("Sender ID");
+		senderId.addTextChangeListener(event -> {
+			if (!isBinding()) {
+				String value = event.getText();
+				if (value != null)
+					configBuilder.setSenderId(value);
+				else
+					configBuilder.clearSenderId();
+			}
+		});
+		form.addComponents(accountSid, authToken, senderId);
 	}
 
 	@Override
@@ -81,6 +91,7 @@ public class GxTwilioSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 			configBuilder = GxSmsConfigProtos.TwilioConfig.parseFrom(entity.getConfigData()).toBuilder();
 			accountSid.setValue(configBuilder.getAccountSid());
 			authToken.setValue(configBuilder.getAuthToken());
+			senderId.setValue(configBuilder.getSenderId());
 		} catch (Exception e) {
 			configBuilder = GxSmsConfigProtos.TwilioConfig.newBuilder();
 			L.warn(e.getMessage(), e);
@@ -95,7 +106,7 @@ public class GxTwilioSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 
 	@Override
 	protected String popupHeight() {
-		return "250px";
+		return "300px";
 	}
 
 	@Override

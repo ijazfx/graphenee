@@ -25,12 +25,12 @@ public class AwsSmsServiceImpl implements GxSmsService {
 
 	@Override
 	public String sendPromotionalMessage(String phone, String message) {
-		return sendPromotionalMessage(null, phone, message);
+		return sendPromotionalMessage(smsConfig.getSenderId(), phone, message);
 	}
 
 	@Override
 	public String sendTransactionalMessage(String phone, String message) {
-		return sendTransactionalMessage(null, phone, message);
+		return sendTransactionalMessage(smsConfig.getSenderId(), phone, message);
 	}
 
 	@Override
@@ -83,12 +83,12 @@ public class AwsSmsServiceImpl implements GxSmsService {
 
 					@Override
 					public String getAWSSecretKey() {
-						return smsConfig.getAwsAccessKeyId();
+						return smsConfig.getAwsSecretKey();
 					}
 
 					@Override
 					public String getAWSAccessKeyId() {
-						return smsConfig.getAwsSecretKey();
+						return smsConfig.getAwsAccessKeyId();
 					}
 				};
 			}

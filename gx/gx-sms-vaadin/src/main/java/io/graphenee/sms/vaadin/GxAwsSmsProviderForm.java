@@ -48,43 +48,54 @@ public class GxAwsSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 
 	private MTextField awsRegion;
 
+	private MTextField senderId;
+
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
 		providerNameLabel = new MLabel().withCaption("Provider");
 		isPrimary = new MCheckBox("Is Primary?");
 		form.addComponents(providerNameLabel, isPrimary);
 		awsAccessKeyId = new MTextField("Access Key ID");
-		awsAccessKeyId.addValueChangeListener(event -> {
+		awsAccessKeyId.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setAwsAccessKeyId(value.toString());
+					configBuilder.setAwsAccessKeyId(value);
 				else
 					configBuilder.clearAwsAccessKeyId();
 			}
 		});
 		awsSecretKey = new MPasswordField("Secret Key");
-		awsSecretKey.addValueChangeListener(event -> {
+		awsSecretKey.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setAwsSecretKey(value.toString());
+					configBuilder.setAwsSecretKey(value);
 				else
 					configBuilder.clearAwsSecretKey();
 			}
 		});
-
 		awsRegion = new MTextField("Region");
-		awsRegion.addValueChangeListener(event -> {
+		awsRegion.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setAwsRegion(value.toString());
+					configBuilder.setAwsRegion(value);
 				else
 					configBuilder.clearAwsRegion();
 			}
 		});
-		form.addComponents(awsAccessKeyId, awsSecretKey, awsRegion);
+		senderId = new MTextField("Sender ID");
+		senderId.addTextChangeListener(event -> {
+			if (!isBinding()) {
+				String value = event.getText();
+				if (value != null)
+					configBuilder.setSenderId(value);
+				else
+					configBuilder.clearSenderId();
+			}
+		});
+		form.addComponents(awsAccessKeyId, awsSecretKey, awsRegion, senderId);
 	}
 
 	@Override
@@ -95,6 +106,7 @@ public class GxAwsSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 			awsAccessKeyId.setValue(configBuilder.getAwsAccessKeyId());
 			awsSecretKey.setValue(configBuilder.getAwsSecretKey());
 			awsRegion.setValue(configBuilder.getAwsRegion());
+			senderId.setValue(configBuilder.getSenderId());
 		} catch (Exception e) {
 			configBuilder = GxSmsConfigProtos.AwsSmsConfig.newBuilder();
 			L.warn(e.getMessage(), e);
@@ -109,7 +121,7 @@ public class GxAwsSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 
 	@Override
 	protected String popupHeight() {
-		return "250px";
+		return "300px";
 	}
 
 	@Override

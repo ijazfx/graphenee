@@ -15,8 +15,10 @@
  *******************************************************************************/
 package io.graphenee.core.gson;
 
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Base64;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -56,6 +58,17 @@ public class JsonDeserializers {
 				return null;
 			}
 		}
+	}
+
+	public static class ByteArrayDeserializer implements JsonDeserializer<byte[]> {
+
+		@Override
+		public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			if (json == null)
+				return new byte[] {};
+			return Base64.getDecoder().decode(json.getAsString());
+		}
+
 	}
 
 }

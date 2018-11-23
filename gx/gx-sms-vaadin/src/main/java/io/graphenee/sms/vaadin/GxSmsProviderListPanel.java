@@ -56,7 +56,7 @@ public class GxSmsProviderListPanel extends AbstractEntityListPanel<GxSmsProvide
 
 	@Override
 	protected String panelCaption() {
-		return "SMS Providers";
+		return null;
 	}
 
 	@Override

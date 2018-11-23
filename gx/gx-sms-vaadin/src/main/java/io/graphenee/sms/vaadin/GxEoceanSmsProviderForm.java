@@ -52,6 +52,7 @@ public class GxEoceanSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 	private MTextField baseUrl;
 	private MTextField user;
 	private MPasswordField password;
+	private MTextField senderId;
 
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
@@ -59,37 +60,47 @@ public class GxEoceanSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 		isPrimary = new MCheckBox("Is Primary?");
 		form.addComponents(providerNameLabel, isPrimary);
 		baseUrl = new MTextField("Base URL");
-		baseUrl.addValueChangeListener(event -> {
+		baseUrl.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setBaseUrl(value.toString());
+					configBuilder.setBaseUrl(value);
 				else
 					configBuilder.clearBaseUrl();
 			}
 		});
 		user = new MTextField("User");
-		user.addValueChangeListener(event -> {
+		user.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setUser(value.toString());
+					configBuilder.setUser(value);
 				else
 					configBuilder.clearUser();
 			}
 		});
 
 		password = new MPasswordField("Password");
-		password.addValueChangeListener(event -> {
+		password.addTextChangeListener(event -> {
 			if (!isBinding()) {
-				Object value = event.getProperty().getValue();
+				String value = event.getText();
 				if (value != null)
-					configBuilder.setPassword(value.toString());
+					configBuilder.setPassword(value);
 				else
 					configBuilder.clearPassword();
 			}
 		});
-		form.addComponents(baseUrl, user, password);
+		senderId = new MTextField("Sender ID");
+		senderId.addTextChangeListener(event -> {
+			if (!isBinding()) {
+				String value = event.getText();
+				if (value != null)
+					configBuilder.setSenderId(value);
+				else
+					configBuilder.clearSenderId();
+			}
+		});
+		form.addComponents(baseUrl, user, password, senderId);
 	}
 
 	@Override
@@ -100,6 +111,7 @@ public class GxEoceanSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 			baseUrl.setValue(configBuilder.getBaseUrl());
 			user.setValue(configBuilder.getUser());
 			password.setValue(configBuilder.getPassword());
+			senderId.setValue(configBuilder.getSenderId());
 		} catch (Exception e) {
 			configBuilder = GxSmsConfigProtos.EoceanConfig.newBuilder();
 			L.warn(e.getMessage(), e);
@@ -114,7 +126,7 @@ public class GxEoceanSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 
 	@Override
 	protected String popupHeight() {
-		return "250px";
+		return "300px";
 	}
 
 	@Override

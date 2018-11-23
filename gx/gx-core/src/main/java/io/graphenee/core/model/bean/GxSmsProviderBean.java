@@ -27,6 +27,7 @@ public class GxSmsProviderBean implements Serializable {
 	private byte[] configData;
 	private Boolean isPrimary = false;
 	private Boolean isActive = false;
+	private String senderId;
 
 	public Integer getOid() {
 		return oid;
@@ -74,6 +75,14 @@ public class GxSmsProviderBean implements Serializable {
 
 	public void setIsActive(Boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public String getSenderId() {
+		return senderId;
+	}
+
+	public void setSenderId(String senderId) {
+		this.senderId = senderId;
 	}
 
 	@Override

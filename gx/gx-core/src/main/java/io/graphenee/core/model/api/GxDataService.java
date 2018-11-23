@@ -307,4 +307,6 @@ public interface GxDataService {
 
 	GxSmsProviderBean findSmsProviderByProvider(SmsProvider smsProvider);
 
+	GxSmsProviderBean findSmsProviderByProviderName(String providerName);
+
 }

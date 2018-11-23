@@ -91,6 +91,11 @@ public class Fault<KEY, T> {
 		}
 	}
 
+	public T getInvalidatedValue() {
+		invalidate();
+		return getValue();
+	}
+
 	public T getValue() {
 		isFault = false;
 		if (value == null) {

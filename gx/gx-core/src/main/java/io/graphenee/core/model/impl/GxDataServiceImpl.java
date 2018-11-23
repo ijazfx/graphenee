@@ -1893,6 +1893,14 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxSmsProviderBean findSmsProviderByProviderName(String providerName) {
+		GxSmsProvider entity = smsProviderRepo.findOneByProviderName(providerName);
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
 	public GxSmsProviderBean findSmsProviderPrimary() {
 		GxSmsProvider entity = smsProviderRepo.findOneByIsActiveTrueAndIsPrimaryTrue();
 		if (entity != null)

@@ -6,21 +6,25 @@ import com.twilio.type.PhoneNumber;
 
 import io.graphenee.sms.api.GxSmsService;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
+import io.graphenee.sms.proto.GxSmsConfigProtos.TwilioConfig;
 
 public class TwilioSmsServiceImpl implements GxSmsService {
 
+	private TwilioConfig smsConfig;
+
 	public TwilioSmsServiceImpl(GxSmsConfigProtos.TwilioConfig smsConfig) {
+		this.smsConfig = smsConfig;
 		Twilio.init(smsConfig.getAccountSid(), smsConfig.getAuthToken());
 	}
 
 	@Override
 	public String sendTransactionalMessage(String phone, String message) {
-		return sendMessage(null, phone, message);
+		return sendMessage(smsConfig.getSenderId(), phone, message);
 	}
 
 	@Override
 	public String sendPromotionalMessage(String phone, String message) {
-		return sendMessage(null, phone, message);
+		return sendMessage(smsConfig.getSenderId(), phone, message);
 	}
 
 	@Override
