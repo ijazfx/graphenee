@@ -4,6 +4,5 @@ create table gx_sms_provider(
     implementation_class varchar(200) not null,
     config_data bytea,
     is_primary bit not null default 0,
-    is_active bit not null default 0,
-    primary key(oid)
+    is_active bit not null default 0
 );
