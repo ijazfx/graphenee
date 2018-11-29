@@ -78,7 +78,7 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "termKey" };
+		return new String[] { "termKey", "termSingular", "termPlural" };
 	}
 
 	@Override
@@ -127,6 +127,11 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.selectedNamespace = namespaceBean;
 		namespaceComboBox.setVisible(namespaceBean == null);
+	}
+
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
 	}
 
 }
