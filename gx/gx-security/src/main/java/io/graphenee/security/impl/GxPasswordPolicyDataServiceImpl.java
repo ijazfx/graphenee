@@ -110,6 +110,22 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 		return false;
 	}
 
+	@Override
+	public void assertPasswordPolicy(GxPasswordPolicyBean entity, String username, String password) throws AssertionError {
+		if (!findMinLengthExist(password, entity.getMinLength()))
+			throw new AssertionError("Password must be minimum of " + entity.getMinLength() + " characters.");
+		if (entity.getIsUserUsernameAllowed() && !findMaxUsernameExist(username, password, entity.getMaxAllowedMatchingUserName()))
+			throw new AssertionError("Password must not contain " + entity.getMaxAllowedMatchingUserName() + " or more consecutive characters from username.");
+		if (!findMinUpperCaseCharExist(password, entity.getMinUppercase()))
+			throw new AssertionError("Password must contain at least " + entity.getMinUppercase() + " upper case letter(s).");
+		if (!findMinLowerCaseCharExist(password, entity.getMinLowercase()))
+			throw new AssertionError("Password must contain at least " + entity.getMinLowercase() + " lower case letter(s).");
+		if (!findMinNumbersExist(password, entity.getMinNumbers()))
+			throw new AssertionError("Password must contain at least " + entity.getMinNumbers() + " digit(s).");
+		if (!findMinSpecialCharExist(password, entity.getMinSpecialCharacters()))
+			throw new AssertionError("Password must contain at least " + entity.getMinUppercase() + " special character(s).");
+	}
+
 	private GxNamespaceBean makeNamespaceBean(GxNamespace entity) {
 		GxNamespaceBean bean = new GxNamespaceBean();
 		bean.setOid(entity.getOid());
@@ -143,6 +159,14 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	@Override
 	public List<GxPasswordPolicyBean> findPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean) {
 		return gxPasswordPolicyRepo.findAllByGxNamespaceNamespace(gxNamespaceBean.getNamespace()).stream().map(this::makePasswordPolicyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxPasswordPolicyBean findOnePasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean) {
+		GxPasswordPolicy entity = gxPasswordPolicyRepo.findOneByGxNamespaceNamespace(gxNamespaceBean.getNamespace());
+		if (entity == null)
+			return null;
+		return makePasswordPolicyBean(entity);
 	}
 
 	@Override

@@ -10,4 +10,7 @@ public interface GxPasswordPolicyRepository extends JpaRepository<GxPasswordPoli
 	List<GxPasswordPolicy> findAllByGxNamespaceNamespace(String namespace);
 
 	GxPasswordPolicy findOneByGxNamespaceNamespaceAndIsActiveTrue(String namespace);
+
+	GxPasswordPolicy findOneByGxNamespaceNamespace(String namespace);
+
 }

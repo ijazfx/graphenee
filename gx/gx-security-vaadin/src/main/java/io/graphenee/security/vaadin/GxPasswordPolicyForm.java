@@ -32,16 +32,16 @@ public class GxPasswordPolicyForm extends TRAbstractForm<GxPasswordPolicyBean> {
 
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
-		passwordPolicyName = new MTextField("policy name").withRequired(true);
+		passwordPolicyName = new MTextField("Policy Name").withRequired(true);
 		maxHistory = new MTextField("Max History");
 		maxAge = new MTextField("Max Days");
 		minLength = new MTextField("Min Length");
 		isUserUsernameAllowed = new MCheckBox("Is Username Allowed?");
 		maxAllowedMatchingUserName = new MTextField("Max Match Username");
-		minUppercase = new MTextField("Min Upper case");
-		minLowercase = new MTextField("Min lower case");
+		minUppercase = new MTextField("Min Upper Case");
+		minLowercase = new MTextField("Min Lower Case");
 		minNumbers = new MTextField("Min Numbers");
-		minSpecialCharacters = new MTextField("Min special Chars");
+		minSpecialCharacters = new MTextField("Min Special Chars");
 		isActive = new MCheckBox("Is Active?");
 
 		isUserUsernameAllowed.addValueChangeListener(event -> {
