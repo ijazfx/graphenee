@@ -22,6 +22,8 @@
 		<class>io.graphenee.core.model.entity.GxSupportedLocale</class>
 		<class>io.graphenee.core.model.entity.GxTerm</class>
 		<class>io.graphenee.core.model.entity.GxUserAccount</class>
+		<class>io.graphenee.core.model.entity.GxPasswordHistory</class>
+		<class>io.graphenee.core.model.entity.GxPasswordPolicy</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>
