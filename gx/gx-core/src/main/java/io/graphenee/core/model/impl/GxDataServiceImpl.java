@@ -93,6 +93,7 @@ import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
+import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
 import io.graphenee.core.model.jpa.repository.GxResourceRepository;
 import io.graphenee.core.model.jpa.repository.GxSavedQueryRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityGroupRepository;
@@ -667,6 +668,7 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsPasswordChangeRequired(entity.getIsPasswordChangeRequired());
 		bean.setIsProtected(entity.getIsProtected());
+		bean.setAccountActivationDate(entity.getAccountActivationDate());
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
@@ -696,6 +698,7 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setIsProtected(false);
 		entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
+		entity.setAccountActivationDate(bean.getAccountActivationDate());
 
 		if (bean.getSecurityGroupCollectionFault().isModified()) {
 			entity.getGxSecurityGroups().clear();
@@ -1449,6 +1452,9 @@ public class GxDataServiceImpl implements GxDataService {
 			return null;
 		return makeUserAccountBean(userAccount);
 	}
+
+	@Autowired
+	GxPasswordHistoryRepository gxPasswordHistoryRepo;
 
 	@Override
 	public GxUserAccountBean findUserAccountByUsernameAndPassword(String username, String password) {
