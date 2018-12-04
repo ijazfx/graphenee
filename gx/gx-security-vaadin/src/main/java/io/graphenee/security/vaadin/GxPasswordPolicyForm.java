@@ -10,6 +10,7 @@ import com.vaadin.ui.FormLayout;
 import io.graphenee.core.model.bean.GxPasswordPolicyBean;
 import io.graphenee.vaadin.TRAbstractForm;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxPasswordPolicyForm extends TRAbstractForm<GxPasswordPolicyBean> {
@@ -68,7 +69,6 @@ public class GxPasswordPolicyForm extends TRAbstractForm<GxPasswordPolicyBean> {
 
 	@Override
 	protected String formTitle() {
-		// TODO Auto-generated method stub
 		return "Password Policy";
 	}
 

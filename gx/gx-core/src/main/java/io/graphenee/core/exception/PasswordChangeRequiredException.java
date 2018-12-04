@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.vaadin.view;
-
-import io.graphenee.vaadin.AbstractDashboardSetup;
-import io.graphenee.vaadin.VaadinAbstractLoginComponent;
+package io.graphenee.core.exception;
 
 @SuppressWarnings("serial")
-public class LoginComponent extends VaadinAbstractLoginComponent {
+public class PasswordChangeRequiredException extends Exception {
 
-	private AbstractDashboardSetup dashboardSetup;
-
-	public LoginComponent(AbstractDashboardSetup dashboardSetup) {
-		this.dashboardSetup = dashboardSetup;
+	public PasswordChangeRequiredException() {
+		super();
 	}
 
-	@Override
-	protected boolean isSpringComponent() {
-		return false;
+	public PasswordChangeRequiredException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
-	@Override
-	protected AbstractDashboardSetup dashboardSetup() {
-		return dashboardSetup;
+	public PasswordChangeRequiredException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public PasswordChangeRequiredException(String message) {
+		super(message);
+	}
+
+	public PasswordChangeRequiredException(Throwable cause) {
+		super(cause);
 	}
 
 }

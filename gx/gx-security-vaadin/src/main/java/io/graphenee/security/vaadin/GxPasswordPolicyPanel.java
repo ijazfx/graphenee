@@ -63,7 +63,7 @@ public class GxPasswordPolicyPanel extends AbstractEntityListPanel<GxPasswordPol
 
 	@Override
 	protected List<GxPasswordPolicyBean> fetchEntities() {
-		return dataService.findPasswordPolicyByNamespace(namespaceBean);
+		return dataService.findAllPasswordPolicyByNamespace(namespaceBean);
 	}
 
 	@Override

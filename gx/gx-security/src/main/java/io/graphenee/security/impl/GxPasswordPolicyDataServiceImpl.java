@@ -2,7 +2,6 @@ package io.graphenee.security.impl;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,6 +26,7 @@ import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
 import io.graphenee.core.model.jpa.repository.GxPasswordPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
+import io.graphenee.core.util.TRCalenderUtil;
 import io.graphenee.security.api.GxPasswordPolicyDataService;
 
 @Service
@@ -127,6 +127,11 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	}
 
 	@Override
+	public void assertPasswordPolicy(String namespace, String username, String password) throws AssertionError {
+		assertPasswordPolicy(findPasswordPolicyByNamespace(namespace), username, password);
+	}
+
+	@Override
 	public void assertPasswordPolicy(GxPasswordPolicyBean entity, String username, String password) throws AssertionError {
 		if (!findMinLengthExist(password, entity.getMinLength()))
 			throw new AssertionError("Password must be minimum of " + entity.getMinLength() + " characters.");
@@ -173,13 +178,18 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	}
 
 	@Override
-	public List<GxPasswordPolicyBean> findPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean) {
+	public List<GxPasswordPolicyBean> findAllPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean) {
 		return gxPasswordPolicyRepo.findAllByGxNamespaceNamespace(gxNamespaceBean.getNamespace()).stream().map(this::makePasswordPolicyBean).collect(Collectors.toList());
 	}
 
 	@Override
-	public GxPasswordPolicyBean findOnePasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean) {
-		GxPasswordPolicy entity = gxPasswordPolicyRepo.findOneByGxNamespaceNamespace(gxNamespaceBean.getNamespace());
+	public GxPasswordPolicyBean findPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean) {
+		return findPasswordPolicyByNamespace(gxNamespaceBean.getNamespace());
+	}
+
+	@Override
+	public GxPasswordPolicyBean findPasswordPolicyByNamespace(String namespace) {
+		GxPasswordPolicy entity = gxPasswordPolicyRepo.findOneByGxNamespaceNamespace(namespace);
 		if (entity == null)
 			return null;
 		return makePasswordPolicyBean(entity);
@@ -220,77 +230,82 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	}
 
 	@Override
-	public void changePasswordPolicyApply(String username, String oldPassword, String newPassword, String confirmPassword) throws ChangePasswordFailedException {
+	public void changePassword(String namespace, String username, String oldPassword, String newPassword) throws ChangePasswordFailedException {
 		// fields validation apply
 		GxUserAccountBean userAccountBean = gxDataService.findUserAccountByUsernameAndPassword(username, oldPassword);
 		if (userAccountBean == null)
 			throw new ChangePasswordFailedException("Current password did not match.");
-		if (!newPassword.equals(confirmPassword))
-			throw new ChangePasswordFailedException("New password did not match with confirm password");
 
-		// password policy apply
-		GxNamespaceBean namespaceBean = gxDataService.findNamespace("org.qatarbiobank.qbbrp");
-		GxPasswordPolicyBean passwordPolicyBean = findOnePasswordPolicyByNamespace(namespaceBean);
+		// use system policy if no application level policy defined.
+		GxPasswordPolicyBean passwordPolicyBean = findPasswordPolicyByNamespace(namespace);
 		if (passwordPolicyBean == null) {
-			passwordPolicyBean = new GxPasswordPolicyBean();
-			passwordPolicyBean.setPasswordPolicyName(namespaceBean.getNamespace() + " Policy");
-			passwordPolicyBean.setGxNamespaceBeanFault(BeanFault.beanFault(namespaceBean.getOid(), namespaceBean));
-		}
-		try {
-			assertPasswordPolicy(passwordPolicyBean, username, newPassword);
-		} catch (AssertionError e) {
-			throw new ChangePasswordFailedException(e.getMessage());
+			passwordPolicyBean = findPasswordPolicyByNamespace(gxDataService.findSystemNamespace());
 		}
 
-		Integer maxHistory = passwordPolicyBean.getMaxHistory();
-		String encryptedPassword = CryptoUtil.createPasswordHash(newPassword);
-		GxUserAccount userAccount = userAccountRepo.findByUsername(username);
-		if (maxHistory > 0) {
-			// is password match with current password
-			if (userAccount.getPassword().equals(encryptedPassword)) {
-				throw new ChangePasswordFailedException("password already exists.");
+		if (passwordPolicyBean != null && passwordPolicyBean.getIsActive()) {
+			try {
+				assertPasswordPolicy(namespace, username, newPassword);
+			} catch (AssertionError e) {
+				throw new ChangePasswordFailedException(e.getMessage());
 			}
-			if (maxHistory > 1) {
-				// is password match with histories passwords
-				List<GxPasswordHistory> histories = passwordHistoryRepo.findAllByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
-				for (GxPasswordHistory history : histories) {
-					if (history.getHashedPassword().equals(encryptedPassword))
-						throw new ChangePasswordFailedException("password already exists.");
+			Integer maxHistory = passwordPolicyBean.getMaxHistory();
+			String encryptedPassword = CryptoUtil.createPasswordHash(newPassword);
+			GxUserAccount userAccount = userAccountRepo.findByUsername(username);
+			if (maxHistory > 0) {
+				// is password match with current password
+				if (userAccount.getPassword().equals(encryptedPassword)) {
+					throw new ChangePasswordFailedException("Password has already been used before.");
 				}
-				// password histories update
-				if (histories.size() > 0 && histories.size() == maxHistory - 1)
-					passwordHistoryRepo.delete(histories.get(histories.size() - 1));
-				GxPasswordHistory passwordHistory = new GxPasswordHistory();
-				passwordHistory.setGxUserAccount(userAccount);
-				passwordHistory.setHashedPassword(userAccount.getPassword());
-				passwordHistory.setPasswordDate(new Timestamp(System.currentTimeMillis()));
-				passwordHistoryRepo.save(passwordHistory);
+				if (maxHistory > 1) {
+					// is password match with histories passwords
+					List<GxPasswordHistory> histories = passwordHistoryRepo.findAllByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
+					for (GxPasswordHistory history : histories) {
+						if (history.getHashedPassword().equals(encryptedPassword))
+							throw new ChangePasswordFailedException("Password has already been used before.");
+					}
+					// password histories update
+					if (histories.size() > 0 && histories.size() == maxHistory - 1)
+						passwordHistoryRepo.delete(histories.get(histories.size() - 1));
+					GxPasswordHistory passwordHistory = new GxPasswordHistory();
+					passwordHistory.setGxUserAccount(userAccount);
+					passwordHistory.setHashedPassword(userAccount.getPassword());
+					passwordHistory.setPasswordDate(new Timestamp(System.currentTimeMillis()));
+					passwordHistoryRepo.save(passwordHistory);
+				}
 			}
+			userAccount.setIsPasswordChangeRequired(false);
+			userAccount.setPassword(encryptedPassword);
+			userAccountRepo.save(userAccount);
+		} else {
+			GxUserAccount userAccount = userAccountRepo.findByUsername(username);
+			String encryptedPassword = CryptoUtil.createPasswordHash(newPassword);
+			userAccount.setIsPasswordChangeRequired(false);
+			userAccount.setPassword(encryptedPassword);
+			userAccountRepo.save(userAccount);
 		}
-		userAccount.setIsPasswordChangeRequired(false);
-		userAccount.setPassword(encryptedPassword);
-		userAccountRepo.save(userAccount);
+
 	}
 
 	@Override
-	public Boolean isPasswordExpired(GxUserAccountBean userAccountBean) {
-		GxPasswordHistory passwordHistory = passwordHistoryRepo.findTop1ByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
-		Long changedDate = userAccountRepo.findOne(userAccountBean.getOid()).getAccountActivationDate().getTime();
-		if (passwordHistory != null)
-			changedDate = passwordHistory.getPasswordDate().getTime();
-		if (changedDate == null)
-			return false;
-		Long currDate = new Timestamp(System.currentTimeMillis()).getTime();
-		Long diff = currDate - changedDate;
-		Integer days = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-		GxNamespaceBean namespaceBean = gxDataService.findNamespace("org.qatarbiobank.qbbrp");
-		GxPasswordPolicyBean passwordPolicyBean = findOnePasswordPolicyByNamespace(namespaceBean);
+	public Boolean isPasswordExpired(String namespace, GxUserAccountBean userAccountBean) {
+		// use system policy if no application level policy defined.
+		GxPasswordPolicyBean passwordPolicyBean = findPasswordPolicyByNamespace(namespace);
 		if (passwordPolicyBean == null) {
-			passwordPolicyBean = new GxPasswordPolicyBean();
-			passwordPolicyBean.setPasswordPolicyName(namespaceBean.getNamespace() + " Policy");
-			passwordPolicyBean.setGxNamespaceBeanFault(BeanFault.beanFault(namespaceBean.getOid(), namespaceBean));
+			passwordPolicyBean = findPasswordPolicyByNamespace(gxDataService.findSystemNamespace());
 		}
-		return days > passwordPolicyBean.getMaxAge();
+		if (passwordPolicyBean == null)
+			return false;
+
+		GxPasswordHistory passwordHistory = passwordHistoryRepo.findTop1ByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
+		Timestamp currentTime = TRCalenderUtil.getCurrentTimeStamp();
+		Long diff = 0L;
+		if (passwordHistory != null && passwordHistory.getPasswordDate() != null) {
+			diff = TRCalenderUtil.daysBetween(passwordHistory.getPasswordDate(), currentTime);
+		} else if (userAccountBean.getAccountActivationDate() != null) {
+			diff = TRCalenderUtil.daysBetween(userAccountBean.getAccountActivationDate(), currentTime);
+		}
+		return diff != 0 && diff > passwordPolicyBean.getMaxAge();
+
 	}
 
 }

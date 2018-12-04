@@ -89,6 +89,38 @@ public abstract class DashboardEvent {
 
 	}
 
+	public static final class UserChangePasswordRequestedEvent {
+		private final String userName, oldPassword, newPassword;
+		private Map<String, Object> additionalData;
+
+		public UserChangePasswordRequestedEvent(final String userName, final String oldPassword, final String newPassword) {
+			this.userName = userName;
+			this.oldPassword = oldPassword;
+			this.newPassword = newPassword;
+		}
+
+		public String getUserName() {
+			return userName;
+		}
+
+		public String getOldPassword() {
+			return oldPassword;
+		}
+
+		public String getNewPassword() {
+			return newPassword;
+		}
+
+		public Map<String, Object> getAdditionalData() {
+			return additionalData;
+		}
+
+		public void setAdditionalData(Map<String, Object> additionalData) {
+			this.additionalData = additionalData;
+		}
+
+	}
+
 	public static class BrowserResizeEvent {
 		private int width;
 		private int height;

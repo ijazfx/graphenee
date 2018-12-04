@@ -9,9 +9,11 @@ import io.graphenee.core.model.bean.GxUserAccountBean;
 
 public interface GxPasswordPolicyDataService {
 
-	public List<GxPasswordPolicyBean> findPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean);
+	public List<GxPasswordPolicyBean> findAllPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean);
 
-	public GxPasswordPolicyBean findOnePasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean);
+	public GxPasswordPolicyBean findPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean);
+
+	public GxPasswordPolicyBean findPasswordPolicyByNamespace(String namespace);
 
 	public GxPasswordPolicyBean createOrUpdate(GxPasswordPolicyBean bean);
 
@@ -19,9 +21,11 @@ public interface GxPasswordPolicyDataService {
 
 	Boolean findPasswordIsValid(String namespace, String username, String password);
 
-	void assertPasswordPolicy(GxPasswordPolicyBean policyBean, String username, String password) throws AssertionError;
+	void assertPasswordPolicy(String namespace, String username, String password) throws AssertionError;
 
-	void changePasswordPolicyApply(String username, String oldPassword, String newPassword, String confirmPassword) throws ChangePasswordFailedException;
+	void assertPasswordPolicy(GxPasswordPolicyBean entity, String username, String password) throws AssertionError;
 
-	Boolean isPasswordExpired(GxUserAccountBean usAccountBean);
+	void changePassword(String namespace, String username, String oldPassword, String newPassword) throws ChangePasswordFailedException;
+
+	Boolean isPasswordExpired(String namespace, GxUserAccountBean usAccountBean);
 }
