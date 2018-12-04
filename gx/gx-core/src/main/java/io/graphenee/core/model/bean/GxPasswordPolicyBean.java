@@ -7,7 +7,7 @@ import io.graphenee.core.model.BeanFault;
 public class GxPasswordPolicyBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer oid;
-	private Integer maxHistory = 6;
+	private Integer maxHistory = 3;
 	private Integer maxAge = 60;
 	private Integer minLength = 8;
 	private Boolean isUserUsernameAllowed = false;

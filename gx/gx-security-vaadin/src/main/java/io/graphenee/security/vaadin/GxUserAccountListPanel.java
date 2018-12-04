@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.security.vaadin;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,7 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Override
 	protected void onAddButtonClick(GxUserAccountBean entity) {
+		entity.setAccountActivationDate(new Timestamp(System.currentTimeMillis()));
 		super.onAddButtonClick(entity);
 	}
 

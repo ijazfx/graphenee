@@ -24,6 +24,7 @@ import com.vaadin.ui.AbstractSingleComponentContainer;
 import com.vaadin.ui.Image;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.exception.ChangePasswordFailedException;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.domain.DashboardUser;
@@ -64,6 +65,13 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	public AbstractSingleComponentContainer loginComponent() {
 		return new LoginComponent(this);
+	}
+
+	protected Boolean isPasswordExpired() {
+		return false;
+	}
+
+	protected void changePassword(String oldPassword, String newPassword, String confirmPassword) throws ChangePasswordFailedException {
 	}
 
 	public AbstractMainComponent defaultComponent() {

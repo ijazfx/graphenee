@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.core.model.jpa.repository;
+package io.graphenee.core.exception;
 
-import java.util.List;
-import java.util.UUID;
+@SuppressWarnings("serial")
+public class ChangePasswordFailedException extends Exception {
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+	public ChangePasswordFailedException() {
+		super();
+	}
 
-import io.graphenee.core.model.entity.GxUserAccount;
+	public ChangePasswordFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 
-@Repository
-public interface GxUserAccountRepository extends JpaRepository<GxUserAccount, Integer> {
+	public ChangePasswordFailedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	List<GxUserAccount> findAllByGxSecurityGroupsOidEquals(Integer oidSecurityGroup);
+	public ChangePasswordFailedException(String message) {
+		super(message);
+	}
 
-	List<GxUserAccount> findAllByGxSecurityPoliciesOidEquals(Integer oidSecurityPolicy);
-
-	GxUserAccount findByUsername(String username);
-
-	GxUserAccount findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(UUID accessKey);
-
-	GxUserAccount findByUsernameAndPassword(String username, String password);
+	public ChangePasswordFailedException(Throwable cause) {
+		super(cause);
+	}
 
 }

@@ -228,7 +228,7 @@ public class GxSecurityGroupBean implements Serializable {
 
 		documents.forEach(document -> {
 			String documentJson = document.getDocumentJson();
-			String[] statements = documentJson.split(";");
+			String[] statements = documentJson.split("(;|\n)");
 			for (String statement : statements) {
 				String[] parts = statement.trim().toLowerCase().split("\\s");
 				if (parts.length == 4) {

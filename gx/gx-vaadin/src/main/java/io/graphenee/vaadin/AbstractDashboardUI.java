@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.ui.MNotification;
 
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.Page;
@@ -41,9 +42,13 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.exception.ChangePasswordFailedException;
+import io.graphenee.core.model.bean.GxChangePasswordBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.domain.DashboardUser;
+import io.graphenee.vaadin.domain.GxDashboardUser;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
@@ -95,18 +100,49 @@ public abstract class AbstractDashboardUI extends UI {
 	 * If the user is logged in with appropriate privileges, main view is shown.
 	 * Otherwise login view is shown.
 	 */
+
 	protected void updateContent() {
 		DashboardUser user = (DashboardUser) VaadinSession.getCurrent().getSession().getAttribute(DashboardUser.class.getName());
 		if (user != null) {
-			// Authenticated user
-			VaadinSession.getCurrent().setAttribute(DashboardUser.class, user);
-			setContent(dashboardSetup().defaultComponent());
-			removeStyleName("loginview");
-			try {
-				UI.getCurrent().getNavigator().navigateTo(getNavigator().getState());
-			} catch (Exception ex) {
-				UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
-				// getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+			GxDashboardUser dashboardUser = (GxDashboardUser) user;
+			GxUserAccountBean userAccountBean = dashboardUser.getUser();
+			if (userAccountBean.getIsPasswordChangeRequired() || dashboardSetup().isPasswordExpired()) {
+				GxChangePasswordForm form = new GxChangePasswordForm() {
+					protected void onDismissButtonClick() {
+						super.onDismissButtonClick();
+						//						VaadinSession.getCurrent().close();
+						//						Page.getCurrent().reload();
+						userLoggedOut(null);
+					};
+
+				};
+				form.setEntity(GxChangePasswordBean.class, new GxChangePasswordBean());
+				form.setSavedHandler(entity -> {
+					try {
+						dashboardSetup().changePassword(entity.getCurrentPassword(), entity.getNewPassword(), entity.getConfirmNewPassword());
+						MNotification.tray("Password Change", "Password updated successfully.");
+						form.closePopup();
+						updateContent();
+					} catch (ChangePasswordFailedException e) {
+						Notification notification = new Notification("Access Denied", e.getMessage(), Type.ERROR_MESSAGE);
+						notification.setDelayMsec(3000);
+						notification.setPosition(Position.BOTTOM_CENTER);
+						notification.show(getPage());
+					}
+				});
+				VaadinSession.getCurrent().setAttribute(DashboardUser.class, user);
+				form.openInModalPopup();
+			} else {
+				// Authenticated user
+				VaadinSession.getCurrent().setAttribute(DashboardUser.class, user);
+				setContent(dashboardSetup().defaultComponent());
+				removeStyleName("loginview");
+				try {
+					UI.getCurrent().getNavigator().navigateTo(getNavigator().getState());
+				} catch (Exception ex) {
+					UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+					// getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+				}
 			}
 		} else {
 			CssLayout rootLayout = new CssLayout();
