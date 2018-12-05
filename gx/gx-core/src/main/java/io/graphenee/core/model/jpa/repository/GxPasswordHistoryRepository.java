@@ -10,6 +10,4 @@ public interface GxPasswordHistoryRepository extends JpaRepository<GxPasswordHis
 
 	List<GxPasswordHistory> findAllByGxUserAccountOidOrderByPasswordDateDesc(Integer oidUserAccount);
 
-	GxPasswordHistory findTop1ByGxUserAccountOidOrderByPasswordDateDesc(Integer oidUserAccount);
-
 }
