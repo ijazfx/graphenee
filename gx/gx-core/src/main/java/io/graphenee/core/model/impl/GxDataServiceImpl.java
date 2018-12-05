@@ -694,10 +694,17 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setLastName(bean.getLastName());
 		entity.setFullNameNative(bean.getFullNameNative());
 		entity.setIsLocked(bean.getIsLocked());
-		entity.setIsActive(bean.getIsActive());
 		entity.setIsProtected(false);
 		entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
+
+		if (entity.getIsActive() != bean.getIsActive()) {
+			if (bean.getIsActive()) {
+				bean.setAccountActivationDate(TRCalenderUtil.getCurrentTimeStamp());
+			}
+		}
+
+		entity.setIsActive(bean.getIsActive());
 		entity.setAccountActivationDate(bean.getAccountActivationDate());
 
 		if (bean.getSecurityGroupCollectionFault().isModified()) {
