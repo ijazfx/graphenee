@@ -27,6 +27,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,6 +55,7 @@ public class TRCalenderUtil {
 	public static SimpleDateFormat yyyyMMddHHmmssFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static SimpleDateFormat yyyyMMddHHmmssSSSFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	public static SimpleDateFormat dateWithTimeFormatter = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
+	public static SimpleDateFormat zuluTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
 
 	public static Date addDaysToDate(Date currentDate, int days) {
 		LocalDate now = toLocalDateFromDate(currentDate);
@@ -694,5 +696,4 @@ public class TRCalenderUtil {
 		cal.set(Calendar.DAY_OF_YEAR, 1);
 		return new Timestamp(cal.getTime().getTime());
 	}
-
 }
