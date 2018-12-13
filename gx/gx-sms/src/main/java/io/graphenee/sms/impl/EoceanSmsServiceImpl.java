@@ -22,12 +22,12 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 
 	@Override
 	public String sendTransactionalMessage(String phone, String message) {
-		return sendTransactionalMessage(smsConfig.getSenderId(), phone, message);
+		return sendTransactionalMessage(null, phone, message);
 	}
 
 	@Override
 	public String sendPromotionalMessage(String phone, String message) {
-		return sendPromotionalMessage(smsConfig.getSenderId(), phone, message);
+		return sendPromotionalMessage(null, phone, message);
 	}
 
 	@Override
@@ -41,6 +41,8 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 	}
 
 	private String sendMessage(String senderId, String phone, String message) {
+		if (senderId == null)
+			senderId = smsConfig.getSenderId();
 		Call<String> call = eoceanService.requestAPI(smsConfig.getUser(), smsConfig.getPassword(), senderId, phone, message);
 		try {
 			Response<String> response = call.execute();

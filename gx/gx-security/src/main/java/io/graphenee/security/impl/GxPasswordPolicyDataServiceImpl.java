@@ -296,9 +296,10 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 		if (passwordPolicyBean == null)
 			return false;
 
-		GxPasswordHistory passwordHistory = passwordHistoryRepo.findTop1ByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
+		List<GxPasswordHistory> passwordHistoryList = passwordHistoryRepo.findAllByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
 		Timestamp currentTime = TRCalenderUtil.getCurrentTimeStamp();
 		Long diff = 0L;
+		GxPasswordHistory passwordHistory = passwordHistoryList != null && !passwordHistoryList.isEmpty() ? passwordHistoryList.get(0) : null;
 		if (passwordHistory != null && passwordHistory.getPasswordDate() != null) {
 			diff = TRCalenderUtil.daysBetween(passwordHistory.getPasswordDate(), currentTime);
 		} else if (userAccountBean.getAccountActivationDate() != null) {
