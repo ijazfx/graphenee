@@ -51,6 +51,8 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Override
 	protected boolean onSaveEntity(GxUserAccountBean entity) {
+		if (entity.getOid() == null)
+			entity.setAccountActivationDate(new Timestamp(System.currentTimeMillis()));
 		dataService.save(entity);
 		return true;
 	}
@@ -83,7 +85,6 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Override
 	protected void onAddButtonClick(GxUserAccountBean entity) {
-		entity.setAccountActivationDate(new Timestamp(System.currentTimeMillis()));
 		super.onAddButtonClick(entity);
 	}
 

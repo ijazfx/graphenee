@@ -62,6 +62,12 @@ public class TRCalenderUtil {
 		return toDateFromLocalDate(now);
 	}
 
+	public static Date minusDaysToDate(Date currentDate, int days) {
+		LocalDate now = toLocalDateFromDate(currentDate);
+		now = now.minusDays(days);
+		return toDateFromLocalDate(now);
+	}
+
 	public static Date addMinutesToDate(Date currentDate, int minutes) {
 		LocalDateTime now = toLocalDateTimeFromDate(currentDate);
 		now = now.plusMinutes(minutes);
@@ -695,5 +701,4 @@ public class TRCalenderUtil {
 		cal.set(Calendar.DAY_OF_YEAR, 1);
 		return new Timestamp(cal.getTime().getTime());
 	}
-
 }

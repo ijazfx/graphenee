@@ -10,6 +10,7 @@ import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
+import com.google.common.base.Strings;
 
 import io.graphenee.sms.api.GxSmsService;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
@@ -37,7 +38,7 @@ public class AwsSmsServiceImpl implements GxSmsService {
 	public String sendTransactionalMessage(String senderId, String phone, String message) {
 		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion(smsConfig.getAwsRegion()).withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
-		if (senderId != null) {
+		if (!Strings.isNullOrEmpty(senderId)) {
 			senderId = senderId.trim();
 			smsAttributes.put("AWS.SNS.SMS.SenderID", new MessageAttributeValue().withStringValue(senderId).withDataType("String"));
 		}
@@ -57,7 +58,7 @@ public class AwsSmsServiceImpl implements GxSmsService {
 	public String sendPromotionalMessage(String senderId, String phone, String message) {
 		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion(smsConfig.getAwsRegion()).withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
-		if (senderId != null) {
+		if (!Strings.isNullOrEmpty(senderId)) {
 			senderId = senderId.trim();
 			smsAttributes.put("AWS.SNS.SMS.SenderID", new MessageAttributeValue().withStringValue(senderId).withDataType("String"));
 		}
