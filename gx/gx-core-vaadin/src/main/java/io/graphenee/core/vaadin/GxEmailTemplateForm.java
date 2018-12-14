@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextArea;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -49,11 +50,13 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 	MTextArea ccList;
 	MTextArea bccList;
 	MTextField senderEmailAddress;
+	MLabel msg;
 
 	MCheckBox isActive;
 
 	protected VerticalLayout detailsTab;
 	protected TabSheet mainTabSheet;
+	final int perSMSMaxLength = 160;
 
 	@Override
 	protected void postBinding(GxEmailTemplateBean entity) {
@@ -133,10 +136,21 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 
 		smsBody = new MTextArea("Body").withRequired(true);
 		smsBody.setInputPrompt("Dear #{lastName}, \nThis is a test message.");
-		smsBody.setMaxLength(160);
-		smsBody.setRows(10);
+		smsBody.setRows(15);
+		msg = new MLabel();
 
-		smsForm.addComponent(smsBody);
+		smsBody.addTextChangeListener(event -> {
+			Integer result = event.getText().length() / perSMSMaxLength;
+			if (result > 0 && event.getText().length() > perSMSMaxLength) {
+				if (event.getText().length() % perSMSMaxLength == 0)
+					msg.setValue("The message will consume " + (result) + " x no. of sms.");
+				else
+					msg.setValue("The message will consume " + (result + 1) + " x no. of sms.");
+
+			} else
+				msg.setValue(null);
+		});
+		smsForm.addComponents(smsBody, msg);
 
 		return smsForm;
 	}
