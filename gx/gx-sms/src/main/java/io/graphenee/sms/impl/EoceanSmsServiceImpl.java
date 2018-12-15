@@ -1,5 +1,10 @@
 package io.graphenee.sms.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
 import io.graphenee.sms.api.GxSmsService;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.sms.proto.GxSmsConfigProtos.EoceanConfig;
@@ -10,6 +15,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class EoceanSmsServiceImpl implements GxSmsService {
+
+	private static final Logger L = LoggerFactory.getLogger(EoceanSmsServiceImpl.class);
 
 	private EoceanService eoceanService;
 	private EoceanConfig smsConfig;
@@ -41,7 +48,7 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 	}
 
 	private String sendMessage(String senderId, String phone, String message) {
-		if (senderId == null)
+		if (Strings.isNullOrEmpty(senderId))
 			senderId = smsConfig.getSenderId();
 		Call<String> call = eoceanService.requestAPI(smsConfig.getUser(), smsConfig.getPassword(), senderId, phone, message);
 		try {
@@ -49,8 +56,10 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 			if (response.isSuccessful()) {
 				return "SMS Sent";
 			}
+			L.error(response.message());
 			return response.message();
 		} catch (Exception e) {
+			L.error(e.getMessage(), e);
 			return e.getMessage();
 		}
 	}
