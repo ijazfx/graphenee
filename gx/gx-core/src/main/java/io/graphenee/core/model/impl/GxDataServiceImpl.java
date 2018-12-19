@@ -1589,6 +1589,12 @@ public class GxDataServiceImpl implements GxDataService {
 		return makeAuditLogBean(entities);
 	}
 
+	@Override
+	public List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity) {
+		List<GxAuditLog> entities = auditLogRepository.findAllByOidAuditEntity(oidAuditEntity);
+		return makeAuditLogBean(entities);
+	}
+
 	private List<GxAuditLogBean> makeAuditLogBean(List<GxAuditLog> entities) {
 		List<GxAuditLogBean> beans = new ArrayList<>();
 		entities.forEach(entity -> {

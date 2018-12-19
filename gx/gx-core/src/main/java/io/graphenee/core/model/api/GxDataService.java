@@ -309,4 +309,6 @@ public interface GxDataService {
 
 	GxSmsProviderBean findSmsProviderByProviderName(String providerName);
 
+	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
+
 }
