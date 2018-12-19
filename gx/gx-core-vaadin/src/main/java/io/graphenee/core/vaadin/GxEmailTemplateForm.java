@@ -141,11 +141,11 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 
 		smsBody.addTextChangeListener(event -> {
 			Integer result = event.getText().length() / perSMSMaxLength;
-			if (result > 0 && event.getText().length() > perSMSMaxLength) {
+			if (event.getText().length() > perSMSMaxLength) {
 				if (event.getText().length() % perSMSMaxLength == 0)
-					msg.setValue("The message will consume " + (result) + " x no. of sms.");
+					msg.setValue("The message will consume " + (result) + " no. of sms.");
 				else
-					msg.setValue("The message will consume " + (result + 1) + " x no. of sms.");
+					msg.setValue("The message will consume " + (result + 1) + " no. of sms.");
 
 			} else
 				msg.setValue(null);

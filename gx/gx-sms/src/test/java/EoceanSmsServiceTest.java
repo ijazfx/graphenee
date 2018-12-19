@@ -22,8 +22,8 @@ public class EoceanSmsServiceTest {
 		builder.setBaseUrl(baseUrl).setUser(user).setPassword(pwd);
 
 		GxSmsService service = new EoceanSmsServiceImpl(builder.build());
-		String output = service.sendPromotionalMessage(mask, receiver, "Hello World! This message is from TRIGSOFT, testing Eocean SMS service.");
-		assert (output.toLowerCase().contains("message"));
+		//String output = service.sendPromotionalMessage(mask, receiver, "Hello World! This message is from TRIGSOFT, testing Eocean SMS service.");
+		//assert (output.toLowerCase().contains("message"));
 	}
 
 }

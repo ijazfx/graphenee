@@ -31,4 +31,5 @@ public interface GxAuditLogRepository extends JpaRepository<GxAuditLog, Integer>
 
 	List<GxAuditLog> findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(String auditEntity, Integer oidAuditEntity);
 
+	List<GxAuditLog> findAllByOidAuditEntity(Integer oidAuditEntity);
 }
