@@ -15,58 +15,71 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
+import com.vaadin.server.Resource;
+
 import io.graphenee.core.enums.GenderEnum;
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 
-public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
+public class GxDashboardUser implements GxAuthenticatedUser {
+
+	private GxUserAccountBean user;
 
 	public GxDashboardUser(GxUserAccountBean user) {
-		super(user);
+		this.user = user;
+	}
+
+	public GxUserAccountBean getUser() {
+		return user;
 	}
 
 	@Override
 	public String getFirstName() {
-		return getUser().getFirstName();
+		return user.getFirstName();
 	}
 
 	@Override
 	public void setFirstName(String firstName) {
+		user.setFirstName(firstName);
 	}
 
 	@Override
 	public String getLastName() {
-		return getUser().getLastName();
+		return user.getLastName();
 	}
 
 	@Override
 	public void setLastName(String lastName) {
+		user.setLastName(lastName);
 	}
 
 	@Override
 	public String getUsername() {
-		return getUser().getUsername();
+		return user.getUsername();
 	}
 
 	@Override
 	public void setUsername(String username) {
+		user.setUsername(username);
 	}
 
 	@Override
 	public String getPassword() {
-		return getUser().getPassword();
+		return user.getPassword();
 	}
 
 	@Override
 	public void setPassword(String password) {
+		user.setPassword(password);
 	}
 
 	@Override
 	public GenderEnum getGender() {
-		if (getUser().getGender() == null)
+		if (user.getGender() == null)
 			return GenderEnum.Undisclosed;
-		if (getUser().getGender().getGenderCode().equals(GenderEnum.Male.getGenderCode()))
+		if (user.getGender().getGenderCode().equals(GenderEnum.Male.getGenderCode()))
 			return GenderEnum.Male;
-		if (getUser().getGender().getGenderCode().equals(GenderEnum.Female.getGenderCode()))
+		if (user.getGender().getGenderCode().equals(GenderEnum.Female.getGenderCode()))
 			return GenderEnum.Female;
 		return GenderEnum.Undisclosed;
 	}
@@ -77,12 +90,19 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 
 	@Override
 	public boolean canDoAction(String resource, String action) {
-		return getUser().canDoAction(resource, action);
+		return user.canDoAction(resource, action);
 	}
 
 	@Override
 	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
-		return getUser().canDoAction(resource, action, forceRefresh);
+		return user.canDoAction(resource, action, forceRefresh);
+	}
+
+	public byte[] getProfilePhoto() {
+		return user.getProfileImage();
+	}
+
+	public void setProfilePhoto(Resource resource) {
 	}
 
 }

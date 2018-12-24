@@ -41,6 +41,9 @@ import io.graphenee.vaadin.event.DashboardEventBus;
 @SuppressWarnings("serial")
 public abstract class VaadinAbstractLoginComponent extends LoginForm {
 
+	public static final String USERNAME = "username";
+	public static final String PASSWORD = "password";
+
 	public VaadinAbstractLoginComponent() {
 		if (!isSpringComponent()) {
 			postConstruct();
@@ -62,9 +65,8 @@ public abstract class VaadinAbstractLoginComponent extends LoginForm {
 			mainLayout = new VerticalLayout();
 			mainLayout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 			addLoginListener(listener -> {
-				UserLoginRequestedEvent userLoginRequestedEvent = new UserLoginRequestedEvent(listener.getLoginParameter("username"), listener.getLoginParameter("password"));
+				UserLoginRequestedEvent userLoginRequestedEvent = new UserLoginRequestedEvent(listener.getLoginParameter(USERNAME), listener.getLoginParameter(PASSWORD));
 				DashboardEventBus.sessionInstance().post(userLoginRequestedEvent);
-
 			});
 			setSizeFull();
 			Component loginForm = buildLoginForm(userNameField, passwordField, loginButton);

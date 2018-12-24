@@ -13,33 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.vaadin.util;
+package io.graphenee.vaadin;
 
-import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
 
+import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.model.GxAbstractCredentials;
 import io.graphenee.core.model.GxAuthenticatedUser;
 
-public class DashboardUtils {
+@SuppressWarnings("serial")
+public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends GxAuthenticatedUser> extends AbstractDashboardUI {
 
-	@SuppressWarnings("unchecked")
-	public static <T extends GxAuthenticatedUser> T getLoggedInUser() {
-		return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class.getName());
-	}
+	protected abstract Component createComponent();
 
-	@SuppressWarnings("unchecked")
-	public static <T extends GxAuthenticatedUser> T getLoggedInUser(VaadinSession vaadinSession) {
-		return (T) vaadinSession.getAttribute(GxAuthenticatedUser.class.getName());
-	}
-
-	public static String getLoggedInUsername() {
-		GxAuthenticatedUser loggedInUser = DashboardUtils.getLoggedInUser();
-		final String targetUser;
-		if (loggedInUser != null) {
-			targetUser = loggedInUser.getUsername();
-		} else {
-			targetUser = "system";
-		}
-		return targetUser;
-	}
+	protected abstract R authenticate(C credentials) throws AuthenticationFailedException;
 
 }
