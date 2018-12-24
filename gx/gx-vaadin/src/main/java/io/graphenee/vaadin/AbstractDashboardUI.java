@@ -39,8 +39,10 @@ public abstract class AbstractDashboardUI extends UI {
 	@Override
 	protected void init(final VaadinRequest request) {
 
-		if (this.getClass().isAnnotationPresent(GxSecuredUI.class))
+		if (this.getClass().isAnnotationPresent(GxSecuredUI.class)) {
 			Page.getCurrent().setLocation("/login");
+			return;
+		}
 
 		if (dashboardSetup().shouldLocalize()) {
 			LocalizerService localizer = VaadinSession.getCurrent().getAttribute(LocalizerService.class);

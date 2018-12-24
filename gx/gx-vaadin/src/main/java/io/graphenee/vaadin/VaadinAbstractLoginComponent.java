@@ -38,6 +38,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 
+@Deprecated
 @SuppressWarnings("serial")
 public abstract class VaadinAbstractLoginComponent extends LoginForm {
 

@@ -58,5 +58,6 @@ public class GrapheneeTheme extends BaseTheme {
 	public static String STYLE_V_ALIGN_RIGHT = "v-align-right";
 	public static String STYLE_V_ALIGN_LEFT = "v-align-left";
 	public static String STYLE_V_ALIGN_CENTER = "v-align-center";
+	public static String STYLE_CENTER = "center";
 
 }

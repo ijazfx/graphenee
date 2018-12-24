@@ -15,16 +15,46 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import com.vaadin.server.Page;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Notification.Type;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.model.GxAbstractCredentials;
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.model.GxUsernamePasswordCredentials;
+import io.graphenee.vaadin.ui.GxNotification;
+import io.graphenee.vaadin.view.LoginComponent;
 
 @SuppressWarnings("serial")
 public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends GxAuthenticatedUser> extends AbstractDashboardUI {
 
-	protected abstract Component createComponent();
+	@SuppressWarnings("unchecked")
+	protected Component createComponent() {
+		setStyleName("loginview");
+		LoginComponent loginComponent = new LoginComponent(dashboardSetup());
+		loginComponent.addLoginListener(event -> {
+			String username = event.getLoginParameter(LoginComponent.USERNAME);
+			String password = event.getLoginParameter(LoginComponent.PASSWORD);
+			GxUsernamePasswordCredentials credentials = new GxUsernamePasswordCredentials(username, password);
+			try {
+				authenticate((C) credentials);
+			} catch (AuthenticationFailedException e) {
+				String loginLink = Page.getCurrent().getLocation().toString();
+				String resetPasswordLink = loginLink.replaceAll("login", "reset-password");
+				StringBuilder sb = new StringBuilder();
+				sb.append(e.getMessage());
+				sb.append("&nbsp;");
+				sb.append("If you don't remember your password then <a style=\"color: white;\" href=\"" + resetPasswordLink + "\">Click here!</a> to reset.");
+				GxNotification notification = GxNotification.closable("Access Denied", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+				notification.setDelayMsec(5000);
+				notification.setHtmlContentAllowed(true);
+				notification.show(Page.getCurrent());
+			}
+		});
+		return loginComponent;
+	}
 
 	protected abstract R authenticate(C credentials) throws AuthenticationFailedException;
 
