@@ -120,13 +120,15 @@ public class ResetPasswordPanel extends Panel {
 					resetKeyTextField.clear();
 					resetKeyTextField.setEnabled(shouldEnable);
 					resetKeyTextField.focus();
-					System.err.println(keys[0]);
+					GxNotification notification = GxNotification.tray("Your key to reset password has been sent, please check your email.");
+					notification.setDelayMsec(5000);
+					notification.show(Page.getCurrent());
 				}, error -> {
 					usernameTextField.selectAll();
 					usernameTextField.focus();
 					StringBuilder sb = new StringBuilder();
 					sb.append(error.getMessage());
-					GxNotification notification = GxNotification.closable("Send Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					GxNotification notification = GxNotification.closable("Send Key Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
 					notification.setDelayMsec(5000);
 					notification.show(Page.getCurrent());
 				});
@@ -174,7 +176,7 @@ public class ResetPasswordPanel extends Panel {
 					changeButton.setEnabled(false);
 					StringBuilder sb = new StringBuilder();
 					sb.append("New password and re-typed password must match, please try again.");
-					GxNotification notification = GxNotification.closable("Match Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					GxNotification notification = GxNotification.closable("Match Password Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
 					notification.setDelayMsec(5000);
 					notification.show(Page.getCurrent());
 				}
@@ -190,7 +192,7 @@ public class ResetPasswordPanel extends Panel {
 					location = location.replace("reset-password", "login");
 					Page.getCurrent().setLocation(location);
 				}, error -> {
-					GxNotification notification = GxNotification.closable("Change Failed", error.getMessage(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					GxNotification notification = GxNotification.closable("Change Password Failed", error.getMessage(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
 					notification.setDelayMsec(5000);
 					notification.show(Page.getCurrent());
 				});

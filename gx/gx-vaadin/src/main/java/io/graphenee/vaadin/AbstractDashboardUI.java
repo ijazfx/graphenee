@@ -27,6 +27,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
@@ -40,8 +41,11 @@ public abstract class AbstractDashboardUI extends UI {
 	protected void init(final VaadinRequest request) {
 
 		if (this.getClass().isAnnotationPresent(GxSecuredUI.class)) {
-			Page.getCurrent().setLocation("/login");
-			return;
+			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+			if (user == null) {
+				Page.getCurrent().setLocation("/login");
+				return;
+			}
 		}
 
 		if (dashboardSetup().shouldLocalize()) {
@@ -80,6 +84,10 @@ public abstract class AbstractDashboardUI extends UI {
 		});
 
 		localizeRecursively(this);
+
+		if (UI.getCurrent().getNavigator() != null)
+			UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+
 	}
 
 	protected Component createComponent() {

@@ -26,6 +26,14 @@ public interface GxAuthenticatedUser {
 
 	void setGender(GenderEnum gender);
 
+	String getEmail();
+
+	void setEmail(String email);
+
+	String getMobileNumber();
+
+	void setMobileNumber(String mobileNumber);
+
 	default String getFirstNameLastName() {
 		if (getFirstName() != null) {
 			if (getLastName() != null) {

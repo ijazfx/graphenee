@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
-import com.vaadin.server.Resource;
-
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.bean.GxUserAccountBean;
@@ -98,11 +96,27 @@ public class GxDashboardUser implements GxAuthenticatedUser {
 		return user.canDoAction(resource, action, forceRefresh);
 	}
 
-	public byte[] getProfilePhoto() {
-		return user.getProfileImage();
+	@Override
+	public String getEmail() {
+		return user.getEmail();
 	}
 
-	public void setProfilePhoto(Resource resource) {
+	@Override
+	public void setEmail(String email) {
+		user.setEmail(email);
+	}
+
+	@Override
+	public String getMobileNumber() {
+		return null;
+	}
+
+	@Override
+	public void setMobileNumber(String mobileNumber) {
+	}
+
+	public byte[] getProfilePhoto() {
+		return user.getProfileImage();
 	}
 
 }

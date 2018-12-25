@@ -4,13 +4,13 @@ import com.vaadin.ui.Component;
 
 import io.graphenee.core.callback.TRErrorCallback;
 import io.graphenee.core.callback.TRVoidCallback;
-import io.graphenee.core.exception.AuthenticationFailedException;
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.exception.ChangePasswordFailedException;
+import io.graphenee.core.exception.UserCommunicationException;
 import io.graphenee.vaadin.view.ResetPasswordPanel;
 import io.graphenee.vaadin.view.ResetPasswordPanel.ResetPasswordPanelDelegate;
 
 @SuppressWarnings("serial")
-public abstract class AbstractResetPasswordUI<C extends GxAuthenticatedUser> extends AbstractDashboardUI {
+public abstract class AbstractResetPasswordUI extends AbstractDashboardUI {
 
 	protected Component createComponent() {
 		setStyleName("loginview");
@@ -20,8 +20,7 @@ public abstract class AbstractResetPasswordUI<C extends GxAuthenticatedUser> ext
 			@Override
 			public void sendKeyToUser(String key, String username, TRVoidCallback success, TRErrorCallback error) {
 				try {
-					GxAuthenticatedUser user = findUserByUsernameOrEmail(username);
-					sendResetKeyToUser(key, user);
+					sendResetKeyToUser(key, username);
 					success.execute();
 				} catch (Exception e) {
 					error.execute(e);
@@ -30,10 +29,11 @@ public abstract class AbstractResetPasswordUI<C extends GxAuthenticatedUser> ext
 
 			@Override
 			public void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error) {
-				if (username.equals(password)) {
+				try {
+					changeUserPassword(username, password);
 					success.execute();
-				} else {
-					error.execute(new Exception("Password does not qualify for the password policy."));
+				} catch (Exception e) {
+					error.execute(e);
 				}
 			}
 
@@ -41,8 +41,8 @@ public abstract class AbstractResetPasswordUI<C extends GxAuthenticatedUser> ext
 		return resetPasswordComponent;
 	}
 
-	protected abstract void sendResetKeyToUser(String token, GxAuthenticatedUser user) throws AuthenticationFailedException;
+	protected abstract void sendResetKeyToUser(String token, String usernameOrEmail) throws UserCommunicationException;
 
-	protected abstract GxAuthenticatedUser findUserByUsernameOrEmail(String usernameOrEmail) throws AuthenticationFailedException;
+	protected abstract void changeUserPassword(String usernameOrEmail, String password) throws ChangePasswordFailedException;
 
 }

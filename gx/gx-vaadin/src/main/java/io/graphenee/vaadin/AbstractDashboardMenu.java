@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -51,7 +52,6 @@ import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
-import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.TRButtonClickListener;
 
@@ -219,7 +219,8 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 				userMenuItem.addItem("Sign Out", new Command() {
 					@Override
 					public void menuSelected(final MenuItem selectedItem) {
-						DashboardEventBus.sessionInstance().post(new UserLoggedOutEvent());
+						VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, null);
+						Page.getCurrent().reload();
 					}
 				});
 			}

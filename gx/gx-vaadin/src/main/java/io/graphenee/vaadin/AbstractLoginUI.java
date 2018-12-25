@@ -16,6 +16,7 @@
 package io.graphenee.vaadin;
 
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification.Type;
@@ -39,7 +40,11 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 			String password = event.getLoginParameter(LoginComponent.PASSWORD);
 			GxUsernamePasswordCredentials credentials = new GxUsernamePasswordCredentials(username, password);
 			try {
-				authenticate((C) credentials);
+				R user = authenticate((C) credentials);
+				VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
+				String location = Page.getCurrent().getLocation().toString();
+				location = location.replaceAll("/login", "");
+				Page.getCurrent().setLocation(location);
 			} catch (AuthenticationFailedException e) {
 				String loginLink = Page.getCurrent().getLocation().toString();
 				String resetPasswordLink = loginLink.replaceAll("login", "reset-password");
