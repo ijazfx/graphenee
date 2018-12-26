@@ -34,6 +34,10 @@ public interface GxAuthenticatedUser {
 
 	void setMobileNumber(String mobileNumber);
 
+	default boolean isPasswordChangeRequired() {
+		return false;
+	}
+
 	default String getFirstNameLastName() {
 		if (getFirstName() != null) {
 			if (getLastName() != null) {

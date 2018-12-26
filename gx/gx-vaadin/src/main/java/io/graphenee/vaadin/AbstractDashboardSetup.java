@@ -33,6 +33,8 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	public abstract String applicationTitle();
 
+	private BaseProfileForm profileForm = null;
+
 	public String dashboardTitle() {
 		return applicationTitle();
 	}
@@ -65,8 +67,14 @@ public abstract class AbstractDashboardSetup implements Serializable {
 		return new DashboardMenu(this).build();
 	}
 
-	public AbstractComponent profileComponent() {
-		return null;
+	public BaseProfileForm profileComponent() {
+		if (profileForm == null) {
+			profileForm = new BaseProfileForm();
+			profileForm.setSavedHandler(event -> {
+
+			});
+		}
+		return profileForm;
 	}
 
 	public AbstractComponent preferencesComponent() {

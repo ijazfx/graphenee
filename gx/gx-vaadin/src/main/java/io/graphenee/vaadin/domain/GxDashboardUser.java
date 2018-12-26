@@ -72,6 +72,11 @@ public class GxDashboardUser implements GxAuthenticatedUser {
 	}
 
 	@Override
+	public boolean isPasswordChangeRequired() {
+		return user.getIsPasswordChangeRequired();
+	}
+
+	@Override
 	public GenderEnum getGender() {
 		if (user.getGender() == null)
 			return GenderEnum.Undisclosed;

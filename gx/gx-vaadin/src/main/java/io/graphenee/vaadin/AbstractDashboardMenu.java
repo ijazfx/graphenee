@@ -29,7 +29,6 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -44,16 +43,17 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.callback.TRVoidCallback;
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.model.bean.GxChangePasswordBean;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.TRButtonClickListener;
+import io.graphenee.vaadin.util.DashboardUtils;
 
 /**
  * A responsive menu component providing user information and the controls for
@@ -173,40 +173,28 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			userMenuItem.setText(user.getFirstNameLastName());
 			if (dashboardSetup().profileComponent() != null) {
 				shouldAddSeparator = true;
-				userMenuItem.addItem("Edit Profile", new Command() {
+				userMenuItem.addItem("Profile", new Command() {
 					@Override
 					public void menuSelected(final MenuItem selectedItem) {
-						AbstractComponent profileComponent = dashboardSetup().profileComponent();
-						if (profileComponent instanceof TRAbstractForm<?>) {
-							TRAbstractForm<?> form = (TRAbstractForm<?>) profileComponent;
-							form.openInModalPopup();
-						} else {
-							Window window = new Window("Profile", profileComponent);
-							window.setModal(true);
-							UI.getCurrent().addWindow(window);
-							window.focus();
-						}
+						BaseProfileForm profileForm = dashboardSetup().profileComponent();
+						GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
+						profileForm.setEntity(GxAuthenticatedUser.class, user);
+						profileForm.openInModalPopup();
 					}
 				});
 			}
-			if (dashboardSetup().preferencesComponent() != null) {
-				shouldAddSeparator = true;
-				userMenuItem.addItem("Preferences", new Command() {
-					@Override
-					public void menuSelected(final MenuItem selectedItem) {
-						AbstractComponent preferencesComponent = dashboardSetup().preferencesComponent();
-						if (preferencesComponent instanceof TRAbstractForm<?>) {
-							TRAbstractForm<?> form = (TRAbstractForm<?>) preferencesComponent;
-							form.openInModalPopup();
-						} else {
-							Window window = new Window("Preferences", preferencesComponent);
-							window.setModal(true);
-							UI.getCurrent().addWindow(window);
-							window.focus();
-						}
-					}
-				});
-			}
+			userMenuItem.addItem("Change Password", new Command() {
+				@Override
+				public void menuSelected(final MenuItem selectedItem) {
+					GxChangePasswordForm changePasswordForm = new GxChangePasswordForm();
+					GxChangePasswordBean bean = new GxChangePasswordBean();
+					changePasswordForm.setEntity(GxChangePasswordBean.class, bean);
+					changePasswordForm.setSavedHandler(event -> {
+
+					});
+					changePasswordForm.openInModalPopup();
+				}
+			});
 			if (shouldAddSeparator) {
 				userMenuItem.addSeparator();
 			}
