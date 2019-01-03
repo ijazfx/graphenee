@@ -20,6 +20,8 @@ import org.kie.internal.process.CorrelationKey;
 
 public interface GxKieRuntimeEngineService {
 
+	public static final String JBPM_MANAGER_DEFAULT_GROUP = "default-singleton";
+
 	RuntimeEngine newSingletonRuntimeEngine();
 
 	RuntimeEngine newPerRequestRuntimeEngine();

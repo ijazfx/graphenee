@@ -391,4 +391,13 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		return "450px";
 	}
 
+	@Override
+	protected void adjustSaveButtonState() {
+		super.adjustSaveButtonState();
+		boolean valid = isValid();
+		approveButton.setEnabled(valid);
+		rejectButton.setEnabled(valid);
+		completeButton.setEnabled(valid);
+	}
+
 }
