@@ -201,6 +201,10 @@ public interface GxDataService {
 
 	GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace);
 
+	GxEmailTemplateBean findEmailTemplateByTemplateCodeActive(String templateCode);
+
+	GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace);
+
 	List<GxEmailTemplateBean> findEmailTemplate();
 
 	List<GxEmailTemplateBean> findEmailTemplateByNamespace(GxNamespaceBean namespace);
