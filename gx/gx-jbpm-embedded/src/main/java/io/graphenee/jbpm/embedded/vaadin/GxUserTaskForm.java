@@ -122,10 +122,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		footer.addComponentAsFirst(taskButtonsLayout);
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.reject() in your implementation.
-	 * @throws GxCompleteTaskException exception in case of failure
-	 */
 	@Transactional
 	private void rejectTask() {
 		Map<String, Object> taskData = new HashMap<>();
@@ -162,10 +158,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onReject(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.approve() in your implementation.
-	 * @throws GxCompleteTaskException exception in case of failure
-	 */
 	@Transactional
 	private void approveTask() {
 		Map<String, Object> taskData = new HashMap<>();
@@ -201,11 +193,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onApprove(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.assign(...) in your implementation.
-	 * @param assignToUserId the user id of the user to assign the task
-	 * @throws GxAssignTaskException exception in case of failure
-	 */
 	@Transactional
 	private void assignTask() {
 		onAssign(getEntity(), new GxUserTaskAssigner() {
@@ -257,10 +244,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onAssign(T entity, GxUserTaskAssigner assigner) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.skip() in your implementation.
-	 * @throws GxSkipTaskException exception in case of failure
-	 */
 	@Transactional
 	private void skipTask() {
 		onSkip(getEntity(), new GxUserTaskSkipper() {
@@ -296,12 +279,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onSkip(T entity, GxUserTaskSkipper skipper) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.complete() in your implementation.
-	 * @throws GxCompleteTaskException exception in case of failure
-	 */
 	@Transactional
-	protected void completeTask() {
+	private void completeTask() {
 		Map<String, Object> taskData = new HashMap<>();
 		onComplete(taskData, getEntity(), new GxUserTaskHandler() {
 
