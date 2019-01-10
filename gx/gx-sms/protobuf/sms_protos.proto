@@ -9,11 +9,13 @@ message AwsSmsConfig {
   optional string awsAccessKeyId = 1;
   optional string awsSecretKey = 2;
   optional string awsRegion = 3;
+  optional string senderId = 4;
 }
 
 message TwilioConfig {
   optional string accountSid = 1;
   optional string authToken = 2;
+  optional string senderId = 3;
 }
 
 message EoceanConfig {
@@ -21,6 +23,7 @@ message EoceanConfig {
   optional string user = 2;
   optional string password = 3;
   optional string responseType = 4;
+  optional string senderId = 5;
 }
 
 

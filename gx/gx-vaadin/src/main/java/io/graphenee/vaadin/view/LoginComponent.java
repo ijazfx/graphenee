@@ -18,6 +18,7 @@ package io.graphenee.vaadin.view;
 import io.graphenee.vaadin.AbstractDashboardSetup;
 import io.graphenee.vaadin.VaadinAbstractLoginComponent;
 
+@SuppressWarnings("serial")
 public class LoginComponent extends VaadinAbstractLoginComponent {
 
 	private AbstractDashboardSetup dashboardSetup;

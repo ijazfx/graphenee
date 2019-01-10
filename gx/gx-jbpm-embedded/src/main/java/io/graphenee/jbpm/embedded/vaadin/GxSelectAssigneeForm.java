@@ -68,7 +68,7 @@ public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 
 	@Override
 	protected String popupHeight() {
-		return "150px";
+		return "180px";
 	}
 
 	@Override

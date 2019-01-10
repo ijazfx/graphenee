@@ -43,6 +43,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.AccessKeyType;
+import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
@@ -59,6 +60,7 @@ import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
+import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
@@ -77,6 +79,7 @@ import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
@@ -90,11 +93,13 @@ import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
+import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
 import io.graphenee.core.model.jpa.repository.GxResourceRepository;
 import io.graphenee.core.model.jpa.repository.GxSavedQueryRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityGroupRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyRepository;
+import io.graphenee.core.model.jpa.repository.GxSmsProviderRepository;
 import io.graphenee.core.model.jpa.repository.GxStateRepository;
 import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
@@ -167,6 +172,9 @@ public class GxDataServiceImpl implements GxDataService {
 	@Autowired
 	GxAccessKeyRepository accessKeyRepo;
 
+	@Autowired
+	GxSmsProviderRepository smsProviderRepo;
+
 	@PostConstruct
 	public void initialize() {
 		TransactionTemplate tran = new TransactionTemplate(transactionManager);
@@ -210,6 +218,7 @@ public class GxDataServiceImpl implements GxDataService {
 				admin.getSecurityGroupCollectionFault().add(adminGroup);
 				save(admin);
 			}
+
 			return null;
 		});
 	}
@@ -659,6 +668,7 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsPasswordChangeRequired(entity.getIsPasswordChangeRequired());
 		bean.setIsProtected(entity.getIsProtected());
+		bean.setAccountActivationDate(entity.getAccountActivationDate());
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
@@ -684,10 +694,18 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setLastName(bean.getLastName());
 		entity.setFullNameNative(bean.getFullNameNative());
 		entity.setIsLocked(bean.getIsLocked());
-		entity.setIsActive(bean.getIsActive());
 		entity.setIsProtected(false);
 		entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
+
+		if (entity.getIsActive() != bean.getIsActive()) {
+			if (bean.getIsActive()) {
+				bean.setAccountActivationDate(TRCalenderUtil.getCurrentTimeStamp());
+			}
+		}
+
+		entity.setIsActive(bean.getIsActive());
+		entity.setAccountActivationDate(bean.getAccountActivationDate());
 
 		if (bean.getSecurityGroupCollectionFault().isModified()) {
 			entity.getGxSecurityGroups().clear();
@@ -1329,6 +1347,30 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxEmailTemplateBean findEmailTemplateByTemplateCodeActive(String templateCode) {
+		GxNamespaceBean namespace = findNamespace(GxNamespaceBean.SYSTEM);
+		GxEmailTemplate emailTemplate = null;
+		if (namespace != null) {
+			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
+		} else {
+			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndIsActive(templateCode, true);
+		}
+		if (emailTemplate != null) {
+			return makeEmailTemplateBean(emailTemplate, namespace);
+		}
+		return null;
+	}
+
+	@Override
+	public GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace) {
+		GxEmailTemplate emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
+		if (emailTemplate != null) {
+			return makeEmailTemplateBean(emailTemplate, namespace);
+		}
+		return null;
+	}
+
+	@Override
 	public List<GxEmailTemplateBean> findEmailTemplate() {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
 		beans.addAll(emailTemplateRepository.findAll(new Sort("templateName")).stream().map(template -> {
@@ -1442,6 +1484,9 @@ public class GxDataServiceImpl implements GxDataService {
 		return makeUserAccountBean(userAccount);
 	}
 
+	@Autowired
+	GxPasswordHistoryRepository gxPasswordHistoryRepo;
+
 	@Override
 	public GxUserAccountBean findUserAccountByUsernameAndPassword(String username, String password) {
 		GxUserAccount userAccount = userAccountRepo.findByUsername(username);
@@ -1463,7 +1508,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean) {
-		GxSecurityGroup entity = securityGroupRepo.findAllBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
+		GxSecurityGroup entity = securityGroupRepo.findOneBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
 		if (entity != null) {
 			return makeSecurityGroupBean(entity);
 		}
@@ -1565,6 +1610,12 @@ public class GxDataServiceImpl implements GxDataService {
 
 	public List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity) {
 		List<GxAuditLog> entities = auditLogRepository.findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(auditEntity, oidAuditEntity);
+		return makeAuditLogBean(entities);
+	}
+
+	@Override
+	public List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity) {
+		List<GxAuditLog> entities = auditLogRepository.findAllByOidAuditEntity(oidAuditEntity);
 		return makeAuditLogBean(entities);
 	}
 
@@ -1813,6 +1864,104 @@ public class GxDataServiceImpl implements GxDataService {
 		if (entity != null)
 			return makeCurrencyBean(entity);
 		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean createOrUpdate(GxSmsProviderBean bean) {
+		GxSmsProvider gxSmsProvider;
+		if (bean.getOid() == null)
+			gxSmsProvider = new GxSmsProvider();
+		else
+			gxSmsProvider = smsProviderRepo.findOne(bean.getOid());
+		gxSmsProvider = smsProviderRepo.save(toEntity(bean, gxSmsProvider));
+		bean.setOid(gxSmsProvider.getOid());
+		if (bean.getIsPrimary())
+			markAsPrimary(bean);
+		return bean;
+	}
+
+	private GxSmsProvider toEntity(GxSmsProviderBean bean, GxSmsProvider entity) {
+		entity.setConfigData(bean.getConfigData());
+		entity.setImplementationClass(bean.getImplementationClass());
+		entity.setIsActive(bean.getIsActive());
+		entity.setIsPrimary(bean.getIsPrimary());
+		entity.setProviderName(bean.getProviderName());
+		return entity;
+	}
+
+	@Override
+	public void delete(GxSmsProvider bean) {
+		smsProviderRepo.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxSmsProviderBean> findSmsProvider() {
+		return makeSmsProviderBean(smsProviderRepo.findAll(new Sort("providerName")));
+	}
+
+	@Override
+	public List<GxSmsProviderBean> findSmsProviderActive() {
+		return makeSmsProviderBean(smsProviderRepo.findAllByIsActiveTrueOrderByProviderNameAsc());
+	}
+
+	private List<GxSmsProviderBean> makeSmsProviderBean(List<GxSmsProvider> entities) {
+		return entities.stream().map(this::makeSmsProviderBean).collect(Collectors.toList());
+	}
+
+	private GxSmsProviderBean makeSmsProviderBean(GxSmsProvider entity) {
+		GxSmsProviderBean bean = new GxSmsProviderBean();
+		bean.setOid(entity.getOid());
+		bean.setConfigData(entity.getConfigData());
+		bean.setImplementationClass(entity.getImplementationClass());
+		bean.setIsActive(entity.getIsActive());
+		bean.setIsPrimary(entity.getIsPrimary());
+		bean.setProviderName(entity.getProviderName());
+		return bean;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProvider(Integer oid) {
+		GxSmsProvider entity = smsProviderRepo.findOne(oid);
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderByProvider(SmsProvider smsProvider) {
+		GxSmsProvider entity = smsProviderRepo.findOneByProviderName(smsProvider.getProviderName());
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderByProviderName(String providerName) {
+		GxSmsProvider entity = smsProviderRepo.findOneByProviderName(providerName);
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderPrimary() {
+		GxSmsProvider entity = smsProviderRepo.findOneByIsActiveTrueAndIsPrimaryTrue();
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public void markAsPrimary(GxSmsProviderBean bean) {
+		List<GxSmsProvider> allProviders = smsProviderRepo.findAll();
+		allProviders.forEach(provider -> {
+			if (bean.getOid().equals(provider.getOid()))
+				provider.setIsPrimary(true);
+			else
+				provider.setIsPrimary(false);
+
+		});
+		smsProviderRepo.save(allProviders);
 	}
 
 }

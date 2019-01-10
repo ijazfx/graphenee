@@ -44,7 +44,9 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractLayout;
@@ -53,15 +55,15 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Grid.CellReference;
-import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.util.TRCalenderUtil;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
-import io.graphenee.vaadin.renderer.BooleanRenderer;
+import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class AbstractEntityTablePanel<T> extends MPanel {
@@ -224,6 +226,12 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			rootLayout.setExpandRatio(mainTable, 1);
 			setContent(rootLayout);
 
+			for (Object o : mainTable.getVisibleColumns()) {
+				if (o != null) {
+					applyRendererForColumn(new TableColumn(mainTable, o.toString()));
+				}
+			}
+
 			postBuild();
 			isBuilt = true;
 		}
@@ -252,26 +260,28 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			// }
 		}
 
-		// table.getcolumns.forEach(column -> {
-		// applyRendererForColumn(column);
-		// });
-
 		if (isSelectionEnabled) {
 			table.setMultiSelectMode(MultiSelectMode.DEFAULT);
 			table.setSelectable(true);
 		} else {
 			table.setSelectable(false);
 		}
-		table.addItemClickListener(event -> {
-			if (event.getPropertyId() != null) {
-				BeanItem<T> item = mainTableContainer.getItem(event.getItemId());
-				if (onItemClick != null) {
-					Boolean value = onItemClick.apply(item.getBean());
-					if (value != null && value == true) {
-						onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+		table.addItemClickListener(new TRItemClickListener() {
+
+			@Override
+			public void onItemClick(ItemClickEvent event) {
+				if (event.getPropertyId() != null) {
+					BeanItem<T> item = mainTableContainer.getItem(event.getItemId());
+					if (item != null) {
+						if (onItemClick != null) {
+							Boolean value = onItemClick.apply(item.getBean());
+							if (value != null && value == true) {
+								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							}
+						} else {
+							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+						}
 					}
-				} else {
-					onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 				}
 			}
 		});
@@ -365,25 +375,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 		return null;
 	}
 
-	protected void applyRendererForColumn(Column column) {
-		if (column.getPropertyId() != null) {
-			if (column.getPropertyId().toString().matches("(is|should|has)[A-Z].*")) {
-				column.setMaximumWidth(150);
-				column.setRenderer(new BooleanRenderer(event -> {
-					if (event.getPropertyId() != null) {
-						onGridItemClicked((T) event.getItemId(), event.getPropertyId().toString());
-					} else {
-						onGridItemClicked((T) event.getItemId(), "");
-					}
-				}), BooleanRenderer.CHECK_BOX_CONVERTER);
-			} else if ((column.getPropertyId().toString().matches("(date|since)") || column.getPropertyId().toString().matches("(date|since)[A-Z].*")
-					|| column.getPropertyId().toString().matches(".*[a-z](Date|Since)"))) {
-				column.setRenderer(new DateRenderer(applyDateFormatForProperty(column.getPropertyId().toString())));
-			} else if ((column.getPropertyId().toString().equalsIgnoreCase("time") || column.getPropertyId().toString().matches("(time)[A-Z].*")
-					|| column.getPropertyId().toString().matches(".*[a-z](Time)"))) {
-				column.setRenderer(new DateRenderer(applyDateTimeFormatForProperty(column.getPropertyId().toString())));
-			}
-		}
+	protected void applyRendererForColumn(TableColumn column) {
 	}
 
 	protected DateFormat applyDateFormatForProperty(String propertyId) {
@@ -808,6 +800,62 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	public void hideMargin() {
 		rootLayoutMargin = false;
 		rootLayout.setMargin(false);
+	}
+
+	public MButton getAddButton() {
+		return addButton;
+	}
+
+	public MButton getEditButton() {
+		return editButton;
+	}
+
+	public MButton getDeleteButton() {
+		return deleteButton;
+	}
+
+	public static class TableColumn {
+
+		private Table table;
+		private String propertyId;
+
+		TableColumn(Table table, String propertyId) {
+			this.table = table;
+			this.propertyId = propertyId;
+		}
+
+		public void setWidth(int width) {
+			table.setColumnWidth(propertyId, width);
+		}
+
+		public void setAlignment(Align align) {
+			table.setColumnAlignment(propertyId, align);
+		}
+
+		public void setCollapsed(boolean collapsed) {
+			table.setColumnCollapsed(propertyId, collapsed);
+		}
+
+		public void setExpandRatio(float expandRatio) {
+			table.setColumnExpandRatio(propertyId, expandRatio);
+		}
+
+		public void setFooter(String footer) {
+			table.setColumnFooter(propertyId, footer);
+		}
+
+		public void setHeader(String header) {
+			table.setColumnHeader(propertyId, header);
+		}
+
+		public void setIcon(Resource icon) {
+			table.setColumnIcon(propertyId, icon);
+		}
+
+		public String getPropertyId() {
+			return propertyId;
+		}
+
 	}
 
 }

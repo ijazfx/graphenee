@@ -20,6 +20,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.ui.MNotification;
 
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.Page;
@@ -41,11 +42,15 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.exception.ChangePasswordFailedException;
+import io.graphenee.core.exception.PasswordChangeRequiredException;
+import io.graphenee.core.model.bean.GxChangePasswordBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.domain.DashboardUser;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
+import io.graphenee.vaadin.event.DashboardEvent.UserChangePasswordRequestedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
@@ -55,6 +60,8 @@ import io.graphenee.vaadin.util.VaadinUtils;
 public abstract class AbstractDashboardUI extends UI {
 
 	private static Logger L = LoggerFactory.getLogger(AbstractDashboardUI.class);
+	boolean passwordChangeRequired = false;
+	String username;
 
 	@Override
 	protected void init(final VaadinRequest request) {
@@ -72,7 +79,8 @@ public abstract class AbstractDashboardUI extends UI {
 			setLocale(locale);
 		}
 
-		DashboardEventBus.sessionInstance().register(this);
+		DashboardEventBus.sessionInstance().register(AbstractDashboardUI.this);
+
 		Responsive.makeResponsive(this);
 		addStyleName(ValoTheme.UI_WITH_MENU);
 
@@ -87,6 +95,10 @@ public abstract class AbstractDashboardUI extends UI {
 			}
 		});
 
+		addDetachListener(event -> {
+			DashboardEventBus.sessionInstance().unregister(AbstractDashboardUI.this);
+		});
+
 		localizeRecursively(this);
 	}
 
@@ -95,6 +107,7 @@ public abstract class AbstractDashboardUI extends UI {
 	 * If the user is logged in with appropriate privileges, main view is shown.
 	 * Otherwise login view is shown.
 	 */
+
 	protected void updateContent() {
 		DashboardUser user = (DashboardUser) VaadinSession.getCurrent().getSession().getAttribute(DashboardUser.class.getName());
 		if (user != null) {
@@ -111,39 +124,63 @@ public abstract class AbstractDashboardUI extends UI {
 		} else {
 			CssLayout rootLayout = new CssLayout();
 			rootLayout.setSizeFull();
-			rootLayout.addComponent(dashboardSetup().loginComponent());
 
-			Label poweredByLabel = new Label();
-			poweredByLabel.setWidthUndefined();
-			poweredByLabel.setStyleName("powered-by");
-			poweredByLabel.setContentMode(ContentMode.HTML);
-			poweredByLabel.setValue("Powered by <strong>Graphenee&trade;</strong>");
-			poweredByLabel.setVisible(dashboardSetup().shouldShowPoweredByGraphenee());
+			if (passwordChangeRequired) {
+				GxChangePasswordForm form = new GxChangePasswordForm();
+				form.setEntity(GxChangePasswordBean.class, new GxChangePasswordBean());
+				form.setSavedHandler(entity -> {
+					try {
+						UserChangePasswordRequestedEvent event = new UserChangePasswordRequestedEvent(username, entity.getCurrentPassword(), entity.getNewPassword());
+						dashboardSetup().changePassword(event);
+						MNotification.tray("Change Password Success", "The password has been changed successfully!");
+						form.closePopup();
+						passwordChangeRequired = false;
+						username = null;
+						updateContent();
+					} catch (ChangePasswordFailedException e) {
+						Notification notification = new Notification("Change Password Failed", e.getMessage(), Type.ERROR_MESSAGE);
+						notification.setDelayMsec(3000);
+						notification.setPosition(Position.BOTTOM_CENTER);
+						notification.show(getPage());
+					}
+				});
+				VaadinSession.getCurrent().setAttribute(DashboardUser.class, user);
+				form.openInModalPopup();
+			} else {
 
-			rootLayout.addComponent(poweredByLabel);
+				rootLayout.addComponent(dashboardSetup().loginComponent());
 
-			if (dashboardSetup().shouldLocalize() && dashboardSetup().supportedLocales() != null) {
-				CssLayout languageBar = new CssLayout();
-				languageBar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-				languageBar.addStyleName("language-bar");
+				Label poweredByLabel = new Label();
+				poweredByLabel.setWidthUndefined();
+				poweredByLabel.setStyleName("powered-by");
+				poweredByLabel.setContentMode(ContentMode.HTML);
+				poweredByLabel.setValue("Powered by <strong>Graphenee&trade;</strong>");
+				poweredByLabel.setVisible(dashboardSetup().shouldShowPoweredByGraphenee());
 
-				for (GxSupportedLocaleBean supportedLocaleBean : dashboardSetup().supportedLocales()) {
-					MButton localeButton = new MButton(supportedLocaleBean.getLocaleName());
-					localeButton.addClickListener(event -> {
-						Locale locale = new Locale(supportedLocaleBean.getLocaleCode());
-						VaadinSession.getCurrent().setAttribute(Locale.class, locale);
-						UI.getCurrent().getPage().setLocation("/");
-					});
-					localeButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
-					languageBar.addComponent(localeButton);
+				rootLayout.addComponent(poweredByLabel);
+
+				if (dashboardSetup().shouldLocalize() && dashboardSetup().supportedLocales() != null) {
+					CssLayout languageBar = new CssLayout();
+					languageBar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+					languageBar.addStyleName("language-bar");
+
+					for (GxSupportedLocaleBean supportedLocaleBean : dashboardSetup().supportedLocales()) {
+						MButton localeButton = new MButton(supportedLocaleBean.getLocaleName());
+						localeButton.addClickListener(event -> {
+							Locale locale = new Locale(supportedLocaleBean.getLocaleCode());
+							VaadinSession.getCurrent().setAttribute(Locale.class, locale);
+							UI.getCurrent().getPage().setLocation("/");
+						});
+						localeButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
+						languageBar.addComponent(localeButton);
+					}
+
+					rootLayout.addComponent(languageBar);
 				}
-
-				rootLayout.addComponent(languageBar);
+				setContent(rootLayout);
+				// setContent(dashboardSetup().loginComponent());
+				addStyleName("loginview");
 			}
-
-			setContent(rootLayout);
-			// setContent(dashboardSetup().loginComponent());
-			addStyleName("loginview");
 		}
 	}
 
@@ -161,6 +198,10 @@ public abstract class AbstractDashboardUI extends UI {
 			notification.setDelayMsec(3000);
 			notification.setPosition(Position.BOTTOM_CENTER);
 			notification.show(getPage());
+		} catch (PasswordChangeRequiredException e) {
+			passwordChangeRequired = true;
+			username = event.getUserName();
+			updateContent();
 		}
 	}
 

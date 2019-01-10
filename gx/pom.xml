@@ -103,6 +103,7 @@
 		<module>gx-aws</module>
 		<module>gx-jbpm-embedded</module>
 		<module>gx-sms</module>
+		<module>gx-sms-vaadin</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
@@ -288,12 +289,12 @@
 			<dependency>
 				<groupId>com.vaadin.addon</groupId>
 				<artifactId>vaadin-charts</artifactId>
-				<version>3.2.1</version>
+				<version>3.3.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin.addon</groupId>
 				<artifactId>vaadin-spreadsheet</artifactId>
-				<version>1.2.0</version>
+				<version>1.5.0.alpha1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin.addon</groupId>
@@ -338,7 +339,7 @@
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
-				<version>4.0.0</version>
+				<version>3.17</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.protobuf</groupId>
@@ -354,6 +355,16 @@
 				<groupId>io.graphenee</groupId>
 				<artifactId>gx-sms</artifactId>
 				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.graphenee</groupId>
+				<artifactId>gx-sms-vaadin</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.17</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -380,7 +391,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.java.persistence>2.1.1</version.java.persistence>
-		<version.vaadin>7.7.9</version.vaadin>
+		<version.vaadin>7.7.15</version.vaadin>
 	</properties>
 
 	<distributionManagement>

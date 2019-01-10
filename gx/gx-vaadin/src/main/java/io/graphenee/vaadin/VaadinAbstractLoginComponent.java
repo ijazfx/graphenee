@@ -41,8 +41,6 @@ import io.graphenee.vaadin.event.DashboardEventBus;
 @SuppressWarnings("serial")
 public abstract class VaadinAbstractLoginComponent extends LoginForm {
 
-	private boolean isBuilt;
-
 	public VaadinAbstractLoginComponent() {
 		if (!isSpringComponent()) {
 			postConstruct();

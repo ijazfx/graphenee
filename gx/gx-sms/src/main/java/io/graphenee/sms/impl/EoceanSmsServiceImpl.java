@@ -1,5 +1,12 @@
 package io.graphenee.sms.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
+
+import io.graphenee.sms.GxSmsResponse;
+import io.graphenee.sms.GxSmsSendException;
 import io.graphenee.sms.api.GxSmsService;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.sms.proto.GxSmsConfigProtos.EoceanConfig;
@@ -11,8 +18,11 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class EoceanSmsServiceImpl implements GxSmsService {
 
+	private static final Logger L = LoggerFactory.getLogger(EoceanSmsServiceImpl.class);
+
 	private EoceanService eoceanService;
 	private EoceanConfig smsConfig;
+	private final int perSMSMaxLength = 160;
 
 	public EoceanSmsServiceImpl(GxSmsConfigProtos.EoceanConfig smsConfig) {
 		this.smsConfig = smsConfig;
@@ -21,36 +31,44 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 	}
 
 	@Override
-	public String sendTransactionalMessage(String phone, String message) {
-		throw new UnsupportedOperationException("Please use method with senderId.");
+	public GxSmsResponse sendTransactionalMessage(String phone, String message) throws GxSmsSendException {
+		return sendTransactionalMessage(null, phone, message);
 	}
 
 	@Override
-	public String sendPromotionalMessage(String phone, String message) {
-		throw new UnsupportedOperationException("Please use method with senderId.");
+	public GxSmsResponse sendPromotionalMessage(String phone, String message) throws GxSmsSendException {
+		return sendPromotionalMessage(null, phone, message);
 	}
 
 	@Override
-	public String sendTransactionalMessage(String senderId, String phone, String message) {
+	public GxSmsResponse sendTransactionalMessage(String senderId, String phone, String message) throws GxSmsSendException {
 		return sendMessage(senderId, phone, message);
 	}
 
 	@Override
-	public String sendPromotionalMessage(String senderId, String phone, String message) {
+	public GxSmsResponse sendPromotionalMessage(String senderId, String phone, String message) throws GxSmsSendException {
 		return sendMessage(senderId, phone, message);
 	}
 
-	private String sendMessage(String senderId, String phone, String message) {
+	private GxSmsResponse sendMessage(String senderId, String phone, String message) throws GxSmsSendException {
+		if (Strings.isNullOrEmpty(senderId))
+			senderId = smsConfig.getSenderId();
 		Call<String> call = eoceanService.requestAPI(smsConfig.getUser(), smsConfig.getPassword(), senderId, phone, message);
 		try {
 			Response<String> response = call.execute();
 			if (response.isSuccessful()) {
-				return "SMS Sent";
+				GxSmsResponse gxSmsResponse = new GxSmsResponse();
+				gxSmsResponse.setDetail(response.message());
+				int smsCount = message.length() / perSMSMaxLength;
+				if (message.length() % perSMSMaxLength != 0)
+					smsCount += 1;
+				gxSmsResponse.setSmsCount(smsCount);
+				return gxSmsResponse;
 			}
-			return response.message();
 		} catch (Exception e) {
-			return e.getMessage();
+			throw new GxSmsSendException(e.getMessage(), e);
 		}
+		return null;
 	}
 
 }

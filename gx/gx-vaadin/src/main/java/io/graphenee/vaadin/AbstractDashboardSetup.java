@@ -24,9 +24,12 @@ import com.vaadin.ui.AbstractSingleComponentContainer;
 import com.vaadin.ui.Image;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
+import io.graphenee.core.exception.ChangePasswordFailedException;
+import io.graphenee.core.exception.PasswordChangeRequiredException;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.domain.DashboardUser;
+import io.graphenee.vaadin.event.DashboardEvent.UserChangePasswordRequestedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.view.DashboardMenu;
 import io.graphenee.vaadin.view.LoginComponent;
@@ -88,7 +91,10 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	public abstract void registerViewProviders(Navigator navigator);
 
-	public abstract DashboardUser authenticate(UserLoginRequestedEvent event) throws AuthenticationFailedException;
+	public abstract DashboardUser authenticate(UserLoginRequestedEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
+
+	protected void changePassword(UserChangePasswordRequestedEvent event) throws ChangePasswordFailedException {
+	}
 
 	public List<GxSupportedLocaleBean> supportedLocales() {
 		return null;

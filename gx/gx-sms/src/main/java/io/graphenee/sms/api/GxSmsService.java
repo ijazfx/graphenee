@@ -1,13 +1,16 @@
 package io.graphenee.sms.api;
 
+import io.graphenee.sms.GxSmsResponse;
+import io.graphenee.sms.GxSmsSendException;
+
 public interface GxSmsService {
 
-	String sendTransactionalMessage(String phone, String message);
+	GxSmsResponse sendTransactionalMessage(String phone, String message) throws GxSmsSendException;
 
-	String sendPromotionalMessage(String phone, String message);
+	GxSmsResponse sendPromotionalMessage(String phone, String message) throws GxSmsSendException;
 
-	String sendTransactionalMessage(String senderId, String phone, String message);
+	GxSmsResponse sendTransactionalMessage(String senderId, String phone, String message) throws GxSmsSendException;
 
-	String sendPromotionalMessage(String senderId, String phone, String message);
+	GxSmsResponse sendPromotionalMessage(String senderId, String phone, String message) throws GxSmsSendException;
 
 }

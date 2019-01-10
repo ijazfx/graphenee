@@ -15,19 +15,26 @@
  *******************************************************************************/
 package io.graphenee.core.gson;
 
+import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Base64;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import io.graphenee.core.util.TRCalenderUtil;
 
 public class JsonDeserializers {
 
 	public static final JsonDeserializer<Timestamp> TIMESTAMP_DESERIALIZER = new TimestampDeserializer();
+	public static final JsonSerializer<Timestamp> TIMESTAMP_SERIALIZER = new TimestampSerializer();
 
 	public static class TimestampDeserializer implements JsonDeserializer<Timestamp> {
 
@@ -56,6 +63,28 @@ public class JsonDeserializers {
 				return null;
 			}
 		}
+	}
+
+	public static class TimestampSerializer implements JsonSerializer<Timestamp> {
+
+		@Override
+		public JsonElement serialize(Timestamp src, Type typeOfSrc, JsonSerializationContext context) {
+			if (src == null)
+				return JsonNull.INSTANCE;
+			return new JsonPrimitive(src.getTime());
+		}
+
+	}
+
+	public static class ByteArrayDeserializer implements JsonDeserializer<byte[]> {
+
+		@Override
+		public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			if (json == null)
+				return new byte[] {};
+			return Base64.getDecoder().decode(json.getAsString());
+		}
+
 	}
 
 }

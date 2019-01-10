@@ -70,8 +70,12 @@ public class DashboardEventBus implements SubscriberExceptionHandler {
 	public static DashboardEventBus sessionInstance() {
 		DashboardEventBus dashboardEventBus = VaadinSession.getCurrent().getAttribute(DashboardEventBus.class);
 		if (dashboardEventBus == null) {
-			dashboardEventBus = new DashboardEventBus();
-			VaadinSession.getCurrent().setAttribute(DashboardEventBus.class, dashboardEventBus);
+			synchronized (DashboardEventBus.class) {
+				if (dashboardEventBus == null) {
+					dashboardEventBus = new DashboardEventBus();
+					VaadinSession.getCurrent().setAttribute(DashboardEventBus.class, dashboardEventBus);
+				}
+			}
 		}
 		return dashboardEventBus;
 	}
@@ -79,8 +83,12 @@ public class DashboardEventBus implements SubscriberExceptionHandler {
 	public static DashboardEventBus sessionInstance(VaadinSession session) {
 		DashboardEventBus dashboardEventBus = session.getAttribute(DashboardEventBus.class);
 		if (dashboardEventBus == null) {
-			dashboardEventBus = new DashboardEventBus();
-			session.setAttribute(DashboardEventBus.class, dashboardEventBus);
+			synchronized (DashboardEventBus.class) {
+				if (dashboardEventBus == null) {
+					dashboardEventBus = new DashboardEventBus();
+					session.setAttribute(DashboardEventBus.class, dashboardEventBus);
+				}
+			}
 		}
 		return dashboardEventBus;
 	}

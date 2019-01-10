@@ -108,6 +108,11 @@ public class CollectionFault<T> {
 		valuesUpdated = null;
 	}
 
+	public Collection<T> getInvalidatedCollection() {
+		invalidate();
+		return getCollection();
+	}
+
 	public Collection<T> getCollection() {
 		isFault = false;
 		_initializeCollection();

@@ -34,4 +34,6 @@ public interface GxUserAccountRepository extends JpaRepository<GxUserAccount, In
 
 	GxUserAccount findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(UUID accessKey);
 
+	GxUserAccount findByUsernameAndPassword(String username, String password);
+
 }
