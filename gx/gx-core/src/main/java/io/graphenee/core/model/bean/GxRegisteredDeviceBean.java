@@ -82,6 +82,6 @@ public class GxRegisteredDeviceBean implements Serializable {
 	}
 
 	public String getMobileApplicationName() {
-		return getGxMobileApplicationBeanFault().getBean() != null ? gxMobileApplicationBeanFault.getBean().getApplicationName() : "N/A";
+		return getGxMobileApplicationBeanFault() != null ? gxMobileApplicationBeanFault.getBean().getApplicationName() : "N/A";
 	}
 }

@@ -296,7 +296,6 @@ public class GxDataServiceImpl implements GxDataService {
 		return Collections.emptyList();
 	}
 
-	@Transactional
 	@Override
 	public void deleteTermByTermKeyAndOidNameSpace(String termKey, Integer oidNamespace) {
 		termRepo.deleteByTermKeyAndOidNameSpace(termKey, oidNamespace);
@@ -798,7 +797,6 @@ public class GxDataServiceImpl implements GxDataService {
 		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
-	@Transactional
 	private GxSecurityPolicyBean makeSecurityPolicyBean(GxSecurityPolicy entity) {
 		GxSecurityPolicyBean bean = new GxSecurityPolicyBean();
 		bean.setOid(entity.getOid());
@@ -2058,7 +2056,6 @@ public class GxDataServiceImpl implements GxDataService {
 		return gxMobileApplicationRepository.findByGxNamespaceOid(gxNameSpace.getOid()).stream().map(this::makeGxMobileApplicationBean).collect(Collectors.toList());
 	}
 
-	@Transactional
 	@Override
 	public void deleteMobileApplication(GxMobileApplicationBean bean) {
 		gxMobileApplicationRepository.deleteByOidMobileApplicationAndOidNamespace(bean.getOid(), bean.getGxNamespaceBeanFault().getOid());

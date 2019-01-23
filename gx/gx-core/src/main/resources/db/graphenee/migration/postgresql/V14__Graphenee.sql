@@ -1,7 +1,7 @@
 create sequence gx_mobile_application_seq;
 create sequence gx_registered_device_seq;
 
-create table gx_mobile(
+create table gx_mobile_application (
 	oid integer not null default nextval('gx_mobile_application_seq'::regclass),
 	application_name varchar(50),
 	is_active boolean not null default false,
@@ -10,7 +10,7 @@ create table gx_mobile(
     primary key(oid)
 );
 
-create table gx_registered_device(
+create table gx_registered_device (
 	oid integer not null default nextval('gx_registered_device_seq'::regclass),
 	oid_mobile_application integer not null,
 	system_name varchar(50),

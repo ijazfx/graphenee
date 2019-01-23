@@ -1,2 +1,0 @@
-alter table gx_mobile
-rename to gx_mobile_application

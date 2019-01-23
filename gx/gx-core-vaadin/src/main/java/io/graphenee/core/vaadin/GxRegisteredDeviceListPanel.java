@@ -58,7 +58,7 @@ public class GxRegisteredDeviceListPanel extends AbstractEntityListPanel<GxRegis
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "systemName", "brand", "mobileApplicationName", "ownerId", "isTablet", "isActive" };
+		return new String[] { "mobileApplicationName", "systemName", "brand", "ownerId", "isTablet", "isActive" };
 	}
 
 	@Override
@@ -97,6 +97,11 @@ public class GxRegisteredDeviceListPanel extends AbstractEntityListPanel<GxRegis
 				}), BooleanRenderer.SWITCH_CONVERTER);
 			}
 		}
+	}
+
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
 	}
 
 }

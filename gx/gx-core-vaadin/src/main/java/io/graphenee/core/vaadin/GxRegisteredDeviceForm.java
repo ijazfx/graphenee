@@ -73,7 +73,7 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 
 	@Override
 	protected String formTitle() {
-		return getEntity().getSystemName() != null && getEntity().getBrand() != null ? getEntity().getSystemName() + " - " + getEntity().getBrand() : "Register New Device";
+		return "Device Details";
 	}
 
 	@Override
