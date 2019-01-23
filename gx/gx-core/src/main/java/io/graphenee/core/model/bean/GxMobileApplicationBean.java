@@ -10,7 +10,7 @@ public class GxMobileApplicationBean implements Serializable {
 
 	private Integer oid;
 	private String applicationName;
-	private Boolean isActive = false;
+	private Boolean isActive = true;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 
 	public Integer getOid() {

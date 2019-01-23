@@ -1,5 +1,6 @@
 package io.graphenee.core.vaadin;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
 
+import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
@@ -53,12 +55,14 @@ public class GxRegisteredDeviceListPanel extends AbstractEntityListPanel<GxRegis
 
 	@Override
 	protected List<GxRegisteredDeviceBean> fetchEntities() {
-		return dataService.findByMobileApplication(selectedMobileApplication);
+		if (selectedMobileApplication != null)
+			return dataService.findByMobileApplication(selectedMobileApplication);
+		return Collections.emptyList();
 	}
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "mobileApplicationName", "systemName", "brand", "ownerId", "isTablet", "isActive" };
+		return new String[] { "ownerId", "uniqueId", "systemName", "brand", "isTablet", "isActive" };
 	}
 
 	@Override
@@ -67,26 +71,29 @@ public class GxRegisteredDeviceListPanel extends AbstractEntityListPanel<GxRegis
 	}
 
 	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
 		mobileApplicationComboBox = new ComboBox("Mobile Application");
 		List<GxMobileApplicationBean> gxMobileApplicationBeans = dataService.findMobileApplication();
 		mobileApplicationComboBox.addItems(gxMobileApplicationBeans);
-		if (gxMobileApplicationBeans != null) {
+		if (!gxMobileApplicationBeans.isEmpty()) {
 			mobileApplicationComboBox.setValue(gxMobileApplicationBeans.get(0));
 			selectedMobileApplication = (GxMobileApplicationBean) mobileApplicationComboBox.getValue();
+			setAddButtonEnable(selectedMobileApplication != null);
+		} else {
+			setAddButtonEnable(false);
 		}
 		mobileApplicationComboBox.addValueChangeListener(event -> {
 			selectedMobileApplication = (GxMobileApplicationBean) event.getProperty().getValue();
+			setAddButtonEnable(selectedMobileApplication != null);
 			refresh();
 		});
 
 		toolbar.addComponent(mobileApplicationComboBox);
-		super.addButtonsToToolbar(toolbar);
+		super.addButtonsToSecondaryToolbar(toolbar);
 	}
 
 	@Override
 	protected void postBuild() {
-		super.postBuild();
 		for (com.vaadin.ui.Grid.Column column : entityGrid().getColumns()) {
 			if (column.getPropertyId().toString().matches("(isActive)")) {
 				column.setRenderer(new BooleanRenderer(event -> {
@@ -101,6 +108,18 @@ public class GxRegisteredDeviceListPanel extends AbstractEntityListPanel<GxRegis
 
 	@Override
 	protected boolean isGridCellFilterEnabled() {
+		return true;
+	}
+
+	@Override
+	protected void onAddButtonClick(GxRegisteredDeviceBean entity) {
+		if (selectedMobileApplication != null)
+			entity.setGxMobileApplicationBeanFault(BeanFault.beanFault(selectedMobileApplication.getOid(), selectedMobileApplication));
+		super.onAddButtonClick(entity);
+	}
+
+	@Override
+	protected boolean shouldShowDeleteConfirmation() {
 		return true;
 	}
 

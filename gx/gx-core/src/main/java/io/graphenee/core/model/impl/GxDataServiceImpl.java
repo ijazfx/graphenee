@@ -44,6 +44,8 @@ import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.core.exception.RegisterDeviceFailedException;
+import io.graphenee.core.exception.UnregisterDeviceFailedException;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
@@ -1990,6 +1992,43 @@ public class GxDataServiceImpl implements GxDataService {
 		return bean;
 	}
 
+	@Override
+	public GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String applicationName, String systemName, String brand, boolean isTablet, String ownerId)
+			throws RegisterDeviceFailedException {
+		GxMobileApplicationBean mobileApplicationBean = findByApplicationNameAndNamespace(applicationName, namespace);
+		if (mobileApplicationBean == null)
+			throw new RegisterDeviceFailedException("Mobile application " + applicationName + " does not exist.");
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceApplicationAndDeviceId(namespace, applicationName, uniqueId);
+		if (device != null)
+			throw new RegisterDeviceFailedException("Device with uniqueId " + uniqueId + " for application " + applicationName + " already registered");
+		GxRegisteredDevice entity = new GxRegisteredDevice();
+		entity.setBrand(brand);
+		entity.setIsActive(true);
+		entity.setIsTablet(isTablet);
+		entity.setOwnerId(ownerId);
+		entity.setSystemName(systemName);
+		entity.setUniqueId(uniqueId);
+		entity.setGxMobileApplication(gxMobileApplicationRepository.findOne(mobileApplicationBean.getOid()));
+		entity = gxRegisteredDeviceRepository.save(entity);
+		return makeGxRegisteredDeviceBean(entity);
+	}
+
+	@Override
+	public void unregisterDevice(String namespace, String uniqueId, String applicationName) throws UnregisterDeviceFailedException {
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceApplicationAndDeviceId(namespace, applicationName, uniqueId);
+		if (device == null)
+			throw new UnregisterDeviceFailedException("Device with uniqueId " + uniqueId + " for application " + applicationName + " does not exist.");
+		gxRegisteredDeviceRepository.delete(device.getOid());
+	}
+
+	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceApplicationAndDeviceId(String namespace, String applicationName, String uniqueId) {
+		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxMobileApplicationGxNamespaceNamespaceAndGxMobileApplicationApplicationNameAndUniqueId(namespace,
+				applicationName, uniqueId);
+		if (device == null)
+			return null;
+		return makeGxRegisteredDeviceBean(device);
+	}
+
 	private GxMobileApplicationBean makeGxMobileApplicationBean(GxMobileApplication gxMobileApplication) {
 		GxMobileApplicationBean bean = new GxMobileApplicationBean();
 		bean.setOid(gxMobileApplication.getOid());
@@ -2064,6 +2103,8 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public GxMobileApplicationBean findByApplicationNameAndNamespace(String applicationName, String namespace) {
 		GxMobileApplication entity = gxMobileApplicationRepository.findByApplicationNameAndGxNamespaceNamespace(applicationName, namespace);
+		if (entity == null)
+			return null;
 		return makeGxMobileApplicationBean(entity);
 	}
 

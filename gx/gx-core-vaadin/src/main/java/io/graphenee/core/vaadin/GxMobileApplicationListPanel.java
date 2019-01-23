@@ -113,4 +113,9 @@ public class GxMobileApplicationListPanel extends AbstractEntityListPanel<GxMobi
 		namespaceComboBox.setVisible(namespaceBean == null);
 	}
 
+	@Override
+	protected boolean shouldShowDeleteConfirmation() {
+		return true;
+	}
+
 }

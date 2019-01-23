@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 
 import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.core.exception.RegisterDeviceFailedException;
+import io.graphenee.core.exception.UnregisterDeviceFailedException;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
@@ -334,5 +336,10 @@ public interface GxDataService {
 	List<GxRegisteredDeviceBean> findByMobileApplication(GxMobileApplicationBean bean);
 
 	void delete(GxRegisteredDeviceBean bean);
+
+	GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String applicationName, String systemName, String brand, boolean isTablet, String ownerId)
+			throws RegisterDeviceFailedException;
+
+	void unregisterDevice(String namespace, String uniqueId, String applicationName) throws UnregisterDeviceFailedException;
 
 }

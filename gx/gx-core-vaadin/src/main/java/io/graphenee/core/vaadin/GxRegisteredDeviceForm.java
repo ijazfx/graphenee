@@ -7,12 +7,9 @@ import org.vaadin.viritin.fields.MTextField;
 
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 
-import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.vaadin.TRAbstractForm;
 
@@ -36,10 +33,6 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 	MCheckBox isActive;
 	MCheckBox isTablet;
 
-	ComboBox gxMobileApplicationComboBox;
-
-	private GxMobileApplicationBean selectedApplicationBean;
-
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
 		systemName = new MTextField("Platform Name").withRequired(true);
@@ -48,22 +41,7 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 		ownerId = new MTextField("Device Owner Id").withRequired(true);
 		isActive = new MCheckBox("Is Active");
 		isTablet = new MCheckBox("Is Tablet");
-		gxMobileApplicationComboBox = new ComboBox("Mobile Application");
-		gxMobileApplicationComboBox.addItems(dataService.findMobileApplication());
-		gxMobileApplicationComboBox.setRequired(true);
-		gxMobileApplicationComboBox.addValueChangeListener(event -> {
-			selectedApplicationBean = (GxMobileApplicationBean) event.getProperty().getValue();
-			if (selectedApplicationBean != null)
-				if (!isBinding())
-					getEntity().setGxMobileApplicationBeanFault(new BeanFault<Integer, GxMobileApplicationBean>(selectedApplicationBean.getOid(), selectedApplicationBean));
-		});
-		form.addComponents(systemName, brandName, uniqueId, ownerId, isActive, isTablet, gxMobileApplicationComboBox);
-	}
-
-	@Override
-	protected void postBinding(GxRegisteredDeviceBean entity) {
-		if (entity.getGxMobileApplicationBeanFault() != null)
-			gxMobileApplicationComboBox.setValue(entity.getGxMobileApplicationBeanFault().getBean());
+		form.addComponents(systemName, brandName, uniqueId, ownerId, isActive, isTablet);
 	}
 
 	@Override
@@ -78,7 +56,7 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 
 	@Override
 	protected String popupHeight() {
-		return "400";
+		return "300";
 	}
 
 	@Override

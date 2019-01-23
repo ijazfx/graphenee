@@ -13,7 +13,7 @@ public class GxRegisteredDeviceBean implements Serializable {
 	private String uniqueId;
 	private Boolean isTablet = false;
 	private String brand;
-	private Boolean isActive = false;
+	private Boolean isActive = true;
 	private String ownerId;
 	private BeanFault<Integer, GxMobileApplicationBean> gxMobileApplicationBeanFault;
 
