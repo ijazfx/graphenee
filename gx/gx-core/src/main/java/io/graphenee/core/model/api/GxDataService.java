@@ -27,7 +27,9 @@ import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
+import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
@@ -314,5 +316,23 @@ public interface GxDataService {
 	GxSmsProviderBean findSmsProviderByProviderName(String providerName);
 
 	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
+
+	GxMobileApplicationBean createOrUpdate(GxMobileApplicationBean bean);
+
+	GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean);
+
+	List<GxMobileApplicationBean> findMobileApplication();
+
+	List<GxMobileApplicationBean> findAllByNamespace(GxNamespaceBean gxNameSpace);
+
+	GxMobileApplicationBean findByApplicationNameAndNamespace(String applicationName, String namespace);
+
+	void deleteMobileApplication(GxMobileApplicationBean bean);
+
+	List<GxRegisteredDeviceBean> findRegisteredDevices();
+
+	List<GxRegisteredDeviceBean> findByMobileApplication(GxMobileApplicationBean bean);
+
+	void delete(GxRegisteredDeviceBean bean);
 
 }
