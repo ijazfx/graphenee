@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>io.graphenee.blockchain</groupId>
+		<artifactId>gx-blockchain</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>gx-sawtooth</artifactId>
+	<name>Graphenee Sawtooth</name>
+	<properties>
+		<sawtooth.version>v0.1.2</sawtooth.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.hyperledger.sawtooth</groupId>
+			<artifactId>sawtooth-sdk-transaction-processor</artifactId>
+			<version>${sawtooth.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hyperledger.sawtooth</groupId>
+			<artifactId>sawtooth-sdk-signing</artifactId>
+			<version>${sawtooth.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hyperledger.sawtooth</groupId>
+			<artifactId>sawtooth-sdk-protos</artifactId>
+			<version>${sawtooth.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>retrofit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>converter-gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>converter-scalars</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

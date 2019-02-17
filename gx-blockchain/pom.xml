@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.graphenee.blockchain</groupId>
+  <artifactId>gx-blockchain</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Graphenee Blockchain</name>
+  <packaging>pom</packaging>
+  <modules>
+  	<module>gx-sawtooth</module>
+  </modules>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>io.graphenee.blockchain</groupId>
+  			<artifactId>gx-sawtooth</artifactId>
+  			<version>${project.version}</version>
+  		</dependency>
+  		<dependency>
+  			<groupId>io.graphenee</groupId>
+  			<artifactId>gx</artifactId>
+  			<version>0.1.2-SNAPSHOT</version>
+  			<type>pom</type>
+  			<scope>import</scope>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
+</project>
