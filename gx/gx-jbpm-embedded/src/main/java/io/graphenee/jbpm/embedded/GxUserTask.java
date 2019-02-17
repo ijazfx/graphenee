@@ -31,6 +31,8 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
 
+import io.graphenee.core.model.Fault;
+import io.graphenee.core.util.KeyValueWrapper;
 import io.graphenee.jbpm.embedded.exception.GxAssignTaskException;
 import io.graphenee.jbpm.embedded.exception.GxCompleteTaskException;
 import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
@@ -41,6 +43,9 @@ public class GxUserTask implements TaskSummary {
 	WeakReference<TaskService> taskService;
 	private volatile Task internalTask;
 	private String taskOwner;
+
+	private Fault<Long, Object> taskObjectFault;
+	private KeyValueWrapper o;
 
 	public GxUserTask(TaskService taskService, TaskSummary task) {
 		this.taskService = new WeakReference<>(taskService);
@@ -253,6 +258,21 @@ public class GxUserTask implements TaskSummary {
 
 	public void setTaskOwner(String taskOwner) {
 		this.taskOwner = taskOwner;
+	}
+
+	public Fault<Long, Object> getTaskObjectFault() {
+		return taskObjectFault;
+	}
+
+	public void setTaskObjectFault(Fault<Long, Object> taskObjectFault) {
+		this.taskObjectFault = taskObjectFault;
+	}
+
+	public KeyValueWrapper getO() {
+		if (o == null && getTaskObjectFault() != null) {
+			o = new KeyValueWrapper(getTaskObjectFault().getValue());
+		}
+		return o;
 	}
 
 }

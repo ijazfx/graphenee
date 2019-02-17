@@ -1,0 +1,17 @@
+package io.graphenee.core.model.jpa.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import io.graphenee.core.model.entity.GxRegisteredDevice;
+
+@Repository
+public interface GxRegisteredDeviceRepository extends JpaRepository<GxRegisteredDevice, Integer> {
+
+	List<GxRegisteredDevice> findByGxMobileApplicationApplicationName(String applicationName);
+
+	GxRegisteredDevice findByGxMobileApplicationGxNamespaceNamespaceAndGxMobileApplicationApplicationNameAndUniqueId(String namespace, String applicationName, String uniqueId);
+
+}

@@ -44,6 +44,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MultiSelectMode;
@@ -62,6 +63,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.util.TRCalenderUtil;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
+import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class AbstractEntityTablePanel<T> extends MPanel {
@@ -264,16 +266,22 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 		} else {
 			table.setSelectable(false);
 		}
-		table.addItemClickListener(event -> {
-			if (event.getPropertyId() != null) {
-				BeanItem<T> item = mainTableContainer.getItem(event.getItemId());
-				if (onItemClick != null) {
-					Boolean value = onItemClick.apply(item.getBean());
-					if (value != null && value == true) {
-						onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+		table.addItemClickListener(new TRItemClickListener() {
+
+			@Override
+			public void onItemClick(ItemClickEvent event) {
+				if (event.getPropertyId() != null) {
+					BeanItem<T> item = mainTableContainer.getItem(event.getItemId());
+					if (item != null) {
+						if (onItemClick != null) {
+							Boolean value = onItemClick.apply(item.getBean());
+							if (value != null && value == true) {
+								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							}
+						} else {
+							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+						}
 					}
-				} else {
-					onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 				}
 			}
 		});
@@ -792,6 +800,18 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	public void hideMargin() {
 		rootLayoutMargin = false;
 		rootLayout.setMargin(false);
+	}
+
+	public MButton getAddButton() {
+		return addButton;
+	}
+
+	public MButton getEditButton() {
+		return editButton;
+	}
+
+	public MButton getDeleteButton() {
+		return deleteButton;
 	}
 
 	public static class TableColumn {

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 
 import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.core.exception.RegisterDeviceFailedException;
+import io.graphenee.core.exception.UnregisterDeviceFailedException;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
@@ -27,7 +29,9 @@ import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
+import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
@@ -201,6 +205,10 @@ public interface GxDataService {
 
 	GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace);
 
+	GxEmailTemplateBean findEmailTemplateByTemplateCodeActive(String templateCode);
+
+	GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace);
+
 	List<GxEmailTemplateBean> findEmailTemplate();
 
 	List<GxEmailTemplateBean> findEmailTemplateByNamespace(GxNamespaceBean namespace);
@@ -310,5 +318,28 @@ public interface GxDataService {
 	GxSmsProviderBean findSmsProviderByProviderName(String providerName);
 
 	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
+
+	GxMobileApplicationBean createOrUpdate(GxMobileApplicationBean bean);
+
+	GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean);
+
+	List<GxMobileApplicationBean> findMobileApplication();
+
+	List<GxMobileApplicationBean> findAllByNamespace(GxNamespaceBean gxNameSpace);
+
+	GxMobileApplicationBean findByApplicationNameAndNamespace(String applicationName, String namespace);
+
+	void deleteMobileApplication(GxMobileApplicationBean bean);
+
+	List<GxRegisteredDeviceBean> findRegisteredDevices();
+
+	List<GxRegisteredDeviceBean> findByMobileApplication(GxMobileApplicationBean bean);
+
+	void delete(GxRegisteredDeviceBean bean);
+
+	GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String applicationName, String systemName, String brand, boolean isTablet, String ownerId)
+			throws RegisterDeviceFailedException;
+
+	void unregisterDevice(String namespace, String uniqueId, String applicationName) throws UnregisterDeviceFailedException;
 
 }

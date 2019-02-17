@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.jbpm.embedded.service;
+package io.graphenee.core.exception;
 
-import org.kie.api.runtime.manager.RuntimeEngine;
-import org.kie.internal.process.CorrelationKey;
+@SuppressWarnings("serial")
+public class RegisterDeviceFailedException extends Exception {
 
-public interface GxKieRuntimeEngineService {
+	public RegisterDeviceFailedException() {
+		super();
+	}
 
-	public static final String JBPM_MANAGER_DEFAULT_GROUP = "default-singleton";
+	public RegisterDeviceFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 
-	RuntimeEngine newSingletonRuntimeEngine();
+	public RegisterDeviceFailedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	RuntimeEngine newPerRequestRuntimeEngine();
+	public RegisterDeviceFailedException(String message) {
+		super(message);
+	}
 
-	RuntimeEngine newPerProcessRuntimeEngine();
-
-	RuntimeEngine newPerProcessRuntimeEngine(Long processInstanceId);
-
-	RuntimeEngine newPerProcessRuntimeEngine(CorrelationKey key);
+	public RegisterDeviceFailedException(Throwable cause) {
+		super(cause);
+	}
 
 }

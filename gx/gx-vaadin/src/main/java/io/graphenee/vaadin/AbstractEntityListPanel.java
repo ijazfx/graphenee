@@ -267,13 +267,15 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			public void onItemClick(ItemClickEvent event) {
 				if (event.getPropertyId() != null) {
 					BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
-					if (onItemClick != null) {
-						Boolean value = onItemClick.apply(item.getBean());
-						if (value != null && value == true) {
+					if (item != null) {
+						if (onItemClick != null) {
+							Boolean value = onItemClick.apply(item.getBean());
+							if (value != null && value == true) {
+								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							}
+						} else {
 							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 						}
-					} else {
-						onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 					}
 				}
 			}
@@ -752,6 +754,18 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	public void hideMargin() {
 		rootLayoutMargin = false;
 		rootLayout.setMargin(false);
+	}
+
+	public MButton getAddButton() {
+		return addButton;
+	}
+
+	public MButton getEditButton() {
+		return editButton;
+	}
+
+	public MButton getDeleteButton() {
+		return deleteButton;
 	}
 
 }

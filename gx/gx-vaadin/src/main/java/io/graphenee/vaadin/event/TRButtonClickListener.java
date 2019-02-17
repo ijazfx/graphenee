@@ -14,7 +14,7 @@ public abstract class TRButtonClickListener implements Button.ClickListener, Ser
 
 	private static final long serialVersionUID = 1L;
 
-	private long sleepDuration = 250L;
+	private long sleepDuration = 1000L;
 	volatile boolean isFired = false;
 
 	@Override

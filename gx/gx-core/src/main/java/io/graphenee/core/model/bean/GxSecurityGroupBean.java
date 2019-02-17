@@ -278,4 +278,8 @@ public class GxSecurityGroupBean implements Serializable {
 		this.accessKeyCollectionFault = accessKeyCollectionFault;
 	}
 
+	public boolean hasMember(GxUserAccountBean userAccountBean) {
+		return getUserAccountCollectionFault().getBeans().contains(userAccountBean);
+	}
+
 }
