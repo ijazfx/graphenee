@@ -15,9 +15,12 @@
  *******************************************************************************/
 package io.graphenee.vaadin.view;
 
+import org.vaadin.viritin.label.MLabel;
+
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -81,6 +84,10 @@ public class LoginComponent extends LoginForm {
 		if (isRememberMeEnabled()) {
 			loginPanel.addComponent(new CheckBox("Remember me", true));
 		}
+		MLabel forgotPasswordLabel = new MLabel();
+		forgotPasswordLabel.setValue("Forgot password? <a href=\"/reset-password\">Click here!</a> to reset.");
+		forgotPasswordLabel.setContentMode(ContentMode.HTML);
+		loginPanel.addComponent(forgotPasswordLabel);
 		return loginPanel;
 	}
 

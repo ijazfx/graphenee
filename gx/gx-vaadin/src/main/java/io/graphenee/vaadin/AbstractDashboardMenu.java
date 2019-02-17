@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,7 @@ import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -48,7 +51,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.graphenee.core.callback.TRVoidCallback;
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
-import io.graphenee.core.model.bean.GxChangePasswordBean;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
@@ -159,8 +161,15 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		if (user != null) {
 			byte[] photoBytes = user.getProfilePhoto();
 			Resource photo = null;
-			if (photoBytes == null) {
+			if (photoBytes != null) {
+				photo = new StreamResource(new StreamResource.StreamSource() {
 
+					@Override
+					public InputStream getStream() {
+						ByteArrayInputStream bais = new ByteArrayInputStream(photoBytes);
+						return bais;
+					}
+				}, user.getUsername() + "_photo");
 			} else {
 				if (user.getGender() == GenderEnum.Female) {
 					photo = GrapheneeTheme.AVATAR_FEMALE;
@@ -186,13 +195,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			userMenuItem.addItem("Change Password", new Command() {
 				@Override
 				public void menuSelected(final MenuItem selectedItem) {
-					GxChangePasswordForm changePasswordForm = new GxChangePasswordForm();
-					GxChangePasswordBean bean = new GxChangePasswordBean();
-					changePasswordForm.setEntity(GxChangePasswordBean.class, bean);
-					changePasswordForm.setSavedHandler(event -> {
-
-					});
-					changePasswordForm.openInModalPopup();
+					Page.getCurrent().setLocation("/reset-password");
 				}
 			});
 			if (shouldAddSeparator) {
