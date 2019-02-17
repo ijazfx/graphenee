@@ -88,6 +88,8 @@ public abstract class AbstractDashboardUI extends UI {
 		if (UI.getCurrent().getNavigator() != null)
 			UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
 
+		Page.getCurrent().setTitle(dashboardSetup().applicationTitle());
+
 	}
 
 	protected Component createComponent() {
