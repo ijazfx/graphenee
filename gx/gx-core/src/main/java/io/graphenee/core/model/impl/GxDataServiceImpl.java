@@ -44,6 +44,8 @@ import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.core.exception.RegisterDeviceFailedException;
+import io.graphenee.core.exception.UnregisterDeviceFailedException;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
@@ -54,7 +56,9 @@ import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
+import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
@@ -73,7 +77,9 @@ import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxCurrency;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
+import io.graphenee.core.model.entity.GxMobileApplication;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
@@ -92,8 +98,10 @@ import io.graphenee.core.model.jpa.repository.GxCountryRepository;
 import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
+import io.graphenee.core.model.jpa.repository.GxMobileApplicationRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
+import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
 import io.graphenee.core.model.jpa.repository.GxResourceRepository;
 import io.graphenee.core.model.jpa.repository.GxSavedQueryRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityGroupRepository;
@@ -174,6 +182,12 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxSmsProviderRepository smsProviderRepo;
+
+	@Autowired
+	GxMobileApplicationRepository gxMobileApplicationRepository;
+
+	@Autowired
+	GxRegisteredDeviceRepository gxRegisteredDeviceRepository;
 
 	@PostConstruct
 	public void initialize() {
@@ -284,7 +298,6 @@ public class GxDataServiceImpl implements GxDataService {
 		return Collections.emptyList();
 	}
 
-	@Transactional
 	@Override
 	public void deleteTermByTermKeyAndOidNameSpace(String termKey, Integer oidNamespace) {
 		termRepo.deleteByTermKeyAndOidNameSpace(termKey, oidNamespace);
@@ -786,7 +799,6 @@ public class GxDataServiceImpl implements GxDataService {
 		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
-	@Transactional
 	private GxSecurityPolicyBean makeSecurityPolicyBean(GxSecurityPolicy entity) {
 		GxSecurityPolicyBean bean = new GxSecurityPolicyBean();
 		bean.setOid(entity.getOid());
@@ -1962,6 +1974,154 @@ public class GxDataServiceImpl implements GxDataService {
 
 		});
 		smsProviderRepo.save(allProviders);
+	}
+
+	@Override
+	public GxMobileApplicationBean createOrUpdate(GxMobileApplicationBean bean) {
+		GxMobileApplication entity = toEntity(bean);
+		gxMobileApplicationRepository.save(entity);
+		bean.setOid(entity.getOid());
+		return bean;
+	}
+
+	@Override
+	public GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean) {
+		GxRegisteredDevice entity = toEntity(bean);
+		gxRegisteredDeviceRepository.save(entity);
+		bean.setOid(entity.getOid());
+		return bean;
+	}
+
+	@Override
+	public GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String applicationName, String systemName, String brand, boolean isTablet, String ownerId)
+			throws RegisterDeviceFailedException {
+		GxMobileApplicationBean mobileApplicationBean = findByApplicationNameAndNamespace(applicationName, namespace);
+		if (mobileApplicationBean == null)
+			throw new RegisterDeviceFailedException("Mobile application " + applicationName + " does not exist.");
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceApplicationAndDeviceId(namespace, applicationName, uniqueId);
+		if (device != null)
+			throw new RegisterDeviceFailedException("Device with uniqueId " + uniqueId + " for application " + applicationName + " already registered");
+		GxRegisteredDevice entity = new GxRegisteredDevice();
+		entity.setBrand(brand);
+		entity.setIsActive(true);
+		entity.setIsTablet(isTablet);
+		entity.setOwnerId(ownerId);
+		entity.setSystemName(systemName);
+		entity.setUniqueId(uniqueId);
+		entity.setGxMobileApplication(gxMobileApplicationRepository.findOne(mobileApplicationBean.getOid()));
+		entity = gxRegisteredDeviceRepository.save(entity);
+		return makeGxRegisteredDeviceBean(entity);
+	}
+
+	@Override
+	public void unregisterDevice(String namespace, String uniqueId, String applicationName) throws UnregisterDeviceFailedException {
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceApplicationAndDeviceId(namespace, applicationName, uniqueId);
+		if (device == null)
+			throw new UnregisterDeviceFailedException("Device with uniqueId " + uniqueId + " for application " + applicationName + " does not exist.");
+		gxRegisteredDeviceRepository.delete(device.getOid());
+	}
+
+	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceApplicationAndDeviceId(String namespace, String applicationName, String uniqueId) {
+		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxMobileApplicationGxNamespaceNamespaceAndGxMobileApplicationApplicationNameAndUniqueId(namespace,
+				applicationName, uniqueId);
+		if (device == null)
+			return null;
+		return makeGxRegisteredDeviceBean(device);
+	}
+
+	private GxMobileApplicationBean makeGxMobileApplicationBean(GxMobileApplication gxMobileApplication) {
+		GxMobileApplicationBean bean = new GxMobileApplicationBean();
+		bean.setOid(gxMobileApplication.getOid());
+		bean.setApplicationName(gxMobileApplication.getApplicationName());
+		bean.setIsActive(gxMobileApplication.getIsActive());
+		bean.setGxNamespaceBeanFault(BeanFault.beanFault(gxMobileApplication.getGxNamespace().getOid(), oid -> {
+			return makeNamespaceBean(namespaceRepo.findOne(oid));
+		}));
+		return bean;
+	}
+
+	private GxMobileApplication toEntity(GxMobileApplicationBean bean) {
+		GxMobileApplication entity = null;
+		if (bean.getOid() != null) {
+			entity = gxMobileApplicationRepository.findOne(bean.getOid());
+		} else {
+			entity = new GxMobileApplication();
+		}
+		entity.setApplicationName(bean.getApplicationName());
+		entity.setIsActive(bean.getIsActive());
+		entity.setGxNamespace(namespaceRepo.findOne(bean.getGxNamespaceBeanFault().getOid()));
+		return entity;
+	}
+
+	private GxRegisteredDeviceBean makeGxRegisteredDeviceBean(GxRegisteredDevice entity) {
+		GxRegisteredDeviceBean bean = new GxRegisteredDeviceBean();
+		bean.setOid(entity.getOid());
+		bean.setSystemName(entity.getSystemName());
+		bean.setUniqueId(entity.getUniqueId());
+		bean.setIsTablet(entity.getIsTablet());
+		bean.setBrand(entity.getBrand());
+		bean.setIsActive(entity.getIsActive());
+		bean.setOwnerId(entity.getOwnerId());
+		bean.setGxMobileApplicationBeanFault(BeanFault.beanFault(entity.getGxMobileApplication().getOid(), oid -> {
+			return makeGxMobileApplicationBean(gxMobileApplicationRepository.findOne(oid));
+		}));
+		return bean;
+	}
+
+	private GxRegisteredDevice toEntity(GxRegisteredDeviceBean bean) {
+		GxRegisteredDevice entity = null;
+		if (bean.getOid() != null) {
+			entity = gxRegisteredDeviceRepository.findOne(bean.getOid());
+		} else {
+			entity = new GxRegisteredDevice();
+		}
+		entity.setSystemName(bean.getSystemName());
+		entity.setUniqueId(bean.getUniqueId());
+		entity.setIsTablet(bean.getIsTablet());
+		entity.setBrand(bean.getBrand());
+		entity.setIsActive(bean.getIsActive());
+		entity.setOwnerId(bean.getOwnerId());
+		entity.setGxMobileApplication(gxMobileApplicationRepository.findOne(bean.getGxMobileApplicationBeanFault().getOid()));
+		return entity;
+	}
+
+	@Override
+	public List<GxMobileApplicationBean> findMobileApplication() {
+		return gxMobileApplicationRepository.findAll().stream().map(this::makeGxMobileApplicationBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxMobileApplicationBean> findAllByNamespace(GxNamespaceBean gxNameSpace) {
+		return gxMobileApplicationRepository.findByGxNamespaceOid(gxNameSpace.getOid()).stream().map(this::makeGxMobileApplicationBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public void deleteMobileApplication(GxMobileApplicationBean bean) {
+		gxMobileApplicationRepository.deleteByOidMobileApplicationAndOidNamespace(bean.getOid(), bean.getGxNamespaceBeanFault().getOid());
+	}
+
+	@Override
+	public GxMobileApplicationBean findByApplicationNameAndNamespace(String applicationName, String namespace) {
+		GxMobileApplication entity = gxMobileApplicationRepository.findByApplicationNameAndGxNamespaceNamespace(applicationName, namespace);
+		if (entity == null)
+			return null;
+		return makeGxMobileApplicationBean(entity);
+	}
+
+	@Override
+	public List<GxRegisteredDeviceBean> findRegisteredDevices() {
+		return gxRegisteredDeviceRepository.findAll().stream().map(this::makeGxRegisteredDeviceBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxRegisteredDeviceBean> findByMobileApplication(GxMobileApplicationBean bean) {
+		return gxRegisteredDeviceRepository.findByGxMobileApplicationApplicationName(bean.getApplicationName()).stream().map(this::makeGxRegisteredDeviceBean)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public void delete(GxRegisteredDeviceBean bean) {
+		gxRegisteredDeviceRepository.delete(bean.getOid());
 	}
 
 }

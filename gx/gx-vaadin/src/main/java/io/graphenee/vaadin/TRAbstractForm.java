@@ -165,6 +165,8 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	@Override
 	public Window openInModalPopup() {
+		if (formTitle() != null)
+			setModalWindowTitle(formTitle());
 		Window window = super.openInModalPopup();
 		window.setResizable(isPopupResizable());
 		window.setResizeLazy(true);
@@ -174,7 +176,6 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 		window.setHeight(popupHeight());
 		window.setStyleName("popupWindow");
 		Responsive.makeResponsive(window);
-		window.setCaption(formTitle());
 		return window;
 	}
 

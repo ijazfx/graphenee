@@ -13,20 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.vaadin.domain;
+package io.graphenee.core.exception;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+@SuppressWarnings("serial")
+public class UnregisterDeviceFailedException extends Exception {
 
-public abstract class AbstractDashboardUser<T> implements GxAuthenticatedUser {
-
-	private T user;
-
-	public AbstractDashboardUser(T user) {
-		this.user = user;
+	public UnregisterDeviceFailedException() {
+		super();
 	}
 
-	public T getUser() {
-		return user;
+	public UnregisterDeviceFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public UnregisterDeviceFailedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public UnregisterDeviceFailedException(String message) {
+		super(message);
+	}
+
+	public UnregisterDeviceFailedException(Throwable cause) {
+		super(cause);
 	}
 
 }

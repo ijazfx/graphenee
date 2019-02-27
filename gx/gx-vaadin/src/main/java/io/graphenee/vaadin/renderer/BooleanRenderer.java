@@ -27,6 +27,7 @@ public class BooleanRenderer extends ImageRenderer {
 
 	public static final CheckBoxConverter CHECK_BOX_CONVERTER = new CheckBoxConverter();
 	public static final SwitchConverter SWITCH_CONVERTER = new SwitchConverter();
+	public static final StatusConverter STATUS_CONVERTER = new StatusConverter();
 
 	public BooleanRenderer() {
 	}
@@ -100,6 +101,28 @@ public class BooleanRenderer extends ImageRenderer {
 		public SwitchConverter() {
 			trueStateResource = GrapheneeTheme.themeResource("images/toggle-on.png");
 			falseStateResource = GrapheneeTheme.themeResource("images/toggle-off.png");
+		}
+
+		@Override
+		protected Resource trueStateResource() {
+			return trueStateResource;
+		}
+
+		@Override
+		protected Resource falseStateResource() {
+			return falseStateResource;
+		}
+
+	}
+
+	public static class StatusConverter extends BooleanConverter {
+
+		Resource trueStateResource;
+		Resource falseStateResource;
+
+		public StatusConverter() {
+			trueStateResource = GrapheneeTheme.themeResource("images/ok.png");
+			falseStateResource = GrapheneeTheme.themeResource("images/warn.png");
 		}
 
 		@Override

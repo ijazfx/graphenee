@@ -178,6 +178,10 @@ public class BeanCollectionFault<T> {
 		if (!beansUpdated.contains(bean)) {
 			beansUpdated.add(bean);
 		}
+		_initializeBeansRemovedCollection();
+		if (beansRemoved.contains(bean)) {
+			beansRemoved.remove(bean);
+		}
 		notificationModificationListeners();
 	}
 

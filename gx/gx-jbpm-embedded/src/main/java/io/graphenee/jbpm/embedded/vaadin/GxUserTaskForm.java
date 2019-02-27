@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.kie.api.task.model.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,6 @@ import io.graphenee.jbpm.embedded.GxUserTask;
 import io.graphenee.jbpm.embedded.exception.GxAssignTaskException;
 import io.graphenee.jbpm.embedded.exception.GxCompleteTaskException;
 import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
-import io.graphenee.jbpm.embedded.exception.GxTaskException;
 import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm.GxAssigneeHolder;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.ui.GxNotification;
@@ -91,48 +91,23 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	@Override
 	protected void addButtonsToFooter(HorizontalLayout footer) {
 		approveButton = new MButton(approveButtonCaption()).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			try {
-				approveTask();
-			} catch (GxCompleteTaskException ex) {
-				GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			approveTask();
 		});
 
 		rejectButton = new MButton(rejectButtonCaption()).withStyleName(ValoTheme.BUTTON_DANGER).withListener(event -> {
-			try {
-				rejectTask();
-			} catch (GxCompleteTaskException ex) {
-				GxNotification.closable("Unable to reject", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			rejectTask();
 		});
 
 		completeButton = new MButton(completeButtonCaption()).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
-			try {
-				completeTask();
-			} catch (GxCompleteTaskException ex) {
-				GxNotification.closable("Unable to complete", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			completeTask();
 		});
 
 		skipButton = new MButton("Skip").withListener(event -> {
-			try {
-				skipTask();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to approve", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			skipTask();
 		});
 
 		assignButton = new MButton("Assign").withListener(event -> {
-			try {
-				assignTask();
-			} catch (GxTaskException ex) {
-				GxNotification.closable("Unable to assign", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-				L.error(ex.getMessage());
-			}
+			assignTask();
 		});
 
 		MHorizontalLayout taskButtonsLayout = new MHorizontalLayout();
@@ -147,12 +122,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 		footer.addComponentAsFirst(taskButtonsLayout);
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.reject() in your implementation.
-	 * @throws GxCompleteTaskException exception in case of failure
-	 */
 	@Transactional
-	private void rejectTask() throws GxCompleteTaskException {
+	private void rejectTask() {
 		Map<String, Object> taskData = new HashMap<>();
 		onReject(taskData, getEntity(), new GxUserTaskHandler() {
 
@@ -164,8 +135,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 					notifyGxTaskActionListeners(GxTaskAction.REJECTED, getUserTask(), getEntity());
 					closePopup();
 				} catch (Exception ex) {
-					GxNotification.closable("Task Error", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-					L.error(ex.getMessage());
+					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+					GxNotification.closable("Task Error", message, Type.ERROR_MESSAGE).show(Page.getCurrent());
+					L.error(ex.getMessage(), ex);
 				}
 			}
 
@@ -176,7 +148,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 			@Override
 			public void error(Throwable t) {
-				GxNotification.closable("Task Error", t.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
+				GxNotification.closable(null, message, Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 		});
 
@@ -185,12 +158,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onReject(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.approve() in your implementation.
-	 * @throws GxCompleteTaskException exception in case of failure
-	 */
 	@Transactional
-	private void approveTask() throws GxCompleteTaskException {
+	private void approveTask() {
 		Map<String, Object> taskData = new HashMap<>();
 		onApprove(taskData, getEntity(), new GxUserTaskHandler() {
 
@@ -202,8 +171,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 					notifyGxTaskActionListeners(GxTaskAction.APPROVED, getUserTask(), getEntity());
 					closePopup();
 				} catch (Exception ex) {
-					GxNotification.closable("Task Error", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-					L.error(ex.getMessage());
+					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+					GxNotification.closable("Task Error", message, Type.ERROR_MESSAGE).show(Page.getCurrent());
+					L.error(ex.getMessage(), ex);
 				}
 			}
 
@@ -214,7 +184,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 			@Override
 			public void error(Throwable t) {
-				GxNotification.closable("Task Error", t.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
+				GxNotification.closable(null, message, Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 		});
 	}
@@ -222,13 +193,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onApprove(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.assign(...) in your implementation.
-	 * @param assignToUserId the user id of the user to assign the task
-	 * @throws GxAssignTaskException exception in case of failure
-	 */
 	@Transactional
-	private void assignTask() throws GxAssignTaskException {
+	private void assignTask() {
 		onAssign(getEntity(), new GxUserTaskAssigner() {
 
 			@Override
@@ -249,7 +215,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 									closePopup();
 								} catch (GxAssignTaskException ex) {
 									GxNotification.closable("Task Error", ex.getMessage(), Type.WARNING_MESSAGE).show(Page.getCurrent());
-									L.error(ex.getMessage());
+									L.error(ex.getMessage(), ex);
 								}
 							}
 						});
@@ -267,7 +233,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 			@Override
 			public void error(Throwable t) {
-				GxNotification.closable("Task Error", t.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
+				GxNotification.closable(null, message, Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 
 		});
@@ -277,12 +244,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onAssign(T entity, GxUserTaskAssigner assigner) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.skip() in your implementation.
-	 * @throws GxSkipTaskException exception in case of failure
-	 */
 	@Transactional
-	private void skipTask() throws GxSkipTaskException {
+	private void skipTask() {
 		onSkip(getEntity(), new GxUserTaskSkipper() {
 
 			@Override
@@ -293,8 +256,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 					notifyGxTaskActionListeners(GxTaskAction.SKIPPED, getUserTask(), getEntity());
 					closePopup();
 				} catch (Exception ex) {
-					GxNotification.closable("Task Error", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-					L.error(ex.getMessage());
+					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+					GxNotification.closable("Task Error", message, Type.ERROR_MESSAGE).show(Page.getCurrent());
+					L.error(ex.getMessage(), ex);
 				}
 			}
 
@@ -305,7 +269,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 			@Override
 			public void error(Throwable t) {
-				GxNotification.closable("Task Error", t.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
+				GxNotification.closable(null, message, Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 
 		});
@@ -314,12 +279,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onSkip(T entity, GxUserTaskSkipper skipper) {
 	}
 
-	/**
-	 * You should only override this method if you want to provide some sort of confirmation. Do not forget to invoke super.complete() in your implementation.
-	 * @throws GxCompleteTaskException exception in case of failure
-	 */
 	@Transactional
-	protected void completeTask() throws GxCompleteTaskException {
+	private void completeTask() {
 		Map<String, Object> taskData = new HashMap<>();
 		onComplete(taskData, getEntity(), new GxUserTaskHandler() {
 
@@ -331,8 +292,9 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 					notifyGxTaskActionListeners(GxTaskAction.COMPLETED, getUserTask(), getEntity());
 					closePopup();
 				} catch (Exception ex) {
-					GxNotification.closable("Task Error", ex.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
-					L.error(ex.getMessage());
+					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+					GxNotification.closable("Task Error", message, Type.ERROR_MESSAGE).show(Page.getCurrent());
+					L.error(ex.getMessage(), ex);
 				}
 			}
 
@@ -343,7 +305,8 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 			@Override
 			public void error(Throwable t) {
-				GxNotification.closable("Task Error", t.getMessage(), Type.ERROR_MESSAGE).show(Page.getCurrent());
+				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
+				GxNotification.closable(null, message, Type.WARNING_MESSAGE).show(Page.getCurrent());
 			}
 		});
 	}
@@ -360,15 +323,18 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 
 	@Override
 	public Window openInModalPopup() {
+		GxUserTask task = getUserTask();
+		boolean valid = task != null
+				&& (task.getStatus() == Status.Ready || task.getStatus() == Status.Reserved || task.getStatus() == Status.InProgress || task.getStatus() == Status.Created);
 		Window popup = super.openInModalPopup();
 		approveButton.setCaption(approveButtonCaption());
-		approveButton.setVisible(getUserTask() != null);
+		approveButton.setVisible(valid);
 		rejectButton.setCaption(rejectButtonCaption());
-		rejectButton.setVisible(getUserTask() != null);
+		rejectButton.setVisible(valid);
 		completeButton.setCaption(completeButtonCaption());
-		completeButton.setVisible(getUserTask() != null);
-		skipButton.setVisible(getUserTask() != null && getUserTask().isSkipable());
-		assignButton.setVisible(getUserTask() != null && isAssignable());
+		completeButton.setVisible(valid);
+		skipButton.setVisible(valid && getUserTask().isSkipable());
+		assignButton.setVisible(valid && isAssignable());
 		return popup;
 	}
 

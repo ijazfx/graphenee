@@ -16,8 +16,9 @@
 package io.graphenee.vaadin.domain;
 
 import io.graphenee.core.enums.GenderEnum;
+import io.graphenee.core.model.GxAuthenticatedUser;
 
-public final class MockUser implements DashboardUser {
+public final class MockUser implements GxAuthenticatedUser {
 
 	String firstName;
 	String lastName;
@@ -73,6 +74,29 @@ public final class MockUser implements DashboardUser {
 	@Override
 	public void setGender(GenderEnum gender) {
 		this.gender = gender;
+	}
+
+	@Override
+	public byte[] getProfilePhoto() {
+		return null;
+	}
+
+	@Override
+	public String getEmail() {
+		return null;
+	}
+
+	@Override
+	public void setEmail(String email) {
+	}
+
+	@Override
+	public String getMobileNumber() {
+		return null;
+	}
+
+	@Override
+	public void setMobileNumber(String mobileNumber) {
 	}
 
 }

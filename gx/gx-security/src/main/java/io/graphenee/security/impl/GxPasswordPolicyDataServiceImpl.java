@@ -133,6 +133,10 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 
 	@Override
 	public void assertPasswordPolicy(GxPasswordPolicyBean entity, String username, String password) throws AssertionError {
+		if (entity == null)
+			return;
+		if (!entity.getIsActive())
+			return;
 		if (!findMinLengthExist(password, entity.getMinLength()))
 			throw new AssertionError("Password must be minimum of " + entity.getMinLength() + " characters.");
 		if (entity.getIsUserUsernameAllowed() && !findMaxUsernameExist(username, password, entity.getMaxAllowedMatchingUserName()))
