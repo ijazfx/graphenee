@@ -85,11 +85,35 @@ public abstract class AbstractDashboardUI extends UI {
 
 		localizeRecursively(this);
 
-		if (UI.getCurrent().getNavigator() != null)
-			UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+		if (UI.getCurrent().getNavigator() != null) {
+
+			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+
+			String currentState = UI.getCurrent().getNavigator().getState();
+			String navigableState = findNavigableState(user, currentState);
+
+			try {
+				if (currentState.startsWith(navigableState))
+					UI.getCurrent().getNavigator().navigateTo(currentState);
+				else
+					UI.getCurrent().getNavigator().navigateTo(navigableState);
+			} catch (Exception ex) {
+				UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+			}
+
+		}
 
 		Page.getCurrent().setTitle(dashboardSetup().applicationTitle());
 
+	}
+
+	private String findNavigableState(GxAuthenticatedUser user, String currentState) {
+		if (user.canDoAction(currentState, "view"))
+			return currentState;
+		if (currentState.lastIndexOf("/") >= 0) {
+			return findNavigableState(user, currentState.substring(0, currentState.lastIndexOf("/")));
+		}
+		return dashboardSetup().dashboardViewName();
 	}
 
 	protected Component createComponent() {
