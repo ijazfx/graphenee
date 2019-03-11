@@ -17,22 +17,22 @@ package io.graphenee.vaadin.util;
 
 import com.vaadin.server.VaadinSession;
 
-import io.graphenee.vaadin.domain.DashboardUser;
+import io.graphenee.core.model.GxAuthenticatedUser;
 
 public class DashboardUtils {
 
 	@SuppressWarnings("unchecked")
-	public static <T extends DashboardUser> T getLoggedInUser() {
-		return (T) VaadinSession.getCurrent().getAttribute(DashboardUser.class.getName());
+	public static <T extends GxAuthenticatedUser> T getLoggedInUser() {
+		return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class.getName());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends DashboardUser> T getLoggedInUser(VaadinSession vaadinSession) {
-		return (T) vaadinSession.getAttribute(DashboardUser.class.getName());
+	public static <T extends GxAuthenticatedUser> T getLoggedInUser(VaadinSession vaadinSession) {
+		return (T) vaadinSession.getAttribute(GxAuthenticatedUser.class.getName());
 	}
 
 	public static String getLoggedInUsername() {
-		DashboardUser loggedInUser = DashboardUtils.getLoggedInUser();
+		GxAuthenticatedUser loggedInUser = DashboardUtils.getLoggedInUser();
 		final String targetUser;
 		if (loggedInUser != null) {
 			targetUser = loggedInUser.getUsername();

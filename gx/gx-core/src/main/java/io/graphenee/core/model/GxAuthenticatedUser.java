@@ -1,36 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2016, 2018 Farrukh Ijaz
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
-package io.graphenee.vaadin.domain;
-
-import com.vaadin.server.Resource;
+package io.graphenee.core.model;
 
 import io.graphenee.core.enums.GenderEnum;
-import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
-public interface DashboardUser {
+public interface GxAuthenticatedUser {
 
-	default Resource getProfilePhoto() {
-		if (getGender() != null && getGender() == GenderEnum.Female) {
-			return GrapheneeTheme.AVATAR_FEMALE;
-		}
-		return GrapheneeTheme.AVATAR_MALE;
-	}
-
-	default void setProfilePhoto(Resource resource) {
-	}
+	byte[] getProfilePhoto();
 
 	String getFirstName();
 
@@ -51,6 +25,18 @@ public interface DashboardUser {
 	GenderEnum getGender();
 
 	void setGender(GenderEnum gender);
+
+	String getEmail();
+
+	void setEmail(String email);
+
+	String getMobileNumber();
+
+	void setMobileNumber(String mobileNumber);
+
+	default boolean isPasswordChangeRequired() {
+		return false;
+	}
 
 	default String getFirstNameLastName() {
 		if (getFirstName() != null) {

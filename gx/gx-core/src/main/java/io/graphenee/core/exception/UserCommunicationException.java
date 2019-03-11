@@ -13,20 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.vaadin.domain;
+package io.graphenee.core.exception;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+@SuppressWarnings("serial")
+public class UserCommunicationException extends Exception {
 
-public abstract class AbstractDashboardUser<T> implements GxAuthenticatedUser {
-
-	private T user;
-
-	public AbstractDashboardUser(T user) {
-		this.user = user;
+	public UserCommunicationException() {
+		super();
 	}
 
-	public T getUser() {
-		return user;
+	public UserCommunicationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
+
+	public UserCommunicationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public UserCommunicationException(String message) {
+		super(message);
+	}
+
+	public UserCommunicationException(Throwable cause) {
+		super(cause);
 	}
 
 }
