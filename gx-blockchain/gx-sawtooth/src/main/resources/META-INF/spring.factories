@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.graphenee.blockchain.sawtooth.GrapheneeSawtoothConfiguration

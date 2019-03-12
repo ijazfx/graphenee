@@ -2,6 +2,7 @@ package io.graphenee.blockchain.sawtooth;
 
 import com.google.gson.JsonObject;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -12,9 +13,9 @@ import retrofit2.http.Query;
 
 public interface SawtoothRestService {
 
-	@Headers("Cache-Type: application/octet-stream")
+	@Headers("Content-Type: application/octet-stream")
 	@POST("/batches")
-	Call<JsonObject> sendBatches(@Body byte[] data);
+	Call<JsonObject> sendBatches(@Body RequestBody data);
 
 	@GET("/batches")
 	Call<JsonObject> fetchBatches();

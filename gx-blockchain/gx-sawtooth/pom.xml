@@ -40,6 +40,10 @@
 			<groupId>com.squareup.retrofit2</groupId>
 			<artifactId>converter-scalars</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>converter-protobuf</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>
