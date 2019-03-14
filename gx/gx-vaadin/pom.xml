@@ -68,6 +68,10 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.vaadin.addon</groupId>
+			<artifactId>vaadin-context-menu</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>
