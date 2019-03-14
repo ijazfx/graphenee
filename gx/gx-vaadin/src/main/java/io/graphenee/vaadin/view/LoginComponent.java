@@ -58,6 +58,9 @@ public class LoginComponent extends LoginForm {
 			mainLayout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 			addLoginListener(listener -> {
 				UserLoginRequestedEvent userLoginRequestedEvent = new UserLoginRequestedEvent(listener.getLoginParameter(USERNAME), listener.getLoginParameter(PASSWORD));
+				// clear password field...
+				passwordField.clear();
+				passwordField.focus();
 				DashboardEventBus.sessionInstance().post(userLoginRequestedEvent);
 			});
 			setSizeFull();
