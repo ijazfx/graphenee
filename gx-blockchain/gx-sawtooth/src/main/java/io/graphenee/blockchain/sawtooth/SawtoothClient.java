@@ -1,5 +1,7 @@
 package io.graphenee.blockchain.sawtooth;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 
 import org.bitcoinj.core.ECKey;
@@ -49,13 +51,10 @@ public class SawtoothClient {
 		batchSignerECKey = ECKey.fromPrivate(keyAsBytes);
 	}
 
-	public void submitTransaction(String familyName, String version, String[] inputAddress, String[] outputAddress, byte[] payload) {
+	public void submitTransaction(String familyName, String version, Collection<String> inputAddress, Collection<String> outputAddress, byte[] payload) {
 		try {
 			Secp256k1PrivateKey transactionSignerPrivateKey = Secp256k1PrivateKey.fromHex(transactionSignerECKey.getPrivateKeyAsHex());
 			Secp256k1PrivateKey batchSignerPrivateKey = Secp256k1PrivateKey.fromHex(batchSignerECKey.getPrivateKeyAsHex());
-			//			Secp256k1PublicKey transactionSignerPublicKey = Secp256k1PublicKey.fromHex(transactionSignerECKey.getPublicKeyAsHex());
-			//			Secp256k1PublicKey batchSignerPublicKey = Secp256k1PublicKey.fromHex(batchSignerECKey.getPublicKeyAsHex());
-
 			Context ctx = CryptoFactory.createContext("secp256k1");
 
 			// build transaction header
@@ -63,8 +62,7 @@ public class SawtoothClient {
 
 			TransactionHeader transactionHeader = TransactionHeader.newBuilder().setFamilyName(familyName).setFamilyVersion(version)
 					.setSignerPublicKey(transactionSignerECKey.getPublicKeyAsHex()).setBatcherPublicKey(batchSignerECKey.getPublicKeyAsHex()).setPayloadSha512(encodedPayload)
-					.setNonce(UUID.randomUUID().toString()).build();
-			//			String transactionHeaderSignature = ctx.sign(transactionHeader.toByteArray(), transactionSignerPrivateKey);
+					.setNonce(UUID.randomUUID().toString()).addAllInputs(inputAddress).addAllOutputs(outputAddress).build();
 			String transactionHeaderSignature = ctx.sign(transactionHeader.toByteArray(), transactionSignerPrivateKey);
 
 			// build transaction
@@ -96,7 +94,14 @@ public class SawtoothClient {
 		//		cli.setSignerPrivateKey("41373efdf3ceeba60837b004aa6999f9d68e53cd8e26f4bb199e34a409e57216".getBytes());
 		PrivateKey privateKey = CryptoFactory.createContext("secp256k1").newRandomPrivateKey();
 		cli.setSignerPrivateKey(privateKey.getBytes());
-		cli.submitTransaction("adp", "1.0", null, null, "Hello World!".getBytes());
+
+		String address = Utils.hash512("adp".getBytes()).substring(0, 6) + Utils.hash512("farrukh".getBytes()).substring(0, 64);
+
+		System.err.println(address);
+
+		cli.submitTransaction("adp", "1.0", Arrays.asList(address), Arrays.asList(address), "Hello Universe!".getBytes());
+
+		//		cli.submitTransaction("intkey", "1.0", null, null, "\\xa3eValue\\ndVerbcsetdNamedname".getBytes());
 	}
 
 }
