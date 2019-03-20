@@ -126,7 +126,6 @@ public abstract class TRAbstractEntityComboBox<T> extends CssLayout {
 			});
 
 			layout = new CssLayout(addButton, comboBox, editButton, deleteButton);
-			layout.setCaption(toolbarCaption());
 			layout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
 			addComponent(layout);

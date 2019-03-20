@@ -39,6 +39,8 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
 import org.vaadin.viritin.ui.MNotification;
 
 import com.google.common.base.Strings;
+import com.vaadin.addon.contextmenu.ContextMenu;
+import com.vaadin.addon.contextmenu.GridContextMenu;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -131,6 +133,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 					L.warn(e.getMessage(), e);
 				}
 			}).withStyleName(ValoTheme.BUTTON_PRIMARY);
+
 			editButton = new MButton(FontAwesome.EDIT, localizedSingularValue("Modify"), event -> {
 				Collection<T> items = mainGrid.getSelectedRowsWithType();
 				if (items.size() == 1) {
@@ -327,7 +330,16 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			}
 		});
 
+		GridContextMenu contextMenu = new GridContextMenu(grid);
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			event.getContextMenu().removeItems();
+			addMenuItemsToContextMenu(contextMenu, (T) event.getItemId(), grid.getSelectedRowsWithType());
+		});
+
 		return grid;
+	}
+
+	protected void addMenuItemsToContextMenu(ContextMenu contextMenu, T item, Collection<T> selectedItems) {
 	}
 
 	protected String generateCellStyle(CellReference cell) {
