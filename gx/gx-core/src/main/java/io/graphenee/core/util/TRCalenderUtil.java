@@ -86,6 +86,14 @@ public class TRCalenderUtil {
 		return cal.get(calendarField);
 	}
 
+	public static long monthsBetween(Date startDate, Date endDate) {
+		return monthsBetweenUsingChronoUnit(startDate, endDate);
+	}
+
+	public static long monthsBetweenUsingChronoUnit(Date startDate, Date endDate) {
+		return Math.abs(ChronoUnit.MONTHS.between(toLocalDateFromDate(startDate), toLocalDateFromDate(endDate)));
+	}
+
 	public static long daysBetween(Date startDate, Date endDate) {
 		return daysBetweenUsingChronoUnit(startDate, endDate);
 	}
@@ -139,6 +147,13 @@ public class TRCalenderUtil {
 		}
 
 		return value;
+	}
+
+	public static String age(Timestamp timestamp) {
+		long diff = monthsBetween(timestamp, getCurrentTimeStamp());
+		int years = (int) diff / 12;
+		int remainingMonths = (int) diff % 12;
+		return years + "y " + remainingMonths + "m";
 	}
 
 	public static Date endOfDay() {

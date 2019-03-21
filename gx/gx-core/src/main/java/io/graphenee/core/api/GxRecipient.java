@@ -1,4 +1,4 @@
-package io.graphenee.sms.impl;
+package io.graphenee.core.api;
 
 public interface GxRecipient {
 
