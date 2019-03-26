@@ -28,8 +28,8 @@ public class GxRegisteredDevice extends GxMappedSuperclass implements Serializab
 	@Column(name = "system_name")
 	private String systemName;
 
-	@Column(name = "unique_id")
-	private String uniqueId;
+	@Column(name = "device_token")
+	private String deviceToken;
 
 	@Column(name = "is_tablet")
 	private Boolean isTablet;
@@ -44,8 +44,8 @@ public class GxRegisteredDevice extends GxMappedSuperclass implements Serializab
 	private String ownerId;
 
 	@ManyToOne
-	@JoinColumn(name = "oid_mobile_application")
-	private GxMobileApplication gxMobileApplication;
+	@JoinColumn(name = "oid_namespace")
+	private GxNamespace gxNamespace;
 
 	public Integer getOid() {
 		return oid;
@@ -61,14 +61,6 @@ public class GxRegisteredDevice extends GxMappedSuperclass implements Serializab
 
 	public void setSystemName(String systemName) {
 		this.systemName = systemName;
-	}
-
-	public String getUniqueId() {
-		return uniqueId;
-	}
-
-	public void setUniqueId(String uniqueId) {
-		this.uniqueId = uniqueId;
 	}
 
 	public Boolean getIsTablet() {
@@ -103,12 +95,20 @@ public class GxRegisteredDevice extends GxMappedSuperclass implements Serializab
 		this.ownerId = ownerId;
 	}
 
-	public GxMobileApplication getGxMobileApplication() {
-		return gxMobileApplication;
+	public String getDeviceToken() {
+		return deviceToken;
 	}
 
-	public void setGxMobileApplication(GxMobileApplication gxMobileApplication) {
-		this.gxMobileApplication = gxMobileApplication;
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
+	}
+
+	public GxNamespace getGxNamespace() {
+		return gxNamespace;
+	}
+
+	public void setGxNamespace(GxNamespace gxNamespace) {
+		this.gxNamespace = gxNamespace;
 	}
 
 }

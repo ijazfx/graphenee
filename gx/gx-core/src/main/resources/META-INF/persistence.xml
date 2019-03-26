@@ -24,7 +24,6 @@
 		<class>io.graphenee.core.model.entity.GxUserAccount</class>
 		<class>io.graphenee.core.model.entity.GxPasswordHistory</class>
 		<class>io.graphenee.core.model.entity.GxPasswordPolicy</class>
-		<class>io.graphenee.core.model.entity.GxMobileApplication</class>
 		<class>io.graphenee.core.model.entity.GxRegisteredDevice</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>

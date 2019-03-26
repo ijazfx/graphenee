@@ -23,7 +23,7 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 	GxDataService dataService;
 
 	MTextField systemName;
-	MTextField uniqueId;
+	MTextField deviceToken;
 
 	@PropertyId("brand")
 	MTextField brandName;
@@ -36,12 +36,16 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
 		systemName = new MTextField("Platform Name").withRequired(true);
-		uniqueId = new MTextField("Device Unique Id").withRequired(true);
+		systemName.setMaxLength(50);
+		deviceToken = new MTextField("Device Token").withRequired(true);
+		deviceToken.setMaxLength(200);
 		brandName = new MTextField("Brand Name").withRequired(true);
+		brandName.setMaxLength(50);
 		ownerId = new MTextField("Device Owner Id").withRequired(true);
+		ownerId.setMaxLength(100);
 		isActive = new MCheckBox("Is Active");
 		isTablet = new MCheckBox("Is Tablet");
-		form.addComponents(systemName, brandName, uniqueId, ownerId, isActive, isTablet);
+		form.addComponents(systemName, brandName, deviceToken, ownerId, isActive, isTablet);
 	}
 
 	@Override
