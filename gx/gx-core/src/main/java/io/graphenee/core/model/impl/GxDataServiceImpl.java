@@ -79,6 +79,7 @@ import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxNamespaceProperty;
+import io.graphenee.core.model.entity.GxPasswordHistory;
 import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
@@ -713,7 +714,6 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setFullNameNative(bean.getFullNameNative());
 		entity.setIsLocked(bean.getIsLocked());
 		entity.setIsProtected(false);
-		entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
 
 		if (entity.getIsActive() != bean.getIsActive()) {
@@ -741,10 +741,12 @@ public class GxDataServiceImpl implements GxDataService {
 
 		if (!Strings.isNullOrEmpty(bean.getPassword())) {
 			entity.setPassword(CryptoUtil.createPasswordHash(bean.getPassword()));
+			entity.setIsPasswordChangeRequired(false);
 		} else {
 			if (entity.getOid() == null) {
 				entity.setPassword(CryptoUtil.createPasswordHash("123456789"));
 			}
+			entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
 		}
 
 		if (bean.getAccessKeyCollectionFault().isModified()) {
@@ -761,6 +763,15 @@ public class GxDataServiceImpl implements GxDataService {
 	public GxUserAccountBean save(GxUserAccountBean bean) {
 		GxUserAccount saved = userAccountRepo.save(toEntity(bean));
 		bean.setOid(saved.getOid());
+
+		if (bean.getPassword() != null) {
+			GxPasswordHistory history = new GxPasswordHistory();
+			history.setGxUserAccount(saved);
+			history.setHashedPassword(CryptoUtil.createPasswordHash(bean.getPassword()));
+			history.setPasswordDate(TRCalenderUtil.getCurrentTimeStamp());
+			gxPasswordHistoryRepo.save(history);
+		}
+
 		return bean;
 	}
 
