@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +24,9 @@ import io.graphenee.core.model.entity.GxNamespaceProperty;
 
 @Repository
 public interface GxNamespacePropertyRepository extends JpaRepository<GxNamespaceProperty, Integer> {
+
+	List<GxNamespaceProperty> findAllByGxNamespaceOidOrderByPropertyKey(Integer oidNamespace);
+
+	GxNamespaceProperty findOneByGxNamespaceOidAndPropertyKey(Integer oidNamespace, String propertyKey);
 
 }

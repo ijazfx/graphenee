@@ -60,7 +60,7 @@ public class ResetPasswordPanel extends Panel {
 
 		MVerticalLayout sendResetKeyLayout = new MVerticalLayout().withMargin(false);
 
-		MLabel forgotPasswordTitle = new MLabel("Forgot Password?").withStyleName(ValoTheme.LABEL_H3);
+		MLabel forgotPasswordTitle = new MLabel("Reset Password").withStyleName(ValoTheme.LABEL_H3);
 		sendResetKeyLayout.addComponent(forgotPasswordTitle);
 
 		MHorizontalLayout layout1 = new MHorizontalLayout().withFullWidth().withMargin(false).withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);

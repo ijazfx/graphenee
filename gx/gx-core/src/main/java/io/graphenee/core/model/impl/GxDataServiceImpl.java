@@ -58,6 +58,7 @@ import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxNamespacePropertyBean;
 import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
@@ -79,6 +80,7 @@ import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxMobileApplication;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxNamespaceProperty;
 import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
@@ -99,6 +101,7 @@ import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
 import io.graphenee.core.model.jpa.repository.GxMobileApplicationRepository;
+import io.graphenee.core.model.jpa.repository.GxNamespacePropertyRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
 import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
@@ -131,6 +134,9 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxNamespaceRepository namespaceRepo;
+
+	@Autowired
+	GxNamespacePropertyRepository namespacePropertyRepo;
 
 	@Autowired
 	GxSecurityGroupRepository securityGroupRepo;
@@ -399,6 +405,11 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setNamespaceDescription(entity.getNamespaceDescription());
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsProtected(entity.getIsProtected());
+
+		bean.setNamespacePropertyBeanCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return findNamespacePropertyByNamespace(bean);
+		}));
+
 		return bean;
 	}
 
@@ -2122,6 +2133,71 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxRegisteredDeviceBean bean) {
 		gxRegisteredDeviceRepository.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxNamespacePropertyBean> findNamespaceProperty() {
+		return namespacePropertyRepo.findAll().stream().map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxNamespacePropertyBean findNamespaceProperty(Integer oidNamespaceProperty) {
+		GxNamespaceProperty entity = namespacePropertyRepo.findOne(oidNamespaceProperty);
+		if (entity != null)
+			return makeGxNamespacePropertyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxNamespacePropertyBean save(GxNamespacePropertyBean bean) {
+		GxNamespaceProperty savedEntity = namespacePropertyRepo.save(toEntity(bean));
+		bean.setOid(savedEntity.getOid());
+		return bean;
+	}
+
+	@Override
+	public void delete(GxNamespacePropertyBean bean) {
+		if (bean.getOid() != null)
+			namespacePropertyRepo.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace) {
+		return namespacePropertyRepo.findAllByGxNamespaceOidOrderByPropertyKey(namespace.getOid()).stream().map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey) {
+		GxNamespaceProperty entity = namespacePropertyRepo.findOneByGxNamespaceOidAndPropertyKey(namespace.getOid(), propertyKey);
+		if (entity != null)
+			return makeGxNamespacePropertyBean(entity);
+		return null;
+	}
+
+	private GxNamespacePropertyBean makeGxNamespacePropertyBean(GxNamespaceProperty entity) {
+		GxNamespacePropertyBean bean = new GxNamespacePropertyBean();
+		bean.setOid(entity.getOid());
+		bean.setPropertyDefaultValue(entity.getPropertyDefaultValue());
+		bean.setPropertyKey(entity.getPropertyKey());
+		bean.setPropertyValue(entity.getPropertyValue());
+		bean.setNamespaceFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
+			return makeNamespaceBean(namespaceRepo.findOne(oid));
+		}));
+		return bean;
+	}
+
+	private GxNamespaceProperty toEntity(GxNamespacePropertyBean bean) {
+		GxNamespaceProperty entity = null;
+		if (bean.getOid() != null) {
+			entity = namespacePropertyRepo.findOne(bean.getOid());
+		} else {
+			entity = new GxNamespaceProperty();
+		}
+		entity.setPropertyDefaultValue(bean.getPropertyDefaultValue());
+		entity.setPropertyKey(bean.getPropertyKey());
+		entity.setPropertyValue(bean.getPropertyValue());
+		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceFault().getOid()));
+		return entity;
 	}
 
 }

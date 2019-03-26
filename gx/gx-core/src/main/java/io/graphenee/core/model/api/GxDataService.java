@@ -31,6 +31,7 @@ import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxNamespacePropertyBean;
 import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
@@ -86,6 +87,18 @@ public interface GxDataService {
 	GxNamespaceBean save(GxNamespaceBean entity);
 
 	void delete(GxNamespaceBean entity);
+
+	List<GxNamespacePropertyBean> findNamespaceProperty();
+
+	GxNamespacePropertyBean findNamespaceProperty(Integer oidNamespaceProperty);
+
+	GxNamespacePropertyBean save(GxNamespacePropertyBean bean);
+
+	void delete(GxNamespacePropertyBean bean);
+
+	List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace);
+
+	GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey);
 
 	List<GxSecurityGroupBean> findSecurityGroup();
 
