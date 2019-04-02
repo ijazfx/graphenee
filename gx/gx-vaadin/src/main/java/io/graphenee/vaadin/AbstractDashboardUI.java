@@ -15,7 +15,9 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.BrowserWindowResizeEvent;
@@ -39,6 +41,16 @@ public abstract class AbstractDashboardUI extends UI {
 
 	@Override
 	protected void init(final VaadinRequest request) {
+
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		Map<String, String[]> queryMap = new HashMap<>();
+		for (String key : parameterMap.keySet()) {
+			if (!key.startsWith("v-")) {
+				queryMap.put(key, parameterMap.get(key));
+			}
+		}
+
+		VaadinSession.getCurrent().setAttribute("gx-QueryMap", queryMap);
 
 		if (this.getClass().isAnnotationPresent(GxSecuredUI.class)) {
 			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);

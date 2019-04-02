@@ -134,4 +134,9 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 		this.namespaceBean = namespaceBean;
 	}
 
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
+	}
+
 }

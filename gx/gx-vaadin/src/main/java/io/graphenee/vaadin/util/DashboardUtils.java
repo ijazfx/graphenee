@@ -15,6 +15,9 @@
  *******************************************************************************/
 package io.graphenee.vaadin.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.vaadin.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -40,6 +43,24 @@ public class DashboardUtils {
 			targetUser = "system";
 		}
 		return targetUser;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, String[]> getQueryMap() {
+		Map<String, String[]> map = (Map<String, String[]>) VaadinSession.getCurrent().getAttribute("gx-QueryMap");
+		if (map == null) {
+			map = new HashMap<>();
+		}
+		return map;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, String[]> getQueryMap(VaadinSession vaadinSession) {
+		Map<String, String[]> map = (Map<String, String[]>) vaadinSession.getAttribute("gx-QueryMap");
+		if (map == null) {
+			map = new HashMap<>();
+		}
+		return map;
 	}
 
 }

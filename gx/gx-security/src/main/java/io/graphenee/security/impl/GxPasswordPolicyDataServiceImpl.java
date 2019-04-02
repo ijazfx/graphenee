@@ -47,6 +47,20 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	Pattern pattern;
 	Matcher matcher;
 
+	private Boolean findPasswordAlreadyUsed(String username, String password, int maxHistory) {
+		if (maxHistory > 0) {
+			String passwordHash = CryptoUtil.createPasswordHash(password);
+			GxUserAccountBean userAccountBean = gxDataService.findUserAccountByUsername(username);
+			List<GxPasswordHistory> history = passwordHistoryRepo.findAllByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
+			for (int i = 0; i < history.size() && i < maxHistory; i++) {
+				GxPasswordHistory passwordHistory = history.get(i);
+				if (passwordHistory.getHashedPassword().equals(passwordHash))
+					return true;
+			}
+		}
+		return false;
+	}
+
 	private Boolean findMinLengthExist(String password, int min) {
 		return password.length() >= min ? true : false;
 	}
@@ -121,7 +135,8 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 		if (findMinLengthExist(password, entity.getMinLength())
 				&& (!entity.getIsUserUsernameAllowed() || findMaxUsernameExist(username, password, entity.getMaxAllowedMatchingUserName()))
 				&& findMinUpperCaseCharExist(password, entity.getMinUppercase()) && findMinLowerCaseCharExist(password, entity.getMinLowercase())
-				&& findMinNumbersExist(password, entity.getMinNumbers()) && findMinSpecialCharExist(password, entity.getMinSpecialCharacters()))
+				&& findMinNumbersExist(password, entity.getMinNumbers()) && findMinSpecialCharExist(password, entity.getMinSpecialCharacters())
+				&& findPasswordAlreadyUsed(username, password, entity.getMaxHistory()))
 			return true;
 		return false;
 	}
@@ -149,6 +164,9 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			throw new AssertionError("Password must contain at least " + entity.getMinNumbers() + " digit(s).");
 		if (!findMinSpecialCharExist(password, entity.getMinSpecialCharacters()))
 			throw new AssertionError("Password must contain at least " + entity.getMinUppercase() + " special character(s).");
+		if (findPasswordAlreadyUsed(username, password, entity.getMaxHistory()))
+			throw new AssertionError("Password has already been used, set a different password.");
+
 	}
 
 	private GxNamespaceBean makeNamespaceBean(GxNamespace entity) {

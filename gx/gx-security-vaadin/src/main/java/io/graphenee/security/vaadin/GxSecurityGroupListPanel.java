@@ -144,4 +144,9 @@ public class GxSecurityGroupListPanel extends AbstractEntityListPanel<GxSecurity
 		namespaceComboBox.setVisible(namespaceBean == null);
 	}
 
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
+	}
+
 }

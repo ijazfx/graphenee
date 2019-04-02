@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
+import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
@@ -66,6 +67,7 @@ public class FileChooser extends CustomField<String> {
 	private Function<String, String> fileNameTranslator;
 	private String rootFolder;
 	private MButton deleteButton;
+	private FileDownloader fileDownloader;
 
 	ResourcePreviewPanel previewPanel;
 
@@ -114,35 +116,38 @@ public class FileChooser extends CustomField<String> {
 	}
 
 	private void preview(String filePath) {
-		File file = new File(filePath);
-		Resource resource = null;
-		if (file.exists()) {
-			resource = new FileResource(file);
-		} else {
-			try {
-				String resourcePath = storage.resourcePath(getRootFolder(), filePath);
-				InputStream inputStream = storage.resolve(resourcePath);
-				InputStreamSource source = new InputStreamSource(inputStream);
-				resource = new StreamResource(source, UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
-					@Override
-					public String getMIMEType() {
-						String mimeType = FileTypeResolver.getMIMEType(filePath);
-						if (mimeType != null) {
-							return mimeType;
+		String extension = FilenameUtils.getExtension(filePath);
+		if (extension != null && extension.matches("(png|jpg|gif|bmp|jpeg|pdf)")) {
+			File file = new File(filePath);
+			Resource resource = null;
+			if (file.exists()) {
+				resource = new FileResource(file);
+			} else {
+				try {
+					String resourcePath = storage.resourcePath(getRootFolder(), filePath);
+					InputStream inputStream = storage.resolve(resourcePath);
+					InputStreamSource source = new InputStreamSource(inputStream);
+					resource = new StreamResource(source, UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
+						@Override
+						public String getMIMEType() {
+							String mimeType = FileTypeResolver.getMIMEType(filePath);
+							if (mimeType != null) {
+								return mimeType;
+							}
+							return super.getMIMEType();
 						}
-						return super.getMIMEType();
-					}
-				};
-			} catch (ResolveFailedException e) {
-				resource = null;
+					};
+				} catch (ResolveFailedException e) {
+					resource = null;
+				}
 			}
+			if (previewPanel == null) {
+				previewPanel = new ResourcePreviewPanel();
+			}
+			previewPanel.build();
+			previewPanel.preview(resource);
+			previewPanel.openInModalPopup();
 		}
-		if (previewPanel == null) {
-			previewPanel = new ResourcePreviewPanel();
-		}
-		previewPanel.build();
-		previewPanel.preview(resource);
-		previewPanel.openInModalPopup();
 	}
 
 	private void uploadReceived(String inputFileName, Path inputFilePath) {
@@ -260,6 +265,7 @@ public class FileChooser extends CustomField<String> {
 		deleteButton = new MButton(FontAwesome.CLOSE).withListener(event -> {
 			setValue(null);
 		}).withStyleName(ValoTheme.BUTTON_TINY, ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_QUIET);
+
 		imageLayout.addComponent(deleteButton);
 		imageLayout.setComponentAlignment(deleteButton, Alignment.BOTTOM_RIGHT);
 		imageLayout.setExpandRatio(deleteButton, 1);
@@ -281,6 +287,10 @@ public class FileChooser extends CustomField<String> {
 
 	private void renderComponent() {
 		if (previewImage != null) {
+			if (fileDownloader != null) {
+				previewImage.removeExtension(fileDownloader);
+				fileDownloader = null;
+			}
 			previewImage.markAsDirtyRecursive();
 			String fileName = getValue();
 			Resource resource = null;
@@ -307,6 +317,31 @@ public class FileChooser extends CustomField<String> {
 					previewImage.setHeight(componentHeight);
 					previewImage.setSource(resource);
 				}
+
+				if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg|pdf)")) {
+					try {
+						File file = new File(fileName);
+						if (file.isFile() && file.exists()) {
+							Resource downloadResource = new FileResource(file);
+							if (fileDownloader == null) {
+								fileDownloader = new FileDownloader(downloadResource);
+								fileDownloader.extend(previewImage);
+							}
+						} else {
+							String resourcePath = storage.resourcePath(getRootFolder(), fileName);
+							InputStream inputStream = storage.resolve(resourcePath);
+							InputStreamSource isr = new InputStreamSource(inputStream);
+							Resource downloadResource = new StreamResource(isr, fileName);
+							if (fileDownloader == null) {
+								fileDownloader = new FileDownloader(downloadResource);
+								fileDownloader.extend(previewImage);
+							}
+						}
+					} catch (ResolveFailedException e1) {
+						resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
+					}
+				}
+
 				uploadComponent.setVisible(false);
 				imageLayout.setVisible(true);
 			} else {
