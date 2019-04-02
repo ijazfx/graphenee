@@ -338,6 +338,15 @@ public class TRCalenderUtil {
 		return Timestamp.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
 	}
 
+	public static final Integer getDayOfMonth(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.DAY_OF_MONTH);
+	}
+
 	public static final Integer getDay(Date date) {
 		if (date == null) {
 			return null;
@@ -405,6 +414,15 @@ public class TRCalenderUtil {
 			return null;
 		}
 		return timeFormatter.format(date);
+	}
+
+	public static final Integer getYear(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.YEAR);
 	}
 
 	public static final Integer getMonth(Date date) {
@@ -714,6 +732,15 @@ public class TRCalenderUtil {
 		cal.set(Calendar.YEAR, 1970);
 		cal.set(Calendar.MONTH, 1);
 		cal.set(Calendar.DAY_OF_YEAR, 1);
+		return new Timestamp(cal.getTime().getTime());
+	}
+
+	public static Timestamp setTimeForDate(Timestamp time, Timestamp date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(time);
+		cal.set(Calendar.YEAR, getYear(date));
+		cal.set(Calendar.MONTH, getMonth(date));
+		cal.set(Calendar.DAY_OF_MONTH, getDayOfMonth(date));
 		return new Timestamp(cal.getTime().getTime());
 	}
 }
