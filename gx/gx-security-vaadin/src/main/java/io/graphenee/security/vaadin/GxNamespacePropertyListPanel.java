@@ -27,14 +27,13 @@ import com.vaadin.ui.ComboBox;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.bean.GxSecurityPolicyBean;
+import io.graphenee.core.model.bean.GxNamespacePropertyBean;
 import io.graphenee.vaadin.AbstractEntityListPanel;
 import io.graphenee.vaadin.TRAbstractForm;
-import io.graphenee.vaadin.renderer.BooleanRenderer;
 
 @SpringComponent
 @Scope("prototype")
-public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurityPolicyBean> {
+public class GxNamespacePropertyListPanel extends AbstractEntityListPanel<GxNamespacePropertyBean> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -42,24 +41,24 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 	GxDataService dataService;
 
 	@Autowired
-	GxSecurityPolicyForm editorForm;
+	GxNamespacePropertyForm editorForm;
 
 	private ComboBox namespaceComboBox;
 
 	private GxNamespaceBean namespaceBean;
 
-	public GxSecurityPolicyListPanel() {
-		super(GxSecurityPolicyBean.class);
+	public GxNamespacePropertyListPanel() {
+		super(GxNamespacePropertyBean.class);
 	}
 
 	@Override
-	protected boolean onSaveEntity(GxSecurityPolicyBean entity) {
+	protected boolean onSaveEntity(GxNamespacePropertyBean entity) {
 		dataService.save(entity);
 		return true;
 	}
 
 	@Override
-	protected boolean onDeleteEntity(GxSecurityPolicyBean entity) {
+	protected boolean onDeleteEntity(GxNamespacePropertyBean entity) {
 		dataService.delete(entity);
 		return true;
 	}
@@ -70,27 +69,27 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 	}
 
 	@Override
-	protected List<GxSecurityPolicyBean> fetchEntities() {
+	protected List<GxNamespacePropertyBean> fetchEntities() {
 		if (namespaceBean != null)
-			return dataService.findSecurityPolicyByNamespace(namespaceBean);
-		return dataService.findSecurityPolicy();
+			return dataService.findNamespacePropertyByNamespace(namespaceBean);
+		return dataService.findNamespaceProperty();
 	}
 
 	@Override
-	protected <F> List<GxSecurityPolicyBean> fetchEntities(F filter) {
+	protected <F> List<GxNamespacePropertyBean> fetchEntities(F filter) {
 		if (filter instanceof GxNamespaceBean) {
-			return dataService.findSecurityPolicyByNamespace((GxNamespaceBean) filter);
+			return dataService.findNamespacePropertyByNamespace((GxNamespaceBean) filter);
 		}
 		return super.fetchEntities(filter);
 	}
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "securityPolicyName", "securityPolicyDescription", "priority", "isActive" };
+		return new String[] { "propertyKey", "propertyValue", "propertyDefaultValue" };
 	}
 
 	@Override
-	protected TRAbstractForm<GxSecurityPolicyBean> editorForm() {
+	protected TRAbstractForm<GxNamespacePropertyBean> editorForm() {
 		return editorForm;
 	}
 
@@ -103,10 +102,11 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 			refresh(event.getProperty().getValue());
 		});
 		toolbar.addComponent(namespaceComboBox);
+
 	}
 
 	@Override
-	protected void preEdit(GxSecurityPolicyBean item) {
+	protected void preEdit(GxNamespacePropertyBean item) {
 		if (item.getOid() == null) {
 			GxNamespaceBean selectedNamespaceBean = namespaceBean != null ? namespaceBean : (GxNamespaceBean) namespaceComboBox.getValue();
 			if (selectedNamespaceBean != null) {
@@ -115,37 +115,9 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 		}
 	}
 
-	@Override
-	protected void postBuild() {
-		super.postBuild();
-		for (com.vaadin.ui.Grid.Column column : entityGrid().getColumns()) {
-			if (column.getPropertyId().toString().matches("(isActive)")) {
-				column.setRenderer(new BooleanRenderer(event -> {
-					onGridItemClicked((GxSecurityPolicyBean) event.getItemId(), column.getPropertyId().toString());
-				}), BooleanRenderer.SWITCH_CONVERTER);
-			}
-		}
-	}
-
-	@Override
-	protected void onGridItemClicked(GxSecurityPolicyBean item, String propertyId) {
-		if (propertyId.equals("isActive")) {
-			item.setIsActive(!item.getIsActive());
-			dataService.save(item);
-			entityGrid().refreshRow(item);
-			return;
-		}
-		super.onGridItemClicked(item, propertyId);
-	}
-
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
 		namespaceComboBox.setVisible(namespaceBean == null);
-	}
-
-	@Override
-	protected boolean isGridCellFilterEnabled() {
-		return true;
 	}
 
 }

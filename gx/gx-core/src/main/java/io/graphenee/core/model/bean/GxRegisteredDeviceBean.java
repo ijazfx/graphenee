@@ -10,12 +10,12 @@ public class GxRegisteredDeviceBean implements Serializable {
 
 	private Integer oid;
 	private String systemName;
-	private String uniqueId;
+	private String deviceToken;
 	private Boolean isTablet = false;
 	private String brand;
 	private Boolean isActive = true;
 	private String ownerId;
-	private BeanFault<Integer, GxMobileApplicationBean> gxMobileApplicationBeanFault;
+	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
 
 	public Integer getOid() {
 		return oid;
@@ -31,14 +31,6 @@ public class GxRegisteredDeviceBean implements Serializable {
 
 	public void setSystemName(String systemName) {
 		this.systemName = systemName;
-	}
-
-	public String getUniqueId() {
-		return uniqueId;
-	}
-
-	public void setUniqueId(String uniqueId) {
-		this.uniqueId = uniqueId;
 	}
 
 	public Boolean getIsTablet() {
@@ -73,15 +65,19 @@ public class GxRegisteredDeviceBean implements Serializable {
 		this.ownerId = ownerId;
 	}
 
-	public BeanFault<Integer, GxMobileApplicationBean> getGxMobileApplicationBeanFault() {
-		return gxMobileApplicationBeanFault;
+	public String getDeviceToken() {
+		return deviceToken;
 	}
 
-	public void setGxMobileApplicationBeanFault(BeanFault<Integer, GxMobileApplicationBean> gxMobileApplicationBeanFault) {
-		this.gxMobileApplicationBeanFault = gxMobileApplicationBeanFault;
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
 	}
 
-	public String getMobileApplicationName() {
-		return getGxMobileApplicationBeanFault() != null ? gxMobileApplicationBeanFault.getBean().getApplicationName() : "N/A";
+	public BeanFault<Integer, GxNamespaceBean> getNamespaceFault() {
+		return namespaceFault;
+	}
+
+	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
+		this.namespaceFault = namespaceFault;
 	}
 }

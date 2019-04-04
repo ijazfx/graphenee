@@ -10,8 +10,8 @@ import io.graphenee.core.model.entity.GxRegisteredDevice;
 @Repository
 public interface GxRegisteredDeviceRepository extends JpaRepository<GxRegisteredDevice, Integer> {
 
-	List<GxRegisteredDevice> findByGxMobileApplicationApplicationName(String applicationName);
+	List<GxRegisteredDevice> findByGxNamespaceNamespace(String namespace);
 
-	GxRegisteredDevice findByGxMobileApplicationGxNamespaceNamespaceAndGxMobileApplicationApplicationNameAndUniqueId(String namespace, String applicationName, String uniqueId);
+	GxRegisteredDevice findByGxNamespaceNamespaceAndDeviceToken(String namespace, String deviceToken);
 
 }

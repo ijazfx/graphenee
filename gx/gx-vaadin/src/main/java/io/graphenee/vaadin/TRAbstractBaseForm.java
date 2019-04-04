@@ -608,6 +608,57 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		return false;
 	}
 
+	Set<Field> lockedFields = new HashSet<>();
+
+	public void lockFields() {
+		lockFields(getCompositionRoot());
+	}
+
+	private void lockFields(Component compositionRoot) {
+		if (compositionRoot instanceof AbstractComponentContainer) {
+			AbstractComponentContainer cc = (AbstractComponentContainer) compositionRoot;
+			Iterator<Component> iterator = cc.iterator();
+			while (iterator.hasNext()) {
+				Component component = iterator.next();
+				if (component.isReadOnly())
+					continue;
+				if (component instanceof AbstractTextField) {
+					AbstractTextField abstractTextField = (AbstractTextField) component;
+					if (abstractTextField.isEnabled()) {
+						lockedFields.add(abstractTextField);
+					}
+				}
+				if (component instanceof AbstractField) {
+					AbstractField abstractField = (AbstractField) component;
+					if (abstractField.isEnabled()) {
+						lockedFields.add(abstractField);
+					}
+				}
+				if (component instanceof AbstractSingleComponentContainer) {
+					AbstractSingleComponentContainer container = (AbstractSingleComponentContainer) component;
+					lockFields(container.getContent());
+
+				}
+				if (component instanceof AbstractComponentContainer) {
+					lockFields(component);
+				}
+			}
+		} else if (compositionRoot instanceof AbstractSingleComponentContainer) {
+			AbstractSingleComponentContainer container = (AbstractSingleComponentContainer) compositionRoot;
+			lockFields(container.getContent());
+		}
+		lockedFields.forEach(field -> {
+			field.setReadOnly(true);
+		});
+	}
+
+	public void unlockFields() {
+		lockedFields.forEach(field -> {
+			field.setReadOnly(false);
+		});
+		lockedFields.clear();
+	}
+
 	/**
 	 * This method should return the actual content of the form, including
 	 * possible toolbar. Use setEntity(T entity) to fill in the data. Am example

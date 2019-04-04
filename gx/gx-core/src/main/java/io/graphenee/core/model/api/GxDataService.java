@@ -29,8 +29,8 @@ import io.graphenee.core.model.bean.GxCountryBean;
 import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
-import io.graphenee.core.model.bean.GxMobileApplicationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxNamespacePropertyBean;
 import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
@@ -86,6 +86,18 @@ public interface GxDataService {
 	GxNamespaceBean save(GxNamespaceBean entity);
 
 	void delete(GxNamespaceBean entity);
+
+	List<GxNamespacePropertyBean> findNamespaceProperty();
+
+	GxNamespacePropertyBean findNamespaceProperty(Integer oidNamespaceProperty);
+
+	GxNamespacePropertyBean save(GxNamespacePropertyBean bean);
+
+	void delete(GxNamespacePropertyBean bean);
+
+	List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace);
+
+	GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey);
 
 	List<GxSecurityGroupBean> findSecurityGroup();
 
@@ -319,27 +331,17 @@ public interface GxDataService {
 
 	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
 
-	GxMobileApplicationBean createOrUpdate(GxMobileApplicationBean bean);
-
 	GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean);
 
-	List<GxMobileApplicationBean> findMobileApplication();
+	List<GxRegisteredDeviceBean> findRegisteredDevice();
 
-	List<GxMobileApplicationBean> findAllByNamespace(GxNamespaceBean gxNameSpace);
-
-	GxMobileApplicationBean findByApplicationNameAndNamespace(String applicationName, String namespace);
-
-	void deleteMobileApplication(GxMobileApplicationBean bean);
-
-	List<GxRegisteredDeviceBean> findRegisteredDevices();
-
-	List<GxRegisteredDeviceBean> findByMobileApplication(GxMobileApplicationBean bean);
+	List<GxRegisteredDeviceBean> findRegisteredDeviceByNamespace(GxNamespaceBean bean);
 
 	void delete(GxRegisteredDeviceBean bean);
 
-	GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String applicationName, String systemName, String brand, boolean isTablet, String ownerId)
+	GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId)
 			throws RegisterDeviceFailedException;
 
-	void unregisterDevice(String namespace, String uniqueId, String applicationName) throws UnregisterDeviceFailedException;
+	void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
 
 }

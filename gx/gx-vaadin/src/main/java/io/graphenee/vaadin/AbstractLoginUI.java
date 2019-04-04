@@ -41,13 +41,20 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 			GxUsernamePasswordCredentials credentials = new GxUsernamePasswordCredentials(username, password);
 			try {
 				R user = authenticate((C) credentials);
-				VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
-				String location = Page.getCurrent().getLocation().toString();
-				location = location.replaceAll("/login", "");
-				Page.getCurrent().setLocation(location);
+				if (user.isPasswordChangeRequired()) {
+					VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
+					String location = Page.getCurrent().getLocation().toString();
+					location = location.replaceAll("/login", "/reset-password");
+					Page.getCurrent().setLocation(location);
+				} else {
+					VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
+					String location = Page.getCurrent().getLocation().toString();
+					location = location.replaceAll("/login", "");
+					Page.getCurrent().setLocation(location);
+				}
 			} catch (AuthenticationFailedException e) {
 				String loginLink = Page.getCurrent().getLocation().toString();
-				String resetPasswordLink = loginLink.replaceAll("login", "reset-password");
+				String resetPasswordLink = loginLink.replaceAll("/login", "/reset-password");
 				StringBuilder sb = new StringBuilder();
 				sb.append(e.getMessage());
 				sb.append("&nbsp;");
