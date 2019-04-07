@@ -415,6 +415,33 @@ public class TRCalenderUtil {
 		return timeFormatter.format(date);
 	}
 
+	public static final Integer getHourOfDay(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.HOUR_OF_DAY);
+	}
+
+	public static final Integer getMinutes(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.MINUTE);
+	}
+
+	public static final Integer getSeconds(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.SECOND);
+	}
+
 	public static final Integer getYear(Date date) {
 		if (date == null) {
 			return null;
