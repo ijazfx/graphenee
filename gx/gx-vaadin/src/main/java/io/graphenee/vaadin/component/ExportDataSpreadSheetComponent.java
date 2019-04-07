@@ -23,6 +23,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -46,6 +48,8 @@ public class ExportDataSpreadSheetComponent {
 	private Supplier<Collection<String>> dataColumnSupplier;
 	private Supplier<Collection<Object>> dataItemsSupplier;
 	private DownloadButton downloadButton;
+
+	private CellStyle defaultDateStyle = null;
 
 	public ExportDataSpreadSheetComponent withFileName(String fileName) {
 		this.fileName = fileName;
@@ -117,6 +121,8 @@ public class ExportDataSpreadSheetComponent {
 				dataItems = dataItemsSupplier.get();
 			}
 			XSSFWorkbook workbook = new XSSFWorkbook();
+			defaultDateStyle = workbook.createCellStyle();
+			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalenderUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
 			buildHeaderRow();
 			buildDataRows();
@@ -148,18 +154,21 @@ public class ExportDataSpreadSheetComponent {
 		KeyValueWrapper kvw = new KeyValueWrapper(item);
 		for (String property : dataColumns) {
 			Object value = kvw.valueForKeyPath(property);
+			Cell cell = row.createCell(i++);
 			if (value instanceof String) {
-				row.createCell(i++).setCellValue(value.toString());
+				cell.setCellValue(value.toString());
 			} else if (value instanceof Boolean) {
-				row.createCell(i++).setCellValue((Boolean) value);
+				cell.setCellValue((Boolean) value);
 			} else if (value instanceof Double) {
-				row.createCell(i++).setCellValue(((Double) value).doubleValue());
+				cell.setCellValue(((Double) value).doubleValue());
 			} else if (value instanceof Number) {
-				row.createCell(i++).setCellValue(((Number) value).intValue());
+				cell.setCellValue(((Number) value).intValue());
 			} else if (value instanceof Date) {
-				row.createCell(i++).setCellValue((Date) value);
+				if (defaultDateStyle != null)
+					cell.setCellStyle(defaultDateStyle);
+				cell.setCellValue((Date) value);
 			} else {
-				row.createCell(i++).setCellValue("");
+				cell.setCellValue("");
 			}
 		}
 	}
