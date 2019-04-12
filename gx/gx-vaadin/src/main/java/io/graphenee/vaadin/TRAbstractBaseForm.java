@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.groups.Default;
-
 import org.vaadin.viritin.BeanBinder;
 import org.vaadin.viritin.MBeanFieldGroup;
 import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
@@ -289,11 +287,6 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 			binding = true;
 			fieldGroup = bindEntity(entity);
 			binding = false;
-			try {
-				fieldGroup.setValidationGroups(getValidationGroups());
-			} catch (Throwable e) {
-				// Probably no Validation API available
-			}
 
 			for (Map.Entry<MBeanFieldGroup.MValidator<T>, Collection<AbstractComponent>> e : mValidators.entrySet()) {
 				fieldGroup.addValidator(e.getKey(), e.getValue().toArray(new AbstractComponent[e.getValue().size()]));
@@ -700,31 +693,6 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	private final LinkedHashMap<MBeanFieldGroup.MValidator<T>, Collection<AbstractComponent>> mValidators = new LinkedHashMap<MBeanFieldGroup.MValidator<T>, Collection<AbstractComponent>>();
 
 	private final Map<Class, AbstractComponent> validatorToErrorTarget = new LinkedHashMap<Class, AbstractComponent>();
-
-	private Class<?>[] validationGroups;
-
-	/**
-	 * @return the JSR 303 bean validation groups that should be used to
-	 * validate the bean
-	 */
-	public Class<?>[] getValidationGroups() {
-		if (validationGroups == null) {
-			return new Class<?>[] { Default.class };
-		}
-		return validationGroups;
-	}
-
-	/**
-	 * @param validationGroups the JSR 303 bean validation groups that should be
-	 * used to validate the bean. Note, that groups currently only affect
-	 * cross-field/bean-level validation.
-	 */
-	public void setValidationGroups(Class<?>... validationGroups) {
-		this.validationGroups = validationGroups;
-		if (getFieldGroup() != null) {
-			getFieldGroup().setValidationGroups(validationGroups);
-		}
-	}
 
 	public void setValidationErrorTarget(Class aClass, AbstractComponent errorTarget) {
 		validatorToErrorTarget.put(aClass, errorTarget);
