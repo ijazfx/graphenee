@@ -110,7 +110,10 @@ public abstract class AbstractDashboardUI extends UI {
 				else
 					UI.getCurrent().getNavigator().navigateTo(navigableState);
 			} catch (Exception ex) {
-				UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
+				String dashboardViewName = dashboardSetup().dashboardViewName();
+				if (dashboardViewName == null)
+					dashboardViewName = "";
+				UI.getCurrent().getNavigator().navigateTo(dashboardViewName);
 			}
 
 		}
@@ -120,7 +123,7 @@ public abstract class AbstractDashboardUI extends UI {
 	}
 
 	private String findNavigableState(GxAuthenticatedUser user, String currentState) {
-		if (user.canDoAction(currentState, "view"))
+		if (user != null && user.canDoAction(currentState, "view"))
 			return currentState;
 		if (currentState.lastIndexOf("/") >= 0) {
 			return findNavigableState(user, currentState.substring(0, currentState.lastIndexOf("/")));
