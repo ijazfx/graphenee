@@ -23,7 +23,7 @@ import javax.sql.DataSource;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 
 public class DataSourceUtil {
 

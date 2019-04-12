@@ -21,5 +21,9 @@
 		<groupId>com.vaadin.addon</groupId>
 		<artifactId>vaadin-spreadsheet</artifactId>
 	</dependency>
+  	<dependency>
+  		<groupId>org.springframework</groupId>
+  		<artifactId>spring-context</artifactId>
+  	</dependency>
   </dependencies>
 </project>

@@ -558,7 +558,9 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			deselectAll();
 			List<T> entities = fetchEntities();
 			mainGridContainer.removeAllItems();
-			mainGridContainer.addAll(entities);
+			if (entities != null) {
+				mainGridContainer.addAll(entities);
+			}
 			UI.getCurrent().push();
 		});
 		return this;

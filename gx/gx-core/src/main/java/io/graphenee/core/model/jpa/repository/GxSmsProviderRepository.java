@@ -17,13 +17,13 @@ package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxSmsProvider;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxSmsProviderRepository extends JpaRepository<GxSmsProvider, Integer> {
+public interface GxSmsProviderRepository extends GxJpaRepository<GxSmsProvider, Integer> {
 
 	List<GxSmsProvider> findAllByIsActiveTrueOrderByProviderNameAsc();
 

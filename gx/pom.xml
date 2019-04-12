@@ -110,15 +110,10 @@
 			<!-- spring dependencies -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter</artifactId>
+				<artifactId>spring-boot-starter-parent</artifactId>
 				<version>${version.spring}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-mail</artifactId>
-				<version>${version.spring}</version>
 			</dependency>
 			<!-- vaadin dependencies -->
 			<dependency>
@@ -191,22 +186,7 @@
 				<version>1.5.0.alpha1</version>
 			</dependency>
 			<!-- flyway dependencies -->
-			<dependency>
-				<groupId>org.flywaydb</groupId>
-				<artifactId>flyway-core</artifactId>
-				<version>4.1.2</version>
-			</dependency>
 			<!-- miscellaneous dependencies -->
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>javax.servlet-api</artifactId>
-				<version>3.1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.validation</groupId>
-				<artifactId>validation-api</artifactId>
-				<version>2.0.0.Beta1</version>
-			</dependency>
 			<dependency>
 				<groupId>com.lambdaworks</groupId>
 				<artifactId>scrypt</artifactId>
@@ -400,7 +380,7 @@
 		<version.java.persistence>2.1.1</version.java.persistence>
 		<version.vaadin>7.7.15</version.vaadin>
 		<version.vaadin.spring>1.2.0</version.vaadin.spring>
-		<version.spring>1.5.8.RELEASE</version.spring>
+		<version.spring>2.1.4.RELEASE</version.spring>
 	</properties>
 
 	<distributionManagement>

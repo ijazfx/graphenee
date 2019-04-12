@@ -248,7 +248,7 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 
 	@Override
 	public void delete(GxPasswordPolicyBean bean) {
-		gxPasswordPolicyRepo.delete(bean.getOid());
+		gxPasswordPolicyRepo.deleteById(bean.getOid());
 	}
 
 	@Override

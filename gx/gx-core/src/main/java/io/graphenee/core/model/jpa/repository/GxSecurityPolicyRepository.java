@@ -18,13 +18,13 @@ package io.graphenee.core.model.jpa.repository;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxSecurityPolicy;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxSecurityPolicyRepository extends JpaRepository<GxSecurityPolicy, Integer> {
+public interface GxSecurityPolicyRepository extends GxJpaRepository<GxSecurityPolicy, Integer> {
 
 	List<GxSecurityPolicy> findAllByGxSecurityGroupsOidEquals(Integer oidSecurityGroup);
 
