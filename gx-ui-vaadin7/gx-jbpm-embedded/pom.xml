@@ -9,7 +9,7 @@
 	<description>Embedded jBPM Module</description>
 	<parent>
 		<groupId>io.graphenee</groupId>
-		<artifactId>gx</artifactId>
+		<artifactId>gx-ui-vaadin7</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
