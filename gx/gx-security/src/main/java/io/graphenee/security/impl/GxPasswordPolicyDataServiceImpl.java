@@ -26,7 +26,7 @@ import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
 import io.graphenee.core.model.jpa.repository.GxPasswordPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
-import io.graphenee.core.util.TRCalenderUtil;
+import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.security.api.GxPasswordPolicyDataService;
 
 @Service
@@ -319,13 +319,13 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			return false;
 
 		List<GxPasswordHistory> passwordHistoryList = passwordHistoryRepo.findAllByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
-		Timestamp currentTime = TRCalenderUtil.getCurrentTimeStamp();
+		Timestamp currentTime = TRCalendarUtil.getCurrentTimeStamp();
 		Long diff = 0L;
 		GxPasswordHistory passwordHistory = passwordHistoryList != null && !passwordHistoryList.isEmpty() ? passwordHistoryList.get(0) : null;
 		if (passwordHistory != null && passwordHistory.getPasswordDate() != null) {
-			diff = TRCalenderUtil.daysBetween(passwordHistory.getPasswordDate(), currentTime);
+			diff = TRCalendarUtil.daysBetween(passwordHistory.getPasswordDate(), currentTime);
 		} else if (userAccountBean.getAccountActivationDate() != null) {
-			diff = TRCalenderUtil.daysBetween(userAccountBean.getAccountActivationDate(), currentTime);
+			diff = TRCalendarUtil.daysBetween(userAccountBean.getAccountActivationDate(), currentTime);
 		}
 		return diff != 0 && diff > passwordPolicyBean.getMaxAge();
 

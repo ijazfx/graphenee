@@ -61,7 +61,7 @@ import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.core.util.TRCalenderUtil;
+import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
 import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.util.VaadinUtils;
@@ -379,11 +379,11 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	protected DateFormat applyDateFormatForProperty(String propertyId) {
-		return TRCalenderUtil.dateFormatter;
+		return TRCalendarUtil.dateFormatter;
 	}
 
 	protected DateFormat applyDateTimeFormatForProperty(String propertyId) {
-		return TRCalenderUtil.dateTimeFormatter;
+		return TRCalendarUtil.dateTimeFormatter;
 	}
 
 	protected Alignment alignmentForProperty(String propertyId) {

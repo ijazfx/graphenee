@@ -59,7 +59,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.core.util.TRCalenderUtil;
+import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
 import io.graphenee.vaadin.event.TRItemClickListener;
@@ -368,11 +368,11 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	protected DateFormat applyDateFormatForProperty(String propertyId) {
-		return TRCalenderUtil.dateFormatter;
+		return TRCalendarUtil.dateFormatter;
 	}
 
 	protected DateFormat applyDateTimeFormatForProperty(String propertyId) {
-		return TRCalenderUtil.dateTimeFormatter;
+		return TRCalendarUtil.dateTimeFormatter;
 	}
 
 	protected Alignment alignmentForProperty(String propertyId) {

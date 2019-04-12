@@ -114,7 +114,7 @@ import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
-import io.graphenee.core.util.TRCalenderUtil;
+import io.graphenee.core.util.TRCalendarUtil;
 
 @Service
 @DependsOn({ "flyway", "flywayInitializer" })
@@ -206,7 +206,7 @@ public class GxDataServiceImpl implements GxDataService {
 				document = new GxSecurityPolicyDocumentBean();
 				document.setIsDefault(true);
 				document.setDocumentJson("grant all on all;");
-				document.setTag(TRCalenderUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
+				document.setTag(TRCalendarUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
 				adminPolicy.getSecurityPolicyDocumentCollectionFault().add(document);
 				// save policy with document
 				save(adminPolicy);
@@ -718,7 +718,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 		if (entity.getIsActive() != bean.getIsActive()) {
 			if (bean.getIsActive()) {
-				bean.setAccountActivationDate(TRCalenderUtil.getCurrentTimeStamp());
+				bean.setAccountActivationDate(TRCalendarUtil.getCurrentTimeStamp());
 			}
 		}
 
@@ -768,7 +768,7 @@ public class GxDataServiceImpl implements GxDataService {
 			GxPasswordHistory history = new GxPasswordHistory();
 			history.setGxUserAccount(saved);
 			history.setHashedPassword(CryptoUtil.createPasswordHash(bean.getPassword()));
-			history.setPasswordDate(TRCalenderUtil.getCurrentTimeStamp());
+			history.setPasswordDate(TRCalendarUtil.getCurrentTimeStamp());
 			gxPasswordHistoryRepo.save(history);
 		}
 

@@ -34,7 +34,7 @@ import org.vaadin.viritin.button.DownloadButton.ContentWriter;
 import com.vaadin.server.FontAwesome;
 
 import io.graphenee.core.util.KeyValueWrapper;
-import io.graphenee.core.util.TRCalenderUtil;
+import io.graphenee.core.util.TRCalendarUtil;
 
 public class ExportDataSpreadSheetComponent {
 
@@ -92,7 +92,7 @@ public class ExportDataSpreadSheetComponent {
 			downloadButton.setCaption("Download");
 			downloadButton.setIcon(FontAwesome.FILE_EXCEL_O);
 			if (StringUtils.isEmpty(fileName)) {
-				fileName = TRCalenderUtil.getFormattedDateTime(TRCalenderUtil.getCurrentTimeStamp(), "yyyyMMdd") + FILE_EXTENSION_XLS;
+				fileName = TRCalendarUtil.getFormattedDateTime(TRCalendarUtil.getCurrentTimeStamp(), "yyyyMMdd") + FILE_EXTENSION_XLS;
 			}
 			downloadButton.setFileName(fileName);
 			downloadButton.setWriter(new ContentWriter() {
@@ -122,7 +122,7 @@ public class ExportDataSpreadSheetComponent {
 			}
 			XSSFWorkbook workbook = new XSSFWorkbook();
 			defaultDateStyle = workbook.createCellStyle();
-			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalenderUtil.dateFormatter.toPattern()));
+			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
 			buildHeaderRow();
 			buildDataRows();

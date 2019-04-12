@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author fijaz
  */
-public class TRCalenderUtil {
+public class TRCalendarUtil {
 
 	private static Map<String, SimpleDateFormat> COMPILED_FORMATTERS = new ConcurrentHashMap<>();
 
@@ -375,7 +375,7 @@ public class TRCalenderUtil {
 		}
 		SimpleDateFormat formatter = COMPILED_FORMATTERS.get(pattern);
 		if (formatter == null) {
-			synchronized (TRCalenderUtil.class) {
+			synchronized (TRCalendarUtil.class) {
 				if (formatter == null) {
 					formatter = new SimpleDateFormat(pattern);
 					COMPILED_FORMATTERS.put(pattern, formatter);
@@ -398,7 +398,7 @@ public class TRCalenderUtil {
 		}
 		SimpleDateFormat formatter = COMPILED_FORMATTERS.get(pattern);
 		if (formatter == null) {
-			synchronized (TRCalenderUtil.class) {
+			synchronized (TRCalendarUtil.class) {
 				if (formatter == null) {
 					formatter = new SimpleDateFormat(pattern);
 					COMPILED_FORMATTERS.put(pattern, formatter);
