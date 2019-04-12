@@ -17,11 +17,10 @@ package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import io.graphenee.core.model.entity.GxResource;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
-public interface GxResourceRepository extends JpaRepository<GxResource, Integer> {
+public interface GxResourceRepository extends GxJpaRepository<GxResource, Integer> {
 
 	GxResource findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(String resourceName, String namespace);
 

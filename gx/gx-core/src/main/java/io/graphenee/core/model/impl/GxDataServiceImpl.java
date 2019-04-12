@@ -376,7 +376,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxTermBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			termRepo.delete(bean.getOid());
+			termRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -486,7 +486,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxSupportedLocaleBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			supportedLocaleRepo.delete(bean.getOid());
+			supportedLocaleRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -524,7 +524,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxNamespaceBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			securityGroupRepo.delete(bean.getOid());
+			securityGroupRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -620,7 +620,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxSecurityGroupBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			securityGroupRepo.delete(bean.getOid());
+			securityGroupRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -778,7 +778,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxUserAccountBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			userAccountRepo.delete(bean.getOid());
+			userAccountRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -934,7 +934,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxSecurityPolicyBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			securityPolicyRepo.delete(bean.getOid());
+			securityPolicyRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -1071,7 +1071,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxCountryBean bean) {
-		countryRepository.delete(bean.getOid());
+		countryRepository.deleteById(bean.getOid());
 	}
 
 	private List<GxStateBean> makeStateBean(List<GxState> stateList) {
@@ -1151,12 +1151,12 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxCityBean bean) {
-		cityRepository.delete(bean.getOid());
+		cityRepository.deleteById(bean.getOid());
 	}
 
 	@Override
 	public void delete(GxStateBean bean) {
-		stateRepository.delete(bean.getOid());
+		stateRepository.deleteById(bean.getOid());
 	}
 
 	private GxState _findState(Integer oid) {
@@ -1292,7 +1292,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxSavedQueryBean bean) {
-		savedQueryRepository.delete(bean.getOid());
+		savedQueryRepository.deleteById(bean.getOid());
 	}
 
 	@Override
@@ -1483,7 +1483,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxEmailTemplateBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			emailTemplateRepository.delete(bean.getOid());
+			emailTemplateRepository.deleteById(bean.getOid());
 		}
 	}
 
@@ -1754,7 +1754,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxAccessKeyBean bean) {
-		accessKeyRepo.delete(bean.getOid());
+		accessKeyRepo.deleteById(bean.getOid());
 	}
 
 	@Override
@@ -1786,7 +1786,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxResourceBean bean) {
-		resourceRepo.delete(bean.getOid());
+		resourceRepo.deleteById(bean.getOid());
 	}
 
 	private List<GxResourceBean> makeResourceBean(List<GxResource> resources) {
@@ -1842,7 +1842,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxCurrencyBean bean) {
-		currencyRepository.delete(bean.getOid());
+		currencyRepository.deleteById(bean.getOid());
 	}
 
 	@Override
@@ -1919,7 +1919,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxSmsProvider bean) {
-		smsProviderRepo.delete(bean.getOid());
+		smsProviderRepo.deleteById(bean.getOid());
 	}
 
 	@Override
@@ -1989,7 +1989,7 @@ public class GxDataServiceImpl implements GxDataService {
 				provider.setIsPrimary(false);
 
 		});
-		smsProviderRepo.save(allProviders);
+		smsProviderRepo.saveAll(allProviders);
 	}
 
 	@Override
@@ -2026,7 +2026,7 @@ public class GxDataServiceImpl implements GxDataService {
 		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
 		if (device == null)
 			throw new UnregisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " does not exist.");
-		gxRegisteredDeviceRepository.delete(device.getOid());
+		gxRegisteredDeviceRepository.deleteById(device.getOid());
 	}
 
 	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceToken(String namespace, String deviceToken) {
@@ -2080,7 +2080,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void delete(GxRegisteredDeviceBean bean) {
-		gxRegisteredDeviceRepository.delete(bean.getOid());
+		gxRegisteredDeviceRepository.deleteById(bean.getOid());
 	}
 
 	@Override
@@ -2106,7 +2106,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxNamespacePropertyBean bean) {
 		if (bean.getOid() != null)
-			namespacePropertyRepo.delete(bean.getOid());
+			namespacePropertyRepo.deleteById(bean.getOid());
 	}
 
 	@Override

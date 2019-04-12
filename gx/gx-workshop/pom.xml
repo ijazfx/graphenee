@@ -67,6 +67,10 @@
 		<dependency>
 			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core-vaadin</artifactId>
+		</dependency>		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 	</dependencies>
 	<name>Graphenee Workshop</name>
@@ -118,13 +122,13 @@
 
 	<packaging>war</packaging>
 	<groupId>io.graphenee</groupId>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>io.graphenee</groupId>
 				<artifactId>gx</artifactId>
-				<version>0.1.2-SNAPSHOT</version>
+				<version>1.0.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

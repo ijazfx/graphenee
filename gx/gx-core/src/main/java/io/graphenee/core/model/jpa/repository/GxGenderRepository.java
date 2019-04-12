@@ -15,13 +15,13 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxGender;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxGenderRepository extends JpaRepository<GxGender, Integer> {
+public interface GxGenderRepository extends GxJpaRepository<GxGender, Integer> {
 
 	GxGender findOneByGenderCode(String genderCode);
 
