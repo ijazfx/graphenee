@@ -20,6 +20,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
@@ -31,6 +32,7 @@ import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.vaadin.AbstractEntityListPanel;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.renderer.BooleanRenderer;
+import io.graphenee.vaadin.ui.GxNotification;
 
 @SpringComponent
 @Scope("prototype")
@@ -54,6 +56,10 @@ public class GxSecurityPolicyListPanel extends AbstractEntityListPanel<GxSecurit
 
 	@Override
 	protected boolean onSaveEntity(GxSecurityPolicyBean entity) {
+		if (entity.getSecurityPolicyDocumentCollectionFault().getBeans().isEmpty()) {
+			GxNotification.tray("Add Policy Statement").show(Page.getCurrent());
+			return false;
+		}
 		dataService.save(entity);
 		return true;
 	}
