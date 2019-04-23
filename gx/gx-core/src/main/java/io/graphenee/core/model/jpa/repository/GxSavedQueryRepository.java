@@ -15,11 +15,10 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import io.graphenee.core.model.entity.GxSavedQuery;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
-public interface GxSavedQueryRepository extends JpaRepository<GxSavedQuery, Integer> {
+public interface GxSavedQueryRepository extends GxJpaRepository<GxSavedQuery, Integer> {
 
 	GxSavedQuery findByQueryNameAndTargetUser(String queryName, String targetUser);
 

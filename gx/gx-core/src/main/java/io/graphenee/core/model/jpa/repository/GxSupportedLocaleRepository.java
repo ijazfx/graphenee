@@ -15,13 +15,13 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxSupportedLocale;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxSupportedLocaleRepository extends JpaRepository<GxSupportedLocale, Integer> {
+public interface GxSupportedLocaleRepository extends GxJpaRepository<GxSupportedLocale, Integer> {
 
 	GxSupportedLocale findByLocaleCodeStartingWith(String localeCode);
 

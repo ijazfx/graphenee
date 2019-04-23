@@ -29,7 +29,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import io.graphenee.core.util.TRCalenderUtil;
+import io.graphenee.core.util.TRCalendarUtil;
 
 public class JsonDeserializers {
 
@@ -47,13 +47,13 @@ public class JsonDeserializers {
 				if (value != null) {
 					value = value.trim();
 					try {
-						return new Timestamp(TRCalenderUtil.yyyyMMddHHmmssSSSFormatter.parse(value).getTime());
+						return new Timestamp(TRCalendarUtil.yyyyMMddHHmmssSSSFormatter.parse(value).getTime());
 					} catch (ParseException e1) {
 						try {
-							return new Timestamp(TRCalenderUtil.yyyyMMddHHmmssFormatter.parse(value).getTime());
+							return new Timestamp(TRCalendarUtil.yyyyMMddHHmmssFormatter.parse(value).getTime());
 						} catch (ParseException e2) {
 							try {
-								return new Timestamp(TRCalenderUtil.yyyyMMddFormatter.parse(value).getTime());
+								return new Timestamp(TRCalendarUtil.yyyyMMddFormatter.parse(value).getTime());
 							} catch (ParseException e3) {
 
 							}

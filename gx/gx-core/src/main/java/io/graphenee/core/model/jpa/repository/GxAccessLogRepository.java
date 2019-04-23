@@ -18,13 +18,13 @@ package io.graphenee.core.model.jpa.repository;
 import java.sql.Timestamp;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import io.graphenee.core.model.entity.GxAccessLog;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
-public interface GxAccessLogRepository extends JpaRepository<GxAccessLog, Integer> {
+public interface GxAccessLogRepository extends GxJpaRepository<GxAccessLog, Integer> {
 
 	List<GxAccessLog> findAllByGxAccessKeyOid(Integer oidAccessKey);
 
