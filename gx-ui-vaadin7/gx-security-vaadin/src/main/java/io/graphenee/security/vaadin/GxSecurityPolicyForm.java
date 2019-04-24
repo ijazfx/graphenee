@@ -27,6 +27,7 @@ import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.util.NestedMethodProperty;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -98,6 +99,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 			getEntity().getSecurityPolicyDocumentCollectionFault().add(selectedDocumentBean);
 			securityPolicyDocumentComboBox.addItem(selectedDocumentBean);
 			securityPolicyDocumentComboBox.select(selectedDocumentBean);
+			adjustSaveButtonState();
 		});
 		MButton cloneButton = new MButton("Clone").withListener(event -> {
 			if (selectedDocumentBean.getOid() != null) {
@@ -108,6 +110,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 				getEntity().getSecurityPolicyDocumentCollectionFault().add(selectedDocumentBean);
 				securityPolicyDocumentComboBox.addItem(selectedDocumentBean);
 				securityPolicyDocumentComboBox.select(selectedDocumentBean);
+				adjustSaveButtonState();
 			}
 		});
 		MButton deleteButton = new MButton("Delete").withListener(event -> {
@@ -116,6 +119,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 				securityPolicyDocumentComboBox.removeItem(selectedDocumentBean);
 				securityPolicyDocumentComboBox.select(null);
 				selectedDocumentBean = null;
+				adjustSaveButtonState();
 			}
 		});
 		MButton makeDefaultButton = new MButton("Make Default").withListener(event -> {
@@ -131,12 +135,13 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		});
 
 		securityPolicyDocumentComboBox = new ComboBox();
+		securityPolicyDocumentComboBox.setWidth("170px");
 		createButton.setEnabled(true);
 		cloneButton.setEnabled(false);
 		makeDefaultButton.setEnabled(false);
 		deleteButton.setEnabled(false);
 		securityPolicyDocumentComboBox.addValueChangeListener(event -> {
-			selectedDocumentBean = (GxSecurityPolicyDocumentBean) event.getProperty().getValue();
+			selectedDocumentBean = (GxSecurityPolicyDocumentBean) securityPolicyDocumentComboBox.getValue();
 			if (selectedDocumentBean != null) {
 				makeDefaultButton.setEnabled(!selectedDocumentBean.getIsDefault());
 				deleteButton.setEnabled(true);
@@ -146,7 +151,9 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 					cloneButton.setEnabled(false);
 				}
 				jsonDocumentTextArea.setEnabled(true);
+				jsonDocumentTextArea.setRequired(true);
 				jsonDocumentTextArea.setValue(selectedDocumentBean.getDocumentJson());
+				jsonDocumentTextArea.discard();
 				jsonDocumentTextArea.setPropertyDataSource(new NestedMethodProperty<>(selectedDocumentBean, "documentJson"));
 				jsonDocumentTextArea.focus();
 			} else {
@@ -154,6 +161,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 				cloneButton.setEnabled(false);
 				deleteButton.setEnabled(false);
 				jsonDocumentTextArea.setEnabled(false);
+				jsonDocumentTextArea.discard();
 				jsonDocumentTextArea.setPropertyDataSource(null);
 				jsonDocumentTextArea.clear();
 			}
@@ -166,10 +174,11 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		jsonDocumentTextArea.addStyleName(GrapheneeTheme.STYLE_CODE);
 		jsonDocumentTextArea.setInputPrompt("e.g.\ngrant all on all\nrevoke write on accounts");
 		jsonDocumentTextArea.setEnabled(false);
-		jsonDocumentTextArea.addTextChangeListener(event -> {
+		jsonDocumentTextArea.addValueChangeListener(event -> {
 			if (selectedDocumentBean != null) {
 				getEntity().getSecurityPolicyDocumentCollectionFault().update(selectedDocumentBean);
 			}
+			adjustSaveButtonState();
 		});
 
 		// form.addComponents(namespaceFault, securityPolicyName, priority,
@@ -242,6 +251,14 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 	@Override
 	protected String popupWidth() {
 		return "700px";
+	}
+
+	@Override
+	public boolean isValid() {
+		if (selectedDocumentBean != null && Strings.isNullOrEmpty(selectedDocumentBean.getDocumentJson())) {
+			return false;
+		}
+		return super.isValid();
 	}
 
 }
