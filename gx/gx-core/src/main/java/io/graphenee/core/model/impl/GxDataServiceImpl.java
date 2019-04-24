@@ -1595,6 +1595,7 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setAuditEntity(bean.getAuditEntity());
 		entity.setAuditEvent(bean.getAuditEvent());
 		entity.setOidAuditEntity(bean.getOidAuditEntity());
+		entity.setAdditionalData(bean.getAdditionalData());
 		if (bean.getGxUserAccountBeanFault() != null) {
 			entity.setGxUserAccount(userAccountRepo.findOne(bean.getGxUserAccountBeanFault().getOid()));
 		} else {
@@ -1609,16 +1610,30 @@ public class GxDataServiceImpl implements GxDataService {
 		return auditEntityEventByUser(null, null, auditEvent, null);
 	}
 
+	public GxAuditLogBean auditEventWithAdditionalData(String auditEvent, byte[] additionalData) {
+		return auditEntityEventByUserWithAdditionalData(null, null, auditEvent, null, additionalData);
+	}
+
 	public GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean) {
 		return auditEntityEventByUser(null, null, auditEvent, userAccountBean);
 	}
 
+	public GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean, byte[] additionalData) {
+		return auditEntityEventByUserWithAdditionalData(null, null, auditEvent, userAccountBean, additionalData);
+	}
+
 	public GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean) {
+		return auditEntityEventByUserWithAdditionalData(auditEntity, oidAuditEntity, auditEvent, userAccountBean, null);
+	}
+
+	public GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean,
+			byte[] additionalData) {
 		GxAuditLogBean bean = new GxAuditLogBean();
 		bean.setAuditDate(new Timestamp(System.currentTimeMillis()));
 		bean.setAuditEntity(auditEntity);
 		bean.setAuditEvent(auditEvent);
 		bean.setOidAuditEntity(oidAuditEntity);
+		bean.setAdditionalData(additionalData);
 		if (userAccountBean != null) {
 			bean.setGxUserAccountBeanFault(BeanFault.beanFault(userAccountBean.getOid(), userAccountBean));
 		}
@@ -1662,6 +1677,7 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setAuditEntity(entity.getAuditEntity());
 		bean.setOidAuditEntity(entity.getOidAuditEntity());
 		bean.setAuditEvent(entity.getAuditEvent());
+		bean.setAdditionalData(entity.getAdditionalData());
 		if (entity.getGxUserAccount() != null) {
 			bean.setGxUserAccountBeanFault(BeanFault.beanFault(entity.getGxUserAccount().getOid(), oid -> {
 				return makeUserAccountBean(userAccountRepo.findOne(oid));

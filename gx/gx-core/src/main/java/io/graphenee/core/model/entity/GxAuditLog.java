@@ -54,6 +54,9 @@ public class GxAuditLog implements Serializable {
 	@Column(name = "oid_audit_entity")
 	private Integer oidAuditEntity;
 
+	@Column(name = "additional_data")
+	private byte[] additionalData;
+
 	//bi-directional many-to-one association to GxUserAccount
 	@ManyToOne
 	@JoinColumn(name = "oid_user_account")
@@ -100,6 +103,14 @@ public class GxAuditLog implements Serializable {
 
 	public void setOidAuditEntity(Integer oidAuditEntity) {
 		this.oidAuditEntity = oidAuditEntity;
+	}
+
+	public byte[] getAdditionalData() {
+		return additionalData;
+	}
+
+	public void setAdditionalData(byte[] additionalData) {
+		this.additionalData = additionalData;
 	}
 
 	public GxUserAccount getGxUserAccount() {
