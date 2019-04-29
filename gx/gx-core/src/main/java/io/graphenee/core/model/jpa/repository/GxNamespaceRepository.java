@@ -15,13 +15,13 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxNamespaceRepository extends JpaRepository<GxNamespace, Integer> {
+public interface GxNamespaceRepository extends GxJpaRepository<GxNamespace, Integer> {
 
 	GxNamespace findByNamespace(String namespace);
 

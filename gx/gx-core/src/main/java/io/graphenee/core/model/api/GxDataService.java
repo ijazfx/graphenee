@@ -283,9 +283,16 @@ public interface GxDataService {
 
 	GxAuditLogBean auditEvent(String auditEvent);
 
+	GxAuditLogBean auditEventWithAdditionalData(String auditEvent, byte[] additionalData);
+
 	GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean);
 
+	GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean, byte[] additionalData);
+
 	GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean);
+
+	GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean,
+			byte[] additionalData);
 
 	List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity);
 

@@ -28,6 +28,7 @@ public class GxAuditLogBean implements Serializable {
 	private String auditEntity;
 	private String auditEvent;
 	private Integer oidAuditEntity;
+	private byte[] additionalData;
 
 	private BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault;
 
@@ -69,6 +70,14 @@ public class GxAuditLogBean implements Serializable {
 
 	public void setOidAuditEntity(Integer oidAuditEntity) {
 		this.oidAuditEntity = oidAuditEntity;
+	}
+
+	public byte[] getAdditionalData() {
+		return additionalData;
+	}
+
+	public void setAdditionalData(byte[] additionalData) {
+		this.additionalData = additionalData;
 	}
 
 	public BeanFault<Integer, GxUserAccountBean> getGxUserAccountBeanFault() {

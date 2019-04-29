@@ -33,7 +33,7 @@ public class TRFormatUtil {
 		}
 		Format formatter = COMPILED_FORMATTERS.get(pattern);
 		if (formatter == null) {
-			synchronized (TRCalenderUtil.class) {
+			synchronized (TRCalendarUtil.class) {
 				if (formatter == null) {
 					formatter = new SimpleDateFormat(pattern);
 					COMPILED_FORMATTERS.put(pattern, formatter);
@@ -50,7 +50,7 @@ public class TRFormatUtil {
 		String key = "#.##-" + groupingSize;
 		Format formatter = COMPILED_FORMATTERS.get(key);
 		if (formatter == null) {
-			synchronized (TRCalenderUtil.class) {
+			synchronized (TRCalendarUtil.class) {
 				if (formatter == null) {
 					DecimalFormat df = new DecimalFormat("#.##");
 					df.setGroupingUsed(true);

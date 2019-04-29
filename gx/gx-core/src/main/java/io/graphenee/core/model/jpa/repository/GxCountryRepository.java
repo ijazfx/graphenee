@@ -17,13 +17,13 @@ package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxCountry;
+import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxCountryRepository extends JpaRepository<GxCountry, Integer> {
+public interface GxCountryRepository extends GxJpaRepository<GxCountry, Integer> {
 
 	List<GxCountry> findAllByIsActiveTrueOrderByCountryNameAsc();
 
