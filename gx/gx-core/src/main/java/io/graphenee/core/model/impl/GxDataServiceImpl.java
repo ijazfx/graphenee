@@ -688,6 +688,7 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setIsPasswordChangeRequired(entity.getIsPasswordChangeRequired());
 		bean.setIsProtected(entity.getIsProtected());
 		bean.setAccountActivationDate(entity.getAccountActivationDate());
+		bean.setProfileImage(entity.getProfileImage());
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
@@ -715,6 +716,10 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setIsLocked(bean.getIsLocked());
 		entity.setIsProtected(false);
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
+
+		if (bean.getProfileImage() != null) {
+			entity.setProfileImage(bean.getProfileImage());
+		}
 
 		if (entity.getIsActive() != bean.getIsActive()) {
 			if (bean.getIsActive()) {

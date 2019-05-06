@@ -53,6 +53,7 @@ import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
+import io.graphenee.vaadin.event.DashboardEvent.UserProfileRenderEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.event.TRButtonClickListener;
 import io.graphenee.vaadin.util.DashboardUtils;
@@ -155,7 +156,10 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	}
 
 	private Component buildUserMenu() {
-		final MenuBar userMenu = new MenuBar();
+		if (userMenu == null) {
+			userMenu = new MenuBar();
+		}
+		userMenu.removeItems();
 		userMenu.addStyleName("user-menu");
 		final GxAuthenticatedUser user = getCurrentUser();
 		if (user != null) {
@@ -261,6 +265,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	HashMap<TRMenuItem, ValoMenuItemButton> buttonsMap = new HashMap<>();
 	private ValoMenuItemButton backButton;
 	private Stack<TRVoidCallback> backStack = new Stack<>();
+	private MenuBar userMenu;
 
 	private void generateValoMenuItemButtons(CssLayout menuItemsLayout, Collection<TRMenuItem> items) {
 		buttonsMap.values().forEach(button -> {
@@ -386,6 +391,11 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			}
 		}
 
+	}
+
+	@Subscribe
+	public void onUserProfileRenderEvent(UserProfileRenderEvent event) {
+		buildUserMenu();
 	}
 
 }
