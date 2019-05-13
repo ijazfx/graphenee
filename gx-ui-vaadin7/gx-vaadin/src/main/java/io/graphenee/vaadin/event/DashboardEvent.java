@@ -193,6 +193,9 @@ public abstract class DashboardEvent {
 	public static class ProfileUpdatedEvent {
 	}
 
+	public static class UserProfileRenderEvent {
+	}
+
 	public static class RequestRefreshNotificationsEvent {
 	}
 
