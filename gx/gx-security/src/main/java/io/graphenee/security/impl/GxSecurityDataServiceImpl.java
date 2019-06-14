@@ -16,6 +16,8 @@
 package io.graphenee.security.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,7 @@ import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
@@ -234,6 +237,33 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 				return makeUserAccountBean(gxUserAccountRepository.findOne(oid));
 			}));
 		return bean;
+	}
+
+	private GxResourceBean makeResourceBean(GxResource entity, GxNamespaceBean namespaceBean) {
+		GxResourceBean bean = new GxResourceBean();
+		bean.setOid(entity.getOid());
+		bean.setResourceName(entity.getResourceName());
+		bean.setResourceDescription(entity.getResourceDescription());
+		bean.setIsActive(entity.getIsActive());
+		bean.setGxNamespaceBeanFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), namespaceBean));
+		return bean;
+	}
+
+	@Override
+	public List<GxResourceBean> findResources(GxNamespaceBean gxNamespaceBean, String accessKey) throws GxPermissionException {
+		GxAccessKey key = gxAccessKeyRepository.findByAccessKey(UUID.fromString(accessKey));
+		if (key == null)
+			throw new GxPermissionException("Access key is not valid");
+		if (!key.getIsActive())
+			throw new GxPermissionException("Access key is not active");
+		if (key.getGxUserAccount() == null)
+			throw new GxPermissionException("Access key is not assigned to any user");
+		List<GxResource> resources = gxResourceRepository.findAllByGxNamespaceNamespace(gxNamespaceBean.getNamespace());
+		List<GxResourceBean> beans = new ArrayList<>();
+		for (GxResource resource : resources) {
+			beans.add(makeResourceBean(resource, gxNamespaceBean));
+		}
+		return beans;
 	}
 
 }
