@@ -80,4 +80,13 @@ public class GxRegisteredDeviceBean implements Serializable {
 	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
 		this.namespaceFault = namespaceFault;
 	}
+
+	public boolean is_iOS() {
+		return getSystemName() != null && getSystemName().trim().toLowerCase().equals("ios");
+	}
+
+	public boolean is_Android() {
+		return getSystemName() != null && getSystemName().trim().toLowerCase().equals("android");
+	}
+
 }
