@@ -47,4 +47,42 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+	</distributionManagement>
+
+	<url>https://github.com/ijazfx/graphenee</url>
+	<description>Graphenee is an enterprise application development framework.</description>
+	<scm>
+		<url>https://github.com/ijazfx/graphenee.git</url>
+		<developerConnection>Farrukh Ijaz</developerConnection>
+	</scm>
+	<issueManagement>
+		<url>https://github.com/ijazfx/graphenee/issues</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>ijazfx</id>
+			<name>Farrukh Ijaz</name>
+			<email>ijazfx@gmail.com</email>
+		</developer>
+	</developers>
+
+
 </project>
