@@ -23,4 +23,5 @@
   		<version>4.2.0</version>
   	</dependency>
   </dependencies>
+  <name>Graphenee Ethereum</name>
 </project>
