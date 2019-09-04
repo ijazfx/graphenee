@@ -2,5 +2,6 @@
     <wb-module deploy-name="gx-security">
         <wb-resource deploy-path="/" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/" source-path="/target/generated-sources/annotations"/>
     </wb-module>
 </project-modules>

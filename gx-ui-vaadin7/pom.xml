@@ -297,4 +297,5 @@
 		</developer>
 	</developers>
 
+	<description>Graphenee UI library based on Vaadin 7 framework.</description>
 </project>
