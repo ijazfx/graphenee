@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx-ui-vaadin7</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>pom</packaging>
 	<name>Graphenee UI Vaadin 7</name>
 	<build>

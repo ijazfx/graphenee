@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee.blockchain</groupId>
 	<artifactId>gx-blockchain</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<name>Graphenee Blockchain</name>
 	<packaging>pom</packaging>
 	<modules>
