@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Graphenee</name>
 	<build>
@@ -198,7 +198,7 @@
 			<dependency>
 				<groupId>com.squareup.retrofit2</groupId>
 				<artifactId>retrofit</artifactId>
-				<version>[2.5.0,)</version>
+				<version>2.5.0</version>
 			</dependency>
 			<dependency>
 				<groupId>com.squareup.retrofit2</groupId>
