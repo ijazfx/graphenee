@@ -268,6 +268,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 					});
 					AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
 					cardPanel.setContent(cardLayout);
+					cardPanel.setWidth(cardLayout.getCardWidth());
 					contentLayout.addComponent(cardPanel);
 
 				});

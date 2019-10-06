@@ -12,6 +12,7 @@ $valo-menu-background-color: #1B1B25 !default;
 $v-card-border-color: #e7eaec !default;
 $v-card-caption-color: #676A6C !default;
 $v-card-icon-color: #C4C4C4 !default;
+$v-card-footer: #FFFFFF !default;
 
 @import "../valo/valo";
 @import "common";
@@ -199,18 +200,26 @@ $view-padding: round($v-unit-size * 0.75) !default;
 	.card-collection {
 		padding: 0px;
 		
+		.card-item-content {
+			overflow: scroll;
+		}
+		
+		.popup-footer {
+			z-index: 300;
+			background-color: $v-card-footer;
+			border-top: 1px solid $v-card-border-color;
+		}
+		
 		> .card-item {
-			margin-bottom: 12px;
 			border-radius: $v-border-radius;
-			box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
-			transition-duration: 200ms;
+			transition-duration: 100ms;
 			transition-timing-function: ease-in;
+			min-width: 200px;
 		}
 		
 		> .card-item:hover {
 			z-index: 2;
 			border-radius: $v-border-radius;
-			box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.5);
 			background: #efefef;
 			transition-duration: 100ms;
 			transition-timing-function: ease-out;
