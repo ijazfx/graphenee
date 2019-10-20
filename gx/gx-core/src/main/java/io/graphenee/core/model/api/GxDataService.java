@@ -127,6 +127,8 @@ public interface GxDataService {
 
 	List<GxSecurityPolicyBean> findSecurityPolicyByNamespace(GxNamespaceBean namespace);
 
+	List<GxUserAccountBean> findUserAccountByNamespace(GxNamespaceBean namespace);
+
 	List<GxUserAccountBean> findUserAccountBySecurityGroup(GxSecurityGroupBean securityGroup);
 
 	GxGenderBean findGenderByCode(String genderCode);
@@ -269,6 +271,8 @@ public interface GxDataService {
 
 	GxUserAccountBean findUserAccountByUsername(String username);
 
+	GxUserAccountBean findUserAccountByUsernameAndNamespace(String username, GxNamespaceBean namespaceBean);
+
 	GxUserAccountBean findUserAccountByUsernameAndPassword(String username, String password);
 
 	GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean);
@@ -350,5 +354,7 @@ public interface GxDataService {
 			throws RegisterDeviceFailedException;
 
 	void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
+
+	GxUserAccountBean findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespaceBean namespace);
 
 }

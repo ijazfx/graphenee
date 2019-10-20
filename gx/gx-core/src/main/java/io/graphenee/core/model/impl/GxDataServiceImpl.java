@@ -43,6 +43,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.AccessKeyType;
+import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.exception.RegisterDeviceFailedException;
 import io.graphenee.core.exception.UnregisterDeviceFailedException;
@@ -218,13 +219,14 @@ public class GxDataServiceImpl implements GxDataService {
 				save(adminGroup);
 			}
 			// create admin user
-			GxUserAccountBean admin = findUserAccountByUsername("admin");
+			GxUserAccountBean admin = findUserAccountByUsernameAndNamespace("admin", namespace);
 			if (admin == null) {
 				admin = new GxUserAccountBean();
 				admin.setUsername("admin");
 				admin.setPassword("change_on_install");
 				admin.setIsActive(true);
 				admin.setIsProtected(true);
+				admin.setNamespaceFault(BeanFault.beanFault(namespace.getOid(), namespace));
 				// save admin user
 				save(admin);
 			}
@@ -698,6 +700,12 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return accessKeyRepo.findAllByGxUserAccountOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 		}));
+		if (entity.getGxGender() != null)
+			bean.setGender(GenderEnum.valueOf(entity.getGxGender().getGenderCode()));
+		if (entity.getGxNamespace() != null)
+			bean.setNamespaceFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
+				return makeNamespaceBean(namespaceRepo.findOne(oid));
+			}));
 		return bean;
 	}
 
@@ -761,6 +769,16 @@ public class GxDataServiceImpl implements GxDataService {
 			});
 		}
 
+		if (bean.getGender() != null)
+			entity.setGxGender(genderRepo.findOneByGenderCode(bean.getGender().getGenderCode()));
+		else
+			entity.setGxGender(null);
+
+		if (bean.getNamespaceFault() != null)
+			entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceFault().getOid()));
+		else
+			entity.setGxNamespace(null);
+
 		return entity;
 	}
 
@@ -785,6 +803,12 @@ public class GxDataServiceImpl implements GxDataService {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
 			userAccountRepo.deleteById(bean.getOid());
 		}
+	}
+
+	@Override
+	public List<GxUserAccountBean> findUserAccountByNamespace(GxNamespaceBean namespace) {
+		List<GxUserAccount> users = userAccountRepo.findAllByGxNamespaceOid(namespace.getOid());
+		return users.stream().map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	@Override
@@ -1517,6 +1541,17 @@ public class GxDataServiceImpl implements GxDataService {
 		return makeUserAccountBean(userAccount);
 	}
 
+	@Override
+	public GxUserAccountBean findUserAccountByUsernameAndNamespace(String username, GxNamespaceBean namespaceBean) {
+		GxUserAccount userAccount = userAccountRepo.findByUsernameAndGxNamespaceOid(username, namespaceBean.getOid());
+		if (userAccount == null) {
+			userAccount = userAccountRepo.findByUsernameAndGxNamespaceIsNull(username);
+			if (userAccount == null)
+				return null;
+		}
+		return makeUserAccountBean(userAccount);
+	}
+
 	@Autowired
 	GxPasswordHistoryRepository gxPasswordHistoryRepo;
 
@@ -1525,6 +1560,28 @@ public class GxDataServiceImpl implements GxDataService {
 		GxUserAccount userAccount = userAccountRepo.findByUsername(username);
 		if (userAccount == null)
 			return null;
+		String encryptedPassword = CryptoUtil.createPasswordHash(password);
+		boolean authenticated = false;
+		if (userAccount.getPassword() != null && userAccount.getPassword().equals(password)) {
+			userAccount.setPassword(encryptedPassword);
+			userAccountRepo.save(userAccount);
+			authenticated = true;
+		} else if (userAccount.getPassword().equals(encryptedPassword)) {
+			authenticated = true;
+		}
+		if (!authenticated)
+			return null;
+		return makeUserAccountBean(userAccount);
+	}
+
+	@Override
+	public GxUserAccountBean findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespaceBean namespace) {
+		GxUserAccount userAccount = userAccountRepo.findByUsernameAndGxNamespaceOid(username, namespace.getOid());
+		if (userAccount == null) {
+			userAccount = userAccountRepo.findByUsernameAndGxNamespaceIsNull(username);
+			if (userAccount == null)
+				return null;
+		}
 		String encryptedPassword = CryptoUtil.createPasswordHash(password);
 		boolean authenticated = false;
 		if (userAccount.getPassword() != null && userAccount.getPassword().equals(password)) {

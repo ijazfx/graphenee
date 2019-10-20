@@ -233,7 +233,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
 	@Override
 	protected void postBinding(GxSecurityPolicyBean entity) {
-		List<GxUserAccountBean> userAccounts = dataService.findUserAccount();
+		List<GxUserAccountBean> userAccounts = dataService.findUserAccountByNamespace(entity.getNamespaceFault().getBean());
 		userAccountCollectionFault.addItems(userAccounts);
 		List<GxSecurityGroupBean> securityGroups = dataService.findSecurityGroupByNamespace(entity.getNamespaceFault().getBean());
 		securityGroupCollectionFault.addItems(securityGroups);
