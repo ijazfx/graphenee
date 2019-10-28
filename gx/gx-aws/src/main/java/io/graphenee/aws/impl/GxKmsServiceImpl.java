@@ -11,6 +11,7 @@ import com.amazonaws.services.kms.model.DecryptRequest;
 import com.amazonaws.services.kms.model.DecryptResult;
 import com.amazonaws.services.kms.model.EncryptRequest;
 import com.amazonaws.services.kms.model.EncryptResult;
+import com.amazonaws.util.Base64;
 
 import io.graphenee.aws.api.GxKmsService;
 
@@ -27,6 +28,30 @@ public class GxKmsServiceImpl implements GxKmsService {
 			builder.withRegion(region);
 		}
 		kmsClient = builder.build();
+	}
+
+	@Override
+	public String encryptAsBase64String(byte[] content) {
+		byte[] encrypted = encrypt(content);
+		return Base64.encodeAsString(encrypted);
+	}
+
+	@Override
+	public String decryptBase64AsString(byte[] encryptedContentBase64) {
+		byte[] decrypted = decrypt(Base64.decode(encryptedContentBase64));
+		return new String(decrypted);
+	}
+
+	@Override
+	public byte[] decryptBase64(byte[] encryptedContentBase64) {
+		byte[] decrypted = decrypt(Base64.decode(encryptedContentBase64));
+		return decrypted;
+	}
+
+	@Override
+	public String decryptAsString(byte[] encryptedContent) {
+		byte[] decrypted = decrypt(encryptedContent);
+		return new String(decrypted);
 	}
 
 	@Override

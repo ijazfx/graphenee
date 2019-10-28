@@ -12,9 +12,6 @@
 	<name>Graphenee AWS</name>
 	<description>AWS SDK wrapper for Graphenee</description>
 
-	<properties>
-		<version.aws>1.11.659</version.aws>
-	</properties>
 
 	<dependencies>
 		<dependency>
@@ -39,16 +36,5 @@
 		</dependency>
 	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.amazonaws</groupId>
-				<artifactId>aws-java-sdk-bom</artifactId>
-				<version>${version.aws}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 </project>
