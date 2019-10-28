@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.aws.api;
 
-public interface GxAwsService {
+public interface GxSnsService {
 
 	String sendTransactionalSMSMessage(String phone, String message);
 

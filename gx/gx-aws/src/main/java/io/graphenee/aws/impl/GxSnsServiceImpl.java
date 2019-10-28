@@ -19,17 +19,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClient;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.MessageAttributeValue;
 import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 
-import io.graphenee.aws.api.GxAwsService;
+import io.graphenee.aws.api.GxSnsService;
 
-public class GxAwsServiceImpl implements GxAwsService {
+public class GxSnsServiceImpl implements GxSnsService {
 
-	private AWSCredentialsProvider awsCredentialProvider;
+	private AmazonSNS snsClient;
+
+	public GxSnsServiceImpl(AWSCredentialsProvider credentialsProvider, String region) {
+		AmazonSNSClientBuilder builder = AmazonSNSClient.builder().withCredentials(credentialsProvider);
+		if (region != null) {
+			builder.withRegion(region);
+		}
+		snsClient = builder.build();
+	}
 
 	@Override
 	public String sendPromotionalSMSMessage(String phone, String message) {
@@ -43,7 +52,6 @@ public class GxAwsServiceImpl implements GxAwsService {
 
 	@Override
 	public String sendTransactionalSMSMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withRegion("eu-west-1").withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
@@ -63,7 +71,6 @@ public class GxAwsServiceImpl implements GxAwsService {
 
 	@Override
 	public String sendPromotionalSMSMessage(String senderId, String phone, String message) {
-		AmazonSNSClient snsClient = (AmazonSNSClient) AmazonSNSClientBuilder.standard().withCredentials(getAwsCredentialProvider()).build();
 		Map<String, MessageAttributeValue> smsAttributes = new HashMap<String, MessageAttributeValue>();
 		if (senderId != null) {
 			senderId = senderId.trim();
@@ -75,14 +82,6 @@ public class GxAwsServiceImpl implements GxAwsService {
 		if (publish != null)
 			return publish.getMessageId();
 		return null;
-	}
-
-	public AWSCredentialsProvider getAwsCredentialProvider() {
-		return awsCredentialProvider;
-	}
-
-	public void setAwsCredentialProvider(AWSCredentialsProvider awsCredentialProvider) {
-		this.awsCredentialProvider = awsCredentialProvider;
 	}
 
 }
