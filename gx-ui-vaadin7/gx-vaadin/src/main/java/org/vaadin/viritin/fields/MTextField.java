@@ -57,6 +57,10 @@ public class MTextField extends TextField implements EagerValidateable {
 
 	private void configureMaddonStuff() {
 		setNullRepresentation("");
+		setTextChangeEventMode(TextChangeEventMode.LAZY);
+		autocomplete = AutoComplete.off;
+		autocorrect = AutoCorrect.off;
+		autocapitalize = AutoCapitalize.off;
 	}
 
 	public MTextField(String caption) {
@@ -360,7 +364,7 @@ public class MTextField extends TextField implements EagerValidateable {
 			if (isRequired() && getLastKnownTextContent().isEmpty()) {
 				String errorMessage = getRequiredError();
 				if (errorMessage == null || errorMessage.length() == 0)
-					errorMessage = getCaption() + " is required";
+					errorMessage = "This field is required";
 				throw new Validator.EmptyValueException(errorMessage);
 			}
 			validate(getLastKnownTextContent());
