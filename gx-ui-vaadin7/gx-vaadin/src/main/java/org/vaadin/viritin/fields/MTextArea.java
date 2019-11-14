@@ -358,7 +358,10 @@ public class MTextArea extends TextArea implements EagerValidateable {
 		eagerValidationError = null;
 		try {
 			if (isRequired() && getLastKnownTextContent().isEmpty()) {
-				throw new Validator.EmptyValueException(getRequiredError());
+				String errorMessage = getRequiredError();
+				if (errorMessage == null || errorMessage.length() == 0)
+					errorMessage = getCaption() + " is required";
+				throw new Validator.EmptyValueException(errorMessage);
 			}
 			validate(getLastKnownTextContent());
 			if (!wasvalid) {
