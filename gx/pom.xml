@@ -92,18 +92,18 @@
 	<modules>
 		<module>gx-core</module>
 
-		
-		
+
+
 
 		<module>gx-i18n</module>
-		
+
 		<module>gx-security</module>
-		
-		
+
+
 		<module>gx-aws</module>
-		
+
 		<module>gx-sms</module>
-		
+
 	</modules>
 	<dependencyManagement>
 		<dependencies>
@@ -127,13 +127,13 @@
 			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>
-				<artifactId>commons-beanutils-core</artifactId>
-				<version>1.8.0</version>
+				<artifactId>commons-beanutils</artifactId>
+				<version>1.9.2</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils-bean-collections</artifactId>
-				<version>1.8.0</version>
+				<version>1.8.3</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
