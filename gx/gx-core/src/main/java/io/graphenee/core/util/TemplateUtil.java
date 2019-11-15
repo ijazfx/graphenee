@@ -72,9 +72,22 @@ public class TemplateUtil {
 	 * @return - Parsed string where keys are replaced with values
 	 */
 	public static String parseTemplateWithBean(String template, Object bean) {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> data = new BeanMap(bean);
-		return parseTemplateWithMap(template, data);
+		BeanMap bm = new BeanMap(bean);
+		StringBuffer sb = new StringBuffer();
+		Matcher m = KEY_PATTERN.matcher(template);
+
+		while (m.find()) {
+			Object value = bm.get(m.group(1));
+			if (value == null) {
+				m.appendReplacement(sb, "\\#\\{" + m.group(1) + "\\}");
+			} else {
+				m.appendReplacement(sb, (String) value);
+			}
+		}
+
+		m.appendTail(sb);
+
+		return sb.toString();
 	}
 
 	public static void main(String[] args) {

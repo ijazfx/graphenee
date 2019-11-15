@@ -128,11 +128,6 @@
 			</dependency>
 			<!-- vaadin add-ons -->
 			<dependency>
-				<groupId>org.vaadin</groupId>
-				<artifactId>viritin</artifactId>
-				<version>1.61</version>
-			</dependency>
-			<dependency>
 				<groupId>org.vaadin.addons</groupId>
 				<artifactId>vaadin-grid-util</artifactId>
 				<version>1.1.0</version>
