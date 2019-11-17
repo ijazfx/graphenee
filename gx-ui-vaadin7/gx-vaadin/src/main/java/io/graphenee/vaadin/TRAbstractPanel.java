@@ -79,7 +79,7 @@ public abstract class TRAbstractPanel extends MPanel {
 
 			content = createContent();
 
-			MVerticalLayout layout = new MVerticalLayout();
+			MVerticalLayout layout = new MVerticalLayout().withMargin(false).withSpacing(false);
 			layout.setSizeFull();
 			layout.addComponents(content);
 			setContent(layout);
