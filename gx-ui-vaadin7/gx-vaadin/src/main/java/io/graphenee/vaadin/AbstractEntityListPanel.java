@@ -46,6 +46,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -97,7 +98,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	private MVerticalLayout rootLayout;
 
-	private boolean rootLayoutMargin = false;
+	private MarginInfo rootLayoutMargin;
 
 	public AbstractEntityListPanel(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -225,7 +226,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin);
+			rootLayout = new MVerticalLayout();
+			showMargin();
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
 			rootLayout.setExpandRatio(mainGrid, 1);
@@ -673,9 +675,12 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	public AbstractEntityListPanel<T> withMargin(boolean margins) {
-		this.rootLayoutMargin = margins;
-		if (rootLayout != null)
-			rootLayout.setMargin(margins);
+		this.rootLayoutMargin = null;
+		return this;
+	}
+
+	public AbstractEntityListPanel<T> withMargin(MarginInfo marginInfo) {
+		this.rootLayoutMargin = marginInfo;
 		return this;
 	}
 
@@ -761,12 +766,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	public void showMargin() {
-		rootLayoutMargin = true;
-		rootLayout.setMargin(true);
+		if (rootLayoutMargin != null)
+			rootLayout.setMargin(rootLayoutMargin);
+		else
+			rootLayout.setMargin(true);
 	}
 
 	public void hideMargin() {
-		rootLayoutMargin = false;
 		rootLayout.setMargin(false);
 	}
 

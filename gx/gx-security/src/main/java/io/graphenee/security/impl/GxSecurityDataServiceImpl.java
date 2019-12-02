@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import io.graphenee.core.api.GxNamespaceService;
 import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.enums.AccessTypeStatus;
+import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
@@ -212,6 +213,12 @@ public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return gxAccessKeyRepository.findAllByGxUserAccountOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 		}));
+		if (entity.getGxGender() != null)
+			bean.setGender(GenderEnum.valueOf(entity.getGxGender().getGenderCode()));
+		if (entity.getGxNamespace() != null)
+			bean.setNamespaceFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
+				return makeNamespaceBean(namespaceRepo.findOne(oid));
+			}));
 		return bean;
 	}
 

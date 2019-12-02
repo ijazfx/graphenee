@@ -42,7 +42,7 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 			try {
 				R user = authenticate((C) credentials);
 				if (user.isPasswordChangeRequired()) {
-					VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
+					//					VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
 					String location = Page.getCurrent().getLocation().toString();
 					location = location.replaceAll("/login", "/reset-password");
 					Page.getCurrent().setLocation(location);

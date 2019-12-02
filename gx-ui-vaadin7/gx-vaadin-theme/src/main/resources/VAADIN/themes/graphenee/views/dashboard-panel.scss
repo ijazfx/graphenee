@@ -84,12 +84,13 @@
     	}
     	
     	.metro-tile-1 {
+    		-webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.0);
+			-moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.0);
+			box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.0);
 			width: 150px;
 			height: 150px;
-			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
-			transition-duration: 200ms;
-			transition-timing-function: ease-in;
 			border: none;
+			border-radius: $v-border-radius;
 			
 			.v-icon {
 				font-size: 48px;
@@ -97,13 +98,11 @@
 		}
 		
 		.metro-tile-1:hover {
-			transition-duration: 100ms;
-			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-			transition-timing-function: ease-out;
+			-webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.3);
+			-moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.3);
+			box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.3);
 			.v-panel-content  {
 				background: $gx-base-color;
-				transition-duration: 100ms;
-				transition-timing-function: ease-out;
 				* {
 					color: white;
 				}
@@ -111,12 +110,13 @@
 		}
 		
 		.metro-tile-2 {
+			-webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.0);
+			-moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.0);
+			box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.0);
 			width: 310px;
 			height: 150px;
-			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
-			transition-duration: 200ms;
-			transition-timing-function: ease-in;
 			border: none;
+			border-radius: $v-border-radius;
 			
 			.v-icon {
 				font-size: 48px;
@@ -124,13 +124,11 @@
 		}
 		
 		.metro-tile-2:hover {
-			box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-			transition-duration: 100ms;
-			transition-timing-function: ease-out;
+			-webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.3);
+			-moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.3);
+			box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.3);
 			.v-panel-content  {
 				background: $gx-base-color;
-				transition-duration: 100ms;
-				transition-timing-function: ease-out;
 				* {
 					color: white;
 				}

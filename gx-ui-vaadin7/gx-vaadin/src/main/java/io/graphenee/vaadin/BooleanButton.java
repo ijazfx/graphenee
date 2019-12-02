@@ -34,6 +34,7 @@ public abstract class BooleanButton extends Image {
 
 	public BooleanButton(boolean initialState) {
 		currentState = initialState;
+		setPrimaryStyleName("gx-boolean-button");
 		updateImage();
 		addClickListener(event -> {
 			try {
@@ -55,9 +56,11 @@ public abstract class BooleanButton extends Image {
 	private void updateImage() {
 		if (currentState) {
 			setSource(trueStateResource());
+			//setCaption("True");
 			markAsDirty();
 		} else {
 			setSource(falseStateResource());
+			//setCaption("False");
 			markAsDirty();
 		}
 	}

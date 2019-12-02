@@ -78,17 +78,12 @@ public class GxDashboardUser implements GxAuthenticatedUser {
 
 	@Override
 	public GenderEnum getGender() {
-		if (user.getGender() == null)
-			return GenderEnum.Undisclosed;
-		if (user.getGender().getGenderCode().equals(GenderEnum.Male.getGenderCode()))
-			return GenderEnum.Male;
-		if (user.getGender().getGenderCode().equals(GenderEnum.Female.getGenderCode()))
-			return GenderEnum.Female;
-		return GenderEnum.Undisclosed;
+		return user.getGender();
 	}
 
 	@Override
 	public void setGender(GenderEnum gender) {
+		user.setGender(gender);
 	}
 
 	@Override

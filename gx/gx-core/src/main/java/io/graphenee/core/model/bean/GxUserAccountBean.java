@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 
@@ -46,10 +47,10 @@ public class GxUserAccountBean implements Serializable {
 	private Boolean isActive = true;
 	private Boolean isLocked = false;
 	private Boolean isProtected = false;
-	private GxGenderBean gender;
+	private GenderEnum gender;
 	private Timestamp accountActivationDate;
 	private Integer countLoginFailed = 0;
-	private Boolean isPasswordChangeRequired = true;
+	private Boolean isPasswordChangeRequired = false;
 	private Timestamp lastLoginDate;
 	private Timestamp lastLoginFailedDate;
 	private String verificationToken;
@@ -151,11 +152,11 @@ public class GxUserAccountBean implements Serializable {
 		this.isProtected = isProtected;
 	}
 
-	public GxGenderBean getGender() {
+	public GenderEnum getGender() {
 		return gender;
 	}
 
-	public void setGender(GxGenderBean gender) {
+	public void setGender(GenderEnum gender) {
 		this.gender = gender;
 	}
 

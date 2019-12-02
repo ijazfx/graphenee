@@ -70,6 +70,8 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Override
 	protected List<GxUserAccountBean> fetchEntities() {
+		if (namespaceBean != null)
+			return dataService.findUserAccountByNamespace(namespaceBean);
 		return dataService.findUserAccount();
 	}
 

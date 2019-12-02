@@ -47,10 +47,10 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	Pattern pattern;
 	Matcher matcher;
 
-	private Boolean findPasswordAlreadyUsed(String username, String password, int maxHistory) {
+	private Boolean findPasswordAlreadyUsed(GxNamespaceBean namespace, String username, String password, int maxHistory) {
 		if (maxHistory > 0) {
 			String passwordHash = CryptoUtil.createPasswordHash(password);
-			GxUserAccountBean userAccountBean = gxDataService.findUserAccountByUsername(username);
+			GxUserAccountBean userAccountBean = gxDataService.findUserAccountByUsernameAndNamespace(username, namespace);
 			List<GxPasswordHistory> history = passwordHistoryRepo.findAllByGxUserAccountOidOrderByPasswordDateDesc(userAccountBean.getOid());
 			for (int i = 0; i < history.size() && i < maxHistory; i++) {
 				GxPasswordHistory passwordHistory = history.get(i);
@@ -130,13 +130,14 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 
 	@Override
 	public Boolean findPasswordIsValid(String namespace, String username, String password) {
+		GxNamespaceBean namespaceBean = gxDataService.findNamespace(namespace);
 		GxPasswordPolicy entity = gxPasswordPolicyRepo.findOneByGxNamespaceNamespaceAndIsActiveTrue(namespace);
 
 		if (findMinLengthExist(password, entity.getMinLength())
 				&& (!entity.getIsUserUsernameAllowed() || findMaxUsernameExist(username, password, entity.getMaxAllowedMatchingUserName()))
 				&& findMinUpperCaseCharExist(password, entity.getMinUppercase()) && findMinLowerCaseCharExist(password, entity.getMinLowercase())
 				&& findMinNumbersExist(password, entity.getMinNumbers()) && findMinSpecialCharExist(password, entity.getMinSpecialCharacters())
-				&& findPasswordAlreadyUsed(username, password, entity.getMaxHistory()))
+				&& findPasswordAlreadyUsed(namespaceBean, username, password, entity.getMaxHistory()))
 			return true;
 		return false;
 	}
@@ -164,7 +165,7 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			throw new AssertionError("Password must contain at least " + entity.getMinNumbers() + " digit(s).");
 		if (!findMinSpecialCharExist(password, entity.getMinSpecialCharacters()))
 			throw new AssertionError("Password must contain at least " + entity.getMinUppercase() + " special character(s).");
-		if (findPasswordAlreadyUsed(username, password, entity.getMaxHistory()))
+		if (findPasswordAlreadyUsed(entity.getGxNamespaceBeanFault().getBean(), username, password, entity.getMaxHistory()))
 			throw new AssertionError("Password has already been used, set a different password.");
 
 	}
@@ -253,8 +254,9 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 
 	@Override
 	public void changePassword(String namespace, String username, String oldPassword, String newPassword) throws ChangePasswordFailedException {
+		GxNamespaceBean namespaceBean = gxDataService.findNamespace(namespace);
 		// fields validation apply
-		GxUserAccountBean userAccountBean = gxDataService.findUserAccountByUsernameAndPassword(username, oldPassword);
+		GxUserAccountBean userAccountBean = gxDataService.findUserAccountByUsernamePasswordAndNamespace(username, oldPassword, namespaceBean);
 		if (userAccountBean == null)
 			throw new ChangePasswordFailedException("Current password did not match.");
 
@@ -299,7 +301,7 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			userAccount.setPassword(encryptedPassword);
 			userAccountRepo.save(userAccount);
 		} else {
-			GxUserAccount userAccount = userAccountRepo.findByUsername(username);
+			GxUserAccount userAccount = userAccountRepo.findByUsernameAndGxNamespaceOid(username, namespaceBean.getOid());
 			String encryptedPassword = CryptoUtil.createPasswordHash(newPassword);
 			userAccount.setIsPasswordChangeRequired(false);
 			userAccount.setPassword(encryptedPassword);

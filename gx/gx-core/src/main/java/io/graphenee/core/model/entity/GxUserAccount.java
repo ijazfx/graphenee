@@ -119,6 +119,10 @@ public class GxUserAccount implements Serializable {
 	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
 	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
 
+	@ManyToOne
+	@JoinColumn(name = "oid_namespace")
+	private GxNamespace gxNamespace;
+
 	public GxUserAccount() {
 	}
 
@@ -318,6 +322,14 @@ public class GxUserAccount implements Serializable {
 
 	public void setGxAccessKeys(List<GxAccessKey> gxAccessKeys) {
 		this.gxAccessKeys = gxAccessKeys;
+	}
+
+	public GxNamespace getGxNamespace() {
+		return gxNamespace;
+	}
+
+	public void setGxNamespace(GxNamespace gxNamespace) {
+		this.gxNamespace = gxNamespace;
 	}
 
 }

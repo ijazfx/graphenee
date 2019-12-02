@@ -26,14 +26,24 @@ import io.graphenee.core.model.jpa.GxJpaRepository;
 @Repository
 public interface GxUserAccountRepository extends GxJpaRepository<GxUserAccount, Integer> {
 
+	List<GxUserAccount> findAllByGxNamespaceOid(Integer oidNamespace);
+
 	List<GxUserAccount> findAllByGxSecurityGroupsOidEquals(Integer oidSecurityGroup);
 
 	List<GxUserAccount> findAllByGxSecurityPoliciesOidEquals(Integer oidSecurityPolicy);
+
+	GxUserAccount findByUsernameAndGxNamespaceOid(String username, Integer oidNamespace);
+
+	GxUserAccount findByUsernameAndGxNamespaceIsNull(String username);
 
 	GxUserAccount findByUsername(String username);
 
 	GxUserAccount findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(UUID accessKey);
 
 	GxUserAccount findByUsernameAndPassword(String username, String password);
+
+	GxUserAccount findByUsernameAndPasswordAndGxNamespaceOid(String username, String password, Integer oidNamespace);
+
+	GxUserAccount findByUsernameAndPasswordAndGxNamespaceIsNull(String username, String password);
 
 }

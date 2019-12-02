@@ -15,14 +15,11 @@
  *******************************************************************************/
 package io.graphenee.aws.api;
 
-public interface GxAwsService {
+public interface GxS3Service {
 
-	String sendTransactionalSMSMessage(String phone, String message);
+	boolean doesBucketExists(String bucketName);
 
-	String sendPromotionalSMSMessage(String phone, String message);
+	boolean doesObjectExist(String bucketName, String objectName);
 
-	String sendTransactionalSMSMessage(String senderId, String phone, String message);
-
-	String sendPromotionalSMSMessage(String senderId, String phone, String message);
-
+	boolean doesObjectExist(String objectName);
 }

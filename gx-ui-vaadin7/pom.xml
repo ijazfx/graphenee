@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx-ui-vaadin7</artifactId>
-	<version>1.0.1</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Graphenee UI Vaadin 7</name>
 	<build>
@@ -128,11 +128,6 @@
 			</dependency>
 			<!-- vaadin add-ons -->
 			<dependency>
-				<groupId>org.vaadin</groupId>
-				<artifactId>viritin</artifactId>
-				<version>1.61</version>
-			</dependency>
-			<dependency>
 				<groupId>org.vaadin.addons</groupId>
 				<artifactId>vaadin-grid-util</artifactId>
 				<version>1.1.0</version>
@@ -228,14 +223,6 @@
 
 	<repositories>
 		<repository>
-			<id>jcenter</id>
-			<url>http://jcenter.bintray.com/</url>
-		</repository>
-		<repository>
-			<id>vaadin-addons</id>
-			<url>http://maven.vaadin.com/vaadin-addons/</url>
-		</repository>
-		<repository>
 			<id>jasperreports</id>
 			<url>http://jasperreports.sourceforge.net/maven2/</url>
 		</repository>
@@ -244,15 +231,20 @@
 			<url>https://jaspersoft.artifactoryonline.com/jaspersoft/jr-ce-releases/</url>
 		</repository>
 		<repository>
-         		<id>snapshots-repo</id>
-         		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-         		<releases>
-				<enabled>false</enabled>
-			</releases>
-         		<snapshots>
+			<id>jcenter</id>
+			<url>http://jcenter.bintray.com/</url>
+		</repository>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons/</url>
+		</repository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-       		</repository>
+		</repository>
 	</repositories>
 
 	<properties>
