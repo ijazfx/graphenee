@@ -138,11 +138,6 @@
 				<version>1.1</version>
 			</dependency>
 			<dependency>
-				<groupId>org.vaadin.addon</groupId>
-				<artifactId>easyuploads</artifactId>
-				<version>7.4.10</version>
-			</dependency>
-			<dependency>
 				<groupId>com.vaadin.addon</groupId>
 				<artifactId>vaadin-context-menu</artifactId>
 				<version>0.7.5</version>
