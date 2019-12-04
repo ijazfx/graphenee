@@ -223,18 +223,6 @@
 
 	<repositories>
 		<repository>
-			<id>jasperreports</id>
-			<url>http://jasperreports.sourceforge.net/maven2/</url>
-		</repository>
-		<repository>
-			<id>jaspersoft</id>
-			<url>https://jaspersoft.artifactoryonline.com/jaspersoft/jr-ce-releases/</url>
-		</repository>
-		<repository>
-			<id>jcenter</id>
-			<url>http://jcenter.bintray.com/</url>
-		</repository>
-		<repository>
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons/</url>
 		</repository>
@@ -250,7 +238,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.java.persistence>2.1.1</version.java.persistence>
-		<version.vaadin>7.7.15</version.vaadin>
+		<version.vaadin>7.7.17</version.vaadin>
 		<version.vaadin.spring>1.2.0</version.vaadin.spring>
 	</properties>
 
