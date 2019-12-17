@@ -25,6 +25,10 @@
 		<class>io.graphenee.core.model.entity.GxPasswordHistory</class>
 		<class>io.graphenee.core.model.entity.GxPasswordPolicy</class>
 		<class>io.graphenee.core.model.entity.GxRegisteredDevice</class>
+		<class>io.graphenee.core.model.entity.GxAccount</class>
+		<class>io.graphenee.core.model.entity.GxAccountType</class>
+		<class>io.graphenee.core.model.entity.GxTransaction</class>
+		<class>io.graphenee.core.model.entity.GxVoucher</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>
