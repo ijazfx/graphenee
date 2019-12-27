@@ -2,6 +2,7 @@ create sequence gx_account_type_seq;
 create sequence gx_account_seq;
 create sequence gx_voucher_seq;
 create sequence gx_transaction_seq;
+create sequence gx_account_balance_seq;
 
 create table gx_account_type (
 	oid integer not null default nextval('gx_account_type_seq'::regclass),
@@ -27,6 +28,7 @@ create table gx_voucher (
 	oid integer not null default nextval('gx_voucher_seq'::regclass),
 	voucher_number varchar(20),
 	voucher_date timestamp not null,
+	description varchar(200) not null,
 	oid_namespace integer not null,
 	foreign key (oid_namespace) references gx_namespace(oid) on delete restrict on update cascade,
 	primary key (oid)
@@ -35,9 +37,8 @@ create table gx_voucher (
 create table gx_transaction (
 	oid integer not null default nextval('gx_transaction_seq'::regclass),
 	transaction_date timestamp not null,
-	credit double precision not null default 0,
-	debit double precision not null default 0,
-	description varchar(200) not null,
+	amount double precision not null default 0,
+	description varchar(200),
 	oid_account integer not null,
 	oid_namespace integer not null,
 	foreign key (oid_account) references gx_account(oid) on delete restrict on update cascade,
@@ -57,3 +58,12 @@ insert into gx_account_type (type_name, type_code) values ('Liability', 'LI');
 insert into gx_account_type (type_name, type_code) values ('Equity', 'EQ');
 insert into gx_account_type (type_name, type_code) values ('Expense', 'EX');
 insert into gx_account_type (type_name, type_code) values ('Income', 'IN');
+
+create table gx_account_balance (
+	oid integer not null default nextval('gx_account_balance_seq'::regclass),
+	oid_account integer not null,
+	opening_balance double precision not null default 0,
+	opening_year timestamp not null,
+	foreign key (oid_account) references gx_account(oid) on delete restrict on update cascade,
+	primary key (oid)
+);

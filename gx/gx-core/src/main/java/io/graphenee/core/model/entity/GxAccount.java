@@ -58,6 +58,9 @@ public class GxAccount extends io.graphenee.core.model.GxMappedSuperclass implem
 	@OneToMany(mappedBy = "gxAccount", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<GxTransaction> gxTransactions = new ArrayList<GxTransaction>();
 
+	@OneToMany(mappedBy = "gxAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<GxAccountBalance> gxAccountBalances = new ArrayList<>();
+
 	public GxAccount() {
 	}
 
@@ -151,6 +154,28 @@ public class GxAccount extends io.graphenee.core.model.GxMappedSuperclass implem
 
 	public void setGxNamespace(GxNamespace gxNamespace) {
 		this.gxNamespace = gxNamespace;
+	}
+
+	public List<GxAccountBalance> getGxAccountBalances() {
+		return gxAccountBalances;
+	}
+
+	public void setGxAccountBalances(List<GxAccountBalance> gxAccountBalances) {
+		this.gxAccountBalances = gxAccountBalances;
+	}
+
+	public GxAccountBalance addGxAccountBalance(GxAccountBalance gxAccountBalance) {
+		getGxAccountBalances().add(gxAccountBalance);
+		gxAccountBalance.setGxAccount(this);
+
+		return gxAccountBalance;
+	}
+
+	public GxAccountBalance removeGxAccountBalance(GxAccountBalance gxAccountBalance) {
+		getGxAccountBalances().remove(gxAccountBalance);
+		gxAccountBalance.setGxAccount(null);
+
+		return gxAccountBalance;
 	}
 
 }

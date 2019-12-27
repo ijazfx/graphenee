@@ -29,6 +29,9 @@
 		<class>io.graphenee.core.model.entity.GxAccountType</class>
 		<class>io.graphenee.core.model.entity.GxTransaction</class>
 		<class>io.graphenee.core.model.entity.GxVoucher</class>
+		<class>io.graphenee.core.model.entity.GxGeneralLedger</class>
+		<class>io.graphenee.core.model.entity.GxTrialBalance</class>
+		<class>io.graphenee.core.model.entity.GxAccountBalance</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>

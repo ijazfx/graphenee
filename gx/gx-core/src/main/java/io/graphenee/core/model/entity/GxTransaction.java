@@ -30,9 +30,7 @@ public class GxTransaction extends io.graphenee.core.model.GxMappedSuperclass im
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
-	private Double credit;
-
-	private Double debit;
+	private Double amount;
 
 	private String description;
 
@@ -103,20 +101,12 @@ public class GxTransaction extends io.graphenee.core.model.GxMappedSuperclass im
 		this.gxNamespace = gxNamespace;
 	}
 
-	public Double getCredit() {
-		return credit;
+	public Double getAmount() {
+		return amount;
 	}
 
-	public void setCredit(Double credit) {
-		this.credit = credit;
-	}
-
-	public Double getDebit() {
-		return debit;
-	}
-
-	public void setDebit(Double debit) {
-		this.debit = debit;
+	public void setAmount(Double amount) {
+		this.amount = amount;
 	}
 
 }

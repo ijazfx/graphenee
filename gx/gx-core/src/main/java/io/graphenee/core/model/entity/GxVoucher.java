@@ -42,6 +42,8 @@ public class GxVoucher extends io.graphenee.core.model.GxMappedSuperclass implem
 	@Column(name = "voucher_number")
 	private String voucherNumber;
 
+	private String description;
+
 	//bi-directional many-to-many association to GxTransaction
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "gx_voucher_transaction_join", joinColumns = { @JoinColumn(name = "oid_voucher") }, inverseJoinColumns = { @JoinColumn(name = "oid_transaction") })
@@ -88,6 +90,14 @@ public class GxVoucher extends io.graphenee.core.model.GxMappedSuperclass implem
 
 	public void setGxNamespace(GxNamespace gxNamespace) {
 		this.gxNamespace = gxNamespace;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

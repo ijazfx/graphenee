@@ -18,6 +18,7 @@ public class GxAccountBean implements Serializable {
 	private BeanFault<Integer, GxAccountBean> gxParentAccountBeanFault;
 	private BeanCollectionFault<GxAccountBean> gxChildAccountBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxTransactionBean> gxTransactionBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
+	private BeanCollectionFault<GxAccountBalanceBean> gxAccountBalanceBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
 
 	public Integer getOid() {
 		return oid;
@@ -83,6 +84,14 @@ public class GxAccountBean implements Serializable {
 		this.gxTransactionBeanCollectionFault = gxTransactionBeanCollectionFault;
 	}
 
+	public BeanCollectionFault<GxAccountBalanceBean> getGxAccountBalanceBeanCollectionFault() {
+		return gxAccountBalanceBeanCollectionFault;
+	}
+
+	public void setGxAccountBalanceBeanCollectionFault(BeanCollectionFault<GxAccountBalanceBean> gxAccountBalanceBeanCollectionFault) {
+		this.gxAccountBalanceBeanCollectionFault = gxAccountBalanceBeanCollectionFault;
+	}
+
 	public String getAccountType() {
 		return getGxAccountTypeBeanFault() != null ? getGxAccountTypeBeanFault().getBean().getTypeName() : null;
 	}
@@ -104,6 +113,10 @@ public class GxAccountBean implements Serializable {
 		}
 
 		return childAccounts;
+	}
+
+	public String getAccountNameWithCode() {
+		return accountCode + " - " + accountName;
 	}
 
 	@Override
@@ -133,7 +146,7 @@ public class GxAccountBean implements Serializable {
 
 	@Override
 	public String toString() {
-		return accountName;
+		return accountCode + " - " + accountName;
 	}
 
 }

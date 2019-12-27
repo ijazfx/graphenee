@@ -12,6 +12,7 @@ public class GxVoucherBean implements Serializable {
 	private Integer oid;
 	private Timestamp voucherDate;
 	private String voucherNumber;
+	private String description;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 	private BeanCollectionFault<GxTransactionBean> gxTransactionBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
 
@@ -53,6 +54,22 @@ public class GxVoucherBean implements Serializable {
 
 	public void setGxTransactionBeanCollectionFault(BeanCollectionFault<GxTransactionBean> gxTransactionBeanCollectionFault) {
 		this.gxTransactionBeanCollectionFault = gxTransactionBeanCollectionFault;
+	}
+
+	public Double getDebitTotal() {
+		return getGxTransactionBeanCollectionFault().getBeans().stream().mapToDouble(GxTransactionBean::getDebit).sum();
+	}
+
+	public Double getCreditTotal() {
+		return getGxTransactionBeanCollectionFault().getBeans().stream().mapToDouble(GxTransactionBean::getCredit).sum();
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	@Override

@@ -1,5 +1,8 @@
 package io.graphenee.accounting.vaadin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MTextField;
@@ -45,12 +48,8 @@ public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
 			@Override
 			public void validate(Object value) throws InvalidValueException {
 				if (value != null && !value.toString().isEmpty() && !value.toString().equals("0")) {
-					GxAccountBean accountBean = null;
-					if (getEntity().getGxNamespaceBeanFault() != null) {
-						accountBean = accountingDataService.findByAccountNumberAndNamespace(Integer.parseInt(value.toString()), getEntity().getGxNamespaceBeanFault().getBean());
-					} else {
-						accountBean = accountingDataService.findByAccountNumber(Integer.parseInt(value.toString()));
-					}
+					GxAccountBean accountBean = accountingDataService.findByAccountNumberAndNamespace(Integer.parseInt(value.toString()),
+							getEntity().getGxNamespaceBeanFault().getBean());
 					if (accountBean != null && (getEntity().getOid() == null || accountBean.getOid().intValue() != getEntity().getOid().intValue())) {
 						String message = "Account already exist against account code %s";
 						message = String.format(message, value.toString());
@@ -72,10 +71,8 @@ public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
 		gxParentAccountBeanFault.addValueChangeListener(listener -> {
 			if (listener.getProperty().getValue() != null) {
 				GxAccountBean accountBean = (GxAccountBean) listener.getProperty().getValue();
-				if (accountBean != null) {
-					gxAccountTypeBeanFault.setValue(accountBean.getGxAccountTypeBeanFault().getBean());
-					gxAccountTypeBeanFault.setReadOnly(true);
-				}
+				gxAccountTypeBeanFault.setValue(accountBean.getGxAccountTypeBeanFault().getBean());
+				gxAccountTypeBeanFault.setReadOnly(true);
 			} else {
 				gxAccountTypeBeanFault.setReadOnly(false);
 				gxAccountTypeBeanFault.setValue(null);
@@ -90,6 +87,21 @@ public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
 		gxAccountTypeBeanFault.setContainerDataSource(accountTypeBeanContainer);
 		gxAccountTypeBeanFault.setConverter(new BeanFaultToBeanConverter(GxAccountBean.class));
 
+		gxAccountTypeBeanFault.addValueChangeListener(listener -> {
+			if (listener.getProperty().getValue() != null) {
+				GxAccountTypeBean accountTypeBean = (GxAccountTypeBean) listener.getProperty().getValue();
+				List<GxAccountBean> accountBeans = accountingDataService.findAllAccountsByNamespaceAndAccountType(getEntity().getGxNamespaceBeanFault().getBean(), accountTypeBean);
+
+				accountBeans.removeAll(getEntity().getAllChildAccounts());
+
+				if (getEntity().getOid() != null)
+					accountBeans.remove(getEntity());
+
+				accountBeanContainer.removeAllItems();
+				accountBeanContainer.addAll(accountBeans);
+			}
+		});
+
 		form.addComponents(accountCode, accountName, gxParentAccountBeanFault, gxAccountTypeBeanFault);
 	}
 
@@ -101,18 +113,38 @@ public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
 	@Override
 	protected void preBinding(GxAccountBean entity) {
 		super.preBinding(entity);
-		if (entity.getGxNamespaceBeanFault() != null)
-			accountBeanContainer.addAll(accountingDataService.findAllAccountsByNamespace(entity.getGxNamespaceBeanFault().getBean()));
-		else
-			accountBeanContainer.addAll(accountingDataService.findAllAccounts());
-		if (entity.getOid() != null && accountBeanContainer.size() > 0)
-			accountBeanContainer.removeItem(entity);
+
+		List<GxAccountBean> accountBeans = accountingDataService.findAllAccountsByNamespace(entity.getGxNamespaceBeanFault().getBean());
+		accountBeans.removeAll(entity.getAllChildAccounts());
+
+		if (entity.getOid() != null)
+			accountBeans.remove(entity);
+
+		if (entity.getGxAccountTypeBeanFault() != null)
+			accountBeans = accountBeans.stream().filter(ab -> ab.getGxAccountTypeBeanFault().getOid().intValue() == entity.getGxAccountTypeBeanFault().getOid().intValue())
+					.collect(Collectors.toList());
+
+		accountBeanContainer.removeAllItems();
+		accountBeanContainer.addAll(accountBeans);
 		accountTypeBeanContainer.addAll(accountingDataService.findAllAccountTypes());
+	}
+
+	@Override
+	protected void postBinding(GxAccountBean entity) {
+		super.postBinding(entity);
+		if (entity.getGxParentAccountBeanFault() != null) {
+			gxAccountTypeBeanFault.setReadOnly(true);
+		}
 	}
 
 	@Override
 	protected String formTitle() {
 		return "Account Form";
+	}
+
+	@Override
+	protected String popupHeight() {
+		return "250px";
 	}
 
 }

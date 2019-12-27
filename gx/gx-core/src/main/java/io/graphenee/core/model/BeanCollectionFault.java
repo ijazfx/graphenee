@@ -50,11 +50,15 @@ public class BeanCollectionFault<T> {
 	}
 
 	public static <T> BeanCollectionFault<T> emptyCollectionFault() {
-		return new BeanCollectionFault<>(new ArrayList<>());
+		return new BeanCollectionFault<>(() -> {
+			return new ArrayList<>();
+		});
 	}
 
 	public static <T> BeanCollectionFault<T> collectionFault(Collection<T> collection) {
-		return new BeanCollectionFault<>(collection);
+		return new BeanCollectionFault<>(() -> {
+			return collection;
+		});
 	}
 
 	public static <T> BeanCollectionFault<T> collectionFault(Supplier<Collection<T>> resolver) {
