@@ -12,6 +12,7 @@ import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.model.api.GxBeanFactory;
 import io.graphenee.core.model.api.GxEntityFactory;
 import io.graphenee.core.model.bean.GxAccountBean;
+import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
@@ -22,6 +23,7 @@ import io.graphenee.core.model.entity.GxAccount;
 import io.graphenee.core.model.entity.GxAccountType;
 import io.graphenee.core.model.entity.GxGeneralLedger;
 import io.graphenee.core.model.entity.GxVoucher;
+import io.graphenee.core.model.jpa.repository.GxAccountConfigurationRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxGeneralLedgerRepository;
@@ -57,6 +59,9 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Autowired
 	GxTrialBalanceRepository trialBalanceRepository;
+
+	@Autowired
+	GxAccountConfigurationRepository accountConfigurationRepository;
 
 	@Override
 	public List<GxAccountTypeBean> findAllAccountTypes() {
@@ -211,6 +216,17 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	@Override
 	public Double findAccountBalanceByAccountAndChildAccountsAndDateIsBefore(List<Integer> oids, Timestamp date) {
 		return generalLedgerRepository.findBalanceByAccountAndChildAccountsAndDateIsBefore(oids, date);
+	}
+
+	@Override
+	public GxAccountConfigurationBean findAccountConfigurationByNamespace(GxNamespaceBean namespaceBean) {
+		return beanFactory.makeGxAccountConfigurationBean(accountConfigurationRepository.findTop1ByGxNamespaceOid(namespaceBean.getOid()));
+	}
+
+	@Override
+	public GxAccountConfigurationBean createOrUpdate(GxAccountConfigurationBean bean) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

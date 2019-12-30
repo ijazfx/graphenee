@@ -27,8 +27,8 @@ select
 	ac.oid as oid_account,
 	ac.oid_account_type,
 	act.type_name as account_type_name,
-	(case when t.amount < 0 then sum(t.amount) else 0.0 end) as debit,
-	(case when t.amount > 0 then sum(t.amount) else 0.0 end) as credit,
+	(case when t.amount < 0 then sum(t.amount) else 0.0 end) as credit,
+	(case when t.amount > 0 then sum(t.amount) else 0.0 end) as debit,
 	t.oid_namespace
 from gx_transaction as t, gx_account as ac,  gx_account_type as act
 where t.oid_account = ac.oid and act.oid = ac.oid_account_type

@@ -32,6 +32,7 @@
 		<class>io.graphenee.core.model.entity.GxGeneralLedger</class>
 		<class>io.graphenee.core.model.entity.GxTrialBalance</class>
 		<class>io.graphenee.core.model.entity.GxAccountBalance</class>
+		<class>io.graphenee.core.model.entity.GxAccountConfiguration</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>

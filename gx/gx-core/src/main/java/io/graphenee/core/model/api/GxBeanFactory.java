@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.bean.GxAccountBean;
+import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
@@ -18,6 +19,7 @@ import io.graphenee.core.model.bean.GxTransactionBean;
 import io.graphenee.core.model.bean.GxTrialBalanceBean;
 import io.graphenee.core.model.bean.GxVoucherBean;
 import io.graphenee.core.model.entity.GxAccount;
+import io.graphenee.core.model.entity.GxAccountConfiguration;
 import io.graphenee.core.model.entity.GxAccountType;
 import io.graphenee.core.model.entity.GxGeneralLedger;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -94,12 +96,13 @@ public class GxBeanFactory {
 		bean.setOid(entity.getOid());
 
 		if (entity.getAmount() > 0)
-			bean.setCredit(entity.getAmount());
+			bean.setDebit(entity.getAmount());
 		else
-			bean.setDebit(Math.abs(entity.getAmount()));
+			bean.setCredit(Math.abs(entity.getAmount()));
 
 		bean.setDescription(entity.getDescription());
 		bean.setTransactionDate(entity.getTransactionDate());
+		bean.setIsArchived(entity.getIsArchived());
 		if (entity.getGxNamespace() != null) {
 			bean.setGxNamespaceBeanFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
 				return makeNamespaceBean(namespaceRepository.findOne(oid));
@@ -201,6 +204,18 @@ public class GxBeanFactory {
 		bean.setAccountTypeName(entity.getAccountTypeName());
 		bean.setDebit(entity.getDebit());
 		bean.setCredit(entity.getCredit());
+
+		return bean;
+	}
+
+	public GxAccountConfigurationBean makeGxAccountConfigurationBean(GxAccountConfiguration entity) {
+		GxAccountConfigurationBean bean = new GxAccountConfigurationBean();
+		bean.setOid(entity.getOid());
+		bean.setVoucherNumber(entity.getVoucherNumber());
+		bean.setFiscalYearStart(entity.getFiscalYearStart());
+		bean.setGxNamespaceBeanFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
+			return makeNamespaceBean(namespaceRepository.findOne(oid));
+		}));
 
 		return bean;
 	}

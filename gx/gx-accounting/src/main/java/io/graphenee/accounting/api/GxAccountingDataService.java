@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import io.graphenee.core.model.bean.GxAccountBean;
+import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
@@ -58,5 +59,9 @@ public interface GxAccountingDataService {
 
 	List<GxGeneralLedgerBean> findAllByAccountAndChildAccountsAndNamespaceAndDateRangeOrderByTransactionDateAsc(GxAccountBean selectedAccount, GxNamespaceBean namespaceBean,
 			Timestamp fromDate, Timestamp toDate);
+
+	GxAccountConfigurationBean findAccountConfigurationByNamespace(GxNamespaceBean namespanceBean);
+
+	GxAccountConfigurationBean createOrUpdate(GxAccountConfigurationBean bean);
 
 }

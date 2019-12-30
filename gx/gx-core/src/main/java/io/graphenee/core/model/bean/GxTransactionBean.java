@@ -15,6 +15,7 @@ public class GxTransactionBean implements Serializable {
 	private Double debit = 0.0;
 	private Double credit = 0.0;
 	private String description;
+	private Boolean isArchived = false;
 	private Timestamp transactionDate;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 	private BeanFault<Integer, GxAccountBean> gxAccountBeanFault;
@@ -75,6 +76,14 @@ public class GxTransactionBean implements Serializable {
 		this.gxAccountBeanFault = gxAccountBeanFault;
 	}
 
+	public Boolean getIsArchived() {
+		return isArchived;
+	}
+
+	public void setIsArchived(Boolean isArchived) {
+		this.isArchived = isArchived;
+	}
+
 	public String getAccountName() {
 		return getGxAccountBeanFault() != null ? getGxAccountBeanFault().getBean().getAccountName() : null;
 	}
@@ -84,7 +93,7 @@ public class GxTransactionBean implements Serializable {
 	}
 
 	public Double getAmount() {
-		return credit > 0 ? credit : (-debit);
+		return debit > 0 ? debit : (-credit);
 	}
 
 	@Override

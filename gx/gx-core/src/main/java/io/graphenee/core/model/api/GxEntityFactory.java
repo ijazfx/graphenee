@@ -80,6 +80,7 @@ public class GxEntityFactory {
 
 		entity.setTransactionDate(bean.getTransactionDate());
 		entity.setDescription(bean.getDescription());
+		entity.setIsArchived(bean.getIsArchived());
 		if (bean.getGxNamespaceBeanFault() != null) {
 			entity.setGxNamespace(namespaceRepository.findOne(bean.getGxNamespaceBeanFault().getOid()));
 		}

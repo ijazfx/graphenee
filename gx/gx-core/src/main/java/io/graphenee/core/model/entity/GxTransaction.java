@@ -41,6 +41,9 @@ public class GxTransaction extends io.graphenee.core.model.GxMappedSuperclass im
 	@Column(name = "transaction_date")
 	private Timestamp transactionDate;
 
+	@Column(name = "is_archived")
+	private Boolean isArchived;
+
 	//bi-directional many-to-one association to GxAccount
 	@ManyToOne
 	@JoinColumn(name = "oid_account")
@@ -107,6 +110,14 @@ public class GxTransaction extends io.graphenee.core.model.GxMappedSuperclass im
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+
+	public Boolean getIsArchived() {
+		return isArchived;
+	}
+
+	public void setIsArchived(Boolean isArchived) {
+		this.isArchived = isArchived;
 	}
 
 }
