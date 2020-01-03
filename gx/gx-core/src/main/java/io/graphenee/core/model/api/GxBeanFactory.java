@@ -12,7 +12,9 @@ import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
+import io.graphenee.core.model.bean.GxBalanceSheetBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
+import io.graphenee.core.model.bean.GxIncomeStatementBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxNamespacePropertyBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
@@ -25,7 +27,6 @@ import io.graphenee.core.model.entity.GxGeneralLedger;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxNamespaceProperty;
 import io.graphenee.core.model.entity.GxTransaction;
-import io.graphenee.core.model.entity.GxTrialBalance;
 import io.graphenee.core.model.entity.GxVoucher;
 import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
@@ -60,6 +61,7 @@ public class GxBeanFactory {
 		bean.setOid(entity.getOid());
 		bean.setTypeCode(entity.getTypeCode());
 		bean.setTypeName(entity.getTypeName());
+		bean.setAccountNumberSequence(entity.getAccountNumberSequence());
 
 		return bean;
 	}
@@ -193,17 +195,14 @@ public class GxBeanFactory {
 		return generalLedger;
 	}
 
-	public GxTrialBalanceBean makeGxTrialBalanceBean(GxTrialBalance entity) {
+	public GxTrialBalanceBean makeGxTrialBalanceBean(Object[] row) {
 		GxTrialBalanceBean bean = new GxTrialBalanceBean();
-		bean.setOid(entity.getOid());
-		bean.setMonth(entity.getMonth());
-		bean.setYear(entity.getYear());
-		bean.setAccountName(entity.getAccountName());
-		bean.setOidAccount(entity.getOidAccount());
-		bean.setOidAccountType(entity.getOidAccountType());
-		bean.setAccountTypeName(entity.getAccountTypeName());
-		bean.setDebit(entity.getDebit());
-		bean.setCredit(entity.getCredit());
+		bean.setAccountName((String) row[0]);
+		bean.setOidAccount((Integer) row[1]);
+		bean.setOidAccountType((Integer) row[2]);
+		bean.setAccountTypeName((String) row[3]);
+		bean.setDebit((Double) row[4]);
+		bean.setCredit(Math.abs((Double) row[5]));
 
 		return bean;
 	}
@@ -216,6 +215,32 @@ public class GxBeanFactory {
 		bean.setGxNamespaceBeanFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
 			return makeNamespaceBean(namespaceRepository.findOne(oid));
 		}));
+
+		return bean;
+	}
+
+	public GxBalanceSheetBean makeGxBalanceSheetBean(Object[] row) {
+		GxBalanceSheetBean bean = new GxBalanceSheetBean();
+		bean.setAccountName((String) row[0]);
+		bean.setOidAccount((Integer) row[1]);
+		bean.setOidParentAccount((Integer) row[2]);
+		bean.setParentAccountName((String) row[3]);
+		bean.setOidAccountType((Integer) row[4]);
+		bean.setAccountTypeName((String) row[5]);
+		bean.setAccountTypeCode((String) row[6]);
+		bean.setAmount(Math.abs((Double) row[7]));
+
+		return bean;
+	}
+
+	public GxIncomeStatementBean makeGxIncomeStatementBean(Object[] row) {
+		GxIncomeStatementBean bean = new GxIncomeStatementBean();
+		bean.setAccountName((String) row[0]);
+		bean.setOidAccount((Integer) row[1]);
+		bean.setOidAccountType((Integer) row[2]);
+		bean.setAccountTypeName((String) row[3]);
+		bean.setAccountTypeCode((String) row[4]);
+		bean.setAmount(Math.abs((Double) row[5]));
 
 		return bean;
 	}

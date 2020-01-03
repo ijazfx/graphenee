@@ -2,6 +2,7 @@ package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 import io.graphenee.core.model.BeanFault;
 
@@ -43,6 +44,15 @@ public class GxAccountConfigurationBean implements Serializable {
 
 	public void setGxNamespaceBeanFault(BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault) {
 		this.gxNamespaceBeanFault = gxNamespaceBeanFault;
+	}
+
+	public Timestamp getFiscalYearEnd() {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(getFiscalYearStart());
+		cal.add(Calendar.YEAR, 1);
+		cal.add(Calendar.DAY_OF_MONTH, -1);
+
+		return new Timestamp(cal.getTime().getTime());
 	}
 
 	@Override

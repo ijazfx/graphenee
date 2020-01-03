@@ -6,7 +6,9 @@ import java.util.List;
 import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
+import io.graphenee.core.model.bean.GxBalanceSheetBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
+import io.graphenee.core.model.bean.GxIncomeStatementBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
 import io.graphenee.core.model.bean.GxTrialBalanceBean;
@@ -60,8 +62,13 @@ public interface GxAccountingDataService {
 	List<GxGeneralLedgerBean> findAllByAccountAndChildAccountsAndNamespaceAndDateRangeOrderByTransactionDateAsc(GxAccountBean selectedAccount, GxNamespaceBean namespaceBean,
 			Timestamp fromDate, Timestamp toDate);
 
-	GxAccountConfigurationBean findAccountConfigurationByNamespace(GxNamespaceBean namespanceBean);
+	GxAccountConfigurationBean findAccountConfigurationByNamespace(GxNamespaceBean namespaceBean);
 
 	GxAccountConfigurationBean createOrUpdate(GxAccountConfigurationBean bean);
 
+	void closeYear(List<GxAccountBean> accounts, GxNamespaceBean namespaceBean);
+
+	List<GxBalanceSheetBean> findBalanceSheetByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
+
+	List<GxIncomeStatementBean> findIncomeStatementByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
 }

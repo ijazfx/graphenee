@@ -16,6 +16,7 @@ public class GxAccountTypeForm extends TRAbstractForm<GxAccountTypeBean> {
 
 	MTextField typeName;
 	MTextField typeCode;
+	MTextField accountNumberSequence;
 
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
@@ -24,7 +25,9 @@ public class GxAccountTypeForm extends TRAbstractForm<GxAccountTypeBean> {
 		typeCode = new MTextField("Type Code").withRequired(true);
 		typeCode.setMaxLength(2);
 
-		form.addComponents(typeName, typeCode);
+		accountNumberSequence = new MTextField("Account Number Sequence").withRequired(true);
+
+		form.addComponents(typeName, typeCode, accountNumberSequence);
 	}
 
 	@Override

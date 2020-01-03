@@ -9,6 +9,7 @@ create table gx_account_type (
 	oid integer not null default nextval('gx_account_type_seq'::regclass),
 	type_name varchar(50) not null,
 	type_code varchar(2) not null,
+	account_number_sequence integer,
 	primary key (oid)
 );
 

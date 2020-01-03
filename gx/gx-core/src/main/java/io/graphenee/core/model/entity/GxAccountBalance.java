@@ -34,8 +34,12 @@ public class GxAccountBalance extends io.graphenee.core.model.GxMappedSuperclass
 	@Column(name = "opening_balance")
 	private Double openingBalance;
 
-	@Column(name = "opening_year")
-	private Timestamp openingYear;
+	@Column(name = "fiscal_year")
+	private Timestamp fiscalYear;
+
+	@ManyToOne
+	@JoinColumn(name = "oid_namespace")
+	private GxNamespace gxNamespace;
 
 	public GxAccountBalance() {
 	}
@@ -56,20 +60,28 @@ public class GxAccountBalance extends io.graphenee.core.model.GxMappedSuperclass
 		this.openingBalance = openingBalance;
 	}
 
-	public Timestamp getOpeningYear() {
-		return this.openingYear;
-	}
-
-	public void setOpeningYear(Timestamp openingYear) {
-		this.openingYear = openingYear;
-	}
-
 	public GxAccount getGxAccount() {
 		return gxAccount;
 	}
 
 	public void setGxAccount(GxAccount gxAccount) {
 		this.gxAccount = gxAccount;
+	}
+
+	public GxNamespace getGxNamespace() {
+		return gxNamespace;
+	}
+
+	public void setGxNamespace(GxNamespace gxNamespace) {
+		this.gxNamespace = gxNamespace;
+	}
+
+	public Timestamp getFiscalYear() {
+		return fiscalYear;
+	}
+
+	public void setFiscalYear(Timestamp fiscalYear) {
+		this.fiscalYear = fiscalYear;
 	}
 
 }

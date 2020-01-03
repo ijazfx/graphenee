@@ -69,13 +69,19 @@ public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
 		gxParentAccountBeanFault.setConverter(new BeanFaultToBeanConverter(GxAccountBean.class));
 
 		gxParentAccountBeanFault.addValueChangeListener(listener -> {
-			if (listener.getProperty().getValue() != null) {
-				GxAccountBean accountBean = (GxAccountBean) listener.getProperty().getValue();
-				gxAccountTypeBeanFault.setValue(accountBean.getGxAccountTypeBeanFault().getBean());
-				gxAccountTypeBeanFault.setReadOnly(true);
-			} else {
-				gxAccountTypeBeanFault.setReadOnly(false);
-				gxAccountTypeBeanFault.setValue(null);
+			if (!isBinding()) {
+				if (listener.getProperty().getValue() != null) {
+					GxAccountBean accountBean = (GxAccountBean) listener.getProperty().getValue();
+					gxAccountTypeBeanFault.setValue(accountBean.getGxAccountTypeBeanFault().getBean());
+					gxAccountTypeBeanFault.setReadOnly(true);
+					Integer accountNumberSequence = accountBean.getGxAccountTypeBeanFault().getBean().getAccountNumberSequence();
+					if (accountNumberSequence != null)
+						accountCode.setValue(accountNumberSequence.toString());
+				} else {
+					gxAccountTypeBeanFault.setReadOnly(false);
+					gxAccountTypeBeanFault.setValue(null);
+					accountCode.setValue(null);
+				}
 			}
 		});
 
@@ -88,17 +94,22 @@ public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
 		gxAccountTypeBeanFault.setConverter(new BeanFaultToBeanConverter(GxAccountBean.class));
 
 		gxAccountTypeBeanFault.addValueChangeListener(listener -> {
-			if (listener.getProperty().getValue() != null) {
-				GxAccountTypeBean accountTypeBean = (GxAccountTypeBean) listener.getProperty().getValue();
-				List<GxAccountBean> accountBeans = accountingDataService.findAllAccountsByNamespaceAndAccountType(getEntity().getGxNamespaceBeanFault().getBean(), accountTypeBean);
+			if (!isBinding()) {
+				if (listener.getProperty().getValue() != null) {
+					GxAccountTypeBean accountTypeBean = (GxAccountTypeBean) listener.getProperty().getValue();
+					List<GxAccountBean> accountBeans = accountingDataService.findAllAccountsByNamespaceAndAccountType(getEntity().getGxNamespaceBeanFault().getBean(),
+							accountTypeBean);
 
-				accountBeans.removeAll(getEntity().getAllChildAccounts());
+					accountBeans.removeAll(getEntity().getAllChildAccounts());
 
-				if (getEntity().getOid() != null)
-					accountBeans.remove(getEntity());
+					if (getEntity().getOid() != null)
+						accountBeans.remove(getEntity());
 
-				accountBeanContainer.removeAllItems();
-				accountBeanContainer.addAll(accountBeans);
+					accountBeanContainer.removeAllItems();
+					accountBeanContainer.addAll(accountBeans);
+					if (accountTypeBean.getAccountNumberSequence() != null)
+						accountCode.setValue(accountTypeBean.getAccountNumberSequence().toString());
+				}
 			}
 		});
 

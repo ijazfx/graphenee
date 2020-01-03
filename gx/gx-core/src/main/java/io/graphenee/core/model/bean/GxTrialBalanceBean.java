@@ -1,19 +1,19 @@
 package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class GxTrialBalanceBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer oid;
-	private Integer month;
-	private Integer year;
 	private String accountName;
 	private Integer oidAccount;
 	private String accountTypeName;
 	private Integer oidAccountType;
 	private Double debit;
 	private Double credit;
+	private Timestamp month;
 
 	public Integer getOid() {
 		return oid;
@@ -21,22 +21,6 @@ public class GxTrialBalanceBean implements Serializable {
 
 	public void setOid(Integer oid) {
 		this.oid = oid;
-	}
-
-	public Integer getMonth() {
-		return month;
-	}
-
-	public void setMonth(Integer month) {
-		this.month = month;
-	}
-
-	public Integer getYear() {
-		return year;
-	}
-
-	public void setYear(Integer year) {
-		this.year = year;
 	}
 
 	public String getAccountName() {
@@ -87,29 +71,12 @@ public class GxTrialBalanceBean implements Serializable {
 		this.credit = credit;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((oid == null) ? 0 : oid.hashCode());
-		return result;
+	public Timestamp getMonth() {
+		return month;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		GxTrialBalanceBean other = (GxTrialBalanceBean) obj;
-		if (oid == null) {
-			if (other.oid != null)
-				return false;
-		} else if (!oid.equals(other.oid))
-			return false;
-		return true;
+	public void setMonth(Timestamp month) {
+		this.month = month;
 	}
 
 }

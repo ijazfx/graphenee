@@ -81,11 +81,11 @@ public class GxGeneralLedgerBean implements Serializable {
 	}
 
 	public Double getDebit() {
-		return getAmount() < 0 ? Math.abs(getAmount()) : 0;
+		return getAmount() > 0 ? getAmount() : 0;
 	}
 
 	public Double getCredit() {
-		return getAmount() > 0 ? getAmount() : 0;
+		return getAmount() < 0 ? Math.abs(getAmount()) : 0;
 	}
 
 	public Double getBalance() {

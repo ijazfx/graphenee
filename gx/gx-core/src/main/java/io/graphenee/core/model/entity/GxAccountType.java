@@ -1,32 +1,42 @@
 package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * The persistent class for the gx_account_type database table.
  * 
  */
 @Entity
-@Table(name="gx_account_type")
-@NamedQuery(name="GxAccountType.findAll", query="SELECT g FROM GxAccountType g")
+@Table(name = "gx_account_type")
+@NamedQuery(name = "GxAccountType.findAll", query = "SELECT g FROM GxAccountType g")
 public class GxAccountType extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
-	@Column(name="type_code")
+	@Column(name = "type_code")
 	private String typeCode;
 
-	@Column(name="type_name")
+	@Column(name = "type_name")
 	private String typeName;
 
+	@Column(name = "account_number_sequence")
+	private Integer accountNumberSequence;
+
 	//bi-directional many-to-one association to GxAccount
-	@OneToMany(mappedBy="gxAccountType")
+	@OneToMany(mappedBy = "gxAccountType")
 	private List<GxAccount> gxAccounts;
 
 	public GxAccountType() {
@@ -76,6 +86,14 @@ public class GxAccountType extends io.graphenee.core.model.GxMappedSuperclass im
 		gxAccount.setGxAccountType(null);
 
 		return gxAccount;
+	}
+
+	public Integer getAccountNumberSequence() {
+		return accountNumberSequence;
+	}
+
+	public void setAccountNumberSequence(Integer accountNumberSequence) {
+		this.accountNumberSequence = accountNumberSequence;
 	}
 
 }

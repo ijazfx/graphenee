@@ -14,18 +14,24 @@ import io.graphenee.core.model.api.GxEntityFactory;
 import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
+import io.graphenee.core.model.bean.GxBalanceSheetBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
+import io.graphenee.core.model.bean.GxIncomeStatementBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
 import io.graphenee.core.model.bean.GxTrialBalanceBean;
 import io.graphenee.core.model.bean.GxVoucherBean;
 import io.graphenee.core.model.entity.GxAccount;
+import io.graphenee.core.model.entity.GxAccountBalance;
+import io.graphenee.core.model.entity.GxAccountConfiguration;
 import io.graphenee.core.model.entity.GxAccountType;
 import io.graphenee.core.model.entity.GxGeneralLedger;
 import io.graphenee.core.model.entity.GxVoucher;
+import io.graphenee.core.model.jpa.repository.GxAccountBalanceRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountConfigurationRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
+import io.graphenee.core.model.jpa.repository.GxBalanceSheetRepository;
 import io.graphenee.core.model.jpa.repository.GxGeneralLedgerRepository;
 import io.graphenee.core.model.jpa.repository.GxTransactionRepository;
 import io.graphenee.core.model.jpa.repository.GxTrialBalanceRepository;
@@ -63,6 +69,12 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	@Autowired
 	GxAccountConfigurationRepository accountConfigurationRepository;
 
+	@Autowired
+	GxAccountBalanceRepository accountBalanceRepository;
+
+	@Autowired
+	GxBalanceSheetRepository balanceSheetRepository;
+
 	@Override
 	public List<GxAccountTypeBean> findAllAccountTypes() {
 		return accountTypeRepository.findAllByOrderByTypeName().stream().map(entity -> beanFactory.makeGxAccountTypeBean(entity)).collect(Collectors.toList());
@@ -79,6 +91,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	@Override
 	public void delete(GxAccountTypeBean bean) {
 		accountTypeRepository.deleteById(bean.getOid());
+		refreshAllView();
 	}
 
 	@Override
@@ -86,6 +99,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 		GxAccount entity = entityFactory.makeGxAccountEntity(bean);
 		accountRepository.save(entity);
 		bean.setOid(entity.getOid());
+		refreshAllView();
 		return bean;
 	}
 
@@ -156,16 +170,20 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 		GxVoucher entity = entityFactory.makeGxVoucherEntity(bean);
 		voucherRepository.save(entity);
 		bean.setOid(entity.getOid());
+		refreshAllView();
+		return bean;
+	}
+
+	private void refreshAllView() {
 		generalLedgerRepository.refreshGxGeneralLedgerView();
 		trialBalanceRepository.refreshGxTrialBalanceView();
-		return bean;
+		balanceSheetRepository.refreshGxBalanceSheetView();
 	}
 
 	@Override
 	public void delete(GxVoucherBean bean) {
 		voucherRepository.deleteById(bean.getOid());
-		generalLedgerRepository.refreshGxGeneralLedgerView();
-		trialBalanceRepository.refreshGxTrialBalanceView();
+		refreshAllView();
 	}
 
 	@Override
@@ -189,10 +207,9 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Override
 	public List<GxTrialBalanceBean> findAllByMonthAndYearAndNamespace(Timestamp date, GxNamespaceBean namespaceBean) {
-		Integer month = TRCalendarUtil.getMonth(date);
-		Integer year = TRCalendarUtil.getYear(date);
-		return trialBalanceRepository.findAllByOidNamespaceAndMonthAndYear(namespaceBean.getOid(), month + 1, year).stream()
-				.map(entity -> beanFactory.makeGxTrialBalanceBean(entity)).collect(Collectors.toList());
+		Timestamp month = new Timestamp(TRCalendarUtil.endOfMonth(date).getTime());
+		List<Object[]> rows = trialBalanceRepository.findAllByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), month);
+		return rows.stream().map(entity -> beanFactory.makeGxTrialBalanceBean(entity)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -220,13 +237,42 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Override
 	public GxAccountConfigurationBean findAccountConfigurationByNamespace(GxNamespaceBean namespaceBean) {
-		return beanFactory.makeGxAccountConfigurationBean(accountConfigurationRepository.findTop1ByGxNamespaceOid(namespaceBean.getOid()));
+		GxAccountConfiguration entity = accountConfigurationRepository.findTop1ByGxNamespaceOid(namespaceBean.getOid());
+		if (entity != null)
+			return beanFactory.makeGxAccountConfigurationBean(entity);
+		return null;
 	}
 
 	@Override
 	public GxAccountConfigurationBean createOrUpdate(GxAccountConfigurationBean bean) {
-		// TODO Auto-generated method stub
-		return null;
+		GxAccountConfiguration entity = entityFactory.makeGxAccountConfigurationEntity(bean);
+		accountConfigurationRepository.save(entity);
+		bean.setOid(entity.getOid());
+		return bean;
+	}
+
+	@Override
+	public void closeYear(List<GxAccountBean> accounts, GxNamespaceBean namespaceBean) {
+		GxAccountConfigurationBean accountConfigurationBean = findAccountConfigurationByNamespace(namespaceBean);
+
+		for (GxAccountBean accountBean : accounts) {
+			GxAccountBalance entity = entityFactory.makeGxAccountBalanceEntity(accountBean, accountConfigurationBean);
+			//			accountBalanceRepository.save(entity);
+		}
+	}
+
+	@Override
+	public List<GxBalanceSheetBean> findBalanceSheetByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean) {
+		List<Object[]> rows = balanceSheetRepository.findBalanceSheetByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), toDate);
+
+		return rows.stream().map(row -> beanFactory.makeGxBalanceSheetBean(row)).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxIncomeStatementBean> findIncomeStatementByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean) {
+		List<Object[]> rows = balanceSheetRepository.findIncomeStatementByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), toDate);
+
+		return rows.stream().map(row -> beanFactory.makeGxIncomeStatementBean(row)).collect(Collectors.toList());
 	}
 
 }

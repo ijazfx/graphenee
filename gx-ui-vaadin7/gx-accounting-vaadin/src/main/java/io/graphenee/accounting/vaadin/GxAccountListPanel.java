@@ -4,18 +4,25 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.viritin.button.MButton;
 
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.UI;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccountBean;
+import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityListPanel;
 import io.graphenee.vaadin.TRAbstractForm;
+import io.graphenee.vaadin.ui.GxNotification;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -34,6 +41,8 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 
 	@Autowired
 	GxAccountForm form;
+
+	private MButton closeYearButton;
 
 	public GxAccountListPanel() {
 		super(GxAccountBean.class);
@@ -115,6 +124,34 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
 		namespaceComboBox.setVisible(namespaceBean == null);
+	}
+
+	@Override
+	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
+		super.addButtonsToToolbar(toolbar);
+		closeYearButton = new MButton("Close Year").withListener(event -> {
+			GxAccountConfigurationBean configurationBean = accountingDataService.findAccountConfigurationByNamespace(namespaceBean);
+			if (configurationBean != null) {
+				if (TRCalendarUtil.getCurrentTimeStamp().after(configurationBean.getFiscalYearEnd())) {
+					ConfirmDialog.show(UI.getCurrent(), "Are you sure to close a finalcial year?", e -> {
+						if (e.isConfirmed()) {
+							List<GxAccountBean> rows = entityGrid().getRows();
+							if (!rows.isEmpty()) {
+								accountingDataService.closeYear(rows, namespaceBean);
+								refresh();
+								entityGrid().deselectAll();
+							}
+						}
+					});
+				} else {
+					GxNotification.tray("You cannot close year till " + TRCalendarUtil.getFormattedDate(configurationBean.getFiscalYearEnd()) + " .").show(Page.getCurrent());
+				}
+			} else {
+				GxNotification.tray("Account configuration is not configure.").show(Page.getCurrent());
+			}
+		});
+
+		toolbar.addComponent(closeYearButton);
 	}
 
 }

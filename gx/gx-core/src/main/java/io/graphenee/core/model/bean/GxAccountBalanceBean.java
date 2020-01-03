@@ -10,8 +10,9 @@ public class GxAccountBalanceBean implements Serializable {
 
 	private Integer oid;
 	private Double openingBalance;
-	private Timestamp openingYear;
+	private Timestamp fiscalYear;
 	private BeanFault<Integer, GxAccountBean> gxAccountBeanFault;
+	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 
 	public Integer getOid() {
 		return oid;
@@ -29,20 +30,28 @@ public class GxAccountBalanceBean implements Serializable {
 		this.openingBalance = openingBalance;
 	}
 
-	public Timestamp getOpeningYear() {
-		return openingYear;
-	}
-
-	public void setOpeningYear(Timestamp openingYear) {
-		this.openingYear = openingYear;
-	}
-
 	public BeanFault<Integer, GxAccountBean> getGxAccountBeanFault() {
 		return gxAccountBeanFault;
 	}
 
 	public void setGxAccountBeanFault(BeanFault<Integer, GxAccountBean> gxAccountBeanFault) {
 		this.gxAccountBeanFault = gxAccountBeanFault;
+	}
+
+	public Timestamp getFiscalYear() {
+		return fiscalYear;
+	}
+
+	public void setFiscalYear(Timestamp fiscalYear) {
+		this.fiscalYear = fiscalYear;
+	}
+
+	public BeanFault<Integer, GxNamespaceBean> getGxNamespaceBeanFault() {
+		return gxNamespaceBeanFault;
+	}
+
+	public void setGxNamespaceBeanFault(BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault) {
+		this.gxNamespaceBeanFault = gxNamespaceBeanFault;
 	}
 
 	@Override

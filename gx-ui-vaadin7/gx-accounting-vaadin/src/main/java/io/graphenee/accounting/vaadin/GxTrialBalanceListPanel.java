@@ -64,8 +64,7 @@ public class GxTrialBalanceListPanel extends AbstractEntityTablePanel<GxTrialBal
 	@Override
 	protected List<GxTrialBalanceBean> fetchEntities() {
 		trialBalance = accountingDataService.findAllByMonthAndYearAndNamespace(new Timestamp(monthField.getValue().getTime()), namespaceBean);
-		if (!trialBalance.isEmpty())
-			buildFooter();
+		buildFooter();
 		return trialBalance;
 	}
 

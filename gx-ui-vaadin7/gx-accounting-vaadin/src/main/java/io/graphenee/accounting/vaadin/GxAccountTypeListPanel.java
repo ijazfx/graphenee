@@ -51,7 +51,7 @@ public class GxAccountTypeListPanel extends AbstractEntityListPanel<GxAccountTyp
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "typeName", "typeCode" };
+		return new String[] { "typeName", "typeCode", "accountNumberSequence" };
 	}
 
 	@Override

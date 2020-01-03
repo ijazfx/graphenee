@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MDateField;
 import org.vaadin.viritin.fields.MTextArea;
-import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -27,7 +27,7 @@ public class GxVoucherForm extends TRAbstractForm<GxVoucherBean> {
 	@Autowired
 	GxAccountingDataService accountingDataService;
 
-	MTextField voucherNumber;
+	MLabel voucherNumber;
 	MDateField voucherDate;
 	MTextArea description;
 
@@ -42,7 +42,7 @@ public class GxVoucherForm extends TRAbstractForm<GxVoucherBean> {
 		MFormLayout headerLayout = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 		headerLayout.setMargin(false);
 
-		voucherNumber = new MTextField("Voucher Number").withRequired(true);
+		voucherNumber = new MLabel().withCaption("Voucher Number");
 
 		description = new MTextArea("Description").withRequired(true);
 		description.setMaxLength(200);
@@ -52,6 +52,7 @@ public class GxVoucherForm extends TRAbstractForm<GxVoucherBean> {
 		voucherDate.setRequired(true);
 		voucherDate.setDateFormat(TRCalendarUtil.dateFormatter.toPattern());
 		voucherDate.setConverter(new DateToTimestampConverter());
+		voucherDate.setRangeEnd(TRCalendarUtil.getCurrentDate());
 
 		headerLayout.addComponents(voucherNumber, description, voucherDate);
 
@@ -72,6 +73,15 @@ public class GxVoucherForm extends TRAbstractForm<GxVoucherBean> {
 	@Override
 	public boolean isValid() {
 		return super.isValid() && (getEntity().getCreditTotal().equals(getEntity().getDebitTotal()));
+	}
+
+	@Override
+	protected void preBinding(GxVoucherBean entity) {
+		super.preBinding(entity);
+		if (entity.getVoucherNumber() == null)
+			voucherNumber.setValue("-- Auto-Generated --");
+		else
+			voucherNumber.setValue(entity.getVoucherNumber());
 	}
 
 	@Override

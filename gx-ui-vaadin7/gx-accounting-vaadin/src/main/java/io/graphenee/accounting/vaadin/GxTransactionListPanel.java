@@ -10,7 +10,6 @@ import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
-import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
@@ -97,19 +96,15 @@ public class GxTransactionListPanel extends AbstractEntityListPanel<GxTransactio
 		toolbar.addComponent(namespaceComboBox);
 	}
 
-	@Override
-	protected void preEdit(GxTransactionBean item) {
-		if (item.getOid() == null) {
-			GxNamespaceBean selectedNamespaceBean = namespaceBean != null ? namespaceBean : (GxNamespaceBean) namespaceComboBox.getValue();
-			if (selectedNamespaceBean != null) {
-				item.setGxNamespaceBeanFault(BeanFault.beanFault(selectedNamespaceBean.getOid(), selectedNamespaceBean));
-			}
-		}
-	}
-
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
 		namespaceComboBox.setVisible(namespaceBean == null);
+	}
+
+	@Override
+	protected void postBuild() {
+		super.postBuild();
+		hideToolbar();
 	}
 
 }

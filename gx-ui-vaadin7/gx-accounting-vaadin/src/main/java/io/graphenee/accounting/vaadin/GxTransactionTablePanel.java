@@ -24,8 +24,6 @@ import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
 import io.graphenee.core.model.bean.GxVoucherBean;
-import io.graphenee.core.util.TRCalendarUtil;
-import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.AbstractEntityTablePanel;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.converter.BeanFaultToBeanConverter;
@@ -121,7 +119,7 @@ public class GxTransactionTablePanel extends AbstractEntityTablePanel<GxTransact
 		MButton addTransaction = new MButton("Add Entry");
 		addTransaction.addClickListener(clicked -> {
 			GxTransactionBean transaction = new GxTransactionBean();
-			transaction.setTransactionDate(TRCalendarUtil.getCurrentTimeStamp());
+			//			transaction.setTransactionDate(TRCalendarUtil.getCurrentTimeStamp());
 			transaction.setGxNamespaceBeanFault(
 					new BeanFault<Integer, GxNamespaceBean>(voucherBean.getGxNamespaceBeanFault().getOid(), voucherBean.getGxNamespaceBeanFault().getBean()));
 			voucherBean.getGxTransactionBeanCollectionFault().add(transaction);
@@ -156,7 +154,7 @@ public class GxTransactionTablePanel extends AbstractEntityTablePanel<GxTransact
 			return textArea;
 		}
 		if (propertyId.matches("(debit)")) {
-			MTextField textField = new MTextField().withWidth("95px").withStyleName(GrapheneeTheme.STYLE_V_ALIGN_RIGHT);
+			MTextField textField = new MTextField().withWidth("95px");
 			textField.setHeight("40px");
 			textField.setConverter(new StringToDoubleConverter());
 			textField.addValueChangeListener(listener -> {
@@ -169,7 +167,7 @@ public class GxTransactionTablePanel extends AbstractEntityTablePanel<GxTransact
 			return textField;
 		}
 		if (propertyId.matches("(credit)")) {
-			MTextField textField = new MTextField().withWidth("95px").withStyleName(GrapheneeTheme.STYLE_V_ALIGN_RIGHT);
+			MTextField textField = new MTextField().withWidth("95px");
 			textField.setHeight("40px");
 			textField.setConverter(new StringToDoubleConverter());
 			textField.addValueChangeListener(listener -> {

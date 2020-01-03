@@ -9,13 +9,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "gx_trial_balance_view")
-public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
+@Table(name = "gx_balance_sheet_view")
+public class GxBalanceSheet extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name = "oid")
 	private Integer oid;
+
+	private Timestamp month;
 
 	@Column(name = "account_name")
 	private String accountName;
@@ -23,19 +25,25 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 	@Column(name = "oid_account")
 	private Integer oidAccount;
 
-	@Column(name = "account_type_name")
-	private String accountTypeName;
+	@Column(name = "oid_parent_account")
+	private Integer oidParentAccount;
+
+	@Column(name = "parent_account_name")
+	private String parentAccountName;
 
 	@Column(name = "oid_account_type")
 	private Integer oidAccountType;
 
-	private Double debit;
-	private Double credit;
+	@Column(name = "account_type_name")
+	private String accountTypeName;
+
+	@Column(name = "account_type_code")
+	private String accountTypeCode;
+
+	private Double amount;
 
 	@Column(name = "oid_namespace")
 	private Integer oidNamespace;
-
-	private Timestamp month;
 
 	public Integer getOid() {
 		return oid;
@@ -61,12 +69,20 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 		this.oidAccount = oidAccount;
 	}
 
-	public String getAccountTypeName() {
-		return accountTypeName;
+	public Integer getOidParentAccount() {
+		return oidParentAccount;
 	}
 
-	public void setAccountTypeName(String accountTypeName) {
-		this.accountTypeName = accountTypeName;
+	public void setOidParentAccount(Integer oidParentAccount) {
+		this.oidParentAccount = oidParentAccount;
+	}
+
+	public String getParentAccountName() {
+		return parentAccountName;
+	}
+
+	public void setParentAccountName(String parentAccountName) {
+		this.parentAccountName = parentAccountName;
 	}
 
 	public Integer getOidAccountType() {
@@ -77,20 +93,28 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 		this.oidAccountType = oidAccountType;
 	}
 
-	public Double getDebit() {
-		return debit;
+	public String getAccountTypeName() {
+		return accountTypeName;
 	}
 
-	public void setDebit(Double debit) {
-		this.debit = debit;
+	public void setAccountTypeName(String accountTypeName) {
+		this.accountTypeName = accountTypeName;
 	}
 
-	public Double getCredit() {
-		return credit;
+	public String getAccountTypeCode() {
+		return accountTypeCode;
 	}
 
-	public void setCredit(Double credit) {
-		this.credit = credit;
+	public void setAccountTypeCode(String accountTypeCode) {
+		this.accountTypeCode = accountTypeCode;
+	}
+
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
 	}
 
 	public Integer getOidNamespace() {
