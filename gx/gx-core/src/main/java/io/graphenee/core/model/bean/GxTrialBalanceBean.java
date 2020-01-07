@@ -11,8 +11,8 @@ public class GxTrialBalanceBean implements Serializable {
 	private Integer oidAccount;
 	private String accountTypeName;
 	private Integer oidAccountType;
-	private Double debit;
-	private Double credit;
+	private Double debit = 0.0;
+	private Double credit = 0.0;
 	private Timestamp month;
 
 	public Integer getOid() {
@@ -56,7 +56,7 @@ public class GxTrialBalanceBean implements Serializable {
 	}
 
 	public Double getDebit() {
-		return Math.abs(debit);
+		return debit;
 	}
 
 	public void setDebit(Double debit) {
@@ -64,7 +64,7 @@ public class GxTrialBalanceBean implements Serializable {
 	}
 
 	public Double getCredit() {
-		return credit;
+		return Math.abs(credit);
 	}
 
 	public void setCredit(Double credit) {

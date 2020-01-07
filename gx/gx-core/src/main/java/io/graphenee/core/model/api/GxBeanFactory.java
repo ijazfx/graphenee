@@ -201,8 +201,11 @@ public class GxBeanFactory {
 		bean.setOidAccount((Integer) row[1]);
 		bean.setOidAccountType((Integer) row[2]);
 		bean.setAccountTypeName((String) row[3]);
-		bean.setDebit((Double) row[4]);
-		bean.setCredit(Math.abs((Double) row[5]));
+		Double amount = (Double) row[4];
+		if (amount > 0) {
+			bean.setDebit(amount);
+		} else
+			bean.setCredit(Math.abs(amount));
 
 		return bean;
 	}

@@ -19,4 +19,7 @@ public interface GxTransactionRepository extends GxJpaRepository<GxTransaction, 
 	@Query("select sum(t.amount) from GxTransaction t where t.gxAccount.oid = :oidAccount")
 	Double findAccountBalanceByAccount(@Param("oidAccount") Integer oidAccount);
 
+	@Query(value = "select distinct extract(year from t.transactionDate) as year from GxTransaction t where t.gxNamespace.oid = :oidNamespace order by year desc")
+	List<Object> findYearByNamespace(@Param("oidNamespace") Integer oidNamespace);
+
 }

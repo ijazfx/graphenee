@@ -72,7 +72,7 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "voucherNumber", "description", "voucherDate" };
+		return new String[] { "voucherNumber", "description", "voucherDate", "totalAmount" };
 	}
 
 	@Override
@@ -114,6 +114,12 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
 		namespaceComboBox.setVisible(namespaceBean == null);
+	}
+
+	@Override
+	protected void postBuild() {
+		hideSecondaryToolbar();
+		super.postBuild();
 	}
 
 }

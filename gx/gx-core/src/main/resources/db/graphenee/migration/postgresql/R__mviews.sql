@@ -26,8 +26,7 @@ select
 	t.oid_account,
 	ac.oid_account_type,
 	act.type_name as account_type_name,
-	sum(case when t.amount < 0 then t.amount else 0.0 end) as credit,
-	sum(case when t.amount > 0 then t.amount else 0.0 end) as debit,
+	sum(coalesce(t.amount)) as amount,
 	t.oid_namespace
 from gx_transaction as t, gx_account as ac,  gx_account_type as act
 where t.oid_account = ac.oid and ac.oid_account_type = act.oid

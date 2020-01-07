@@ -64,6 +64,10 @@ public class GxVoucherBean implements Serializable {
 		return getGxTransactionBeanCollectionFault().getBeans().stream().mapToDouble(GxTransactionBean::getCredit).sum();
 	}
 
+	public Double getTotalAmount() {
+		return getDebitTotal();
+	}
+
 	public String getDescription() {
 		return description;
 	}

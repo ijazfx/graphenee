@@ -20,6 +20,7 @@ import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTrialBalanceBean;
+import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityTablePanel;
 import io.graphenee.vaadin.TRAbstractForm;
 
@@ -134,8 +135,9 @@ public class GxTrialBalanceListPanel extends AbstractEntityTablePanel<GxTrialBal
 	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
 		super.addButtonsToToolbar(toolbar);
 
-		monthField = new DateField("Month");
+		monthField = new DateField("Upto");
 		monthField.setResolution(Resolution.MONTH);
+		monthField.setDateFormat(TRCalendarUtil.dateFormatter.toPattern());
 
 		Date currentDate = new Date();
 		Calendar cal = Calendar.getInstance();

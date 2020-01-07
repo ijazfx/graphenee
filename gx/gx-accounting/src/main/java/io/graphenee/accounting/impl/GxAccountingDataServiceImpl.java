@@ -1,7 +1,11 @@
 package io.graphenee.accounting.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
+import io.graphenee.core.enums.AccountType;
 import io.graphenee.core.model.api.GxBeanFactory;
 import io.graphenee.core.model.api.GxEntityFactory;
 import io.graphenee.core.model.bean.GxAccountBean;
@@ -263,16 +268,56 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Override
 	public List<GxBalanceSheetBean> findBalanceSheetByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean) {
-		List<Object[]> rows = balanceSheetRepository.findBalanceSheetByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), toDate);
+		Timestamp month = new Timestamp(TRCalendarUtil.endOfMonth(toDate).getTime());
+		List<Object[]> rows = balanceSheetRepository.findBalanceSheetByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), month);
 
 		return rows.stream().map(row -> beanFactory.makeGxBalanceSheetBean(row)).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxIncomeStatementBean> findIncomeStatementByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean) {
-		List<Object[]> rows = balanceSheetRepository.findIncomeStatementByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), toDate);
+		Timestamp month = new Timestamp(TRCalendarUtil.endOfMonth(toDate).getTime());
+		List<Object[]> rows = balanceSheetRepository.findIncomeStatementByOidNamespaceAndMonthLessThanEqual(namespaceBean.getOid(), month);
 
 		return rows.stream().map(row -> beanFactory.makeGxIncomeStatementBean(row)).collect(Collectors.toList());
+	}
+
+	@Override
+	public Map<String, List<GxGeneralLedgerBean>> findAllByNamespaceAndDateRangeOrderByTransactionDateAsc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
+		List<GxAccountBean> accounts = findAllAccountsByNamespace(namespaceBean);
+		List<GxGeneralLedgerBean> generalLedgers = new ArrayList<GxGeneralLedgerBean>();
+		if (accounts != null) {
+			accounts.forEach(account -> {
+				generalLedgers.addAll(findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAsc(account, namespaceBean, fromDate, toDate));
+			});
+		}
+
+		Map<String, List<GxGeneralLedgerBean>> ledgerMap = new TreeMap<String, List<GxGeneralLedgerBean>>((Comparator<String>) (o1, o2) -> o1.compareTo(o2));
+		ledgerMap.putAll(generalLedgers.stream().collect(Collectors.groupingBy(entity -> entity.getAccountName())));
+
+		return ledgerMap;
+	}
+
+	@Override
+	public Double findNetIncomeByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean) {
+		List<GxIncomeStatementBean> incomeStatementList = findIncomeStatementByDateAndNamespace(toDate, namespaceBean);
+
+		Double incomesTotalAmount = incomeStatementList.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.INCOME.typeCode()))
+				.mapToDouble(GxIncomeStatementBean::getAmount).sum();
+
+		Double expensesTotalAmount = incomeStatementList.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.EXPENSE.typeCode()))
+				.mapToDouble(GxIncomeStatementBean::getAmount).sum();
+
+		return incomesTotalAmount - expensesTotalAmount;
+	}
+
+	@Override
+	public List<Integer> findTransactionYearByNamespace(GxNamespaceBean namespaceBean) {
+		List<Integer> years = new ArrayList<Integer>();
+		transactionRepository.findYearByNamespace(namespaceBean.getOid()).forEach(year -> {
+			years.add(((Double) year).intValue());
+		});
+		return years;
 	}
 
 }

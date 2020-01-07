@@ -29,8 +29,7 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 	@Column(name = "oid_account_type")
 	private Integer oidAccountType;
 
-	private Double debit;
-	private Double credit;
+	private Double amount;
 
 	@Column(name = "oid_namespace")
 	private Integer oidNamespace;
@@ -77,22 +76,6 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 		this.oidAccountType = oidAccountType;
 	}
 
-	public Double getDebit() {
-		return debit;
-	}
-
-	public void setDebit(Double debit) {
-		this.debit = debit;
-	}
-
-	public Double getCredit() {
-		return credit;
-	}
-
-	public void setCredit(Double credit) {
-		this.credit = credit;
-	}
-
 	public Integer getOidNamespace() {
 		return oidNamespace;
 	}
@@ -107,6 +90,14 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 
 	public void setMonth(Timestamp month) {
 		this.month = month;
+	}
+
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
 	}
 
 }

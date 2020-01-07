@@ -104,7 +104,10 @@ public class GxTransactionListPanel extends AbstractEntityListPanel<GxTransactio
 	@Override
 	protected void postBuild() {
 		super.postBuild();
-		hideToolbar();
+		setAddButtonVisibility(false);
+		setEditButtonVisibility(false);
+		setDeleteButtonVisibility(false);
+		hideSecondaryToolbar();
 	}
 
 }

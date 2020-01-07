@@ -2,6 +2,7 @@ package io.graphenee.accounting.api;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
@@ -53,6 +54,8 @@ public interface GxAccountingDataService {
 	List<GxGeneralLedgerBean> findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAsc(GxAccountBean accountBean, GxNamespaceBean namespaceBean, Timestamp fromDate,
 			Timestamp toDate);
 
+	Map<String, List<GxGeneralLedgerBean>> findAllByNamespaceAndDateRangeOrderByTransactionDateAsc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate);
+
 	Double findAccountBalanceByAccountAndDateIsBefore(GxAccountBean accountBean, Timestamp date);
 
 	Double findAccountBalanceByAccountAndChildAccountsAndDateIsBefore(List<Integer> oids, Timestamp date);
@@ -70,5 +73,9 @@ public interface GxAccountingDataService {
 
 	List<GxBalanceSheetBean> findBalanceSheetByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
 
+	Double findNetIncomeByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
+
 	List<GxIncomeStatementBean> findIncomeStatementByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
+
+	List<Integer> findTransactionYearByNamespace(GxNamespaceBean namespaceBean);
 }

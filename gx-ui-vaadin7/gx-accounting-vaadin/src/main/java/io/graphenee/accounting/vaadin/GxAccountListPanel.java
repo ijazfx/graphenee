@@ -154,4 +154,10 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 		toolbar.addComponent(closeYearButton);
 	}
 
+	@Override
+	protected void postBuild() {
+		hideSecondaryToolbar();
+		super.postBuild();
+	}
+
 }
