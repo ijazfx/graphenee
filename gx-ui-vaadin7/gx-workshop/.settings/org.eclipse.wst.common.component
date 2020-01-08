@@ -5,28 +5,28 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
-        <dependent-module archiveName="gx-vaadin-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-vaadin/gx-vaadin">
+        <dependent-module archiveName="gx-vaadin-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-vaadin/gx-vaadin">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-vaadin-theme-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-vaadin-theme/gx-vaadin-theme">
+        <dependent-module archiveName="gx-vaadin-theme-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-vaadin-theme/gx-vaadin-theme">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-core-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-core/gx-core">
+        <dependent-module archiveName="gx-core-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-core/gx-core">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-i18n-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-i18n/gx-i18n">
+        <dependent-module archiveName="gx-i18n-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-i18n/gx-i18n">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-i18n-vaadin-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-i18n-vaadin/gx-i18n-vaadin">
+        <dependent-module archiveName="gx-i18n-vaadin-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-i18n-vaadin/gx-i18n-vaadin">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-security-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-security/gx-security">
+        <dependent-module archiveName="gx-security-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-security/gx-security">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-security-vaadin-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-security-vaadin/gx-security-vaadin">
+        <dependent-module archiveName="gx-security-vaadin-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-security-vaadin/gx-security-vaadin">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="gx-core-vaadin-1.1.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-core-vaadin/gx-core-vaadin">
+        <dependent-module archiveName="gx-core-vaadin-1.2.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/gx-core-vaadin/gx-core-vaadin">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="gx-workshop"/>
