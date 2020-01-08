@@ -4,27 +4,20 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.viritin.button.MButton;
 
-import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid.Column;
-import com.vaadin.ui.UI;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccountBean;
-import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityListPanel;
 import io.graphenee.vaadin.TRAbstractForm;
-import io.graphenee.vaadin.ui.GxNotification;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -43,8 +36,6 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 
 	@Autowired
 	GxAccountForm form;
-
-	private MButton closeYearButton;
 
 	private GxAccountTypeBean accountType;
 
@@ -136,29 +127,6 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 			refresh(event.getProperty().getValue());
 		});
 		toolbar.addComponent(namespaceComboBox);
-
-		closeYearButton = new MButton("Close Year").withListener(event -> {
-			GxAccountConfigurationBean configurationBean = accountingDataService.findAccountConfigurationByNamespace(namespaceBean);
-			if (configurationBean != null) {
-				if (TRCalendarUtil.getCurrentTimeStamp().after(configurationBean.getFiscalYearEnd())) {
-					ConfirmDialog.show(UI.getCurrent(), "Are you sure to close a finalcial year of " + configurationBean.getFormattedFiscalYear() + " ?", e -> {
-						if (e.isConfirmed()) {
-							if (accountingDataService.closeYear(namespaceBean)) {
-								GxNotification.tray("Fiscal year " + configurationBean.getFormattedFiscalYear() + " closed successfully.").show(Page.getCurrent());
-							}
-							refresh();
-							entityGrid().deselectAll();
-						}
-					});
-				} else {
-					GxNotification.tray("You cannot close year till " + TRCalendarUtil.getFormattedDate(configurationBean.getFiscalYearEnd()) + " .").show(Page.getCurrent());
-				}
-			} else {
-				GxNotification.tray("Account configuration is not configured.").show(Page.getCurrent());
-			}
-		});
-
-		toolbar.addComponent(closeYearButton);
 	}
 
 	@Override

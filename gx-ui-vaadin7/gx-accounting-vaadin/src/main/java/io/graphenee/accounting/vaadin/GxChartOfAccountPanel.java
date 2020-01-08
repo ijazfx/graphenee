@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.enums.AccountType;
@@ -54,6 +56,7 @@ public class GxChartOfAccountPanel extends MVerticalLayout {
 		MVerticalLayout accountTypeLayout = new MVerticalLayout().withSpacing(false).withMargin(false);
 		accountTypeLayout.setSizeFull();
 		TabSheet accountTypeTabSheet = new TabSheet();
+		accountTypeTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
 		accountTypeTabSheet.setSizeFull();
 
 		List<GxAccountTypeBean> accountTypeList = accountingDataService.findAllAccountTypes();
@@ -69,21 +72,34 @@ public class GxChartOfAccountPanel extends MVerticalLayout {
 
 		accountTypeTabSheet.addTab(liabilityAccountListPanel.build(), AccountType.LIABILITY.typeName());
 		liabilityAccountListPanel.initializeWithEntity(namespaceBean, liabilityAccountType);
-		liabilityAccountListPanel.refresh();
 
 		accountTypeTabSheet.addTab(equityAccountListPanel.build(), AccountType.EQUITY.typeName());
 		equityAccountListPanel.initializeWithEntity(namespaceBean, equityAccountType);
-		equityAccountListPanel.refresh();
 
 		accountTypeTabSheet.addTab(incomeAccountListPanel.build(), AccountType.INCOME.typeName());
 		incomeAccountListPanel.initializeWithEntity(namespaceBean, incomeAccountType);
-		incomeAccountListPanel.refresh();
 
 		accountTypeTabSheet.addTab(expenseAccountListPanel.build(), AccountType.EXPENSE.typeName());
 		expenseAccountListPanel.initializeWithEntity(namespaceBean, expenseAccountType);
-		expenseAccountListPanel.refresh();
 
 		accountTypeLayout.addComponent(accountTypeTabSheet);
+
+		accountTypeTabSheet.addSelectedTabChangeListener(cl -> {
+			Component component = cl.getTabSheet().getSelectedTab();
+			if (component == assetAccountListPanel)
+				assetAccountListPanel.refresh();
+			if (component == liabilityAccountListPanel)
+				liabilityAccountListPanel.refresh();
+			if (component == equityAccountListPanel)
+				equityAccountListPanel.refresh();
+			if (component == incomeAccountListPanel)
+				incomeAccountListPanel.refresh();
+			if (component == expenseAccountListPanel)
+				expenseAccountListPanel.refresh();
+		});
+
+		accountTypeTabSheet.setSelectedTab(0);
+
 		return accountTypeLayout;
 	}
 
