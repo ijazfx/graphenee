@@ -819,7 +819,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 		private Table table;
 		private String propertyId;
 
-		TableColumn(Table table, String propertyId) {
+		public TableColumn(Table table, String propertyId) {
 			this.table = table;
 			this.propertyId = propertyId;
 		}

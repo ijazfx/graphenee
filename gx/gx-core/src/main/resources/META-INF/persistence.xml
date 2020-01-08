@@ -25,6 +25,15 @@
 		<class>io.graphenee.core.model.entity.GxPasswordHistory</class>
 		<class>io.graphenee.core.model.entity.GxPasswordPolicy</class>
 		<class>io.graphenee.core.model.entity.GxRegisteredDevice</class>
+		<class>io.graphenee.core.model.entity.GxAccount</class>
+		<class>io.graphenee.core.model.entity.GxAccountType</class>
+		<class>io.graphenee.core.model.entity.GxTransaction</class>
+		<class>io.graphenee.core.model.entity.GxVoucher</class>
+		<class>io.graphenee.core.model.entity.GxGeneralLedger</class>
+		<class>io.graphenee.core.model.entity.GxAccountBalance</class>
+		<class>io.graphenee.core.model.entity.GxAccountConfiguration</class>
+		<class>io.graphenee.core.model.entity.GxBalanceSheet</class>
+		<class>io.graphenee.core.model.entity.GxTrialBalance</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 	</persistence-unit>
 </persistence>
