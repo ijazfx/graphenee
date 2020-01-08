@@ -15,6 +15,7 @@ public class GxGeneralLedgerBean implements Serializable {
 	private String description;
 	private Double amount;
 	private Double balance;
+	private Integer oidVoucher;
 
 	public Integer getOid() {
 		return oid;
@@ -98,6 +99,14 @@ public class GxGeneralLedgerBean implements Serializable {
 
 	public Timestamp getTransactionDateTime() {
 		return transactionDate;
+	}
+
+	public Integer getOidVoucher() {
+		return oidVoucher;
+	}
+
+	public void setOidVoucher(Integer oidVoucher) {
+		this.oidVoucher = oidVoucher;
 	}
 
 	@Override

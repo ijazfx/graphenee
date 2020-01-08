@@ -9,9 +9,10 @@ select
 	act.type_name as account_type_name,
 	t.description as description, 
 	t.amount,
-	t.oid_namespace
-from gx_transaction as t, gx_account as ac, gx_account_type as act
-where t.oid_account = ac.oid and act.oid = ac.oid_account_type
+	t.oid_namespace,
+	v.oid as oid_voucher
+from gx_transaction as t, gx_account as ac, gx_account_type as act, gx_voucher as v, gx_voucher_transaction_join as vtj
+where t.oid_account = ac.oid and act.oid = ac.oid_account_type and v.oid = vtj.oid_voucher and t.oid = vtj.oid_transaction
 order by t.transaction_date asc
 with no data;
 create index transaction_date on gx_general_ledger_view(transaction_date);

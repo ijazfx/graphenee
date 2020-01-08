@@ -100,7 +100,7 @@ public class GxVoucherForm extends TRAbstractForm<GxVoucherBean> {
 
 	@Override
 	protected String formTitle() {
-		return "Voucher";
+		return "Journal Voucher";
 	}
 
 	@Override

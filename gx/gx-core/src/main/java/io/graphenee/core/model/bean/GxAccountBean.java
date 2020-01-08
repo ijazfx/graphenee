@@ -119,6 +119,10 @@ public class GxAccountBean implements Serializable {
 		return accountCode + " - " + accountName;
 	}
 
+	public String getIndentedTitle() {
+		return accountCode + "|- " + accountName;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

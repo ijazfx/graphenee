@@ -115,7 +115,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Override
 	public List<GxAccountBean> findAllAccountsByNamespace(GxNamespaceBean namespaceBean) {
-		return accountRepository.findAllByGxNamespaceNamespace(namespaceBean.getNamespace()).stream().map(entity -> beanFactory.makeGxAccountBean(entity))
+		return accountRepository.findAllByGxNamespaceNamespaceOrderByAccountCodeAsc(namespaceBean.getNamespace()).stream().map(entity -> beanFactory.makeGxAccountBean(entity))
 				.collect(Collectors.toList());
 	}
 
@@ -144,7 +144,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Override
 	public List<GxAccountBean> findAllAccountsByNamespaceAndAccountType(GxNamespaceBean namespaceBean, GxAccountTypeBean bean) {
-		return accountRepository.findAllByGxNamespaceNamespaceAndGxAccountTypeOid(namespaceBean.getNamespace(), bean.getOid()).stream()
+		return accountRepository.findAllByGxNamespaceNamespaceAndGxAccountTypeOidOrderByAccountCodeAsc(namespaceBean.getNamespace(), bean.getOid()).stream()
 				.map(entity -> beanFactory.makeGxAccountBean(entity)).collect(Collectors.toList());
 	}
 
@@ -165,8 +165,20 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
-	public List<GxVoucherBean> findAllVouchersByNamespaceOrderByVoucherDateAsc(GxNamespaceBean namespaceBean) {
-		return voucherRepository.findByGxNamespaceNamespaceOrderByVoucherDateAsc(namespaceBean.getNamespace()).stream().map(entity -> beanFactory.makeGxVoucherBean(entity))
+	public List<GxVoucherBean> findAllVouchersByNamespaceOrderByVoucherDateDesc(GxNamespaceBean namespaceBean) {
+		return voucherRepository.findByGxNamespaceNamespaceOrderByVoucherDateDesc(namespaceBean.getNamespace()).stream().map(entity -> beanFactory.makeGxVoucherBean(entity))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxVoucherBean> findAllVouchersByNamespaceAndDateRangeOrderByVoucherDateDesc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
+		return voucherRepository.findByGxNamespaceNamespaceAndVoucherDateIsBetweenOrderByVoucherDateDesc(namespaceBean.getNamespace(), fromDate, toDate).stream()
+				.map(entity -> beanFactory.makeGxVoucherBean(entity)).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxVoucherBean> findAllVouchersByDateRangeOrderByVoucherDateAsc(Timestamp fromDate, Timestamp toDate) {
+		return voucherRepository.findByVoucherDateIsBetweenOrderByVoucherDateAsc(fromDate, toDate).stream().map(entity -> beanFactory.makeGxVoucherBean(entity))
 				.collect(Collectors.toList());
 	}
 
@@ -283,6 +295,24 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
+	public Map<String, List<GxGeneralLedgerBean>> findAllByAccountAndChildAccountsAndNamespaceAndDateRangeGroupByAccountOrderByTransactionDateAsc(GxAccountBean accountBean,
+			GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
+		List<Integer> oids = accountBean.getAllChildAccounts().stream().mapToInt(GxAccountBean::getOid).boxed().collect(Collectors.toList());
+		oids.add(accountBean.getOid());
+
+		Double previousBalance = findAccountBalanceByAccountAndChildAccountsAndDateIsBefore(oids, fromDate);
+
+		Timestamp startDate = TRCalendarUtil.startOfDayAsTimestamp(fromDate);
+		Timestamp endDate = TRCalendarUtil.endOfDayAsTimestamp(toDate);
+
+		List<GxGeneralLedgerBean> generalLedgers = beanFactory.makeGxGeneralLedgerBean(
+				generalLedgerRepository.findAllByOidAccountInAndOidNamespaceAndTransactionDateIsBetweenOrderByTransactionDateAsc(oids, namespaceBean.getOid(), startDate, endDate),
+				previousBalance);
+
+		return generalLedgers.stream().collect(Collectors.groupingBy(GxGeneralLedgerBean::getAccountName));
+	}
+
+	@Override
 	public Map<String, List<GxGeneralLedgerBean>> findAllByNamespaceAndDateRangeOrderByTransactionDateAsc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
 		List<GxAccountBean> accounts = findAllAccountsByNamespace(namespaceBean);
 		List<GxGeneralLedgerBean> generalLedgers = new ArrayList<GxGeneralLedgerBean>();
@@ -315,9 +345,26 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	public List<Integer> findTransactionYearByNamespace(GxNamespaceBean namespaceBean) {
 		List<Integer> years = new ArrayList<Integer>();
 		transactionRepository.findYearByNamespace(namespaceBean.getOid()).forEach(year -> {
-			years.add(((Double) year).intValue());
+			years.add(((Integer) year).intValue());
 		});
 		return years;
+	}
+
+	@Override
+	public List<GxTransactionBean> findAllTransactionsByDateRangeOrderByDateAsc(Timestamp fromDate, Timestamp toDate) {
+		return transactionRepository.findAllByTransactionDateIsBetweenOrderByTransactionDateAsc(fromDate, toDate).stream().map(entity -> beanFactory.makeGxTransactionBean(entity))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxTransactionBean> findAllTransactionsByNamespaceAndDateRangeOrderByDateAsc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
+		return transactionRepository.findAllByGxNamespaceNamespaceAndTransactionDateIsBetweenOrderByTransactionDateAsc(namespaceBean.getNamespace(), fromDate, toDate).stream()
+				.map(entity -> beanFactory.makeGxTransactionBean(entity)).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxVoucherBean findByOidAndNamespace(Integer oid, GxNamespaceBean namespaceBean) {
+		return beanFactory.makeGxVoucherBean(voucherRepository.findByOidAndGxNamespaceOid(oid, namespaceBean.getOid()));
 	}
 
 }

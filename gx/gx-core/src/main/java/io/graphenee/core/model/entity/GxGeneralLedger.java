@@ -41,6 +41,9 @@ public class GxGeneralLedger extends io.graphenee.core.model.GxMappedSuperclass 
 	@Column(name = "oid_namespace")
 	private Integer oidNamespace;
 
+	@Column(name = "oid_voucher")
+	private Integer oidVoucher;
+
 	public Integer getOid() {
 		return oid;
 	}
@@ -111,6 +114,14 @@ public class GxGeneralLedger extends io.graphenee.core.model.GxMappedSuperclass 
 
 	public void setOidNamespace(Integer oidNamespace) {
 		this.oidNamespace = oidNamespace;
+	}
+
+	public Integer getOidVoucher() {
+		return oidVoucher;
+	}
+
+	public void setOidVoucher(Integer oidVoucher) {
+		this.oidVoucher = oidVoucher;
 	}
 
 }

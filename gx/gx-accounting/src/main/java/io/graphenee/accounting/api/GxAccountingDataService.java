@@ -41,13 +41,23 @@ public interface GxAccountingDataService {
 
 	List<GxTransactionBean> findAllTransactionsOrderByDateAsc();
 
+	List<GxTransactionBean> findAllTransactionsByDateRangeOrderByDateAsc(Timestamp fromDate, Timestamp toDate);
+
 	List<GxTransactionBean> findAllTransactionsByNamespaceOrderByDateAsc(GxNamespaceBean namespaceBean);
+
+	List<GxTransactionBean> findAllTransactionsByNamespaceAndDateRangeOrderByDateAsc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate);
 
 	List<GxVoucherBean> findAllVouchersOrderByVoucherDateAsc();
 
-	List<GxVoucherBean> findAllVouchersByNamespaceOrderByVoucherDateAsc(GxNamespaceBean namespaceBean);
+	List<GxVoucherBean> findAllVouchersByDateRangeOrderByVoucherDateAsc(Timestamp fromDate, Timestamp toDate);
+
+	List<GxVoucherBean> findAllVouchersByNamespaceOrderByVoucherDateDesc(GxNamespaceBean namespaceBean);
+
+	List<GxVoucherBean> findAllVouchersByNamespaceAndDateRangeOrderByVoucherDateDesc(GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate);
 
 	GxVoucherBean createOrUpdate(GxVoucherBean bean);
+
+	GxVoucherBean findByOidAndNamespace(Integer oid, GxNamespaceBean namespaceBean);
 
 	void delete(GxVoucherBean bean);
 
@@ -64,6 +74,9 @@ public interface GxAccountingDataService {
 
 	List<GxGeneralLedgerBean> findAllByAccountAndChildAccountsAndNamespaceAndDateRangeOrderByTransactionDateAsc(GxAccountBean selectedAccount, GxNamespaceBean namespaceBean,
 			Timestamp fromDate, Timestamp toDate);
+
+	Map<String, List<GxGeneralLedgerBean>> findAllByAccountAndChildAccountsAndNamespaceAndDateRangeGroupByAccountOrderByTransactionDateAsc(GxAccountBean selectedAccount,
+			GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate);
 
 	GxAccountConfigurationBean findAccountConfigurationByNamespace(GxNamespaceBean namespaceBean);
 

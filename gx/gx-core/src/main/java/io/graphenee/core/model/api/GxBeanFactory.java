@@ -178,6 +178,7 @@ public class GxBeanFactory {
 		bean.setAccountTypeName(entity.getAccountTypeName());
 		bean.setAmount(entity.getAmount());
 		bean.setDescription(entity.getDescription());
+		bean.setOidVoucher(entity.getOidVoucher());
 		return bean;
 	}
 

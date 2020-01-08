@@ -18,6 +18,7 @@ import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
+import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityListPanel;
@@ -42,7 +43,12 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	@Autowired
 	GxAccountForm form;
 
+	@Autowired
+	GxCloseYearForm closeYearForm;
+
 	private MButton closeYearButton;
+
+	private GxAccountTypeBean accountType;
 
 	public GxAccountListPanel() {
 		super(GxAccountBean.class);
@@ -68,21 +74,21 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	@Override
 	protected List<GxAccountBean> fetchEntities() {
 		if (namespaceBean != null)
-			return accountingDataService.findAllAccountsByNamespace(namespaceBean);
+			return accountingDataService.findAllAccountsByNamespaceAndAccountType(namespaceBean, accountType);
 		return accountingDataService.findAllAccounts();
 	}
 
 	@Override
 	protected <F> List<GxAccountBean> fetchEntities(F filter) {
 		if (filter instanceof GxNamespaceBean) {
-			return accountingDataService.findAllAccountsByNamespace((GxNamespaceBean) filter);
+			return accountingDataService.findAllAccountsByNamespaceAndAccountType((GxNamespaceBean) filter, accountType);
 		}
 		return super.fetchEntities(filter);
 	}
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "accountType", "accountCode", "accountName", "parentAccount" };
+		return new String[] { "accountCode", "accountName", "parentAccount" };
 	}
 
 	@Override
@@ -101,7 +107,29 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	}
 
 	@Override
-	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
+	protected void preEdit(GxAccountBean item) {
+		if (item.getOid() == null) {
+			GxNamespaceBean selectedNamespaceBean = namespaceBean != null ? namespaceBean : (GxNamespaceBean) namespaceComboBox.getValue();
+			if (selectedNamespaceBean != null) {
+				item.setGxNamespaceBeanFault(BeanFault.beanFault(selectedNamespaceBean.getOid(), selectedNamespaceBean));
+			}
+			if (accountType != null) {
+				item.setGxAccountTypeBeanFault(BeanFault.beanFault(accountType.getOid(), accountType));
+				item.setAccountCode(accountType.getAccountNumberSequence());
+			}
+		}
+	}
+
+	public void initializeWithEntity(GxNamespaceBean namespaceBean, GxAccountTypeBean accountType) {
+		this.namespaceBean = namespaceBean;
+		this.accountType = accountType;
+		namespaceComboBox.setVisible(namespaceBean == null);
+	}
+
+	@Override
+	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
+		super.addButtonsToToolbar(toolbar);
+
 		namespaceComboBox = new ComboBox("Namespace");
 		namespaceComboBox.setTextInputAllowed(false);
 		namespaceComboBox.addItems(dataService.findNamespace());
@@ -109,26 +137,7 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 			refresh(event.getProperty().getValue());
 		});
 		toolbar.addComponent(namespaceComboBox);
-	}
 
-	@Override
-	protected void preEdit(GxAccountBean item) {
-		if (item.getOid() == null) {
-			GxNamespaceBean selectedNamespaceBean = namespaceBean != null ? namespaceBean : (GxNamespaceBean) namespaceComboBox.getValue();
-			if (selectedNamespaceBean != null) {
-				item.setGxNamespaceBeanFault(BeanFault.beanFault(selectedNamespaceBean.getOid(), selectedNamespaceBean));
-			}
-		}
-	}
-
-	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
-		this.namespaceBean = namespaceBean;
-		namespaceComboBox.setVisible(namespaceBean == null);
-	}
-
-	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
-		super.addButtonsToToolbar(toolbar);
 		closeYearButton = new MButton("Close Year").withListener(event -> {
 			GxAccountConfigurationBean configurationBean = accountingDataService.findAccountConfigurationByNamespace(namespaceBean);
 			if (configurationBean != null) {
@@ -156,7 +165,6 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 
 	@Override
 	protected void postBuild() {
-		hideSecondaryToolbar();
 		super.postBuild();
 	}
 

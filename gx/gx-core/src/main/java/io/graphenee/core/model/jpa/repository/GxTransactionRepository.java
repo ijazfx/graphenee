@@ -1,5 +1,6 @@
 package io.graphenee.core.model.jpa.repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,11 @@ public interface GxTransactionRepository extends GxJpaRepository<GxTransaction, 
 
 	List<GxTransaction> findAllByOrderByTransactionDateAsc();
 
+	List<GxTransaction> findAllByTransactionDateIsBetweenOrderByTransactionDateAsc(Timestamp fromDate, Timestamp toDate);
+
 	List<GxTransaction> findAllByGxNamespaceNamespaceOrderByTransactionDateAsc(String namespace);
+
+	List<GxTransaction> findAllByGxNamespaceNamespaceAndTransactionDateIsBetweenOrderByTransactionDateAsc(String namespace, Timestamp fromDate, Timestamp toDate);
 
 	List<GxTransaction> findAllByGxVouchersOidOrderByTransactionDateAsc(Integer oidVoucher);
 

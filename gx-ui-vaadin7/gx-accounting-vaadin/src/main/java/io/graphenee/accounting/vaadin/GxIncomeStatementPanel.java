@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MTable;
-import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -20,8 +19,8 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.Table.Align;
+import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.enums.AccountType;
@@ -92,29 +91,26 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 
 		body.addComponents(constructTable("Income", incomes, incomesTotalAmount), constructTable("Expense", expenses, expensesTotalAmount));
 
-		Component constructFooter = constructFooter(incomesTotalAmount, expensesTotalAmount);
-		mainLayout.addComponents(body, constructFooter);
-		mainLayout.setComponentAlignment(constructFooter, Alignment.TOP_CENTER);
+		MHorizontalLayout incomeAndExpenseTotalLayout = new MHorizontalLayout().withFullWidth().withMargin(false).withSpacing(true);
+		incomeAndExpenseTotalLayout.addComponents(constructFooterTable("Total", incomesTotalAmount), constructFooterTable("Total", expensesTotalAmount));
+
+		mainLayout.addComponents(body, incomeAndExpenseTotalLayout);
+
+		double netProfit = incomesTotalAmount - expensesTotalAmount;
+		MHorizontalLayout netProfitLayout = new MHorizontalLayout();
+
+		netProfitLayout.setWidth("49.6%");
+
+		if (netProfit > 0) {
+			netProfitLayout.addComponent(constructFooterTable("Net Profit", netProfit));
+			mainLayout.addComponent(netProfitLayout);
+		} else {
+			netProfitLayout.addComponent(constructFooterTable("Net Loss", Math.abs(netProfit)));
+			mainLayout.addComponent(netProfitLayout);
+			mainLayout.setComponentAlignment(netProfitLayout, Alignment.BOTTOM_RIGHT);
+		}
+
 		return mainLayout;
-	}
-
-	private Component constructFooter(Double incomesTotalAmount, Double expensesTotalAmount) {
-		MVerticalLayout footer = new MVerticalLayout().withSizeUndefined().withMargin(true).withSpacing(true);
-
-		MLabel incomeStatementLabel = new MLabel().withStyleName(ValoTheme.LABEL_H3, ValoTheme.LABEL_NO_MARGIN);
-		incomeStatementLabel.setValue("Income Statement = Income - Expense");
-
-		MLabel valueLabel = new MLabel().withStyleName(ValoTheme.LABEL_H3, ValoTheme.LABEL_NO_MARGIN);
-		valueLabel.setValue(String.format("%.2f", incomesTotalAmount) + " - " + String.format("%.2f", expensesTotalAmount));
-
-		MLabel resultLabel = new MLabel().withStyleName(ValoTheme.LABEL_H3, ValoTheme.LABEL_NO_MARGIN);
-		resultLabel.setValue(String.format("%.2f", incomesTotalAmount - expensesTotalAmount));
-
-		footer.addComponents(incomeStatementLabel, valueLabel, resultLabel);
-		footer.setComponentAlignment(valueLabel, Alignment.TOP_RIGHT);
-		footer.setComponentAlignment(resultLabel, Alignment.TOP_RIGHT);
-		return footer;
-
 	}
 
 	private Component constructTable(String tableCaption, List<GxIncomeStatementBean> balanceSheetList, Double totalAmount) {
@@ -141,6 +137,20 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 		}
 
 		return table;
+	}
+
+	private Component constructFooterTable(String title, Double amount) {
+		MTable<String> footerTable = new MTable<String>();
+		footerTable.addContainerProperty(title, String.class, null);
+		footerTable.addContainerProperty("Amount", String.class, null);
+		footerTable.addItem(new Object[] { title, String.format("%.2f", amount) }, 1);
+		footerTable.setResponsive(true);
+		footerTable.setPageLength(footerTable.size());
+		footerTable.setWidth(100, Unit.PERCENTAGE);
+		footerTable.setColumnWidth("Amount", 150);
+		footerTable.setColumnAlignment("Amount", Align.RIGHT);
+		footerTable.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
+		return footerTable;
 	}
 
 	private void applyRendereForColumn(TableColumn column) {

@@ -119,7 +119,6 @@ public class GxTransactionTablePanel extends AbstractEntityTablePanel<GxTransact
 		MButton addTransaction = new MButton("Add Entry");
 		addTransaction.addClickListener(clicked -> {
 			GxTransactionBean transaction = new GxTransactionBean();
-			//			transaction.setTransactionDate(TRCalendarUtil.getCurrentTimeStamp());
 			transaction.setGxNamespaceBeanFault(
 					new BeanFault<Integer, GxNamespaceBean>(voucherBean.getGxNamespaceBeanFault().getOid(), voucherBean.getGxNamespaceBeanFault().getBean()));
 			voucherBean.getGxTransactionBeanCollectionFault().add(transaction);
