@@ -1,7 +1,6 @@
 package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,11 +30,11 @@ public class GxAccountBalance extends io.graphenee.core.model.GxMappedSuperclass
 	@JoinColumn(name = "oid_account")
 	private GxAccount gxAccount;
 
-	@Column(name = "opening_balance")
-	private Double openingBalance;
+	@Column(name = "closing_balance")
+	private Double closingBalance;
 
 	@Column(name = "fiscal_year")
-	private Timestamp fiscalYear;
+	private Integer fiscalYear;
 
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
@@ -50,14 +49,6 @@ public class GxAccountBalance extends io.graphenee.core.model.GxMappedSuperclass
 
 	public void setOid(Integer oid) {
 		this.oid = oid;
-	}
-
-	public double getOpeningBalance() {
-		return this.openingBalance;
-	}
-
-	public void setOpeningBalance(Double openingBalance) {
-		this.openingBalance = openingBalance;
 	}
 
 	public GxAccount getGxAccount() {
@@ -76,11 +67,19 @@ public class GxAccountBalance extends io.graphenee.core.model.GxMappedSuperclass
 		this.gxNamespace = gxNamespace;
 	}
 
-	public Timestamp getFiscalYear() {
+	public Double getClosingBalance() {
+		return closingBalance;
+	}
+
+	public void setClosingBalance(Double closingBalance) {
+		this.closingBalance = closingBalance;
+	}
+
+	public Integer getFiscalYear() {
 		return fiscalYear;
 	}
 
-	public void setFiscalYear(Timestamp fiscalYear) {
+	public void setFiscalYear(Integer fiscalYear) {
 		this.fiscalYear = fiscalYear;
 	}
 

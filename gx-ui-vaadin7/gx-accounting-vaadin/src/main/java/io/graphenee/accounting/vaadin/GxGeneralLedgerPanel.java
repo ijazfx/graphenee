@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTable;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -29,6 +30,7 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.Table.Align;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalSplitPanel;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
@@ -45,7 +47,7 @@ import io.graphenee.vaadin.event.TRItemClickListener;
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
-public class GxGeneralLedgerPanel extends MVerticalLayout {
+public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 
 	@Autowired
 	GxDataService dataService;
@@ -80,12 +82,14 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 
 	public GxGeneralLedgerPanel() {
 		setWidth(100, Unit.PERCENTAGE);
+		setLocked(true);
 	}
 
 	private MHorizontalLayout buildToolbar() {
 		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
 				.withSpacing(true);
-		accountComboBox = new ComboBox("Account");
+		accountComboBox = new ComboBox();
+		accountComboBox.setInputPrompt("Select Account");
 		accountComboBox.setWidth("200px");
 		List<GxAccountBean> accountBeans = null;
 		if (namespaceBean != null)
@@ -103,6 +107,10 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 			refresh();
 		});
 
+		MHorizontalLayout accountAndSubAccountLayout = new MHorizontalLayout();
+		accountAndSubAccountLayout.addComponents(accountComboBox, displaySubAccountsCheckBox);
+		accountAndSubAccountLayout.setComponentAlignment(displaySubAccountsCheckBox, Alignment.MIDDLE_CENTER);
+
 		thisMonthButton = new MButton("This Month");
 		thisYearButton = new MButton("This Year");
 		lastYearButton = new MButton("Last Year");
@@ -110,28 +118,28 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 
 		thisMonthButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(false);
+			toggleEnableDateFields(false);
 			thisMonthButton.setEnabled(false);
 			fetchMode = Timeframe.ThisMonth;
 			refresh();
 		});
 		thisYearButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(false);
+			toggleEnableDateFields(false);
 			thisYearButton.setEnabled(false);
 			fetchMode = Timeframe.ThisYear;
 			refresh();
 		});
 		lastYearButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(false);
+			toggleEnableDateFields(false);
 			lastYearButton.setEnabled(false);
 			fetchMode = Timeframe.LastYear;
 			refresh();
 		});
 		pastButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(true);
+			toggleEnableDateFields(true);
 			pastButton.setEnabled(false);
 			fetchMode = Timeframe.Past;
 			refresh();
@@ -160,15 +168,14 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 			refresh();
 		});
 
-		layout.addComponents(accountComboBox, displaySubAccountsCheckBox, dateRangeLayout, fromDateField, toDateField);
+		layout.addComponents(accountAndSubAccountLayout, dateRangeLayout, fromDateField, toDateField);
 		layout.setComponentAlignment(dateRangeLayout, Alignment.BOTTOM_RIGHT);
-		layout.setComponentAlignment(displaySubAccountsCheckBox, Alignment.BOTTOM_CENTER);
 		layout.setExpandRatio(dateRangeLayout, 1);
 
 		toggleEnable(true);
 		thisMonthButton.setEnabled(false);
 
-		toggleVisibleDateFields(false);
+		toggleEnableDateFields(false);
 
 		return layout;
 
@@ -181,9 +188,9 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 		pastButton.setEnabled(value);
 	}
 
-	private void toggleVisibleDateFields(boolean value) {
-		toDateField.setVisible(value);
-		fromDateField.setVisible(value);
+	private void toggleEnableDateFields(boolean value) {
+		toDateField.setEnabled(value);
+		fromDateField.setEnabled(value);
 	}
 
 	private MVerticalLayout buildBody() {
@@ -211,6 +218,9 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 			ledgerMap.forEach((accountName, entities) -> {
 				mainLayout.addComponent(constructTable(entities, accountName));
 			});
+			if (ledgerMap.isEmpty()) {
+				mainLayout.addComponent(new MLabel("No data available"));
+			}
 		}
 		return mainLayout;
 	}
@@ -308,9 +318,10 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
-		addComponent(buildToolbar());
+		setFirstComponent(buildToolbar());
 		mainPanel = buildBody();
-		addComponent(mainPanel);
+		setSecondComponent(mainPanel);
+		setSplitPosition(8, Unit.PERCENTAGE);
 	}
 
 	private GxGeneralLedgerPanel refresh() {
@@ -318,6 +329,7 @@ public class GxGeneralLedgerPanel extends MVerticalLayout {
 			removeComponent(mainPanel);
 			mainPanel = buildBody();
 			addComponent(mainPanel);
+			setSplitPosition(8, Unit.PERCENTAGE);
 			UI.getCurrent().push();
 		});
 		return this;

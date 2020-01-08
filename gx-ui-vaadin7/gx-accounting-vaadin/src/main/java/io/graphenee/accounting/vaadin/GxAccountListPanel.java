@@ -11,6 +11,7 @@ import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.UI;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
@@ -43,9 +44,6 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	@Autowired
 	GxAccountForm form;
 
-	@Autowired
-	GxCloseYearForm closeYearForm;
-
 	private MButton closeYearButton;
 
 	private GxAccountTypeBean accountType;
@@ -73,8 +71,9 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 
 	@Override
 	protected List<GxAccountBean> fetchEntities() {
-		if (namespaceBean != null)
+		if (namespaceBean != null) {
 			return accountingDataService.findAllAccountsByNamespaceAndAccountType(namespaceBean, accountType);
+		}
 		return accountingDataService.findAllAccounts();
 	}
 
@@ -142,21 +141,20 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 			GxAccountConfigurationBean configurationBean = accountingDataService.findAccountConfigurationByNamespace(namespaceBean);
 			if (configurationBean != null) {
 				if (TRCalendarUtil.getCurrentTimeStamp().after(configurationBean.getFiscalYearEnd())) {
-					ConfirmDialog.show(UI.getCurrent(), "Are you sure to close a finalcial year?", e -> {
+					ConfirmDialog.show(UI.getCurrent(), "Are you sure to close a finalcial year of " + configurationBean.getFormattedFiscalYear() + " ?", e -> {
 						if (e.isConfirmed()) {
-							List<GxAccountBean> rows = entityGrid().getRows();
-							if (!rows.isEmpty()) {
-								accountingDataService.closeYear(rows, namespaceBean);
-								refresh();
-								entityGrid().deselectAll();
+							if (accountingDataService.closeYear(namespaceBean)) {
+								GxNotification.tray("Fiscal year " + configurationBean.getFormattedFiscalYear() + " closed successfully.").show(Page.getCurrent());
 							}
+							refresh();
+							entityGrid().deselectAll();
 						}
 					});
 				} else {
 					GxNotification.tray("You cannot close year till " + TRCalendarUtil.getFormattedDate(configurationBean.getFiscalYearEnd()) + " .").show(Page.getCurrent());
 				}
 			} else {
-				GxNotification.tray("Account configuration is not configure.").show(Page.getCurrent());
+				GxNotification.tray("Account configuration is not configured.").show(Page.getCurrent());
 			}
 		});
 
@@ -164,8 +162,18 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	}
 
 	@Override
-	protected void postBuild() {
-		super.postBuild();
+	protected void applyRendererForColumn(Column column) {
+		if (column.getPropertyId().equals("accountCode")) {
+			column.setMaximumWidth(150);
+		}
+		if (column.getPropertyId().equals("indentedTitle")) {
+			column.setHeaderCaption("Account Name");
+		}
+		if (column.getPropertyId().equals("parentAccount")) {
+			column.setMaximumWidth(250);
+		} else {
+			super.applyRendererForColumn(column);
+		}
 	}
 
 }

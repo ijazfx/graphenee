@@ -1,7 +1,7 @@
 package io.graphenee.core.model.api;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -173,21 +173,15 @@ public class GxEntityFactory {
 		GxAccountBalance accountBalance = new GxAccountBalance();
 		accountBalance.setGxAccount(accountRepository.findOne(accountBean.getOid()));
 		accountBalance.setGxNamespace(namespaceRepository.findOne(accountBean.getGxNamespaceBeanFault().getOid()));
-		Double openingBalance = transactionRepository.findAccountBalanceByAccount(accountBean.getOid());
-		if (openingBalance == null)
-			openingBalance = 0.0;
-		accountBalance.setOpeningBalance(openingBalance);
-		GxAccountBalance previousBalance = accountBalanceRepository.findTop1ByGxAccountOidOrderByFiscalYearDesc(accountBean.getOid());
-		Calendar cal = Calendar.getInstance();
-		if (previousBalance != null) {
-			cal.setTime(previousBalance.getFiscalYear());
-			cal.add(Calendar.YEAR, 1);
-			accountBalance.setFiscalYear(new Timestamp(cal.getTime().getTime()));
-		} else {
-			cal.setTime(TRCalendarUtil.getCurrentTimeStamp());
-			cal.set(cal.get(Calendar.YEAR), 0, 0, 0, 0, 0);
-			accountBalance.setFiscalYear(new Timestamp(cal.getTime().getTime()));
-		}
+
+		List<Integer> oids = accountBean.getAllChildAccounts().stream().mapToInt(GxAccountBean::getOid).boxed().collect(Collectors.toList());
+		oids.add(accountBean.getOid());
+
+		Double closingBalance = transactionRepository.findBalanceByAccountAndChildAccountsAndDateIsBetween(oids, fiscalYearStart, fiscalYearEnd);
+		if (closingBalance == null)
+			closingBalance = 0.0;
+		accountBalance.setClosingBalance(closingBalance);
+		accountBalance.setFiscalYear(TRCalendarUtil.getYear(fiscalYearEnd));
 		return accountBalance;
 	}
 }

@@ -3,6 +3,7 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
@@ -115,12 +116,24 @@ public class GxAccountBean implements Serializable {
 		return childAccounts;
 	}
 
+	public List<GxAccountBean> getDirectChildAccounts() {
+		return getGxChildAccountBeanCollectionFault().getBeans().stream().collect(Collectors.toList());
+	}
+
 	public String getAccountNameWithCode() {
 		return accountCode + " - " + accountName;
 	}
 
 	public String getIndentedTitle() {
-		return accountCode + "|- " + accountName;
+		String indentedSymbol = getGxParentAccountBeanFault() != null ? "|" : "";
+		StringBuilder builder = new StringBuilder(indentedSymbol);
+		GxAccountBean account = gxParentAccountBeanFault != null ? gxParentAccountBeanFault.getBean() : null;
+		while (account != null) {
+			builder.append("--");
+			account = account.gxParentAccountBeanFault != null ? account.gxParentAccountBeanFault.getBean() : null;
+		}
+		builder.append(" " + accountName);
+		return builder.toString();
 	}
 
 	@Override

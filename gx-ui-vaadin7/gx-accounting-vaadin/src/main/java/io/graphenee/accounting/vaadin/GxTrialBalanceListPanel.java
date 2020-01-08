@@ -93,17 +93,6 @@ public class GxTrialBalanceListPanel extends AbstractEntityTablePanel<GxTrialBal
 	}
 
 	@Override
-	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
-		namespaceComboBox = new ComboBox("Namespace");
-		namespaceComboBox.setTextInputAllowed(false);
-		namespaceComboBox.addItems(dataService.findNamespace());
-		namespaceComboBox.addValueChangeListener(event -> {
-			refresh(event.getProperty().getValue());
-		});
-		toolbar.addComponent(namespaceComboBox);
-	}
-
-	@Override
 	protected boolean isGridCellFilterEnabled() {
 		return true;
 	}
@@ -134,6 +123,14 @@ public class GxTrialBalanceListPanel extends AbstractEntityTablePanel<GxTrialBal
 	@Override
 	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
 		super.addButtonsToToolbar(toolbar);
+
+		namespaceComboBox = new ComboBox("Namespace");
+		namespaceComboBox.setTextInputAllowed(false);
+		namespaceComboBox.addItems(dataService.findNamespace());
+		namespaceComboBox.addValueChangeListener(event -> {
+			refresh(event.getProperty().getValue());
+		});
+		toolbar.addComponent(namespaceComboBox);
 
 		monthField = new DateField("Upto");
 		monthField.setResolution(Resolution.MONTH);

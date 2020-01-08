@@ -13,6 +13,8 @@ public interface GxAccountRepository extends GxJpaRepository<GxAccount, Integer>
 
 	List<GxAccount> findAllByGxNamespaceNamespaceAndGxAccountTypeOidOrderByAccountCodeAsc(String namespace, Integer oidAccountType);
 
+	List<GxAccount> findAllByGxNamespaceNamespaceAndGxAccountTypeOidAndGxParentAccountOidIsNullOrderByAccountCodeAsc(String namespace, Integer oidAccountType);
+
 	List<GxAccount> findAllByGxAccountTypeOid(Integer oidAccountType);
 
 	GxAccount findByGxNamespaceNamespaceAndAccountCode(String namespace, Integer accountCode);

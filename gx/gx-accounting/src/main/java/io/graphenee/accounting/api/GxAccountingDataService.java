@@ -82,7 +82,7 @@ public interface GxAccountingDataService {
 
 	GxAccountConfigurationBean createOrUpdate(GxAccountConfigurationBean bean);
 
-	void closeYear(List<GxAccountBean> accounts, GxNamespaceBean namespaceBean);
+	Boolean closeYear(GxNamespaceBean namespaceBean);
 
 	List<GxBalanceSheetBean> findBalanceSheetByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
 
@@ -90,5 +90,4 @@ public interface GxAccountingDataService {
 
 	List<GxIncomeStatementBean> findIncomeStatementByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
 
-	List<Integer> findTransactionYearByNamespace(GxNamespaceBean namespaceBean);
 }

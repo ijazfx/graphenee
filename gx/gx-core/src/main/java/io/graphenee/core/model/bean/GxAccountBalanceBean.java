@@ -1,7 +1,6 @@
 package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 import io.graphenee.core.model.BeanFault;
 
@@ -9,8 +8,8 @@ public class GxAccountBalanceBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer oid;
-	private Double openingBalance;
-	private Timestamp fiscalYear;
+	private Double closingBalance;
+	private Integer fiscalYear;
 	private BeanFault<Integer, GxAccountBean> gxAccountBeanFault;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 
@@ -22,14 +21,6 @@ public class GxAccountBalanceBean implements Serializable {
 		this.oid = oid;
 	}
 
-	public Double getOpeningBalance() {
-		return openingBalance;
-	}
-
-	public void setOpeningBalance(Double openingBalance) {
-		this.openingBalance = openingBalance;
-	}
-
 	public BeanFault<Integer, GxAccountBean> getGxAccountBeanFault() {
 		return gxAccountBeanFault;
 	}
@@ -38,11 +29,19 @@ public class GxAccountBalanceBean implements Serializable {
 		this.gxAccountBeanFault = gxAccountBeanFault;
 	}
 
-	public Timestamp getFiscalYear() {
+	public Double getClosingBalance() {
+		return closingBalance;
+	}
+
+	public void setClosingBalance(Double closingBalance) {
+		this.closingBalance = closingBalance;
+	}
+
+	public Integer getFiscalYear() {
 		return fiscalYear;
 	}
 
-	public void setFiscalYear(Timestamp fiscalYear) {
+	public void setFiscalYear(Integer fiscalYear) {
 		this.fiscalYear = fiscalYear;
 	}
 

@@ -269,13 +269,20 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
-	public void closeYear(List<GxAccountBean> accounts, GxNamespaceBean namespaceBean) {
+	public Boolean closeYear(GxNamespaceBean namespaceBean) {
 		GxAccountConfigurationBean accountConfigurationBean = findAccountConfigurationByNamespace(namespaceBean);
-
-		for (GxAccountBean accountBean : accounts) {
-			GxAccountBalance entity = entityFactory.makeGxAccountBalanceEntity(accountBean, accountConfigurationBean);
-			//			accountBalanceRepository.save(entity);
+		List<GxAccountBean> accounts = findAllAccountsByNamespace(namespaceBean);
+		if (!accounts.isEmpty()) {
+			for (GxAccountBean accountBean : accounts) {
+				GxAccountBalance entity = entityFactory.makeGxAccountBalanceEntity(accountBean, accountConfigurationBean);
+				accountBalanceRepository.save(entity);
+			}
+			accountConfigurationBean.setFiscalYearStart(new Timestamp(TRCalendarUtil.addMonthsToDate(accountConfigurationBean.getFiscalYearStart(), 12).getTime()));
+			GxAccountConfiguration accountConfiguration = entityFactory.makeGxAccountConfigurationEntity(accountConfigurationBean);
+			accountConfigurationRepository.save(accountConfiguration);
+			return true;
 		}
+		return false;
 	}
 
 	@Override
@@ -339,15 +346,6 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 				.mapToDouble(GxIncomeStatementBean::getAmount).sum();
 
 		return incomesTotalAmount - expensesTotalAmount;
-	}
-
-	@Override
-	public List<Integer> findTransactionYearByNamespace(GxNamespaceBean namespaceBean) {
-		List<Integer> years = new ArrayList<Integer>();
-		transactionRepository.findYearByNamespace(namespaceBean.getOid()).forEach(year -> {
-			years.add(((Integer) year).intValue());
-		});
-		return years;
 	}
 
 	@Override

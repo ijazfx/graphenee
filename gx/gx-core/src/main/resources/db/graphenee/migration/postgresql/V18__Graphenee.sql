@@ -64,8 +64,8 @@ insert into gx_account_type (type_name, type_code) values ('Income', 'IN');
 
 create table gx_account_balance (
 	oid integer not null default nextval('gx_account_balance_seq'::regclass),
-	opening_balance double precision not null default 0,
-	fiscal_year timestamp not null,
+	closing_balance double precision not null default 0,
+	fiscal_year integer not null,
 	oid_account integer not null,
 	oid_namespace integer not null,
 	foreign key (oid_account) references gx_account(oid) on delete restrict on update cascade,

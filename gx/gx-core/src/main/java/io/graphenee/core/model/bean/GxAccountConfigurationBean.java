@@ -2,9 +2,9 @@ package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Calendar;
 
 import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.util.TRCalendarUtil;
 
 public class GxAccountConfigurationBean implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -47,12 +47,11 @@ public class GxAccountConfigurationBean implements Serializable {
 	}
 
 	public Timestamp getFiscalYearEnd() {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(getFiscalYearStart());
-		cal.add(Calendar.YEAR, 1);
-		cal.add(Calendar.DAY_OF_MONTH, -1);
+		return new Timestamp(TRCalendarUtil.endOfMonth(TRCalendarUtil.addMonthsToDate(getFiscalYearStart(), 11)).getTime());
+	}
 
-		return new Timestamp(cal.getTime().getTime());
+	public String getFormattedFiscalYear() {
+		return TRCalendarUtil.getFormattedDate(getFiscalYearStart()) + " - " + TRCalendarUtil.getFormattedDate(getFiscalYearEnd());
 	}
 
 	@Override

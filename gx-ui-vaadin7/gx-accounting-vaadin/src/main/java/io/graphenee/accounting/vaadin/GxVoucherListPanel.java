@@ -157,28 +157,28 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 
 		thisMonthButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(false);
+			toggleEnableDateFields(false);
 			thisMonthButton.setEnabled(false);
 			fetchMode = Timeframe.ThisMonth;
 			refresh();
 		});
 		thisYearButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(false);
+			toggleEnableDateFields(false);
 			thisYearButton.setEnabled(false);
 			fetchMode = Timeframe.ThisYear;
 			refresh();
 		});
 		lastYearButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(false);
+			toggleEnableDateFields(false);
 			lastYearButton.setEnabled(false);
 			fetchMode = Timeframe.LastYear;
 			refresh();
 		});
 		pastButton.addClickListener(event -> {
 			toggleEnable(true);
-			toggleVisibleDateFields(true);
+			toggleEnableDateFields(true);
 			pastButton.setEnabled(false);
 			fetchMode = Timeframe.Past;
 			refresh();
@@ -219,7 +219,7 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 		toggleEnable(true);
 		thisMonthButton.setEnabled(false);
 
-		toggleVisibleDateFields(false);
+		toggleEnableDateFields(false);
 
 		toolbar.addComponents(fromDateField, toDateField);
 	}
@@ -231,9 +231,9 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 		pastButton.setEnabled(value);
 	}
 
-	private void toggleVisibleDateFields(boolean value) {
-		toDateField.setVisible(value);
-		fromDateField.setVisible(value);
+	private void toggleEnableDateFields(boolean value) {
+		toDateField.setEnabled(value);
+		fromDateField.setEnabled(value);
 	}
 
 }
