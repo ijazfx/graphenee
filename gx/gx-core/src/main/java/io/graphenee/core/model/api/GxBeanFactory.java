@@ -28,6 +28,7 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxNamespaceProperty;
 import io.graphenee.core.model.entity.GxTransaction;
 import io.graphenee.core.model.entity.GxVoucher;
+import io.graphenee.core.model.jpa.repository.GxAccountConfigurationRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxJournalVoucherRepository;
@@ -55,6 +56,9 @@ public class GxBeanFactory {
 
 	@Autowired
 	GxJournalVoucherRepository voucherRepository;
+
+	@Autowired
+	GxAccountConfigurationRepository accountConfigurationRepository;
 
 	public GxAccountTypeBean makeGxAccountTypeBean(GxAccountType entity) {
 		GxAccountTypeBean bean = new GxAccountTypeBean();
@@ -218,6 +222,9 @@ public class GxBeanFactory {
 		bean.setFiscalYearStart(entity.getFiscalYearStart());
 		bean.setGxNamespaceBeanFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
 			return makeNamespaceBean(namespaceRepository.findOne(oid));
+		}));
+		bean.setFiscalYearStartBeanFault(BeanFault.beanFault(entity.getOid(), oid -> {
+			return accountConfigurationRepository.findOne(oid).getFiscalYearStart();
 		}));
 
 		return bean;

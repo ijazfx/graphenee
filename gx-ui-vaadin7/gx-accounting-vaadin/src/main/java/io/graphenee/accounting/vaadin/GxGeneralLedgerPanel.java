@@ -78,6 +78,8 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 
 	private CheckBox displaySubAccountsCheckBox;
 
+	private MButton generateReportButton;
+
 	private MVerticalLayout mainPanel;
 
 	public GxGeneralLedgerPanel() {
@@ -107,8 +109,12 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 			refresh();
 		});
 
+		generateReportButton = new MButton("Generate Report", event -> {
+
+		});
+
 		MHorizontalLayout accountAndSubAccountLayout = new MHorizontalLayout();
-		accountAndSubAccountLayout.addComponents(accountComboBox, displaySubAccountsCheckBox);
+		accountAndSubAccountLayout.addComponents(accountComboBox, displaySubAccountsCheckBox, generateReportButton);
 		accountAndSubAccountLayout.setComponentAlignment(displaySubAccountsCheckBox, Alignment.MIDDLE_CENTER);
 
 		thisMonthButton = new MButton("This Month");
