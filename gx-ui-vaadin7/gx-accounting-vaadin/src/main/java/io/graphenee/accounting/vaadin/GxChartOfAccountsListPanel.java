@@ -9,6 +9,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.renderers.HtmlRenderer;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.model.BeanFault;
@@ -22,7 +23,7 @@ import io.graphenee.vaadin.TRAbstractForm;
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
-public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
+public class GxChartOfAccountsListPanel extends AbstractEntityListPanel<GxAccountBean> {
 
 	private GxNamespaceBean namespaceBean;
 
@@ -35,11 +36,11 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 	GxAccountingDataService accountingDataService;
 
 	@Autowired
-	GxAccountForm form;
+	GxChartOfAccountsForm form;
 
 	private GxAccountTypeBean accountType;
 
-	public GxAccountListPanel() {
+	public GxChartOfAccountsListPanel() {
 		super(GxAccountBean.class);
 	}
 
@@ -78,7 +79,7 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "accountCode", "accountName", "parentAccount" };
+		return new String[] { "accountCode", "indentedTitle", "parentAccount" };
 	}
 
 	@Override
@@ -136,12 +137,19 @@ public class GxAccountListPanel extends AbstractEntityListPanel<GxAccountBean> {
 		}
 		if (column.getPropertyId().equals("indentedTitle")) {
 			column.setHeaderCaption("Account Name");
+			column.setRenderer(new HtmlRenderer(""));
 		}
 		if (column.getPropertyId().equals("parentAccount")) {
 			column.setMaximumWidth(250);
 		} else {
+			column.setSortable(false);
 			super.applyRendererForColumn(column);
 		}
+	}
+
+	@Override
+	protected void postBuild() {
+		super.postBuild();
 	}
 
 }

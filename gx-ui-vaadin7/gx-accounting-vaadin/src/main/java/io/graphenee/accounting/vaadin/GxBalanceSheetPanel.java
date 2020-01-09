@@ -51,6 +51,7 @@ public class GxBalanceSheetPanel extends MVerticalLayout {
 
 	public GxBalanceSheetPanel() {
 		setWidth(100, Unit.PERCENTAGE);
+		setMargin(false);
 	}
 
 	private MHorizontalLayout buildToolbar() {

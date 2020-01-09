@@ -20,7 +20,7 @@ import io.graphenee.core.model.bean.GxNamespaceBean;
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
-public class GxChartOfAccountPanel extends MVerticalLayout {
+public class GxChartOfAccountsPanel extends MVerticalLayout {
 
 	@Autowired
 	GxDataService dataService;
@@ -29,23 +29,23 @@ public class GxChartOfAccountPanel extends MVerticalLayout {
 	GxAccountingDataService accountingDataService;
 
 	@Autowired
-	GxAccountListPanel assetAccountListPanel;
+	GxChartOfAccountsListPanel assetAccountListPanel;
 
 	@Autowired
-	GxAccountListPanel liabilityAccountListPanel;
+	GxChartOfAccountsListPanel liabilityAccountListPanel;
 
 	@Autowired
-	GxAccountListPanel equityAccountListPanel;
+	GxChartOfAccountsListPanel equityAccountListPanel;
 
 	@Autowired
-	GxAccountListPanel incomeAccountListPanel;
+	GxChartOfAccountsListPanel incomeAccountListPanel;
 
 	@Autowired
-	GxAccountListPanel expenseAccountListPanel;
+	GxChartOfAccountsListPanel expenseAccountListPanel;
 
 	private GxNamespaceBean namespaceBean;
 
-	public GxChartOfAccountPanel() {
+	public GxChartOfAccountsPanel() {
 		withFullHeight();
 		withFullWidth();
 		setSpacing(false);

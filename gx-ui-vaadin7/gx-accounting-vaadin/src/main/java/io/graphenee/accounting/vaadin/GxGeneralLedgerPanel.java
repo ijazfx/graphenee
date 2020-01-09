@@ -56,7 +56,7 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 	GxAccountingDataService accountingDataService;
 
 	@Autowired
-	GxVoucherForm form;
+	GxJournalVoucherForm form;
 
 	private GxNamespaceBean namespaceBean;
 	private GxAccountBean selectedAccount;

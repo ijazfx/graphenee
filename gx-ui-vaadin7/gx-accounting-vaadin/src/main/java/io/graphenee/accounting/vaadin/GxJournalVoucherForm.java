@@ -22,7 +22,7 @@ import io.graphenee.vaadin.converter.DateToTimestampConverter;
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
-public class GxVoucherForm extends TRAbstractForm<GxVoucherBean> {
+public class GxJournalVoucherForm extends TRAbstractForm<GxVoucherBean> {
 
 	@Autowired
 	GxAccountingDataService accountingDataService;

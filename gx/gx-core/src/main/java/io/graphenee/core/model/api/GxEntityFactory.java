@@ -23,9 +23,9 @@ import io.graphenee.core.model.jpa.repository.GxAccountBalanceRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountConfigurationRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
+import io.graphenee.core.model.jpa.repository.GxJournalVoucherRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxTransactionRepository;
-import io.graphenee.core.model.jpa.repository.GxVoucherRepository;
 import io.graphenee.core.util.TRCalendarUtil;
 
 @Service
@@ -44,7 +44,7 @@ public class GxEntityFactory {
 	GxTransactionRepository transactionRepository;
 
 	@Autowired
-	GxVoucherRepository voucherRepository;
+	GxJournalVoucherRepository voucherRepository;
 
 	@Autowired
 	GxAccountConfigurationRepository accountConfigurationRepository;
@@ -167,7 +167,6 @@ public class GxEntityFactory {
 
 	public GxAccountBalance makeGxAccountBalanceEntity(GxAccountBean accountBean, GxAccountConfigurationBean accountConfigurationBean) {
 
-		Timestamp fiscalYearStart = accountConfigurationBean.getFiscalYearStart();
 		Timestamp fiscalYearEnd = accountConfigurationBean.getFiscalYearEnd();
 
 		GxAccountBalance accountBalance = new GxAccountBalance();
@@ -177,7 +176,7 @@ public class GxEntityFactory {
 		List<Integer> oids = accountBean.getAllChildAccounts().stream().mapToInt(GxAccountBean::getOid).boxed().collect(Collectors.toList());
 		oids.add(accountBean.getOid());
 
-		Double closingBalance = transactionRepository.findBalanceByAccountAndChildAccountsAndDateIsBetween(oids, fiscalYearStart, fiscalYearEnd);
+		Double closingBalance = transactionRepository.findBalanceByAccountAndChildAccountsAndDateIsBefore(oids, fiscalYearEnd);
 		if (closingBalance == null)
 			closingBalance = 0.0;
 		accountBalance.setClosingBalance(closingBalance);

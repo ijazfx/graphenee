@@ -23,7 +23,7 @@ import io.graphenee.vaadin.converter.BeanFaultToBeanConverter;
 
 @SpringComponent
 @Scope("prototype")
-public class GxAccountForm extends TRAbstractForm<GxAccountBean> {
+public class GxChartOfAccountsForm extends TRAbstractForm<GxAccountBean> {
 	private static final long serialVersionUID = 1L;
 
 	@Autowired

@@ -49,6 +49,7 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 
 	public GxIncomeStatementPanel() {
 		setWidth(100, Unit.PERCENTAGE);
+		setMargin(false);
 	}
 
 	private MHorizontalLayout buildToolbar() {

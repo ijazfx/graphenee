@@ -30,10 +30,10 @@ import io.graphenee.core.model.entity.GxTransaction;
 import io.graphenee.core.model.entity.GxVoucher;
 import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
+import io.graphenee.core.model.jpa.repository.GxJournalVoucherRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespacePropertyRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxTransactionRepository;
-import io.graphenee.core.model.jpa.repository.GxVoucherRepository;
 
 @Service
 public class GxBeanFactory {
@@ -54,7 +54,7 @@ public class GxBeanFactory {
 	GxTransactionRepository transactionRepository;
 
 	@Autowired
-	GxVoucherRepository voucherRepository;
+	GxJournalVoucherRepository voucherRepository;
 
 	public GxAccountTypeBean makeGxAccountTypeBean(GxAccountType entity) {
 		GxAccountTypeBean bean = new GxAccountTypeBean();
