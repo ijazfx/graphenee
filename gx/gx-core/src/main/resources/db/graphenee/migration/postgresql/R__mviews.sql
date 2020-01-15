@@ -23,6 +23,7 @@ create materialized view gx_trial_balance_view as
 select 
 	row_number() over() oid,
 	date_trunc('month',t.transaction_date) as month,
+	ac.account_code,
 	ac.account_name,
 	t.oid_account,
 	ac.oid_account_type,
@@ -31,7 +32,7 @@ select
 	t.oid_namespace
 from gx_transaction as t, gx_account as ac,  gx_account_type as act
 where t.oid_account = ac.oid and ac.oid_account_type = act.oid
-group by  ac.account_name,t.oid_account, account_type_name, ac.oid_account_type, t.oid_namespace, month
+group by  ac.account_code, ac.account_name,t.oid_account, account_type_name, ac.oid_account_type, t.oid_namespace, month
 with no data;
 create index oid_account on gx_trial_balance_view(oid_account);
 REFRESH MATERIALIZED VIEW gx_trial_balance_view;

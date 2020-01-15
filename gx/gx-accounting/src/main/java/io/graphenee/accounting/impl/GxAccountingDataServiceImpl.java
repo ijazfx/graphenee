@@ -249,6 +249,20 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
+	public Map<String, List<GxGeneralLedgerBean>> findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAscGroupByAccountName(GxAccountBean accountBean,
+			GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
+		Double previousBalance = findAccountBalanceByAccountAndDateIsBefore(accountBean, fromDate);
+
+		Timestamp startDate = TRCalendarUtil.startOfDayAsTimestamp(fromDate);
+		Timestamp endDate = TRCalendarUtil.endOfDayAsTimestamp(toDate);
+
+		List<GxGeneralLedger> ledgerEntries = generalLedgerRepository.findAllByOidAccountAndOidNamespaceAndTransactionDateIsBetweenOrderByTransactionDateAsc(accountBean.getOid(),
+				namespaceBean.getOid(), startDate, endDate);
+
+		return beanFactory.makeGxGeneralLedgerBean(ledgerEntries, previousBalance).stream().collect(Collectors.groupingBy(GxGeneralLedgerBean::getAccountName));
+	}
+
+	@Override
 	public Double findAccountBalanceByAccountAndDateIsBefore(GxAccountBean accountBean, Timestamp date) {
 		return generalLedgerRepository.findBalanceByAccountAndDateIsBefore(accountBean.getOid(), date);
 	}

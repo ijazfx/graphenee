@@ -227,6 +227,16 @@
 				<artifactId>protobuf-java</artifactId>
 				<version>3.6.1</version>
 			</dependency>
+			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
+				<artifactId>jasperreports</artifactId>
+				<version>${jasper.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.jasperreports</groupId>
+				<artifactId>jasperreports-functions</artifactId>
+				<version>${jasper.version}</version>
+			</dependency>
 			<!-- Graphenee modules -->
 			<dependency>
 				<groupId>io.graphenee</groupId>
@@ -298,6 +308,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.java.persistence>2.1.1</version.java.persistence>
 		<version.spring>2.1.4.RELEASE</version.spring>
+		<jasper.version>6.9.0</jasper.version>
 	</properties>
 
 	<distributionManagement>

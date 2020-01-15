@@ -61,6 +61,9 @@ public interface GxAccountingDataService {
 
 	void delete(GxVoucherBean bean);
 
+	Map<String, List<GxGeneralLedgerBean>> findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAscGroupByAccountName(GxAccountBean accountBean,
+			GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate);
+
 	List<GxGeneralLedgerBean> findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAsc(GxAccountBean accountBean, GxNamespaceBean namespaceBean, Timestamp fromDate,
 			Timestamp toDate);
 

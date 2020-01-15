@@ -3,6 +3,8 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import io.graphenee.core.util.TRCalendarUtil;
+
 public class GxGeneralLedgerBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -16,6 +18,7 @@ public class GxGeneralLedgerBean implements Serializable {
 	private Double amount;
 	private Double balance;
 	private Integer oidVoucher;
+	private String formattedDate;
 
 	public Integer getOid() {
 		return oid;
@@ -107,6 +110,10 @@ public class GxGeneralLedgerBean implements Serializable {
 
 	public void setOidVoucher(Integer oidVoucher) {
 		this.oidVoucher = oidVoucher;
+	}
+
+	public String getFormattedDate() {
+		return TRCalendarUtil.dateFormatter.format(transactionDate);
 	}
 
 	@Override

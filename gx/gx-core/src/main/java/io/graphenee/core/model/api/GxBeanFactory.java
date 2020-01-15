@@ -202,11 +202,12 @@ public class GxBeanFactory {
 
 	public GxTrialBalanceBean makeGxTrialBalanceBean(Object[] row) {
 		GxTrialBalanceBean bean = new GxTrialBalanceBean();
-		bean.setAccountName((String) row[0]);
-		bean.setOidAccount((Integer) row[1]);
-		bean.setOidAccountType((Integer) row[2]);
-		bean.setAccountTypeName((String) row[3]);
-		Double amount = (Double) row[4];
+		bean.setAccountCode((Integer) row[0]);
+		bean.setAccountName((String) row[1]);
+		bean.setOidAccount((Integer) row[2]);
+		bean.setOidAccountType((Integer) row[3]);
+		bean.setAccountTypeName((String) row[4]);
+		Double amount = (Double) row[5];
 		if (amount > 0) {
 			bean.setDebit(amount);
 		} else

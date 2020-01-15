@@ -1,18 +1,29 @@
 package io.graphenee.accounting.vaadin;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
@@ -27,13 +38,25 @@ import io.graphenee.core.enums.AccountType;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxIncomeStatementBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityTablePanel.TableColumn;
+import io.graphenee.vaadin.ResourcePreviewPanel;
+import io.graphenee.vaadin.util.VaadinUtils;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxIncomeStatementPanel extends MVerticalLayout {
+
+	public static final Logger L = LoggerFactory.getLogger(GxIncomeStatementBean.class);
 
 	@Autowired
 	GxDataService dataService;
@@ -43,9 +66,28 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 
 	private GxNamespaceBean namespaceBean;
 
+	private String companyName;
+
 	private DateField toDateField;
 
 	private MVerticalLayout mainPanel;
+
+	@Autowired
+	FileStorage storage;
+
+	private MButton generateReportButton;
+
+	private List<GxIncomeStatementBean> incomes = new ArrayList<GxIncomeStatementBean>();
+
+	private List<GxIncomeStatementBean> expenses = new ArrayList<GxIncomeStatementBean>();
+
+	private double incomesTotalAmount;
+
+	private double expensesTotalAmount;
+
+	private double netProfit;
+
+	private String companyLogoPath;
 
 	public GxIncomeStatementPanel() {
 		setWidth(100, Unit.PERCENTAGE);
@@ -53,7 +95,7 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 	}
 
 	private MHorizontalLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withWidthUndefined().withMargin(false)
 				.withSpacing(true);
 		toDateField = new DateField("Upto");
 		toDateField.setResolution(Resolution.MONTH);
@@ -70,7 +112,56 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 			refresh();
 		});
 
-		layout.addComponents(toDateField);
+		generateReportButton = new MButton("Generate Report", event -> {
+			ResourcePreviewPanel previewPanel = new ResourcePreviewPanel();
+			previewPanel.build().openInModalPopup();
+			previewPanel.preview(new StreamResource(new StreamSource() {
+				@Override
+				public InputStream getStream() {
+					try {
+						String reportName = null;
+						Map<String, Object> params = new HashMap<>();
+						reportName = "IncomeStatementReport.jrxml";
+
+						params.put("CompanyName", companyName);
+						params.put("ToDate", TRCalendarUtil.dateFormatter.format(toDateField.getValue()));
+
+						if (companyLogoPath != null) {
+							try {
+								params.put("CompanyLogoPath", storage.resolveToURI(companyLogoPath).getRawPath());
+							} catch (Exception e) {
+								L.warn("Failed to resolve logo file path", e);
+							}
+						}
+
+						JRBeanCollectionDataSource incomeDataSource = new JRBeanCollectionDataSource(incomes);
+						JRBeanCollectionDataSource expenseDataSource = new JRBeanCollectionDataSource(expenses);
+						params.put("IncomeDataSource", incomeDataSource);
+						params.put("ExpenseDataSource", expenseDataSource);
+						params.put("IncomeTotal", incomesTotalAmount);
+						params.put("ExpenseTotal", expensesTotalAmount);
+						params.put("NetProfit", netProfit);
+						String reportResourcePath = storage.resourcePath("reports", reportName);
+						InputStream reportResource = storage.resolve(reportResourcePath);
+						JasperReport incomeStatementReport = JasperCompileManager.compileReport(reportResource);
+
+						ByteArrayOutputStream reportOutput = new ByteArrayOutputStream();
+
+						JasperPrint filledReport = JasperFillManager.fillReport(incomeStatementReport, params, new JREmptyDataSource());
+						JasperExportManager.exportReportToPdfStream(filledReport, reportOutput);
+						return new ByteArrayInputStream(reportOutput.toByteArray());
+					} catch (Exception ex) {
+						L.warn("Failed to process report", ex);
+					}
+					return null;
+				}
+
+			}, "income-statement-report" + System.currentTimeMillis() + ".pdf"));
+		});
+
+		layout.addComponents(toDateField, generateReportButton);
+
+		VaadinUtils.applyStyleRecursively(layout, "small");
 		return layout;
 
 	}
@@ -82,13 +173,11 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 		List<GxIncomeStatementBean> incomeStatementList = accountingDataService.findIncomeStatementByDateAndNamespace(new Timestamp(toDateField.getValue().getTime()),
 				namespaceBean);
 
-		List<GxIncomeStatementBean> incomes = incomeStatementList.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.INCOME.typeCode()))
-				.collect(Collectors.toList());
-		Double incomesTotalAmount = incomes.stream().mapToDouble(GxIncomeStatementBean::getAmount).sum();
+		incomes = incomeStatementList.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.INCOME.typeCode())).collect(Collectors.toList());
+		incomesTotalAmount = incomes.stream().mapToDouble(GxIncomeStatementBean::getAmount).sum();
 
-		List<GxIncomeStatementBean> expenses = incomeStatementList.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.EXPENSE.typeCode()))
-				.collect(Collectors.toList());
-		Double expensesTotalAmount = expenses.stream().mapToDouble(GxIncomeStatementBean::getAmount).sum();
+		expenses = incomeStatementList.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.EXPENSE.typeCode())).collect(Collectors.toList());
+		expensesTotalAmount = expenses.stream().mapToDouble(GxIncomeStatementBean::getAmount).sum();
 
 		body.addComponents(constructTable("Income", incomes, incomesTotalAmount), constructTable("Expense", expenses, expensesTotalAmount));
 
@@ -97,7 +186,7 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 
 		mainLayout.addComponents(body, incomeAndExpenseTotalLayout);
 
-		double netProfit = incomesTotalAmount - expensesTotalAmount;
+		netProfit = incomesTotalAmount - expensesTotalAmount;
 		MHorizontalLayout netProfitLayout = new MHorizontalLayout();
 
 		netProfitLayout.setWidth("49.6%");
@@ -162,8 +251,10 @@ public class GxIncomeStatementPanel extends MVerticalLayout {
 		}
 	}
 
-	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
+	public void initializeWithEntity(GxNamespaceBean namespaceBean, String companyName, String companyLogoPath) {
 		this.namespaceBean = namespaceBean;
+		this.companyName = companyName;
+		this.companyLogoPath = companyLogoPath;
 		addComponent(buildToolbar());
 		mainPanel = buildBody();
 		addComponent(mainPanel);

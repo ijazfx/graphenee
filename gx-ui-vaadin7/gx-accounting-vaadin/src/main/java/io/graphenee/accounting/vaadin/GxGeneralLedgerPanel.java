@@ -1,12 +1,19 @@
 package io.graphenee.accounting.vaadin;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.button.MButton;
@@ -20,6 +27,8 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
@@ -38,16 +47,29 @@ import io.graphenee.core.enums.Timeframe;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
+import io.graphenee.core.model.bean.GxGeneralLedgerReportBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxVoucherBean;
+import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityTablePanel.TableColumn;
+import io.graphenee.vaadin.ResourcePreviewPanel;
 import io.graphenee.vaadin.event.TRItemClickListener;
+import io.graphenee.vaadin.util.VaadinUtils;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxGeneralLedgerPanel extends VerticalSplitPanel {
+
+	public static final Logger L = LoggerFactory.getLogger(GxGeneralLedgerBean.class);
 
 	@Autowired
 	GxDataService dataService;
@@ -57,6 +79,9 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 
 	@Autowired
 	GxJournalVoucherForm form;
+
+	@Autowired
+	FileStorage storage;
 
 	private GxNamespaceBean namespaceBean;
 	private GxAccountBean selectedAccount;
@@ -81,6 +106,12 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 	private MButton generateReportButton;
 
 	private MVerticalLayout mainPanel;
+
+	private String companyName;
+
+	private Map<String, List<GxGeneralLedgerBean>> ledgerMap = new HashMap<String, List<GxGeneralLedgerBean>>();
+
+	private String companyLogoPath = null;
 
 	public GxGeneralLedgerPanel() {
 		setWidth(100, Unit.PERCENTAGE);
@@ -110,7 +141,56 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 		});
 
 		generateReportButton = new MButton("Generate Report", event -> {
+			ResourcePreviewPanel previewPanel = new ResourcePreviewPanel();
+			previewPanel.build().openInModalPopup();
+			previewPanel.preview(new StreamResource(new StreamSource() {
+				@Override
+				public InputStream getStream() {
+					try {
+						String reportName = null;
+						Map<String, Object> params = new HashMap<>();
+						reportName = "GeneralLedgerReport.jrxml";
 
+						params.put("CompanyName", companyName);
+						params.put("FromDate", TRCalendarUtil.dateFormatter.format(fromDateField.getValue()));
+						params.put("ToDate", TRCalendarUtil.dateFormatter.format(toDateField.getValue()));
+
+						if (companyLogoPath != null) {
+							try {
+								params.put("CompanyLogoPath", storage.resolveToURI(companyLogoPath).getRawPath());
+							} catch (Exception e) {
+								L.warn("Failed to resolve logo file path", e);
+							}
+						}
+
+						List<GxGeneralLedgerReportBean> legderDataSourceList = new ArrayList<>();
+
+						ledgerMap.forEach((parentAccount, childAccounts) -> {
+							GxGeneralLedgerReportBean bean = new GxGeneralLedgerReportBean();
+							bean.setParentAccount(parentAccount);
+							bean.setGeneralLedgerList(childAccounts);
+							legderDataSourceList.add(bean);
+						});
+
+						JRBeanCollectionDataSource ledgerDataSource = new JRBeanCollectionDataSource(legderDataSourceList);
+						params.put("LedgerDataSource", ledgerDataSource);
+
+						String reportResourcePath = storage.resourcePath("reports", reportName);
+						InputStream reportResource = storage.resolve(reportResourcePath);
+						JasperReport balanceSheetReport = JasperCompileManager.compileReport(reportResource);
+
+						ByteArrayOutputStream reportOutput = new ByteArrayOutputStream();
+
+						JasperPrint filledReport = JasperFillManager.fillReport(balanceSheetReport, params, new JREmptyDataSource());
+						JasperExportManager.exportReportToPdfStream(filledReport, reportOutput);
+						return new ByteArrayInputStream(reportOutput.toByteArray());
+					} catch (Exception ex) {
+						L.warn("Failed to process report", ex);
+					}
+					return null;
+				}
+
+			}, "general-ledger-report" + System.currentTimeMillis() + ".pdf"));
 		});
 
 		MHorizontalLayout accountAndSubAccountLayout = new MHorizontalLayout();
@@ -183,6 +263,8 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 
 		toggleEnableDateFields(false);
 
+		VaadinUtils.applyStyleRecursively(layout, "small");
+
 		return layout;
 
 	}
@@ -206,8 +288,8 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 		if (selectedAccount != null) {
 			Boolean displaySubAccount = displaySubAccountsCheckBox.getValue();
 			if (displaySubAccount) {
-				Map<String, List<GxGeneralLedgerBean>> ledgerMap = accountingDataService
-						.findAllByAccountAndChildAccountsAndNamespaceAndDateRangeGroupByAccountOrderByTransactionDateAsc(selectedAccount, namespaceBean, fromDate, toDate);
+				ledgerMap = accountingDataService.findAllByAccountAndChildAccountsAndNamespaceAndDateRangeGroupByAccountOrderByTransactionDateAsc(selectedAccount, namespaceBean,
+						fromDate, toDate);
 				Double totalBalance = 0.0;
 				for (Map.Entry<String, List<GxGeneralLedgerBean>> entry : ledgerMap.entrySet()) {
 					mainLayout.addComponent(constructTable(entry.getValue(), entry.getKey()));
@@ -217,10 +299,12 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 
 				mainLayout.addComponent(constructFooterTable(selectedAccount.getAccountName(), totalBalance));
 			} else {
-				mainLayout.addComponent(constructTable(findLedgerByAccount(fromDate, toDate), null));
+				findLedgerByAccount(fromDate, toDate).forEach((accountName, entities) -> {
+					mainLayout.addComponent(constructTable(entities, null));
+				});
 			}
 		} else {
-			Map<String, List<GxGeneralLedgerBean>> ledgerMap = accountingDataService.findAllByNamespaceAndDateRangeOrderByTransactionDateAsc(namespaceBean, fromDate, toDate);
+			ledgerMap = accountingDataService.findAllByNamespaceAndDateRangeOrderByTransactionDateAsc(namespaceBean, fromDate, toDate);
 			ledgerMap.forEach((accountName, entities) -> {
 				mainLayout.addComponent(constructTable(entities, accountName));
 			});
@@ -315,15 +399,18 @@ public class GxGeneralLedgerPanel extends VerticalSplitPanel {
 		}
 	}
 
-	private List<GxGeneralLedgerBean> findLedgerByAccount(Timestamp fromDate, Timestamp toDate) {
+	private Map<String, List<GxGeneralLedgerBean>> findLedgerByAccount(Timestamp fromDate, Timestamp toDate) {
 		if (selectedAccount != null) {
-			return accountingDataService.findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAsc(selectedAccount, namespaceBean, fromDate, toDate);
+			ledgerMap = accountingDataService.findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAscGroupByAccountName(selectedAccount, namespaceBean, fromDate, toDate);
+			return ledgerMap;
 		} else
-			return Collections.emptyList();
+			return Collections.emptyMap();
 	}
 
-	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
+	public void initializeWithEntity(GxNamespaceBean namespaceBean, String companyName, String companyLogoPath) {
 		this.namespaceBean = namespaceBean;
+		this.companyName = companyName;
+		this.companyLogoPath = companyLogoPath;
 		setFirstComponent(buildToolbar());
 		mainPanel = buildBody();
 		setSecondComponent(mainPanel);
