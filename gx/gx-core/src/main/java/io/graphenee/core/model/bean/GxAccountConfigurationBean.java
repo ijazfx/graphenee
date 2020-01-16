@@ -13,6 +13,7 @@ public class GxAccountConfigurationBean implements Serializable {
 	private Timestamp fiscalYearStart;
 	private Integer voucherNumber;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
+	private BeanFault<Integer, Timestamp> fiscalYearStartBeanFault;
 
 	public Integer getOid() {
 		return oid;
@@ -52,6 +53,14 @@ public class GxAccountConfigurationBean implements Serializable {
 
 	public String getFormattedFiscalYear() {
 		return TRCalendarUtil.getFormattedDate(getFiscalYearStart()) + " - " + TRCalendarUtil.getFormattedDate(getFiscalYearEnd());
+	}
+
+	public BeanFault<Integer, Timestamp> getFiscalYearStartBeanFault() {
+		return fiscalYearStartBeanFault;
+	}
+
+	public void setFiscalYearStartBeanFault(BeanFault<Integer, Timestamp> fiscalYearStartBeanFault) {
+		this.fiscalYearStartBeanFault = fiscalYearStartBeanFault;
 	}
 
 	@Override

@@ -67,18 +67,22 @@ public class GxAccountConfigurationForm extends TRAbstractForm<GxAccountConfigur
 			GxAccountConfigurationBean configurationBean = getEntity();
 			if (configurationBean != null) {
 				if (TRCalendarUtil.getCurrentTimeStamp().after(configurationBean.getFiscalYearEnd())) {
-					ConfirmDialog.show(UI.getCurrent(), "Are you sure to close fiscal year " + configurationBean.getFormattedFiscalYear() + " ?", e -> {
-						if (e.isConfirmed()) {
-							if (accountingDataService.closeYear(configurationBean.getGxNamespaceBeanFault().getBean())) {
-								GxNotification.tray("Fiscal year " + configurationBean.getFormattedFiscalYear() + " closed successfully.").show(Page.getCurrent());
-							}
-						}
-					});
+					ConfirmDialog.show(UI.getCurrent(), "Confirm Year Close",
+							"Are you sure to close fiscal year " + configurationBean.getFormattedFiscalYear() + " ? \n All transactions for this year will be archived.", "Ok",
+							"Cancel", e -> {
+								if (e.isConfirmed()) {
+									if (accountingDataService.closeYear(configurationBean.getGxNamespaceBeanFault().getBean())) {
+										GxNotification.tray("Fiscal year " + configurationBean.getFormattedFiscalYear() + " closed successfully.").show(Page.getCurrent());
+										configurationBean.getFiscalYearStartBeanFault().invalidate();
+										fiscalYearStart.setValue(configurationBean.getFiscalYearStartBeanFault().getBean());
+									}
+								}
+							});
 				} else {
 					GxNotification.tray("You cannot close year till " + TRCalendarUtil.getFormattedDate(configurationBean.getFiscalYearEnd()) + " .").show(Page.getCurrent());
 				}
 			} else {
-				GxNotification.tray("Account configuration is not configured.").show(Page.getCurrent());
+				GxNotification.tray("Account settings are not configured.").show(Page.getCurrent());
 			}
 		});
 

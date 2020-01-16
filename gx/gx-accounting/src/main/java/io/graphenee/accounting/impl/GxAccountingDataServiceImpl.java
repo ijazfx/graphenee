@@ -3,6 +3,7 @@ package io.graphenee.accounting.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -38,9 +39,9 @@ import io.graphenee.core.model.jpa.repository.GxAccountRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxBalanceSheetRepository;
 import io.graphenee.core.model.jpa.repository.GxGeneralLedgerRepository;
+import io.graphenee.core.model.jpa.repository.GxJournalVoucherRepository;
 import io.graphenee.core.model.jpa.repository.GxTransactionRepository;
 import io.graphenee.core.model.jpa.repository.GxTrialBalanceRepository;
-import io.graphenee.core.model.jpa.repository.GxVoucherRepository;
 import io.graphenee.core.util.TRCalendarUtil;
 
 @Transactional
@@ -63,7 +64,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	GxTransactionRepository transactionRepository;
 
 	@Autowired
-	GxVoucherRepository voucherRepository;
+	GxJournalVoucherRepository voucherRepository;
 
 	@Autowired
 	GxGeneralLedgerRepository generalLedgerRepository;
@@ -144,8 +145,38 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Override
 	public List<GxAccountBean> findAllAccountsByNamespaceAndAccountType(GxNamespaceBean namespaceBean, GxAccountTypeBean bean) {
-		return accountRepository.findAllByGxNamespaceNamespaceAndGxAccountTypeOidOrderByAccountCodeAsc(namespaceBean.getNamespace(), bean.getOid()).stream()
-				.map(entity -> beanFactory.makeGxAccountBean(entity)).collect(Collectors.toList());
+		List<GxAccountBean> accountList = accountRepository.findAllByGxNamespaceNamespaceAndGxAccountTypeOidOrderByAccountCodeAsc(namespaceBean.getNamespace(), bean.getOid())
+				.stream().map(entity -> beanFactory.makeGxAccountBean(entity)).collect(Collectors.toList());
+
+		Map<GxAccountBean, GxAccountBean> accountMap = new HashMap<GxAccountBean, GxAccountBean>();
+		accountList.forEach(account -> {
+			GxAccountBean parent = account.getGxParentAccountBeanFault() != null ? account.getGxParentAccountBeanFault().getBean() : null;
+			accountMap.put(account, parent);
+		});
+
+		List<GxAccountBean> sortedAccountList = new ArrayList<GxAccountBean>();
+
+		accountMap.forEach((child, parent) -> {
+			if (parent == null) {
+				sortedAccountList.addAll(buildSubAccountHierarchy(child, new ArrayList<GxAccountBean>(), accountMap));
+			}
+		});
+
+		return sortedAccountList;
+	}
+
+	private List<GxAccountBean> buildSubAccountHierarchy(GxAccountBean parent, List<GxAccountBean> accountList, Map<GxAccountBean, GxAccountBean> accountMap) {
+		if (parent != null) {
+			accountList.add(parent);
+		}
+
+		List<GxAccountBean> children = accountMap.entrySet().stream().filter(p -> parent.equals(p.getValue())).map(Map.Entry::getKey).collect(Collectors.toList());
+
+		for (GxAccountBean child : children) {
+			buildSubAccountHierarchy(child, accountList, accountMap);
+		}
+
+		return accountList;
 	}
 
 	@Override
@@ -215,6 +246,20 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 				namespaceBean.getOid(), startDate, endDate);
 
 		return beanFactory.makeGxGeneralLedgerBean(ledgerEntries, previousBalance);
+	}
+
+	@Override
+	public Map<String, List<GxGeneralLedgerBean>> findAllByAccountAndNamespaceAndDateRangeOrderByTransactionDateAscGroupByAccountName(GxAccountBean accountBean,
+			GxNamespaceBean namespaceBean, Timestamp fromDate, Timestamp toDate) {
+		Double previousBalance = findAccountBalanceByAccountAndDateIsBefore(accountBean, fromDate);
+
+		Timestamp startDate = TRCalendarUtil.startOfDayAsTimestamp(fromDate);
+		Timestamp endDate = TRCalendarUtil.endOfDayAsTimestamp(toDate);
+
+		List<GxGeneralLedger> ledgerEntries = generalLedgerRepository.findAllByOidAccountAndOidNamespaceAndTransactionDateIsBetweenOrderByTransactionDateAsc(accountBean.getOid(),
+				namespaceBean.getOid(), startDate, endDate);
+
+		return beanFactory.makeGxGeneralLedgerBean(ledgerEntries, previousBalance).stream().collect(Collectors.groupingBy(GxGeneralLedgerBean::getAccountName));
 	}
 
 	@Override

@@ -7,6 +7,7 @@ public class GxTrialBalanceBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer oid;
+	private Integer accountCode;
 	private String accountName;
 	private Integer oidAccount;
 	private String accountTypeName;
@@ -25,6 +26,14 @@ public class GxTrialBalanceBean implements Serializable {
 
 	public String getAccountName() {
 		return accountName;
+	}
+
+	public Integer getAccountCode() {
+		return accountCode;
+	}
+
+	public void setAccountCode(Integer accountCode) {
+		this.accountCode = accountCode;
 	}
 
 	public void setAccountName(String accountName) {

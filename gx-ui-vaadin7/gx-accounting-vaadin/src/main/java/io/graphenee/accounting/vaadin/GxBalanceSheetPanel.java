@@ -1,20 +1,30 @@
 package io.graphenee.accounting.vaadin;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
@@ -28,17 +38,33 @@ import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.enums.AccountType;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxBalanceSheetBean;
+import io.graphenee.core.model.bean.GxBalanceSheetReportBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.AbstractEntityTablePanel.TableColumn;
+import io.graphenee.vaadin.ResourcePreviewPanel;
+import io.graphenee.vaadin.util.VaadinUtils;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxBalanceSheetPanel extends MVerticalLayout {
 
+	public static final Logger L = LoggerFactory.getLogger(GxBalanceSheetBean.class);
+
 	@Autowired
 	GxDataService dataService;
+
+	@Autowired
+	FileStorage storage;
 
 	@Autowired
 	GxAccountingDataService accountingDataService;
@@ -49,12 +75,27 @@ public class GxBalanceSheetPanel extends MVerticalLayout {
 
 	private MVerticalLayout mainPanel;
 
+	private String companyName;
+
+	private MButton generateReportButton;
+
+	private List<GxBalanceSheetBean> assets = new ArrayList<>();
+	private List<GxBalanceSheetBean> liabilities = new ArrayList<>();
+	private List<GxBalanceSheetBean> equity = new ArrayList<>();
+
+	private Double equityTotalAmount;
+	private Double netIncome;
+	private Double liabilitiesTotalAmount;
+	private Double assetsTotalAmount;
+	private String companyLogoPath;
+
 	public GxBalanceSheetPanel() {
 		setWidth(100, Unit.PERCENTAGE);
+		setMargin(false);
 	}
 
 	private MHorizontalLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withWidthUndefined().withMargin(false)
 				.withSpacing(true);
 		toDateField = new DateField("Upto");
 		toDateField.setResolution(Resolution.MONTH);
@@ -71,9 +112,90 @@ public class GxBalanceSheetPanel extends MVerticalLayout {
 			refresh();
 		});
 
-		layout.addComponents(toDateField);
-		return layout;
+		generateReportButton = new MButton("Generate Report", event -> {
+			ResourcePreviewPanel previewPanel = new ResourcePreviewPanel();
+			previewPanel.build().openInModalPopup();
+			previewPanel.preview(new StreamResource(new StreamSource() {
+				@Override
+				public InputStream getStream() {
+					try {
+						String reportName = null;
+						Map<String, Object> params = new HashMap<>();
+						reportName = "BalanceSheetReport.jrxml";
 
+						params.put("CompanyName", companyName);
+						params.put("ToDate", TRCalendarUtil.dateFormatter.format(toDateField.getValue()));
+
+						if (companyLogoPath != null) {
+							try {
+								params.put("CompanyLogoPath", storage.resolveToURI(companyLogoPath).getRawPath());
+							} catch (Exception e) {
+								L.warn("Failed to resolve logo file path", e);
+							}
+						}
+
+						List<GxBalanceSheetReportBean> assetDataSourceList = new ArrayList<>();
+
+						generateAssetMap().forEach((parentAccount, childAccounts) -> {
+							GxBalanceSheetReportBean bean = new GxBalanceSheetReportBean();
+							bean.setParentAccount(parentAccount.orElse("Asset"));
+							bean.setBalanceSheetList(childAccounts);
+							assetDataSourceList.add(bean);
+						});
+
+						JRBeanCollectionDataSource assetDataSource = new JRBeanCollectionDataSource(assetDataSourceList);
+						params.put("AssetDataSource", assetDataSource);
+
+						List<GxBalanceSheetReportBean> liabilityDataSourceList = new ArrayList<>();
+
+						generateLiablityMap().forEach((parentAccount, childAccounts) -> {
+							GxBalanceSheetReportBean bean = new GxBalanceSheetReportBean();
+							bean.setParentAccount(parentAccount.orElse("Liability"));
+							bean.setBalanceSheetList(childAccounts);
+							liabilityDataSourceList.add(bean);
+						});
+
+						JRBeanCollectionDataSource liabilityDataSource = new JRBeanCollectionDataSource(liabilityDataSourceList);
+						params.put("LiabilityDataSource", liabilityDataSource);
+
+						List<GxBalanceSheetReportBean> equityDataSourceList = new ArrayList<>();
+
+						generateEquityMap().forEach((parentAccount, childAccounts) -> {
+							GxBalanceSheetReportBean bean = new GxBalanceSheetReportBean();
+							bean.setParentAccount(parentAccount.orElse("Equity"));
+							bean.setBalanceSheetList(childAccounts);
+							equityDataSourceList.add(bean);
+						});
+
+						JRBeanCollectionDataSource equityDataSource = new JRBeanCollectionDataSource(equityDataSourceList);
+						params.put("EquityDataSource", equityDataSource);
+						params.put("AssetsTotalAmount", assetsTotalAmount);
+						params.put("LiabilitiesTotalAmount", liabilitiesTotalAmount);
+						params.put("EquityTotalAmount", equityTotalAmount);
+						params.put("NetIncome", netIncome);
+
+						String reportResourcePath = storage.resourcePath("reports", reportName);
+						InputStream reportResource = storage.resolve(reportResourcePath);
+						JasperReport balanceSheetReport = JasperCompileManager.compileReport(reportResource);
+
+						ByteArrayOutputStream reportOutput = new ByteArrayOutputStream();
+
+						JasperPrint filledReport = JasperFillManager.fillReport(balanceSheetReport, params, new JREmptyDataSource());
+						JasperExportManager.exportReportToPdfStream(filledReport, reportOutput);
+						return new ByteArrayInputStream(reportOutput.toByteArray());
+					} catch (Exception ex) {
+						L.warn("Failed to process report", ex);
+					}
+					return null;
+				}
+
+			}, "balance-sheet-report" + System.currentTimeMillis() + ".pdf"));
+		});
+
+		layout.addComponents(toDateField, generateReportButton);
+		VaadinUtils.applyStyleRecursively(layout, "small");
+
+		return layout;
 	}
 
 	private MVerticalLayout buildBody() {
@@ -82,45 +204,38 @@ public class GxBalanceSheetPanel extends MVerticalLayout {
 
 		List<GxBalanceSheetBean> balanceSheetBeans = accountingDataService.findBalanceSheetByDateAndNamespace(new Timestamp(toDateField.getValue().getTime()), namespaceBean);
 
-		Double netIncome = accountingDataService.findNetIncomeByDateAndNamespace(new Timestamp(toDateField.getValue().getTime()), namespaceBean);
+		netIncome = accountingDataService.findNetIncomeByDateAndNamespace(new Timestamp(toDateField.getValue().getTime()), namespaceBean);
 
-		List<GxBalanceSheetBean> assets = balanceSheetBeans.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.ASSET.typeCode()))
-				.collect(Collectors.toList());
+		assets = balanceSheetBeans.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.ASSET.typeCode())).collect(Collectors.toList());
 
 		MVerticalLayout assetLayout = new MVerticalLayout().withSizeUndefined().withFullWidth().withMargin(false).withSpacing(true);
 
-		Map<Optional<String>, List<GxBalanceSheetBean>> assetMap = assets.stream().collect(Collectors.groupingBy(entity -> Optional.ofNullable(entity.getParentAccountName())));
-		assetMap.forEach((parentAccount, childAccounts) -> {
+		generateAssetMap().forEach((parentAccount, childAccounts) -> {
 			Double childAssetsTotalAmount = childAccounts.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
 			assetLayout.addComponent(constructTable(parentAccount.orElse("Assets"), childAccounts, childAssetsTotalAmount));
 		});
 
-		Double assetsTotalAmount = assets.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
+		assetsTotalAmount = assets.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
 
 		MVerticalLayout liabilityAndEquityLayout = new MVerticalLayout().withSizeUndefined().withFullWidth().withMargin(false);
 
-		List<GxBalanceSheetBean> liabilities = balanceSheetBeans.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.LIABILITY.typeCode()))
-				.collect(Collectors.toList());
+		liabilities = balanceSheetBeans.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.LIABILITY.typeCode())).collect(Collectors.toList());
 
-		Map<Optional<String>, List<GxBalanceSheetBean>> liabilityMap = liabilities.stream()
-				.collect(Collectors.groupingBy(entity -> Optional.ofNullable(entity.getParentAccountName())));
-		liabilityMap.forEach((parentAccount, childAccounts) -> {
+		generateLiablityMap().forEach((parentAccount, childAccounts) -> {
 			Double childLiabilitiesTotalAmount = childAccounts.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
 			liabilityAndEquityLayout.addComponent(constructTable(parentAccount.orElse("Liabilities"), childAccounts, childLiabilitiesTotalAmount));
 		});
 
-		Double liabilitiesTotalAmount = liabilities.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
+		liabilitiesTotalAmount = liabilities.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
 
-		List<GxBalanceSheetBean> equity = balanceSheetBeans.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.EQUITY.typeCode()))
-				.collect(Collectors.toList());
+		equity = balanceSheetBeans.stream().filter(entity -> entity.getAccountTypeCode().equals(AccountType.EQUITY.typeCode())).collect(Collectors.toList());
 
-		Map<Optional<String>, List<GxBalanceSheetBean>> equityMap = equity.stream().collect(Collectors.groupingBy(entity -> Optional.ofNullable(entity.getParentAccountName())));
-		equityMap.forEach((parentAccount, childAccounts) -> {
+		generateEquityMap().forEach((parentAccount, childAccounts) -> {
 			Double childEquitiesTotalAmount = childAccounts.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
 			liabilityAndEquityLayout.addComponent(constructTable(parentAccount.orElse("Equity"), childAccounts, childEquitiesTotalAmount));
 		});
 
-		Double equityTotalAmount = equity.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
+		equityTotalAmount = equity.stream().mapToDouble(GxBalanceSheetBean::getAmount).sum();
 
 		liabilityAndEquityLayout.addComponents(constructFooterTable("Net Income", netIncome), constructFooterTable("Total Equity", netIncome + equityTotalAmount));
 
@@ -134,6 +249,18 @@ public class GxBalanceSheetPanel extends MVerticalLayout {
 		mainLayout.addComponents(body, footer);
 
 		return mainLayout;
+	}
+
+	private Map<Optional<String>, List<GxBalanceSheetBean>> generateAssetMap() {
+		return assets.stream().collect(Collectors.groupingBy(entity -> Optional.ofNullable(entity.getParentAccountName())));
+	}
+
+	private Map<Optional<String>, List<GxBalanceSheetBean>> generateLiablityMap() {
+		return liabilities.stream().collect(Collectors.groupingBy(entity -> Optional.ofNullable(entity.getParentAccountName())));
+	}
+
+	private Map<Optional<String>, List<GxBalanceSheetBean>> generateEquityMap() {
+		return equity.stream().collect(Collectors.groupingBy(entity -> Optional.ofNullable(entity.getParentAccountName())));
 	}
 
 	private Component constructFooterTable(String title, Double amount) {
@@ -183,8 +310,10 @@ public class GxBalanceSheetPanel extends MVerticalLayout {
 		}
 	}
 
-	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
+	public void initializeWithEntity(GxNamespaceBean namespaceBean, String companyName, String companyLogoPath) {
 		this.namespaceBean = namespaceBean;
+		this.companyName = companyName;
+		this.companyLogoPath = companyLogoPath;
 		addComponent(buildToolbar());
 		mainPanel = buildBody();
 		addComponent(mainPanel);

@@ -17,6 +17,9 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 	@Column(name = "oid")
 	private Integer oid;
 
+	@Column(name = "account_code")
+	private Integer accountCode;
+
 	@Column(name = "account_name")
 	private String accountName;
 
@@ -38,6 +41,14 @@ public class GxTrialBalance extends io.graphenee.core.model.GxMappedSuperclass i
 
 	public Integer getOid() {
 		return oid;
+	}
+
+	public Integer getAccountCode() {
+		return accountCode;
+	}
+
+	public void setAccountCode(Integer accountCode) {
+		this.accountCode = accountCode;
 	}
 
 	public void setOid(Integer oid) {

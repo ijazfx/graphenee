@@ -21,7 +21,7 @@ public interface GxTransactionRepository extends GxJpaRepository<GxTransaction, 
 
 	List<GxTransaction> findAllByGxVouchersOidOrderByTransactionDateAsc(Integer oidVoucher);
 
-	@Query("select sum(t.amount) from GxTransaction t where t.gxAccount.oid in :oids and t.transactionDate >= :startDate and t.transactionDate <= :endDate")
-	Double findBalanceByAccountAndChildAccountsAndDateIsBetween(@Param("oids") List<Integer> oids, @Param("startDate") Timestamp startDate, @Param("endDate") Timestamp endDate);
+	@Query("select sum(t.amount) from GxTransaction t where t.gxAccount.oid in :oids and t.transactionDate <= :endDate")
+	Double findBalanceByAccountAndChildAccountsAndDateIsBefore(@Param("oids") List<Integer> oids, @Param("endDate") Timestamp endDate);
 
 }

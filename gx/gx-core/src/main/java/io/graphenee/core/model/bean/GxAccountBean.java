@@ -125,11 +125,16 @@ public class GxAccountBean implements Serializable {
 	}
 
 	public String getIndentedTitle() {
-		String indentedSymbol = getGxParentAccountBeanFault() != null ? "|" : "";
-		StringBuilder builder = new StringBuilder(indentedSymbol);
+		StringBuilder builder = new StringBuilder();
 		GxAccountBean account = gxParentAccountBeanFault != null ? gxParentAccountBeanFault.getBean() : null;
+		boolean first = true;
 		while (account != null) {
-			builder.append("--");
+			if (first) {
+				builder.append("\u251c\u2500");
+				first = false;
+			} else {
+				builder.append("\u253c\u2500");
+			}
 			account = account.gxParentAccountBeanFault != null ? account.gxParentAccountBeanFault.getBean() : null;
 		}
 		builder.append(" " + accountName);

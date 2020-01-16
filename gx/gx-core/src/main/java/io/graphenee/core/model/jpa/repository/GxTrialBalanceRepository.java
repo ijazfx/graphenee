@@ -12,7 +12,7 @@ import io.graphenee.core.model.jpa.GxJpaRepository;
 
 public interface GxTrialBalanceRepository extends GxJpaRepository<GxTrialBalance, Integer> {
 
-	@Query("select tb.accountName, tb.oidAccount, tb.oidAccountType, tb.accountTypeName, sum(tb.amount) as amount from GxTrialBalance tb where tb.oidNamespace = :oidNamespace and tb.month <= :month group by tb.accountName, tb.oidAccount,tb.oidAccountType, tb.accountTypeName order by tb.accountName asc")
+	@Query("select tb.accountCode, tb.accountName, tb.oidAccount, tb.oidAccountType, tb.accountTypeName, sum(tb.amount) as amount from GxTrialBalance tb where tb.oidNamespace = :oidNamespace and tb.month <= :month group by tb.accountCode, tb.accountName, tb.oidAccount,tb.oidAccountType, tb.accountTypeName order by tb.accountName asc")
 	List<Object[]> findAllByOidNamespaceAndMonthLessThanEqual(@Param("oidNamespace") Integer oidNamespace, @Param("month") Timestamp month);
 
 	@Modifying

@@ -24,6 +24,7 @@ import io.graphenee.core.model.bean.GxAccountBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
 import io.graphenee.core.model.bean.GxVoucherBean;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.AbstractEntityTablePanel;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.converter.BeanFaultToBeanConverter;
@@ -156,6 +157,7 @@ public class GxTransactionTablePanel extends AbstractEntityTablePanel<GxTransact
 			MTextField textField = new MTextField().withWidth("95px");
 			textField.setHeight("40px");
 			textField.setConverter(new StringToDoubleConverter());
+			textField.setStyleName(GrapheneeTheme.STYLE_V_ALIGN_RIGHT);
 			textField.addValueChangeListener(listener -> {
 				voucherBean.getGxTransactionBeanCollectionFault().update(itemId);
 				entityTable().setColumnFooter("debit", calculateTotalDebit());
@@ -169,6 +171,7 @@ public class GxTransactionTablePanel extends AbstractEntityTablePanel<GxTransact
 			MTextField textField = new MTextField().withWidth("95px");
 			textField.setHeight("40px");
 			textField.setConverter(new StringToDoubleConverter());
+			textField.setStyleName(GrapheneeTheme.STYLE_V_ALIGN_RIGHT);
 			textField.addValueChangeListener(listener -> {
 				voucherBean.getGxTransactionBeanCollectionFault().update(itemId);
 				entityTable().setColumnFooter("credit", calculateTotalCredit());

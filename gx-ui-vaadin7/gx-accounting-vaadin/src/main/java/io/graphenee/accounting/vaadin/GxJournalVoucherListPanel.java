@@ -30,7 +30,7 @@ import io.graphenee.vaadin.TRAbstractForm;
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
-public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
+public class GxJournalVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 
 	private GxNamespaceBean namespaceBean;
 
@@ -43,7 +43,7 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 	GxAccountingDataService accountingDataService;
 
 	@Autowired
-	GxVoucherForm form;
+	GxJournalVoucherForm form;
 
 	private DateField fromDateField;
 	private DateField toDateField;
@@ -58,7 +58,7 @@ public class GxVoucherListPanel extends AbstractEntityListPanel<GxVoucherBean> {
 
 	private Timeframe fetchMode = Timeframe.ThisMonth;
 
-	public GxVoucherListPanel() {
+	public GxJournalVoucherListPanel() {
 		super(GxVoucherBean.class);
 	}
 

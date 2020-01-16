@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import io.graphenee.core.model.entity.GxVoucher;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
-public interface GxVoucherRepository extends GxJpaRepository<GxVoucher, Integer> {
+public interface GxJournalVoucherRepository extends GxJpaRepository<GxVoucher, Integer> {
 
 	List<GxVoucher> findByOrderByVoucherDateAsc();
 
