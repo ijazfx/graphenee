@@ -106,6 +106,7 @@
 		
 		<module>gx-accounting</module>
 
+		<module>gx-pos</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
@@ -273,6 +274,11 @@
 			<dependency>
 				<groupId>io.graphenee</groupId>
 				<artifactId>gx-accounting</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.graphenee</groupId>
+				<artifactId>gx-pos</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
