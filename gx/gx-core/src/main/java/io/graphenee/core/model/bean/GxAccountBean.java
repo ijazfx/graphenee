@@ -3,6 +3,7 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import io.graphenee.core.model.BeanCollectionFault;
@@ -10,6 +11,8 @@ import io.graphenee.core.model.BeanFault;
 
 public class GxAccountBean implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	private UUID uuid = UUID.randomUUID();
 
 	private Integer oid;
 	private Integer accountCode;
@@ -20,6 +23,11 @@ public class GxAccountBean implements Serializable {
 	private BeanCollectionFault<GxAccountBean> gxChildAccountBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxTransactionBean> gxTransactionBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxAccountBalanceBean> gxAccountBalanceBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
+
+	private String parentAccountName;
+	private String accountType;
+	private Double closingBalance;
+	private Integer year;
 
 	public Integer getOid() {
 		return oid;
@@ -94,6 +102,8 @@ public class GxAccountBean implements Serializable {
 	}
 
 	public String getAccountType() {
+		if (accountType != null)
+			return accountType;
 		return getGxAccountTypeBeanFault() != null ? getGxAccountTypeBeanFault().getBean().getTypeName() : null;
 	}
 
@@ -141,10 +151,39 @@ public class GxAccountBean implements Serializable {
 		return builder.toString();
 	}
 
+	public String getParentAccountName() {
+		return parentAccountName;
+	}
+
+	public void setParentAccountName(String parentAccountName) {
+		this.parentAccountName = parentAccountName;
+	}
+
+	public Double getClosingBalance() {
+		return closingBalance;
+	}
+
+	public void setClosingBalance(Double closingBalance) {
+		this.closingBalance = closingBalance;
+	}
+
+	public Integer getYear() {
+		return year;
+	}
+
+	public void setYear(Integer year) {
+		this.year = year;
+	}
+
+	public void setAccountType(String accountType) {
+		this.accountType = accountType;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((accountName == null) ? 0 : accountName.hashCode());
 		result = prime * result + ((oid == null) ? 0 : oid.hashCode());
 		return result;
 	}
@@ -158,6 +197,11 @@ public class GxAccountBean implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		GxAccountBean other = (GxAccountBean) obj;
+		if (accountName == null) {
+			if (other.accountName != null)
+				return false;
+		} else if (!accountName.equals(other.accountName))
+			return false;
 		if (oid == null) {
 			if (other.oid != null)
 				return false;

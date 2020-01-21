@@ -17,6 +17,7 @@ import io.graphenee.core.model.entity.GxAccount;
 import io.graphenee.core.model.entity.GxAccountBalance;
 import io.graphenee.core.model.entity.GxAccountConfiguration;
 import io.graphenee.core.model.entity.GxAccountType;
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTransaction;
 import io.graphenee.core.model.entity.GxVoucher;
 import io.graphenee.core.model.jpa.repository.GxAccountBalanceRepository;
@@ -182,5 +183,25 @@ public class GxEntityFactory {
 		accountBalance.setClosingBalance(closingBalance);
 		accountBalance.setFiscalYear(TRCalendarUtil.getYear(fiscalYearEnd));
 		return accountBalance;
+	}
+
+	public GxAccountBalance makeGxAccountBalanceEntity(GxAccount account, Double balance, Integer year) {
+		GxAccountBalance accountBalance = new GxAccountBalance();
+		accountBalance.setGxAccount(account);
+		accountBalance.setGxNamespace(account.getGxNamespace());
+		accountBalance.setClosingBalance(balance);
+		accountBalance.setFiscalYear(year);
+		return accountBalance;
+	}
+
+	public GxAccount makeGxAccountEntity(GxAccountBean bean, GxAccountType accountType, GxNamespace namespace, GxAccount parent) {
+		GxAccount entity = new GxAccount();
+		entity.setAccountName(bean.getAccountName());
+		entity.setAccountCode(bean.getAccountCode());
+		entity.setGxNamespace(namespace);
+		entity.setGxAccountType(accountType);
+		if (parent != null)
+			entity.setGxParentAccount(parent);
+		return entity;
 	}
 }

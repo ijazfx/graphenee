@@ -17,6 +17,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
+import io.graphenee.core.model.bean.GxImportChartOfAccountBean;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.converter.DateToTimestampConverter;
@@ -31,6 +32,9 @@ public class GxAccountConfigurationForm extends TRAbstractForm<GxAccountConfigur
 
 	MDateField fiscalYearStart;
 	MTextField voucherNumber;
+
+	@Autowired
+	GxImportChartOfAccountsYearActionPanel importChartOfAccountForm;
 
 	@Override
 	protected boolean eagerValidationEnabled() {
@@ -87,10 +91,21 @@ public class GxAccountConfigurationForm extends TRAbstractForm<GxAccountConfigur
 		});
 
 		closeYearButton.setStyleName(ValoTheme.BUTTON_DANGER);
+
+		MButton importAccountButton = new MButton("Import Chart of Accounts").withListener(event -> {
+			GxImportChartOfAccountBean importBean = new GxImportChartOfAccountBean();
+			importBean.setNamespaceBean(getEntity().getGxNamespaceBeanFault().getBean());
+			importChartOfAccountForm.initializeWithEntity(importBean);
+			importChartOfAccountForm.build().openInModalPopup();
+		});
+
+		importAccountButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+		footer.addComponent(importAccountButton);
 		footer.addComponent(closeYearButton);
 		footer.setSizeFull();
-		footer.addComponentAsFirst(closeYearButton);
+		footer.addComponentAsFirst(importAccountButton);
 		footer.setComponentAlignment(closeYearButton, Alignment.MIDDLE_LEFT);
+
 	}
 
 }
