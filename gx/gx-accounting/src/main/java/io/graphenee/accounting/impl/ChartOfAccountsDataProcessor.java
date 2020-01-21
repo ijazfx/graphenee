@@ -19,6 +19,10 @@ public class ChartOfAccountsDataProcessor extends GxImportDataProcessor<GxAccoun
 		this.importCOABean = importCOABean;
 	}
 
+	public ChartOfAccountsDataProcessor() {
+		super(GxAccountBean.class);
+	}
+
 	@Override
 	protected GxAccountBean processRowData(String[] rowData) {
 		GxAccountBean bean = new GxAccountBean();
@@ -68,7 +72,7 @@ public class ChartOfAccountsDataProcessor extends GxImportDataProcessor<GxAccoun
 
 	@Override
 	public String[] requiredColoumnHeader() {
-		return null;
+		return new String[] { "account_type", "account_code", "account_name", "parent_account", "closing_balance" };
 	}
 
 }

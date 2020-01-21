@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.graphenee.core.exception.InvalidImportFormatException;
+
 public abstract class GxImportDataProcessor<T> {
 	protected static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -34,10 +36,9 @@ public abstract class GxImportDataProcessor<T> {
 			while ((row = csvReader.readLine()) != null) {
 				if (totalRowCount == 0) {
 					getHeader(row);
-					//					if (checkFileValidility(requiredColoumnHeader())) {
-					//						MNotification.tray("Invalid file format", "Required column is missing");
-					//						break;
-					//					}
+					if (checkFileValidility(requiredColoumnHeader())) {
+						throw new InvalidImportFormatException("Invalid file format, required column is missing");
+					}
 
 				} else {
 					String[] rowData = row.split(",");

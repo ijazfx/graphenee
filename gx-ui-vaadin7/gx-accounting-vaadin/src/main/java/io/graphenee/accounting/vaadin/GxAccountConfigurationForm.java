@@ -1,7 +1,10 @@
 package io.graphenee.accounting.vaadin;
 
+import java.io.OutputStream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MDateField;
 import org.vaadin.viritin.fields.MTextField;
@@ -16,8 +19,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.accounting.api.GxAccountingDataService;
+import io.graphenee.accounting.impl.ChartOfAccountsDataProcessor;
 import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxImportChartOfAccountBean;
+import io.graphenee.core.util.CSVUtil;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.TRAbstractForm;
 import io.graphenee.vaadin.converter.DateToTimestampConverter;
@@ -99,9 +104,22 @@ public class GxAccountConfigurationForm extends TRAbstractForm<GxAccountConfigur
 			importChartOfAccountForm.build().openInModalPopup();
 		});
 
+		ChartOfAccountsDataProcessor dataProcessor = new ChartOfAccountsDataProcessor();
+
+		String fileName = "chart-of-accounts-template.csv";
+		DownloadButton downloadButton = new DownloadButton((OutputStream out) -> {
+			try {
+				out.write(CSVUtil.getHeaderRow(dataProcessor.requiredColoumnHeader()).getBytes("UTF-8"));
+			} catch (Exception e2) {
+			}
+		}).setFileNameProvider(() -> {
+			return fileName;
+		}).setMimeTypeProvider(() -> {
+			return "text/csv";
+		}).withCaption("Download Chart of Accounts Template");
+
 		importAccountButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
-		footer.addComponent(importAccountButton);
-		footer.addComponent(closeYearButton);
+		footer.addComponents(importAccountButton, downloadButton, closeYearButton);
 		footer.setSizeFull();
 		footer.addComponentAsFirst(importAccountButton);
 		footer.setComponentAlignment(closeYearButton, Alignment.MIDDLE_LEFT);
