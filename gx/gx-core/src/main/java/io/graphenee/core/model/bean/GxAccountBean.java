@@ -15,7 +15,7 @@ public class GxAccountBean implements Serializable {
 	private UUID uuid = UUID.randomUUID();
 
 	private Integer oid;
-	private Integer accountCode;
+	private String accountCode;
 	private String accountName;
 	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
 	private BeanFault<Integer, GxAccountTypeBean> gxAccountTypeBeanFault;
@@ -37,11 +37,11 @@ public class GxAccountBean implements Serializable {
 		this.oid = oid;
 	}
 
-	public Integer getAccountCode() {
+	public String getAccountCode() {
 		return accountCode;
 	}
 
-	public void setAccountCode(Integer accountCode) {
+	public void setAccountCode(String accountCode) {
 		this.accountCode = accountCode;
 	}
 

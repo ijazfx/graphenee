@@ -36,9 +36,9 @@ public interface GxAccountingDataService {
 
 	void delete(GxAccountBean bean);
 
-	GxAccountBean findByAccountNumberAndNamespace(Integer accountCode, GxNamespaceBean namespaceBean);
+	GxAccountBean findByAccountNumberAndNamespace(String accountCode, GxNamespaceBean namespaceBean);
 
-	GxAccountBean findByAccountNumber(Integer accountCode);
+	GxAccountBean findByAccountNumber(String accountCode);
 
 	List<GxTransactionBean> findAllTransactionsOrderByDateAsc();
 

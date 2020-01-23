@@ -29,7 +29,7 @@ public class ChartOfAccountsDataProcessor extends GxImportDataProcessor<GxAccoun
 
 		String accountCode = rowData[getColumnIndex("account_code")];
 		if (accountCode != null)
-			bean.setAccountCode(Integer.parseInt(accountCode.trim()));
+			bean.setAccountCode(accountCode.trim());
 
 		String accountName = rowData[getColumnIndex("account_name")];
 		if (accountName != null)

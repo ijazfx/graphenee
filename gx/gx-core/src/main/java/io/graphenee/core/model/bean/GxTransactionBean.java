@@ -88,7 +88,7 @@ public class GxTransactionBean implements Serializable {
 		return getGxAccountBeanFault() != null ? getGxAccountBeanFault().getBean().getAccountName() : null;
 	}
 
-	public Integer getAccountCode() {
+	public String getAccountCode() {
 		return getGxAccountBeanFault() != null ? getGxAccountBeanFault().getBean().getAccountCode() : null;
 	}
 

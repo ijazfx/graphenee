@@ -10,7 +10,7 @@ public class GxAccountTypeBean implements Serializable {
 	private Integer oid;
 	private String typeCode;
 	private String typeName;
-	private Integer accountNumberSequence = 0;
+	private String accountNumberSequence;
 	private BeanCollectionFault<GxAccountBean> accountBeanCollectionFault = BeanCollectionFault.emptyCollectionFault();
 
 	public Integer getOid() {
@@ -45,11 +45,11 @@ public class GxAccountTypeBean implements Serializable {
 		this.accountBeanCollectionFault = accountBeanCollectionFault;
 	}
 
-	public Integer getAccountNumberSequence() {
+	public String getAccountNumberSequence() {
 		return accountNumberSequence;
 	}
 
-	public void setAccountNumberSequence(Integer accountNumberSequence) {
+	public void setAccountNumberSequence(String accountNumberSequence) {
 		this.accountNumberSequence = accountNumberSequence;
 	}
 

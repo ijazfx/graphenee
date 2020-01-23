@@ -132,7 +132,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
-	public GxAccountBean findByAccountNumberAndNamespace(Integer accountCode, GxNamespaceBean namespaceBean) {
+	public GxAccountBean findByAccountNumberAndNamespace(String accountCode, GxNamespaceBean namespaceBean) {
 		GxAccount entity = accountRepository.findByGxNamespaceNamespaceAndAccountCode(namespaceBean.getNamespace(), accountCode);
 		if (entity != null)
 			return beanFactory.makeGxAccountBean(entity);
@@ -140,7 +140,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
-	public GxAccountBean findByAccountNumber(Integer accountCode) {
+	public GxAccountBean findByAccountNumber(String accountCode) {
 		return beanFactory.makeGxAccountBean(accountRepository.findByAccountCode(accountCode));
 	}
 

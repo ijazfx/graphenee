@@ -33,7 +33,7 @@ public class GxAccountType extends io.graphenee.core.model.GxMappedSuperclass im
 	private String typeName;
 
 	@Column(name = "account_number_sequence")
-	private Integer accountNumberSequence;
+	private String accountNumberSequence;
 
 	//bi-directional many-to-one association to GxAccount
 	@OneToMany(mappedBy = "gxAccountType")
@@ -88,11 +88,11 @@ public class GxAccountType extends io.graphenee.core.model.GxMappedSuperclass im
 		return gxAccount;
 	}
 
-	public Integer getAccountNumberSequence() {
+	public String getAccountNumberSequence() {
 		return accountNumberSequence;
 	}
 
-	public void setAccountNumberSequence(Integer accountNumberSequence) {
+	public void setAccountNumberSequence(String accountNumberSequence) {
 		this.accountNumberSequence = accountNumberSequence;
 	}
 

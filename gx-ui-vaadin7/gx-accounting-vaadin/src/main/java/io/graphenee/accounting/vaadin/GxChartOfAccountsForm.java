@@ -48,8 +48,7 @@ public class GxChartOfAccountsForm extends TRAbstractForm<GxAccountBean> {
 			@Override
 			public void validate(Object value) throws InvalidValueException {
 				if (value != null && !value.toString().isEmpty() && !value.toString().equals("0")) {
-					GxAccountBean accountBean = accountingDataService.findByAccountNumberAndNamespace(Integer.parseInt(value.toString()),
-							getEntity().getGxNamespaceBeanFault().getBean());
+					GxAccountBean accountBean = accountingDataService.findByAccountNumberAndNamespace(value.toString(), getEntity().getGxNamespaceBeanFault().getBean());
 					if (accountBean != null && (getEntity().getOid() == null || accountBean.getOid().intValue() != getEntity().getOid().intValue())) {
 						String message = "Account already exist against account code %s";
 						message = String.format(message, value.toString());
@@ -74,7 +73,7 @@ public class GxChartOfAccountsForm extends TRAbstractForm<GxAccountBean> {
 					GxAccountBean accountBean = (GxAccountBean) listener.getProperty().getValue();
 					gxAccountTypeBeanFault.setValue(accountBean.getGxAccountTypeBeanFault().getBean());
 					gxAccountTypeBeanFault.setReadOnly(true);
-					Integer accountNumberSequence = accountBean.getGxAccountTypeBeanFault().getBean().getAccountNumberSequence();
+					String accountNumberSequence = accountBean.getGxAccountTypeBeanFault().getBean().getAccountNumberSequence();
 					if (accountNumberSequence != null)
 						accountCode.setValue(accountNumberSequence.toString());
 				} else {
