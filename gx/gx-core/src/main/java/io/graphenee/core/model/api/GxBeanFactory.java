@@ -202,7 +202,7 @@ public class GxBeanFactory {
 
 	public GxTrialBalanceBean makeGxTrialBalanceBean(Object[] row) {
 		GxTrialBalanceBean bean = new GxTrialBalanceBean();
-		bean.setAccountCode((Integer) row[0]);
+		bean.setAccountCode((String) row[0]);
 		bean.setAccountName((String) row[1]);
 		bean.setOidAccount((Integer) row[2]);
 		bean.setOidAccountType((Integer) row[3]);

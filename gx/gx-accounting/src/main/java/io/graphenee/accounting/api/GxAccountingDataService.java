@@ -9,6 +9,7 @@ import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxBalanceSheetBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
+import io.graphenee.core.model.bean.GxImportChartOfAccountBean;
 import io.graphenee.core.model.bean.GxIncomeStatementBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
@@ -35,9 +36,9 @@ public interface GxAccountingDataService {
 
 	void delete(GxAccountBean bean);
 
-	GxAccountBean findByAccountNumberAndNamespace(Integer accountCode, GxNamespaceBean namespaceBean);
+	GxAccountBean findByAccountNumberAndNamespace(String accountCode, GxNamespaceBean namespaceBean);
 
-	GxAccountBean findByAccountNumber(Integer accountCode);
+	GxAccountBean findByAccountNumber(String accountCode);
 
 	List<GxTransactionBean> findAllTransactionsOrderByDateAsc();
 
@@ -92,5 +93,7 @@ public interface GxAccountingDataService {
 	Double findNetIncomeByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
 
 	List<GxIncomeStatementBean> findIncomeStatementByDateAndNamespace(Timestamp toDate, GxNamespaceBean namespaceBean);
+
+	void importAccounts(Map<GxAccountBean, GxAccountBean> accountMap, GxImportChartOfAccountBean importBean);
 
 }

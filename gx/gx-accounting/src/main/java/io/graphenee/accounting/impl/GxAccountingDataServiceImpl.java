@@ -22,6 +22,7 @@ import io.graphenee.core.model.bean.GxAccountConfigurationBean;
 import io.graphenee.core.model.bean.GxAccountTypeBean;
 import io.graphenee.core.model.bean.GxBalanceSheetBean;
 import io.graphenee.core.model.bean.GxGeneralLedgerBean;
+import io.graphenee.core.model.bean.GxImportChartOfAccountBean;
 import io.graphenee.core.model.bean.GxIncomeStatementBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxTransactionBean;
@@ -32,6 +33,7 @@ import io.graphenee.core.model.entity.GxAccountBalance;
 import io.graphenee.core.model.entity.GxAccountConfiguration;
 import io.graphenee.core.model.entity.GxAccountType;
 import io.graphenee.core.model.entity.GxGeneralLedger;
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxVoucher;
 import io.graphenee.core.model.jpa.repository.GxAccountBalanceRepository;
 import io.graphenee.core.model.jpa.repository.GxAccountConfigurationRepository;
@@ -40,6 +42,7 @@ import io.graphenee.core.model.jpa.repository.GxAccountTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxBalanceSheetRepository;
 import io.graphenee.core.model.jpa.repository.GxGeneralLedgerRepository;
 import io.graphenee.core.model.jpa.repository.GxJournalVoucherRepository;
+import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxTransactionRepository;
 import io.graphenee.core.model.jpa.repository.GxTrialBalanceRepository;
 import io.graphenee.core.util.TRCalendarUtil;
@@ -80,6 +83,9 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 
 	@Autowired
 	GxBalanceSheetRepository balanceSheetRepository;
+
+	@Autowired
+	GxNamespaceRepository namespaceRepository;
 
 	@Override
 	public List<GxAccountTypeBean> findAllAccountTypes() {
@@ -126,7 +132,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
-	public GxAccountBean findByAccountNumberAndNamespace(Integer accountCode, GxNamespaceBean namespaceBean) {
+	public GxAccountBean findByAccountNumberAndNamespace(String accountCode, GxNamespaceBean namespaceBean) {
 		GxAccount entity = accountRepository.findByGxNamespaceNamespaceAndAccountCode(namespaceBean.getNamespace(), accountCode);
 		if (entity != null)
 			return beanFactory.makeGxAccountBean(entity);
@@ -134,7 +140,7 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	}
 
 	@Override
-	public GxAccountBean findByAccountNumber(Integer accountCode) {
+	public GxAccountBean findByAccountNumber(String accountCode) {
 		return beanFactory.makeGxAccountBean(accountRepository.findByAccountCode(accountCode));
 	}
 
@@ -408,6 +414,48 @@ public class GxAccountingDataServiceImpl implements GxAccountingDataService {
 	@Override
 	public GxVoucherBean findByOidAndNamespace(Integer oid, GxNamespaceBean namespaceBean) {
 		return beanFactory.makeGxVoucherBean(voucherRepository.findByOidAndGxNamespaceOid(oid, namespaceBean.getOid()));
+	}
+
+	@Override
+	public void importAccounts(Map<GxAccountBean, GxAccountBean> accountMap, GxImportChartOfAccountBean importBean) {
+		accountMap.forEach((child, parent) -> {
+			GxNamespace namespace = namespaceRepository.findOne(importBean.getNamespaceBean().getOid());
+			if (parent == null) {
+				GxAccountType accountType = accountTypeRepository.findFirstByTypeNameIgnoreCase(child.getAccountType());
+				GxAccount found = accountRepository.findByGxNamespaceNamespaceAndAccountCode(namespace.getNamespace(), child.getAccountCode());
+				if (accountType != null && found == null) {
+					GxAccount account = accountRepository.save(entityFactory.makeGxAccountEntity(child, accountType, namespace, null));
+					GxAccountBalance accountBalance = entityFactory.makeGxAccountBalanceEntity(account, child.getClosingBalance(), importBean.getYear());
+					accountBalanceRepository.save(accountBalance);
+				}
+			} else {
+				GxAccount existingParentAccount = accountRepository.findByGxNamespaceNamespaceAndAccountCode(namespace.getNamespace(), parent.getAccountCode());
+				if (existingParentAccount != null) {
+					GxAccountType accountType = accountTypeRepository.findFirstByTypeNameIgnoreCase(child.getAccountType());
+					GxAccount foundChild = accountRepository.findByGxNamespaceNamespaceAndAccountCode(namespace.getNamespace(), child.getAccountCode());
+					if (accountType != null && foundChild == null) {
+						GxAccount account = accountRepository.save(entityFactory.makeGxAccountEntity(child, accountType, namespace, existingParentAccount));
+						GxAccountBalance accountBalance = entityFactory.makeGxAccountBalanceEntity(account, child.getClosingBalance(), importBean.getYear());
+						accountBalanceRepository.save(accountBalance);
+					}
+				} else {
+					GxAccountType parentAccountType = accountTypeRepository.findFirstByTypeNameIgnoreCase(parent.getAccountType());
+					if (parentAccountType != null) {
+						GxAccount parentAccount = accountRepository.save(entityFactory.makeGxAccountEntity(parent, parentAccountType, namespace, null));
+						GxAccountBalance parentAccountBalance = entityFactory.makeGxAccountBalanceEntity(parentAccount, parent.getClosingBalance(), importBean.getYear());
+						accountBalanceRepository.save(parentAccountBalance);
+
+						GxAccountType accountType = accountTypeRepository.findFirstByTypeNameIgnoreCase(child.getAccountType());
+						GxAccount foundChild = accountRepository.findByGxNamespaceNamespaceAndAccountCode(namespace.getNamespace(), child.getAccountCode());
+						if (accountType != null && foundChild == null) {
+							GxAccount account = accountRepository.save(entityFactory.makeGxAccountEntity(child, accountType, namespace, parentAccount));
+							GxAccountBalance accountBalance = entityFactory.makeGxAccountBalanceEntity(account, child.getClosingBalance(), importBean.getYear());
+							accountBalanceRepository.save(accountBalance);
+						}
+					}
+				}
+			}
+		});
 	}
 
 }

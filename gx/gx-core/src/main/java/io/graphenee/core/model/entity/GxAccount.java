@@ -31,7 +31,7 @@ public class GxAccount extends io.graphenee.core.model.GxMappedSuperclass implem
 	private Integer oid;
 
 	@Column(name = "account_code")
-	private Integer accountCode;
+	private String accountCode;
 
 	@Column(name = "account_name")
 	private String accountName;
@@ -72,11 +72,11 @@ public class GxAccount extends io.graphenee.core.model.GxMappedSuperclass implem
 		this.oid = oid;
 	}
 
-	public Integer getAccountCode() {
+	public String getAccountCode() {
 		return this.accountCode;
 	}
 
-	public void setAccountCode(Integer accountCode) {
+	public void setAccountCode(String accountCode) {
 		this.accountCode = accountCode;
 	}
 

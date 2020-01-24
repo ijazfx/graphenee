@@ -8,4 +8,7 @@ import io.graphenee.core.model.jpa.GxJpaRepository;
 public interface GxAccountTypeRepository extends GxJpaRepository<GxAccountType, Integer> {
 
 	List<GxAccountType> findAllByOrderByTypeName();
+
+	GxAccountType findFirstByTypeNameIgnoreCase(String typeName);
+
 }
