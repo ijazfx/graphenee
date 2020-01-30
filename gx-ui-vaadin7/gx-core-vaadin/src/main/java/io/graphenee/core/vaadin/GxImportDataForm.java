@@ -1,4 +1,4 @@
-package com.erp.accounting.vaadin.component;
+package io.graphenee.core.vaadin;
 
 import java.io.OutputStream;
 import java.util.List;
