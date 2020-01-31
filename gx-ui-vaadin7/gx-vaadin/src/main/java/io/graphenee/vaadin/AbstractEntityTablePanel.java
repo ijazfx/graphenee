@@ -154,7 +154,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 									T item = itemIterator.next();
 									try {
 										if (onDeleteEntity(item)) {
-											mainTableContainer.removeItem(item);
+											mainTable.removeItem(item);
 											if (delegate != null) {
 												delegate.onDelete(item);
 											}
@@ -166,7 +166,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 											MNotification.tray("Operation Failed", e1.getMessage());
 									}
 								}
-								// refresh();
+								refresh();
 								deselectAll();
 								mainTable.refreshRowCache();
 							}
@@ -177,12 +177,13 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 						for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
 							T item = itemIterator.next();
 							if (onDeleteEntity(item)) {
-								mainTableContainer.removeItem(item);
+								mainTable.removeItem(item);
 							}
 						}
-						// refresh();
+						refresh();
 						deselectAll();
 						mainTable.refreshRowCache();
+						mainTable.refreshRows();
 					}
 
 				}
@@ -404,15 +405,14 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	protected void onTableItemSelect(ValueChangeEvent event) {
 		//TODO: Uncomment when using Table instead of MTable
-		// if (mainTable.getMultiSelectMode() == MultiSelectMode.DEFAULT) {
-		// Collection<T> selected = (Collection<T>)
-		// event.getProperty().getValue();
-		// editButton.setEnabled(selected.size() == 1);
-		// deleteButton.setEnabled(selected.size() > 0);
-		// }
-		Object selected = event.getProperty().getValue();
-		editButton.setEnabled(selected != null);
-		deleteButton.setEnabled(selected != null);
+		if (mainTable.getMultiSelectMode() == MultiSelectMode.DEFAULT) {
+			Collection<T> selected = (Collection<T>) mainTable.getValue();
+			editButton.setEnabled(selected.size() == 1);
+			deleteButton.setEnabled(selected.size() > 0);
+		}
+		//		Object selected = event.getProperty().getValue();
+		//		editButton.setEnabled(selected != null);
+		//		deleteButton.setEnabled(selected != null);
 
 		if (delegate != null) {
 			delegate.onGridItemSelect(event);
@@ -696,6 +696,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 		this.isSelectionEnabled = isSelectionEnabled;
 		if (isSelectionEnabled) {
 			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
+			mainTable.setMultiSelect(true);
 			mainTable.setSelectable(true);
 		} else {
 			mainTable.setSelectable(false);
