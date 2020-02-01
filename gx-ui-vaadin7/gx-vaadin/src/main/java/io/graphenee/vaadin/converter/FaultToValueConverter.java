@@ -22,17 +22,17 @@ import com.vaadin.data.util.converter.Converter;
 import io.graphenee.core.model.Fault;
 import io.graphenee.core.util.KeyValueWrapper;
 
-public class FaultToBeanConverter<ID, T> implements Converter<T, Fault<ID, T>> {
+public class FaultToValueConverter<ID, T> implements Converter<T, Fault<ID, T>> {
 
 	private static final long serialVersionUID = 1L;
 	private String idProperty;
 	private Class<T> typeOfT;
 
-	public FaultToBeanConverter(Class<T> typeOfT) {
+	public FaultToValueConverter(Class<T> typeOfT) {
 		this(typeOfT, "oid");
 	}
 
-	public FaultToBeanConverter(Class<T> typeOfT, String idProperty) {
+	public FaultToValueConverter(Class<T> typeOfT, String idProperty) {
 		this.typeOfT = typeOfT;
 		this.idProperty = idProperty;
 	}
@@ -42,8 +42,8 @@ public class FaultToBeanConverter<ID, T> implements Converter<T, Fault<ID, T>> {
 		if (value == null)
 			return null;
 		ID id = (ID) new KeyValueWrapper(value).valueForKeyPath(idProperty);
-		Fault<ID, T> beanFault = Fault.fault(id, value);
-		return beanFault;
+		Fault<ID, T> fault = Fault.fault(id, value);
+		return fault;
 	}
 
 	@Override
