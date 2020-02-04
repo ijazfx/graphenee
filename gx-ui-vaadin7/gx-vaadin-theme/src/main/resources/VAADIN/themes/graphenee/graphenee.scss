@@ -229,7 +229,7 @@ $view-padding: round($v-unit-size * 0.75) !default;
 	.v-table-footer-container {
 		padding: 8px 9px 9px;
 		float: right;
-		font-size: 100%;
+		font-size: $v-font-size;
 	}
 	
 	.text-align-right {
