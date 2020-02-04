@@ -225,6 +225,18 @@ $view-padding: round($v-unit-size * 0.75) !default;
 			transition-timing-function: ease-out;
 		}
 	}
+	
+	.v-table-footer-container {
+		padding: 8px 9px 9px;
+		float: right;
+		font-size: 100%;
+	}
+	
+	.text-align-right {
+		width: 100%;
+		text-align: right;
+		direction: rtl;
+	}
    
 }
 
