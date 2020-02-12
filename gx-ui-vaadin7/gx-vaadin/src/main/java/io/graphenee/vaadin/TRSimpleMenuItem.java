@@ -30,12 +30,18 @@ public class TRSimpleMenuItem implements TRMenuItem {
 	private String viewName;
 	private List<TRMenuItem> children = new ArrayList<>();
 	private TRMenuItem parent;
+	private String badge;
 
 	private TRSimpleMenuItem(String viewName, String caption, Resource icon, Command command) {
 		this.viewName = viewName;
 		this.caption = caption;
 		this.icon = icon;
 		this.command = command;
+	}
+
+	@Override
+	public String badge() {
+		return badge;
 	}
 
 	@Override
@@ -95,6 +101,16 @@ public class TRSimpleMenuItem implements TRMenuItem {
 	public static TRSimpleMenuItem createMenuItemForView(String view, String caption, Resource icon) {
 		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(view, caption, icon, null);
 		return menuItem;
+	}
+
+	public TRSimpleMenuItem setBadge(String badge) {
+		this.badge = badge;
+		return this;
+	}
+
+	public TRSimpleMenuItem clearBadge() {
+		this.badge = null;
+		return this;
 	}
 
 	@Override

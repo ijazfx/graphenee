@@ -13553,8 +13553,7 @@ div.v-layout.v-horizontal.v-widget {
 	background-image: linear-gradient(to bottom,#2AB27B 0%, #2AB27B 100%);
 	color: #c6e6d9;
 	position: absolute;
-	right: 10px;
-	font-size: 8px;
+	font-size: 10px;
 	color: white;
 	pointer-events: none;
 }

@@ -24,6 +24,7 @@ import java.util.Stack;
 
 import javax.annotation.PostConstruct;
 
+import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -35,6 +36,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
@@ -248,7 +250,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		Collection<TRMenuItem> items = menuItems();
 		backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON);
 		backButton.setVisible(false);
-		backButton.addClickListener(new TRButtonClickListener() {
+		backButton.withListener(new TRButtonClickListener() {
 
 			@Override
 			public void onButtonClick(ClickEvent event) {
@@ -300,12 +302,14 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 						});
 						backButton.setVisible(true);
 					});
+					valoMenuItemButton.setBadge(menuItem.badge());
 					menuItemsLayout.addComponent(valoMenuItemButton);
 					buttonsMap.put(menuItem, valoMenuItemButton);
 				} else {
 					valoMenuItemButton = new ValoMenuItemButton(menuItem.viewName(), menuItem.caption(), menuItem.icon()).withListener(event -> {
 						UI.getCurrent().getNavigator().navigateTo(menuItem.viewName());
 					});
+					valoMenuItemButton.setBadge(menuItem.badge());
 					menuItemsLayout.addComponent(valoMenuItemButton);
 				}
 
@@ -331,11 +335,15 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		getCompositionRoot().removeStyleName(STYLE_VISIBLE);
 	}
 
-	public static class ValoMenuItemButton extends Button {
+	public static class ValoMenuItemButton extends CssLayout {
 
 		private static final String STYLE_SELECTED = "selected";
 
 		private final String viewName;
+
+		private Button button;
+
+		private Label badge;
 
 		public ValoMenuItemButton(String title, Resource icon) {
 			this(null, title, icon, null);
@@ -344,7 +352,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		public ValoMenuItemButton(String title, Resource icon, ClickListener listener) {
 			this(null, title, icon);
 			if (listener != null) {
-				addClickListener(listener);
+				button.addClickListener(listener);
 			}
 		}
 
@@ -353,17 +361,31 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		}
 
 		public ValoMenuItemButton(String viewName, String title, Resource icon, ClickListener listener) {
-			this.viewName = viewName;
+			setWidth("100%");
 			setPrimaryStyleName("valo-menu-item");
-			setIcon(icon);
-			setCaption(title);
+			setStyleName("badgewrapper");
+			this.viewName = viewName;
+			button = new Button();
+			button.setCaption(title);
+			button.setIcon(icon);
+			button.setPrimaryStyleName("valo-menu-item");
+			badge = new Label();
+			badge.setVisible(false);
+			badge.setWidthUndefined();
+			badge.setPrimaryStyleName(ValoTheme.MENU_BADGE);
 			DashboardEventBus.sessionInstance().register(this);
 			withListener(listener);
+			addComponents(button, badge);
+		}
+
+		public void setBadge(String value) {
+			badge.setValue(value);
+			badge.setVisible(!Strings.isNullOrEmpty(value));
 		}
 
 		public ValoMenuItemButton withListener(ClickListener listener) {
 			if (listener != null) {
-				addClickListener(listener);
+				button.addClickListener(listener);
 			}
 			return this;
 		}
