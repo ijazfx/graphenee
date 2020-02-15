@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 import javax.annotation.PostConstruct;
 
@@ -50,10 +49,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.core.callback.TRVoidCallback;
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
+import io.graphenee.vaadin.event.DashboardEvent.BadgeUpdateEvent;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
 import io.graphenee.vaadin.event.DashboardEvent.UserProfileRenderEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
@@ -64,18 +63,18 @@ import io.graphenee.vaadin.util.DashboardUtils;
  * A responsive menu component providing user information and the controls for
  * primary navigation between the views.
  */
-@SuppressWarnings({ "serial", "unchecked" })
 public abstract class AbstractDashboardMenu extends CustomComponent {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final String ID = "dashboard-menu";
 	public static final String REPORTS_BADGE_ID = "dashboard-menu-reports-badge";
 	public static final String NOTIFICATIONS_BADGE_ID = "dashboard-menu-notifications-badge";
 	private static final String STYLE_VISIBLE = "valo-menu-visible";
-	private Label notificationsBadge;
-	private Label reportsBadge;
+	private static final String STYLE_SELECTED = "selected";
 	private MenuItem userMenuItem;
-	private List<Component> menuItems;
-	private boolean isBuilt;
+
+	private volatile boolean shouldBuild = true;
 
 	public AbstractDashboardMenu() {
 		if (!isSpringComponent()) {
@@ -84,7 +83,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	}
 
 	public AbstractDashboardMenu(List<Component> menuItems) {
-		this.menuItems = menuItems;
 		if (!isSpringComponent()) {
 			postConstruct();
 		}
@@ -100,16 +98,19 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	}
 
 	public AbstractDashboardMenu build() {
-		if (!isBuilt) {
-			setPrimaryStyleName("valo-menu");
-			setId(ID);
-			setSizeUndefined();
-			// There's only one DashboardMenu per UI so this doesn't need to be
-			// unregistered from the UI-scoped DashboardEventBus.
-			DashboardEventBus.sessionInstance().register(this);
-			setCompositionRoot(buildContent());
-			postBuild();
-			isBuilt = true;
+		if (shouldBuild) {
+			synchronized (this) {
+				if (shouldBuild) {
+					setId(ID);
+					setPrimaryStyleName("valo-menu");
+					setSizeUndefined();
+					DashboardEventBus.sessionInstance().register(this);
+					dashboardSetup().eventBus().register(this);
+					setCompositionRoot(buildContent());
+					postBuild();
+					shouldBuild = false;
+				}
+			}
 		}
 		return this;
 	}
@@ -189,6 +190,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			if (dashboardSetup().profileComponent() != null) {
 				shouldAddSeparator = true;
 				userMenuItem.addItem("Profile", new Command() {
+
 					@Override
 					public void menuSelected(final MenuItem selectedItem) {
 						BaseProfileForm profileForm = dashboardSetup().profileComponent();
@@ -223,6 +225,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			}
 		}
 		return userMenu;
+
 	}
 
 	private Component buildToggleButton() {
@@ -254,66 +257,67 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 
 			@Override
 			public void onButtonClick(ClickEvent event) {
-				if (!backStack.isEmpty())
-					backStack.pop().execute();
+				String viewName = null;
+				focusedMenuItem = focusedMenuItem.getParent() != null ? focusedMenuItem.getParent().getParent() : null;
+				if (focusedMenuItem == null) {
+					buttonsMap.keySet().forEach(mi -> {
+						buttonsMap.get(mi).setVisible(mi.getParent() == null);
+					});
+					backButton.setVisible(false);
+					viewName = menuItems().get(0).viewName();
+				} else {
+					buttonsMap.values().forEach(vmib -> vmib.setVisible(false));
+					focusedMenuItem.getChildren().forEach(mi -> {
+						buttonsMap.get(mi).setVisible(true);
+					});
+					backButton.setVisible(true);
+					viewName = focusedMenuItem.getChildren().iterator().next().viewName();
+				}
+				if (viewName == null)
+					viewName = dashboardSetup().dashboardViewName();
+				UI.getCurrent().getNavigator().navigateTo(viewName);
 			}
 		});
+
 		generateValoMenuItemButtons(menuItemsLayout, items);
 		menuItemsLayout.addComponent(backButton, 0);
+		buttonsMap.keySet().forEach(mi -> {
+			buttonsMap.get(mi).setVisible(mi.getParent() == null);
+		});
 		return menuItemsLayout;
 
 	}
 
 	HashMap<TRMenuItem, ValoMenuItemButton> buttonsMap = new HashMap<>();
 	private ValoMenuItemButton backButton;
-	private Stack<TRVoidCallback> backStack = new Stack<>();
 	private MenuBar userMenu;
+	private TRMenuItem focusedMenuItem = null;
 
 	private void generateValoMenuItemButtons(CssLayout menuItemsLayout, Collection<TRMenuItem> items) {
-		buttonsMap.values().forEach(button -> {
-			button.setVisible(false);
-		});
 		if (items != null && !items.isEmpty()) {
 			for (TRMenuItem menuItem : items) {
 				if (buttonsMap.containsKey(menuItem))
 					continue;
-				ValoMenuItemButton valoMenuItemButton = null;
-
-				if (menuItem.hasChildren()) {
-					valoMenuItemButton = new ValoMenuItemButton(menuItem.caption(), menuItem.icon()).withListener(event -> {
-						backStack.push(() -> {
-							if (menuItem.getParent() != null) {
-								generateValoMenuItemButtons(menuItemsLayout, menuItem.getParent().getChildren());
-								menuItem.getParent().getChildren().forEach(child -> {
-									buttonsMap.get(child).setVisible(true);
+				ValoMenuItemButton valoMenuItemButton = new ValoMenuItemButton(menuItem.hasChildren() ? null : menuItem.viewName(), menuItem.caption(), menuItem.icon())
+						.withListener(event -> {
+							focusedMenuItem = menuItem;
+							if (menuItem.viewName() != null)
+								UI.getCurrent().getNavigator().navigateTo(menuItem.viewName());
+							if (menuItem.hasChildren()) {
+								buttonsMap.values().forEach(vmib -> vmib.setVisible(false));
+								menuItem.getChildren().forEach(mi -> {
+									buttonsMap.get(mi).setVisible(true);
 								});
 								backButton.setVisible(true);
-							} else {
-								generateValoMenuItemButtons(menuItemsLayout, menuItems());
-								menuItems().forEach(child -> {
-									buttonsMap.get(child).setVisible(true);
-								});
-								backButton.setVisible(false);
 							}
 						});
-						generateValoMenuItemButtons(menuItemsLayout, menuItem.getChildren());
-						menuItem.getChildren().forEach(child -> {
-							buttonsMap.get(child).setVisible(true);
-						});
-						backButton.setVisible(true);
-					});
-					valoMenuItemButton.setBadge(menuItem.badge());
-					menuItemsLayout.addComponent(valoMenuItemButton);
-					buttonsMap.put(menuItem, valoMenuItemButton);
-				} else {
-					valoMenuItemButton = new ValoMenuItemButton(menuItem.viewName(), menuItem.caption(), menuItem.icon()).withListener(event -> {
-						UI.getCurrent().getNavigator().navigateTo(menuItem.viewName());
-					});
-					valoMenuItemButton.setBadge(menuItem.badge());
-					menuItemsLayout.addComponent(valoMenuItemButton);
-				}
-
+				valoMenuItemButton.setBadgeId(menuItem.badgeId());
+				valoMenuItemButton.setBadge(menuItem.badge());
+				menuItemsLayout.addComponent(valoMenuItemButton);
 				buttonsMap.put(menuItem, valoMenuItemButton);
+				if (menuItem.hasChildren()) {
+					generateValoMenuItemButtons(menuItemsLayout, menuItem.getChildren());
+				}
 			}
 		}
 	}
@@ -329,20 +333,13 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	protected void postInitialize() {
 	}
 
-	@Subscribe
-	public void postViewChange(final PostViewChangeEvent event) {
-		// After a successful view change the menu can be hidden in mobile view.
-		getCompositionRoot().removeStyleName(STYLE_VISIBLE);
-	}
-
 	public static class ValoMenuItemButton extends CssLayout {
 
-		private static final String STYLE_SELECTED = "selected";
+		private static final long serialVersionUID = 1L;
 
 		private final String viewName;
-
 		private Button button;
-
+		private String badgeId;
 		private Label badge;
 
 		public ValoMenuItemButton(String title, Resource icon) {
@@ -365,6 +362,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			setPrimaryStyleName("valo-menu-item");
 			setStyleName("badgewrapper");
 			this.viewName = viewName;
+			this.badgeId = null;
 			button = new Button();
 			button.setCaption(title);
 			button.setIcon(icon);
@@ -376,6 +374,10 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			DashboardEventBus.sessionInstance().register(this);
 			withListener(listener);
 			addComponents(button, badge);
+		}
+
+		public void setBadgeId(String badgeId) {
+			this.badgeId = badgeId;
 		}
 
 		public void setBadge(String value) {
@@ -390,17 +392,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			return this;
 		}
 
-		@Subscribe
-		public void postViewChange(final PostViewChangeEvent event) {
-			removeStyleName(STYLE_SELECTED);
-			if (viewName != null) {
-				if (viewName.equals(event.getViewName() + "/" + event.getParameters()))
-					addStyleName(STYLE_SELECTED);
-				else if (viewName.equals(event.getViewName()) && event.getParameters().equalsIgnoreCase(""))
-					addStyleName(STYLE_SELECTED);
-			}
-		}
-
 		@Override
 		public void setVisible(boolean visible) {
 			super.setVisible(visible);
@@ -413,6 +404,48 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			}
 		}
 
+	}
+
+	@Subscribe
+	public void postViewChange(final PostViewChangeEvent event) {
+		// After a successful view change the menu can be hidden in mobile view.
+		getCompositionRoot().removeStyleName(STYLE_VISIBLE);
+		buttonsMap.values().forEach(vmib -> vmib.removeStyleName(STYLE_SELECTED));
+		for (TRMenuItem mi : buttonsMap.keySet()) {
+			ValoMenuItemButton vmib = buttonsMap.get(mi);
+			if (!Strings.isNullOrEmpty(vmib.viewName)) {
+				if (vmib.viewName.equals(event.getViewName() + "/" + event.getParameters())
+						|| (vmib.viewName.equals(event.getViewName()) && event.getParameters().equalsIgnoreCase(""))) {
+					vmib.addStyleName(STYLE_SELECTED);
+					focusedMenuItem = mi;
+				}
+			}
+		}
+		if (focusedMenuItem.getParent() == null) {
+			backButton.setVisible(false);
+			buttonsMap.keySet().forEach(mi -> {
+				buttonsMap.get(mi).setVisible(mi.getParent() == null);
+			});
+		} else {
+			backButton.setVisible(true);
+			buttonsMap.keySet().forEach(mi -> {
+				buttonsMap.get(mi).setVisible(mi.getParent() != null && mi.getParent().equals(focusedMenuItem.getParent()));
+			});
+		}
+	}
+
+	@Subscribe
+	public void updateBadge(final BadgeUpdateEvent event) {
+		UI.getCurrent().access(() -> {
+			buttonsMap.values().forEach(button -> {
+				System.err.println(button.badgeId);
+				if (button.badgeId != null && button.badgeId.equals(event.getBadgeId())) {
+					button.setBadge(event.getBadgeValue());
+					button.markAsDirty();
+				}
+			});
+			UI.getCurrent().push();
+		});
 	}
 
 	@Subscribe

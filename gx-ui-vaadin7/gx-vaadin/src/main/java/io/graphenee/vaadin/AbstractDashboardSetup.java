@@ -18,6 +18,7 @@ package io.graphenee.vaadin;
 import java.io.Serializable;
 import java.util.List;
 
+import com.google.common.eventbus.EventBus;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Image;
@@ -31,9 +32,22 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private EventBus eventBus;
+
 	public abstract String applicationTitle();
 
 	private BaseProfileForm profileForm = null;
+
+	public EventBus eventBus() {
+		if (eventBus == null) {
+			synchronized (this) {
+				if (eventBus == null) {
+					eventBus = new EventBus();
+				}
+			}
+		}
+		return eventBus;
+	}
 
 	public String dashboardTitle() {
 		return applicationTitle();
