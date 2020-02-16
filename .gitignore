@@ -14,3 +14,7 @@ target
 .factorypath
 .metadata
 .settings
+.idea
+.vscode
+.classpath
+.project
