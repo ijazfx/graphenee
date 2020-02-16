@@ -412,7 +412,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxTermBean> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale) {
-		PageRequest pageRequest = new PageRequest(page, size);
+		PageRequest pageRequest = PageRequest.of(page, size);
 		Page<GxTerm> result = null;
 		if (namespace != null && supportedLocale != null) {
 			result = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(pageRequest, namespace.getOid(), supportedLocale.getOid());
@@ -664,7 +664,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxUserAccountBean> findUserAccount() {
-		return userAccountRepo.findAll(new Sort("username")).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
+		return userAccountRepo.findAll(Sort.by("username")).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	@Override
@@ -1430,7 +1430,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxEmailTemplateBean> findEmailTemplate() {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
-		beans.addAll(emailTemplateRepository.findAll(new Sort("templateName")).stream().map(template -> {
+		beans.addAll(emailTemplateRepository.findAll(Sort.by("templateName")).stream().map(template -> {
 			return makeEmailTemplateBean(template, null);
 		}).collect(Collectors.toList()));
 		return beans;
@@ -1767,7 +1767,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxAccessKeyBean> findAccessKey() {
-		return accessKeyRepo.findAll(new Sort("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		return accessKeyRepo.findAll(Sort.by("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 	}
 
 	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {
@@ -2002,7 +2002,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxSmsProviderBean> findSmsProvider() {
-		return makeSmsProviderBean(smsProviderRepo.findAll(new Sort("providerName")));
+		return makeSmsProviderBean(smsProviderRepo.findAll(Sort.by("providerName")));
 	}
 
 	@Override

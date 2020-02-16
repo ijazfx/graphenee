@@ -20,6 +20,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,14 +50,11 @@ public class GrapheneeJbpmConfiguration {
 	@PostConstruct
 	public void init() {
 		if (flywayEnabled) {
-			Flyway flyway = new Flyway();
 			DataSource dsFlyway = grapheneeJbpmProperties().getDataSource();
-			flyway.setDataSource(dsFlyway);
 			String dbVendor = DataSourceUtil.determineDbVendor(dsFlyway);
-			flyway.setLocations("classpath:db/jbpm/migration/" + dbVendor);
-			flyway.setTable("jbpm_schema_version");
-			flyway.setBaselineOnMigrate(true);
-			flyway.setBaselineVersionAsString("0");
+			FluentConfiguration config = Flyway.configure().dataSource(dsFlyway).locations("classpath:db/jbpm/migration/" + dbVendor).table("jbpm_schema_version")
+					.baselineOnMigrate(true).baselineVersion("0");
+			Flyway flyway = new Flyway(config);
 			flyway.migrate();
 		}
 	}
