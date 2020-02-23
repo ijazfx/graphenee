@@ -26,7 +26,7 @@ import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,10 +34,12 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 
+import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.core.util.DataSourceUtil;
 
 @Configuration
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
+@ConditionalOnClass(GrapheneeCoreConfiguration.class)
+//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
 @ComponentScan("io.graphenee.jbpm.embedded")
 public class GrapheneeJbpmConfiguration {
 

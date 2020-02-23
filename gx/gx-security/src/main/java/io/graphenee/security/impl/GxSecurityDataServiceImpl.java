@@ -22,7 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,11 +55,13 @@ import io.graphenee.core.model.jpa.repository.GxSecurityGroupRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
+import io.graphenee.security.GrapheneeSecurityConfiguration;
 import io.graphenee.security.api.GxSecurityDataService;
 import io.graphenee.security.exception.GxPermissionException;
 
 @Service
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
+@ConditionalOnClass(GrapheneeSecurityConfiguration.class)
+//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
 @Transactional
 public class GxSecurityDataServiceImpl implements GxSecurityDataService {
 

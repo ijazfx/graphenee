@@ -526,7 +526,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxNamespaceBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			securityGroupRepo.deleteById(bean.getOid());
+			namespaceRepo.deleteById(bean.getOid());
 		}
 	}
 
