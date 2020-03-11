@@ -10,6 +10,7 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
@@ -87,6 +88,7 @@ public abstract class GxAppLayout extends AppLayout {
 	@Builder
 	public static class GxMenuItem {
 		private String caption;
+		private Icon icon;
 		private Class<? extends Component> component;
 	}
 

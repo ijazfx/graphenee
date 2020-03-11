@@ -2,7 +2,6 @@ package io.graphenee.flow;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,14 +16,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Binder.BindingBuilder;
@@ -36,15 +32,12 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 
 import io.graphenee.core.callback.TRParamCallback;
-import io.graphenee.flow.GxMasterDetailView.FormConfigurator.FormPosition;
 
-@CssImport("styles/master-detail-view.css")
-public abstract class GxMasterDetailView<T> extends Div implements AfterNavigationObserver {
+@CssImport("styles/form-view.css")
+public abstract class GxFormView<T> extends Div implements AfterNavigationObserver {
 
 	private static final long serialVersionUID = 1L;
 
-	private Grid<T> mainGrid;
-	private GridConfigurator<T> gc;
 	private FormConfigurator<T> fc;
 
 	private Button cancel = new Button("Cancel");
@@ -54,73 +47,31 @@ public abstract class GxMasterDetailView<T> extends Div implements AfterNavigati
 
 	private T bean;
 
-	public GxMasterDetailView(Class<T> entityClass) {
-		gc = new GridConfigurator<T>(entityClass);
-		fc = gc.formConfigurator();
-		setClassName("master-detail-view");
-		configure(gc);
+	private VerticalLayout createWrapper() {
+		VerticalLayout wrapper = new VerticalLayout();
+		wrapper.setClassName("wrapper");
+		wrapper.setSpacing(false);
+		return wrapper;
+	}
+
+	public GxFormView(Class<T> entityClass) {
+		fc = new FormConfigurator<T>(entityClass);
+		setClassName("form-view");
 		configure(fc);
 
-		// Configure Grid
-		mainGrid = new Grid<>(entityClass);
-		mainGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-		mainGrid.setHeightFull();
-
-		// Show visible properties only
-		String[] props = gc.getVisibleProperties();
-		if (props != null && props.length > 0) {
-			mainGrid.getColumns().forEach(column -> {
-				column.setVisible(false);
-			});
-		}
-
-		for (int i = 0; i < props.length; i++) {
-			String prop = props[i];
-			String header = gc.getPropertyCaption(prop);
-			if (header == null)
-				header = prop;
-			Column<T> column = mainGrid.getColumnByKey(prop);
-			column.setHeader(header);
-			if (column != null)
-				column.setVisible(true);
-		}
-
 		// Create/Configure Form
-		Component gridComponent = createGridComponent();
 		Component formComponent = createFormComponent();
-
-		if (fc.getPosition() == FormPosition.POPUP) {
-			VerticalLayout layout = new VerticalLayout();
-			layout.setSizeFull();
-			layout.add(gridComponent);
-			add(layout);
-			mainGrid.asSingleSelect().addValueChangeListener(event -> {
-				setEntity(event.getValue());
-			});
-		} else {
-			SplitLayout splitLayout = new SplitLayout();
-			splitLayout.setSizeFull();
-			if (fc.getPosition() == FormPosition.START) {
-				splitLayout.addToPrimary(formComponent);
-				splitLayout.addToSecondary(gridComponent);
-			} else {
-				splitLayout.addToPrimary(gridComponent);
-				splitLayout.addToSecondary(formComponent);
-			}
-			add(splitLayout);
-			mainGrid.asSingleSelect().addValueChangeListener(event -> setEntity(event.getValue()));
-		}
-
+		add(formComponent);
 	}
 
 	private Component createFormComponent() {
-		Div editorDiv = new Div();
-		editorDiv.setClassName("editor-layout");
+		VerticalLayout wrapper = createWrapper();
 		H5 heading = new H5(fc.getCaption());
-		editorDiv.add(heading);
+		wrapper.add(heading);
+
 		GxFormLayout form = GxFormLayout.builder().expandFields(true).build();
-		editorDiv.add(form);
-		binder = new Binder<>(gc.getEntityClass());
+		wrapper.add(form);
+		binder = new Binder<>(fc.getEntityClass());
 		for (String prop : fc.getEditableProperties()) {
 			Component component = componentForProperty(prop, binder);
 			String caption = fc.getPropertyCaption(prop);
@@ -128,8 +79,10 @@ public abstract class GxMasterDetailView<T> extends Div implements AfterNavigati
 				form.addFormItem(component, caption);
 			}
 		}
-		createButtonLayout(editorDiv);
-		return editorDiv;
+		Component buttonLayout = createButtonLayout();
+		wrapper.add(buttonLayout);
+
+		return wrapper;
 	}
 
 	protected Component componentForProperty(String propertyName, Binder<T> binder) {
@@ -143,7 +96,7 @@ public abstract class GxMasterDetailView<T> extends Div implements AfterNavigati
 			if (component != null && component instanceof AbstractField) {
 				builder = binder.forField((AbstractField) component);
 			} else {
-				Field f = gc.getEntityClass().getDeclaredField(propertyName);
+				Field f = fc.getEntityClass().getDeclaredField(propertyName);
 				if (f.getType().equals(Boolean.class)) {
 					Checkbox c = new Checkbox();
 					builder = binder.forField(c);
@@ -187,7 +140,7 @@ public abstract class GxMasterDetailView<T> extends Div implements AfterNavigati
 		}
 	}
 
-	private void createButtonLayout(Div editorDiv) {
+	private Component createButtonLayout() {
 		HorizontalLayout buttonLayout = new HorizontalLayout();
 		buttonLayout.setClassName("button-layout");
 		buttonLayout.setWidthFull();
@@ -197,53 +150,47 @@ public abstract class GxMasterDetailView<T> extends Div implements AfterNavigati
 		save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		save.setText(fc.getSaveCaption());
 		buttonLayout.add(cancel, save);
-		editorDiv.add(buttonLayout);
 
 		cancel.addClickListener(e -> {
-			mainGrid.asSingleSelect().clear();
 			try {
+				binder.setBean(bean);
 				if (fc.onCancel != null) {
 					fc.onCancel.execute(bean);
 				}
-			} catch (Exception ex) {
+			} catch (Exception ve) {
+				Notification.show(ve.getMessage());
 			}
 		});
 
 		save.addClickListener(e -> {
-			binder.writeBeanIfValid(bean);
 			try {
+				binder.writeBean(bean);
 				if (fc.onSave != null) {
 					fc.onSave.execute(bean);
 				}
-				mainGrid.getDataProvider().refreshItem(bean);
-			} catch (Exception ex) {
+			} catch (Exception ve) {
+				Notification.show(ve.getMessage());
 			}
 		});
-	}
 
-	private Component createGridComponent() {
-		Div wrapper = new Div();
-		wrapper.setClassName("wrapper");
-		wrapper.setWidthFull();
-		wrapper.add(mainGrid);
-		return wrapper;
+		return buttonLayout;
 	}
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		mainGrid.setItems(fetchEntities());
+		T bean = entityToEdit();
+		setEntity(bean);
 	}
 
-	protected Collection<T> fetchEntities() {
-		return Collections.emptyList();
-	}
-
-	protected void onDelete(T bean) {
-	}
+	protected abstract T entityToEdit();
 
 	private void setEntity(T bean) {
 		this.bean = bean;
 		bindEntity(bean);
+	}
+
+	public T getEntity() {
+		return bean;
 	}
 
 	protected void bindEntity(T bean) {
@@ -258,118 +205,7 @@ public abstract class GxMasterDetailView<T> extends Div implements AfterNavigati
 	protected void postBinding(T bean) {
 	}
 
-	protected void configure(GridConfigurator<T> gc) {
-	}
-
 	protected void configure(FormConfigurator<T> fc) {
-	}
-
-	public static class GridConfigurator<T> {
-		private Supplier<String> captionProvider;
-		private String[] visibleProperties;
-		private String[] editableProperties;
-		private Component defaultComponent;
-		private FormConfigurator<T> formConfigurator;
-		private Map<String, PropertyConfigurator> propertyConfiguratorMap = new HashMap<>();
-		private Class<T> entityClass;
-
-		public GridConfigurator(Class<T> entityClass) {
-			this.entityClass = entityClass;
-		}
-
-		public Class<T> getEntityClass() {
-			return entityClass;
-		}
-
-		public GridConfigurator<T> caption(String caption) {
-			return captionProvider(() -> caption);
-		}
-
-		public String getCaption() {
-			return captionProvider != null ? captionProvider.get() : null;
-		}
-
-		public GridConfigurator<T> captionProvider(Supplier<String> captionProvider) {
-			this.captionProvider = captionProvider;
-			return this;
-		}
-
-		public GridConfigurator<T> visible(String... propertyName) {
-			this.visibleProperties = propertyName;
-			return this;
-		}
-
-		public String[] getVisibleProperties() {
-			return visibleProperties != null ? visibleProperties : new String[] {};
-		}
-
-		public GridConfigurator<T> editable(String... propertyName) {
-			this.editableProperties = propertyName;
-			return this;
-		}
-
-		public String[] getEditableProperties() {
-			return editableProperties != null ? editableProperties : new String[] {};
-		}
-
-		public GridConfigurator<T> defaultComponent(Component component) {
-			this.defaultComponent = component;
-			return this;
-		}
-
-		public Component getDefaultComponent() {
-			return defaultComponent;
-		}
-
-		public GridConfigurator<T> propertyComponent(String propertyName, Component component) {
-			propertyConfigurator(propertyName).component(component);
-			return this;
-		}
-
-		public Component getPropertyComponent(String propertyName) {
-			Component component = propertyConfigurator(propertyName).getComponent();
-			if (component != null)
-				return component;
-			return getDefaultComponent();
-		}
-
-		public GridConfigurator<T> propertyCaption(String propertyName, String caption) {
-			propertyConfigurator(propertyName).caption(caption);
-			return this;
-		}
-
-		public String getPropertyCaption(String propertyName) {
-			return propertyConfigurator(propertyName).getCaption();
-		}
-
-		public GridConfigurator<T> formCaption(String caption) {
-			formConfigurator().caption(caption);
-			return this;
-		}
-
-		public FormConfigurator<T> formConfigurator() {
-			if (formConfigurator == null) {
-				synchronized (this) {
-					if (formConfigurator == null) {
-						formConfigurator = new FormConfigurator<>(getEntityClass());
-					}
-				}
-			}
-			return formConfigurator;
-		}
-
-		public PropertyConfigurator propertyConfigurator(String propertyName) {
-			if (!propertyConfiguratorMap.containsKey(propertyName)) {
-				synchronized (this) {
-					if (!propertyConfiguratorMap.containsKey(propertyName)) {
-						PropertyConfigurator c = new PropertyConfigurator(propertyName);
-						propertyConfiguratorMap.put(propertyName, c);
-					}
-				}
-			}
-			return propertyConfiguratorMap.get(propertyName);
-		}
-
 	}
 
 	public static class FormConfigurator<T> {

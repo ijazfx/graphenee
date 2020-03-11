@@ -26,6 +26,11 @@
 			<artifactId>vaadin-core</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.github.appreciated</groupId>
+			<artifactId>app-layout-addon</artifactId>
+			<version>4.0.0.rc5</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>

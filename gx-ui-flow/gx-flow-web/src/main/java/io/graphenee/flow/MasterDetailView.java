@@ -36,21 +36,14 @@ public class MasterDetailView extends GxMasterDetailView<GxTermBean> {
 	protected void configure(GridConfigurator<GxTermBean> gc) {
 		gc.caption("Terms");
 		gc.visible("termKey", "termSingular", "termPlural");
-		gc.propertyCaption("termKey", "Key");
-		gc.propertyCaption("termSingular", "Singular");
-		gc.propertyCaption("termPlural", "Plural");
 	}
 
 	@Override
 	protected void configure(FormConfigurator<GxTermBean> fc) {
-		fc.position(FormPosition.POPUP);
+		fc.position(FormPosition.END);
 		fc.caption("Term Detail");
 		fc.editable("termKey", "termSingular", "termPlural", "supportedLocaleFault");
 		fc.required("supportedLocaleFault", "termKey", "termSingular");
-		fc.propertyCaption("supportedLocaleFault", "Locale");
-		fc.propertyCaption("termKey", "Key");
-		fc.propertyCaption("termSingular", "Singular");
-		fc.propertyCaption("termPlural", "Plural");
 		supportedLocaleFault = new ComboBox<GxSupportedLocaleBean>();
 		fc.propertyConfigurator("supportedLocaleFault").component(supportedLocaleFault).converter(new BeanFaultToBeanConverter());
 
