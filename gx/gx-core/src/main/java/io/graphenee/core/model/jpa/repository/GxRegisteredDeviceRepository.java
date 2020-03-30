@@ -13,5 +13,7 @@ public interface GxRegisteredDeviceRepository extends GxJpaRepository<GxRegister
 	List<GxRegisteredDevice> findByGxNamespaceNamespace(String namespace);
 
 	GxRegisteredDevice findByGxNamespaceNamespaceAndDeviceToken(String namespace, String deviceToken);
+	
+	GxRegisteredDevice findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(String namespace, String deviceToken, String ownerId);
 
 }
