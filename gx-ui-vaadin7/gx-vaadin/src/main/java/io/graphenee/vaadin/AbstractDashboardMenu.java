@@ -273,9 +273,10 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 					backButton.setVisible(true);
 					viewName = focusedMenuItem.getChildren().iterator().next().viewName();
 				}
-				if (viewName == null)
-					viewName = dashboardSetup().dashboardViewName();
-				UI.getCurrent().getNavigator().navigateTo(viewName);
+				//				if (viewName == null)
+				//					viewName = dashboardSetup().dashboardViewName();
+				if (viewName != null)
+					UI.getCurrent().getNavigator().navigateTo(viewName);
 			}
 		});
 

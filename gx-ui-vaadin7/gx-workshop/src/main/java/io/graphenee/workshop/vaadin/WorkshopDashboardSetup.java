@@ -57,6 +57,8 @@ public class WorkshopDashboardSetup extends AbstractDashboardSetup {
 	protected List<TRMenuItem> menuItems() {
 		List<TRMenuItem> menus = new ArrayList<>();
 		menus.add(TRSimpleMenuItem.createMenuItemForView(MetroStyleDashboardView.VIEW_NAME, "Home", FontAwesome.HOME));
+		menus.add(TRSimpleMenuItem.createMenuItemForView(MeetingHostView.VIEW_NAME, "Meeting Host", FontAwesome.VIDEO_CAMERA));
+		menus.add(TRSimpleMenuItem.createMenuItemForView(MeetingClientView.VIEW_NAME, "Meeting Client", FontAwesome.VIDEO_CAMERA));
 		TRSimpleMenuItem dmMenuItem = TRSimpleMenuItem.createMenuItemForView(SystemView.VIEW_NAME, "Data Maintenance", FontAwesome.WRENCH);
 		dmMenuItem.addChild(TRSimpleMenuItem.createMenuItemForView(SystemView.VIEW_NAME, "System", FontAwesome.SERVER));
 		dmMenuItem.addChild(TRSimpleMenuItem.createMenuItemForView(LocalizationView.VIEW_NAME, "Localization", FontAwesome.GLOBE));

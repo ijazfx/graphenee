@@ -105,6 +105,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 			rootLayout.setExpandRatio(contentLayout, 1);
 			rootLayout.setHeightUndefined();
 			setContent(rootLayout);
+			setHeightUndefined();
 
 			postBuild();
 			isBuilt = true;
