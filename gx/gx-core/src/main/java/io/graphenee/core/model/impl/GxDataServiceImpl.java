@@ -2084,9 +2084,9 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespaceBean namespaceBean = findNamespace(namespace);
 		if (namespaceBean == null)
 			throw new RegisterDeviceFailedException("Namespace " + namespace + " does not exist.");
-		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(namespace, deviceToken, ownerId);
 		if (device != null)
-			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " already registered");
+			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + "and ownerId " + ownerId + " for namespace " + namespace + " already registered");
 		GxRegisteredDevice entity = new GxRegisteredDevice();
 		entity.setBrand(brand);
 		entity.setIsActive(true);
@@ -2109,6 +2109,13 @@ public class GxDataServiceImpl implements GxDataService {
 
 	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceToken(String namespace, String deviceToken) {
 		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceToken(namespace, deviceToken);
+		if (device == null)
+			return null;
+		return makeGxRegisteredDeviceBean(device);
+	}
+	
+	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace, String deviceToken, String ownerId) {
+		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(namespace, deviceToken, ownerId);
 		if (device == null)
 			return null;
 		return makeGxRegisteredDeviceBean(device);
