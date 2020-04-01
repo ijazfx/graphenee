@@ -58,7 +58,7 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 	}
 
 	protected String getCardWidth() {
-		return "25%";
+		return "33%";
 	}
 
 	protected String getCardHeight() {

@@ -757,6 +757,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		toolbar.setVisible(false);
 	}
 
+	public void setSelectionMode(SelectionMode mode) {
+		entityGrid().setSelectionMode(mode);
+	}
+
 	public void showSecondaryToolbar() {
 		secondaryToolbar.setVisible(true);
 	}

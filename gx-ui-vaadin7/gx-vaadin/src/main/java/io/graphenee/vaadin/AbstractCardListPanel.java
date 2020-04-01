@@ -72,10 +72,15 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		this.entityClass = entityClass;
 		contentLayout = new CssLayout();
 		contentLayout.setSizeFull();
-		contentLayout.addStyleName("card-collection");
+		contentLayout.setPrimaryStyleName("card-collection");
 		if (!isSpringComponent()) {
 			postConstruct();
 		}
+	}
+
+	@Override
+	public void setPrimaryStyleName(String style) {
+		contentLayout.setPrimaryStyleName(style);
 	}
 
 	protected boolean isSpringComponent() {

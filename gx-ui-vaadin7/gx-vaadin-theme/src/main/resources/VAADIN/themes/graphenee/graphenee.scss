@@ -197,6 +197,35 @@ $view-padding: round($v-unit-size * 0.75) !default;
 		transition-timing-function: ease-out;
 	}
 	
+	.comments-card-collection {
+		padding: 0px;
+		
+		.card-item-content {
+			overflow: scroll;
+		}
+		
+		.popup-footer {
+			z-index: 300;
+			background-color: $v-card-footer;
+			border-top: 1px solid $v-card-border-color;
+		}
+		
+		> .card-item {
+			border-radius: $v-border-radius;
+			transition-duration: 100ms;
+			transition-timing-function: ease-in;
+			min-width: 100%;
+		}
+		
+		> .card-item:hover {
+			z-index: 2;
+			border-radius: $v-border-radius;
+			background: #efefef;
+			transition-duration: 100ms;
+			transition-timing-function: ease-out;
+		}
+	}
+	
 	.card-collection {
 		padding: 0px;
 		
@@ -214,7 +243,6 @@ $view-padding: round($v-unit-size * 0.75) !default;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
-			min-width: 200px;
 		}
 		
 		> .card-item:hover {
@@ -240,21 +268,15 @@ $view-padding: round($v-unit-size * 0.75) !default;
    
 }
 
-@media (min-width: 1025px) {
-	.reportFileProcessingPanel {
-  		max-width: 25%;
-  	}
-}
-
 @media (min-width: 769px) and (max-width: 1024px) {
-	.reportFileProcessingPanel {
-  		max-width: 33%;
+	.card-item {
+		min-width: 50%;
   	}
 }
 
 @media (min-width: 415px) and (max-width: 768px) {
-	.reportFileProcessingPanel {
-  		max-width: 50%;
+	.card-item {
+  		min-width: 100%;
   	}
 }
 
