@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -82,6 +83,7 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 
 	private Component buildHeader() {
 		header = new HorizontalLayout();
+		header.setDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
 		header.addStyleName("viewheader");
 		header.setSpacing(true);
 		Responsive.makeResponsive(header);
@@ -100,6 +102,7 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 		toolbar = new HorizontalLayout();
 		toolbar.addStyleName("toolbar");
 		toolbar.setSpacing(true);
+		toolbar.setVisible(false);
 		return toolbar;
 	}
 
@@ -108,12 +111,14 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 	protected abstract void postInitialize();
 
 	protected void addButtons(Button... buttons) {
+		toolbar.setVisible(true);
 		for (Button button : buttons) {
 			toolbar.addComponent(button);
 		}
 	}
 
 	protected void addComponentsToToolbar(Component... components) {
+		toolbar.setVisible(true);
 		for (Component component : components) {
 			toolbar.addComponent(component);
 		}

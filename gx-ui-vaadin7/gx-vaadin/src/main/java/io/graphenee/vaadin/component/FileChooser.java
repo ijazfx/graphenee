@@ -94,8 +94,8 @@ public class FileChooser extends CustomField<String> {
 	public FileChooser(String caption, Function<String, String> fileNameTranslator) {
 		setCaption(caption);
 		this.fileNameTranslator = fileNameTranslator;
-		componentHeight = "100px";
-		componentWidth = "280px";
+		componentHeight = "-1px";
+		componentWidth = "-1px";
 	}
 
 	public void setStorage(FileStorage storage) {
@@ -162,11 +162,12 @@ public class FileChooser extends CustomField<String> {
 		setValue(uploadedFilePath);
 
 		UI.getCurrent().access(() -> {
-			String extension = FilenameUtils.getExtension(uploadedFilePath);
+			String mimeType = TRFileContentUtil.getMimeType(uploadedFilePath);
+			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
 			if (extension != null)
 				extension = extension.toLowerCase();
 			Resource resource = null;
-			if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg)")) {
+			if (mimeType == null || !mimeType.startsWith("image/")) {
 				resource = GrapheneeTheme.fileExtensionIconResource(extension);
 				if (resource == null)
 					resource = GrapheneeTheme.fileExtensionIconResource("bin");
@@ -295,8 +296,9 @@ public class FileChooser extends CustomField<String> {
 			String fileName = getValue();
 			Resource resource = null;
 			if (fileName != null) {
-				String extension = FilenameUtils.getExtension(fileName);
-				if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg)")) {
+				String mimeType = TRFileContentUtil.getMimeType(fileName);
+				if (mimeType == null || !mimeType.startsWith("image/")) {
+					String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
 					resource = GrapheneeTheme.fileExtensionIconResource(extension);
 					previewImage.setHeight("32px");
 					previewImage.setSource(resource);
@@ -314,11 +316,11 @@ public class FileChooser extends CustomField<String> {
 							resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
 						}
 					}
-					previewImage.setHeight(componentHeight);
+					previewImage.setWidth("100px");
 					previewImage.setSource(resource);
 				}
 
-				if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg|pdf)")) {
+				if (mimeType == null || !mimeType.startsWith("image/")) {
 					try {
 						File file = new File(fileName);
 						if (file.isFile() && file.exists()) {

@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -107,10 +106,10 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 				rootLayout.addComponent(toolbar);
 			}
 			rootLayout.addComponent(contentLayout);
-			rootLayout.setExpandRatio(contentLayout, 1);
-			rootLayout.setHeightUndefined();
+			//			rootLayout.setExpandRatio(contentLayout, 1);
+			//			rootLayout.setHeightUndefined();
 			setContent(rootLayout);
-			setHeightUndefined();
+			//			setHeightUndefined();
 
 			postBuild();
 			isBuilt = true;
@@ -127,7 +126,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	}
 
 	private Component buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false).withSpacing(true);
+		MVerticalLayout layout = new MVerticalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withFullWidth().withMargin(false).withSpacing(true);
 		addButton = new MButton(FontAwesome.PLUS, localizedSingularValue(addButtonCaption()), event -> {
 			try {
 				onAddButtonClick(initializeEntity(entityClass.newInstance()));

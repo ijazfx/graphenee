@@ -25,7 +25,7 @@ $v-card-footer: #FFFFFF !default;
 @import "views/reports";
 
 // Main layout padding
-$view-padding: round($v-unit-size * 0.75) !default;
+$view-padding: round($v-unit-size * 0.85) !default;
 
 // Optimize the CSS output
 //$v-included-components: remove($v-included-components, accordion);
@@ -57,7 +57,7 @@ $view-padding: round($v-unit-size * 0.75) !default;
   }
   
   .v-formlayout-captioncell {
-  	min-width: 130px;
+  	  min-width: 100px;
   }
   
   .v-margin-left {
@@ -268,16 +268,31 @@ $view-padding: round($v-unit-size * 0.75) !default;
    
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 1025px) {
+	.card-item {
+		min-width: 33%;
+  	}
+}
+
+@media (min-width: 801px) and (max-width: 1024px) {
 	.card-item {
 		min-width: 50%;
   	}
 }
 
-@media (min-width: 415px) and (max-width: 768px) {
+@media (min-width: 0px) and (max-width: 800px) {
 	.card-item {
   		min-width: 100%;
   	}
+	.v-formlayout-captioncell {
+  		min-width: 70px;
+  	}
+	.viewheader {
+		margin-top: 8px;
+		font-size: 0.65em;
+		padding: round($v-unit-size * 0.65) !important;
+	}
+
 }
 
 @media print {
