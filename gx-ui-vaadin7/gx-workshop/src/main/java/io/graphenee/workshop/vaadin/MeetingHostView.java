@@ -31,7 +31,7 @@ import io.graphenee.core.model.GxMeetingUser;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxUserAccountMeetingUserWrapper;
 import io.graphenee.vaadin.AbstractDashboardPanel;
-import io.graphenee.vaadin.meeting.GxMeetingClient;
+import io.graphenee.vaadin.meeting.GxMeetingHost;
 import io.graphenee.vaadin.util.DashboardUtils;
 
 @SuppressWarnings("serial")
@@ -46,14 +46,14 @@ public class MeetingHostView extends AbstractDashboardPanel implements MView {
 	@Autowired
 	GxDataService dataService;
 
-	private GxMeetingClient meetingClientCompnent;
+	private GxMeetingHost meetingHost;
 
 	@Override
 	public void enter(ViewChangeEvent event) {
 		GxAuthenticatedMeetingUserWrapper meetingUser = new GxAuthenticatedMeetingUserWrapper(DashboardUtils.getLoggedInUser());
 		Collection<GxMeetingUser> users = dataService.findUserAccount().stream().map(u -> new GxUserAccountMeetingUserWrapper(u)).collect(Collectors.toList());
 		GxMeeting meeting = meetingService.createMeeting(meetingUser, "1", users);
-		meetingClientCompnent.initializeWithMeetingUserAndMeeting(meetingUser, meeting);
+		meetingHost.initializeWithMeetingUserAndMeeting(meetingUser, meeting);
 	}
 
 	@Override
@@ -72,8 +72,8 @@ public class MeetingHostView extends AbstractDashboardPanel implements MView {
 
 	@Override
 	protected void postInitialize() {
-		meetingClientCompnent = new GxMeetingClient();
-		addComponent(meetingClientCompnent);
+		meetingHost = new GxMeetingHost();
+		addComponent(meetingHost);
 	}
 
 	@Override

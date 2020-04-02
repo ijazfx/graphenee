@@ -18,7 +18,9 @@ package io.graphenee.vaadin;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.BrowserFrame;
 
 public class ResourcePreviewPanel extends TRAbstractPanel {
@@ -60,8 +62,16 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 	}
 
 	public void preview(Resource resource) {
-		viewer.setSource(resource);
-		viewer.markAsDirtyRecursive();
+		if (resource instanceof StreamResource) {
+			if (resource.getMIMEType().startsWith("image/") || resource.getMIMEType().endsWith("/pdf")) {
+				viewer.setSource(resource);
+				openInModalPopup();
+			} else {
+				Page.getCurrent().open(resource, "_blank", true);
+			}
+		} else {
+			Page.getCurrent().open(resource, "_blank", true);
+		}
 	}
 
 }

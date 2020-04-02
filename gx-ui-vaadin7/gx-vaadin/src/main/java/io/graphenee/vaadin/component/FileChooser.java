@@ -146,7 +146,6 @@ public class FileChooser extends CustomField<String> {
 			}
 			previewPanel.build();
 			previewPanel.preview(resource);
-			previewPanel.openInModalPopup();
 		}
 	}
 

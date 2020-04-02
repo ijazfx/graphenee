@@ -3,9 +3,11 @@ package io.graphenee.vaadin.meeting;
 import java.net.URI;
 
 import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MPanel;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -17,21 +19,25 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.GxMeeting;
 import io.graphenee.core.model.GxMeetingUser;
-import io.graphenee.vaadin.ui.GxNotification;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
+import io.graphenee.vaadin.CardCollectionPanel;
 
 @SuppressWarnings("serial")
-@JavaScript({ "meeting-client.js" })
+@JavaScript({ "meeting-host.js" })
 @StyleSheet({ "meeting.css" })
-public class GxMeetingClient extends VerticalLayout {
+public class GxMeetingHost extends VerticalLayout {
 
+	private BeanItemContainer<GxMeetingUser> meetingContainer;
+	private CardCollectionPanel<GxMeetingUser> roomPanel;
 	private GxMeetingUser user;
 	private GxMeeting meeting;
-	private MButton joinButton;
-	private MButton leaveButton;
+	private Component roomComponent;
+	private MButton startButton;
+	private MButton endButton;
 	private MButton cameraButton;
 	private MButton screenButton;
 
-	public GxMeetingClient() {
+	public GxMeetingHost() {
 		setWidth("100%");
 		setHeight("100%");
 		setMargin(false);
@@ -41,7 +47,7 @@ public class GxMeetingClient extends VerticalLayout {
 
 	private void buildComponent() {
 		addComponent(getToolbar());
-		Component roomComponent = getRoomComponent();
+		roomComponent = getRoomComponent();
 		addComponent(roomComponent);
 		setExpandRatio(roomComponent, 1);
 	}
@@ -49,22 +55,27 @@ public class GxMeetingClient extends VerticalLayout {
 	private Component getToolbar() {
 		CssLayout toolbar = new CssLayout();
 		toolbar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-
-		joinButton = new MButton("Join").withStyleName(ValoTheme.BUTTON_PRIMARY).withListener(e -> {
-			if (!meeting.isStarted()) {
-				GxNotification.tray("Notification", "Meeting is not yet started or has ended already.").show(Page.getCurrent());
-				return;
+		startButton = new MButton("Start").withStyleName(ValoTheme.BUTTON_PRIMARY).withListener(e -> {
+			meeting.start(user);
+			meetingContainer.removeAllItems();
+			meetingContainer.addBean(user);
+			for (GxMeetingUser u : meeting.getInvitees()) {
+				if (!u.getUserId().equals(user.getUserId()))
+					meetingContainer.addBean(u);
 			}
-			meeting.join(user);
-			createOffer(user);
-			joinButton.setEnabled(false);
-			leaveButton.setEnabled(true);
+			roomPanel.refresh();
+			startButton.setEnabled(false);
+			endButton.setEnabled(true);
 		});
-		leaveButton = new MButton("Leave").withStyleName(ValoTheme.BUTTON_DANGER).withListener(e -> {
-			meeting.leave(user);
-			leaveButton.setEnabled(false);
-			joinButton.setEnabled(true);
+
+		endButton = new MButton("End").withStyleName(ValoTheme.BUTTON_DANGER).withListener(e -> {
+			meeting.end(user);
+			meetingContainer.removeAllItems();
+			roomPanel.refresh();
+			endButton.setEnabled(false);
+			startButton.setEnabled(true);
 		});
+
 		cameraButton = new MButton().withIcon(FontAwesome.VIDEO_CAMERA).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		screenButton = new MButton().withIcon(FontAwesome.DESKTOP).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
@@ -78,21 +89,38 @@ public class GxMeetingClient extends VerticalLayout {
 			com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 		});
 
-		toolbar.addComponents(joinButton, leaveButton, cameraButton, screenButton);
+		toolbar.addComponents(startButton, endButton, cameraButton, screenButton);
 
 		return toolbar;
 	}
 
 	private Component getRoomComponent() {
+		roomPanel = new CardCollectionPanel<GxMeetingUser>() {
+
+			@Override
+			protected void layoutCard(MPanel cardPanel, GxMeetingUser item) {
+				if (!item.getUserId().equals(user.getUserId())) {
+					cardPanel.setStyleName(GrapheneeTheme.STYLE_ELEVATED);
+					Label video = new Label();
+					video.setPrimaryStyleName("remotePeerStream");
+					video.setWidthUndefined();
+					video.setContentMode(ContentMode.HTML);
+					String html = "<span class=\"remotePeerTitle\">" + item.getFullName() + "</span>" + "<video id=\"" + getVideoTagId(item.getUserId())
+							+ "\" width=\"160px\" height=\"120px\" autoplay></video>";
+					video.setValue(html);
+					cardPanel.setContent(video);
+					cardPanel.setWidth("160px");
+					cardPanel.setHeight("120px");
+				}
+			}
+
+		};
+		roomPanel.setSizeFull();
+
 		CssLayout roomLayout = new CssLayout();
 		roomLayout.setSizeFull();
 
-		Label hostVideo = new Label();
-		hostVideo.setSizeFull();
-		hostVideo.setContentMode(ContentMode.HTML);
-		String hostVideoHtml = "<video id=\"remoteVideo\" width=\"100%\" height=\"100%\" autoplay></video>";
-		hostVideo.setValue(hostVideoHtml);
-		roomLayout.addComponent(hostVideo);
+		roomLayout.addComponent(roomPanel);
 
 		Label localVideo = new Label();
 		localVideo.setWidthUndefined();
@@ -100,6 +128,9 @@ public class GxMeetingClient extends VerticalLayout {
 		String localVideoHtml = "<video id=\"localVideo\" width=\"160px\" height=\"120px\" autoplay muted></video>";
 		localVideo.setValue(localVideoHtml);
 		roomLayout.addComponent(localVideo);
+
+		meetingContainer = new BeanItemContainer<>(GxMeetingUser.class);
+		roomPanel.setCollectionContainer(meetingContainer);
 
 		return roomLayout;
 	}
@@ -109,23 +140,22 @@ public class GxMeetingClient extends VerticalLayout {
 		this.meeting = meeting;
 		if (meeting != null) {
 			if (user.getUserId().equals(meeting.getHost().getUserId())) {
-				joinButton.setVisible(false);
-				leaveButton.setVisible(false);
+				startButton.setVisible(true);
+				endButton.setVisible(true);
 			} else {
-				joinButton.setVisible(true);
-				leaveButton.setVisible(true);
+				startButton.setVisible(false);
+				endButton.setVisible(false);
 			}
 
-			boolean online = meeting.isOnline(user);
 			boolean started = meeting.isStarted();
 
-			joinButton.setEnabled(!online && started);
-			leaveButton.setEnabled(online && started);
+			startButton.setEnabled(!started);
+			endButton.setEnabled(started);
 
 			initializeWebSocket(user);
 		} else {
-			joinButton.setVisible(false);
-			leaveButton.setVisible(false);
+			startButton.setVisible(false);
+			endButton.setVisible(false);
 		}
 	}
 
@@ -141,9 +171,9 @@ public class GxMeetingClient extends VerticalLayout {
 		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 	}
 
-	private void createOffer(GxMeetingUser user) {
-		String statement = String.format("createOffer()");
-		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
+	public String getVideoTagId(String userId) {
+		String sanitized = userId.trim().replace('-', '_').replace('.', '_');
+		return "vid_" + sanitized;
 	}
 
 }
