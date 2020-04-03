@@ -132,10 +132,13 @@ public class GxMeetingClient extends VerticalLayout {
 		URI pageUri = Page.getCurrent().getLocation();
 		StringBuilder sb = new StringBuilder();
 		if (pageUri.getScheme().startsWith("https"))
-			sb.append("wss://");
+			sb.append("wss://").append(pageUri.getHost());
 		else
-			sb.append("ws://");
-		sb.append(pageUri.getHost()).append(":").append(pageUri.getPort()).append("/socket");
+			sb.append("ws://").append(pageUri.getHost());
+		if (pageUri.getPort() != -1 && pageUri.getPort() != 443) {
+			sb.append(":").append(pageUri.getPort());
+		}
+		sb.append("/socket");
 		String statement = String.format("initializeWebSocket('%s?authToken=%s', '%s')", sb.toString(), user.getUserId(), user.getUserId());
 		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 	}
