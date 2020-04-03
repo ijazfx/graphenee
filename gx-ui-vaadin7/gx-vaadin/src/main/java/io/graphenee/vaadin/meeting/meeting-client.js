@@ -131,8 +131,9 @@ function initializePeerConnection() {
     pc.ontrack = function(event) {
     	if(event.track) {
     		var remoteVideo = document.getElementById('remoteVideo');
-    	    if(remoteVideo.srcObject == null) {
-    	    	const remoteStream = MediaStream();
+    		var remoteStream = remoteVideo.srcObject;
+    		if(remoteStream == null) {
+    	    	remoteStream = new MediaStream();
         	    remoteVideo.srcObject = remoteStream;
     	    }
     		remoteStream.addTrack(event.track, remoteStream);

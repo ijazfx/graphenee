@@ -121,12 +121,11 @@ public class GxMeetingClient extends VerticalLayout {
 
 			joinButton.setEnabled(!online && started);
 			leaveButton.setEnabled(online && started);
-
-			initializeWebSocket(user);
 		} else {
 			joinButton.setVisible(false);
 			leaveButton.setVisible(false);
 		}
+		initializeWebSocket(user);
 	}
 
 	private void initializeWebSocket(GxMeetingUser user) {

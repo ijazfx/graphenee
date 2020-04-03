@@ -152,11 +152,11 @@ public class GxMeetingHost extends VerticalLayout {
 			startButton.setEnabled(!started);
 			endButton.setEnabled(started);
 
-			initializeWebSocket(user);
 		} else {
 			startButton.setVisible(false);
 			endButton.setVisible(false);
 		}
+		initializeWebSocket(user);
 	}
 
 	private void initializeWebSocket(GxMeetingUser user) {
