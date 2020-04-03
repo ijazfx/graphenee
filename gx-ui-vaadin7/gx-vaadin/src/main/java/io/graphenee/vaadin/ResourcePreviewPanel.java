@@ -15,17 +15,30 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.vaadin.server.Page;
+import com.vaadin.server.FileDownloader;
 import com.vaadin.server.Resource;
-import com.vaadin.server.StreamResource;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
+
+@SuppressWarnings("serial")
 public class ResourcePreviewPanel extends TRAbstractPanel {
 
 	private BrowserFrame viewer;
+	private MButton downloadButton;
+	private FileDownloader downloader;
+	private MLabel note;
 
 	@Override
 	protected boolean isSpringComponent() {
@@ -34,7 +47,26 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 
 	@Override
 	protected void addButtonsToFooter(MHorizontalLayout layout) {
-		layout.setVisible(false);
+		downloadButton = new MButton("Download").withStyleName(ValoTheme.BUTTON_PRIMARY).withVisible(true);
+		downloadButton.addClickListener(event -> {
+			downloadButton.setEnabled(false);
+			TimerTask task = new TimerTask() {
+
+				@Override
+				public void run() {
+					UI.getCurrent().access(() -> {
+						closePopup();
+						UI.getCurrent().push();
+					});
+				}
+			};
+
+			Timer t = new Timer();
+			t.schedule(task, 3000);
+		});
+		layout.addComponentAsFirst(downloadButton);
+		layout.setExpandRatio(downloadButton, 1);
+		layout.setWidth("100%");
 	}
 
 	@Override
@@ -49,6 +81,9 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		viewer.setSizeFull();
 		layout.add(viewer);
 		layout.setExpandRatio(viewer, 1);
+		note = new MLabel().withFullWidth().withStyleName(ValoTheme.LABEL_LARGE, GrapheneeTheme.STYLE_MARGIN_ALL);
+		note.setValue("No preview is available, please download the file using Download button.");
+		layout.add(note);
 	}
 
 	@Override
@@ -61,16 +96,35 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		return "800px";
 	}
 
+	public Window openInModalPopup(boolean visible) {
+		Window wnd = super.openInModalPopup();
+		if (!visible) {
+			wnd.setWidth("350px");
+			wnd.setHeight("200px");
+		}
+		return wnd;
+	}
+
 	public void preview(Resource resource) {
-		if (resource instanceof StreamResource) {
-			if (resource.getMIMEType().startsWith("image/") || resource.getMIMEType().endsWith("/pdf")) {
-				viewer.setSource(resource);
-				openInModalPopup();
-			} else {
-				Page.getCurrent().open(resource, "_blank", true);
-			}
+		downloadButton.setEnabled(true);
+		if (resource.getMIMEType().startsWith("image/") || resource.getMIMEType().endsWith("/pdf")) {
+			viewer.setSource(resource);
+			downloadButton.setVisible(false);
+			note.setVisible(false);
+			viewer.setVisible(true);
+			openInModalPopup(true);
 		} else {
-			Page.getCurrent().open(resource, "_blank", true);
+			viewer.setSource(null);
+			viewer.setVisible(false);
+			note.setVisible(true);
+			if (downloader == null) {
+				downloader = new FileDownloader(resource);
+				downloader.extend(downloadButton);
+			} else {
+				downloader.setFileDownloadResource(resource);
+			}
+			downloadButton.setVisible(true);
+			openInModalPopup(false);
 		}
 	}
 

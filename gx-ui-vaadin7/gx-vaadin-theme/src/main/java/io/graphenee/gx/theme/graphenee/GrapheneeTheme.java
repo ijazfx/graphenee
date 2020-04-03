@@ -60,5 +60,12 @@ public class GrapheneeTheme extends BaseTheme {
 	public static String STYLE_V_ALIGN_CENTER = "v-align-center";
 	public static String STYLE_CENTER = "center";
 	public static String STYLE_TEXT_ALIGN_RIGHT = "text-align-right";
+	public static String STYLE_MARGIN_ALL = "gx-margin-all";
+	public static String STYLE_MARGIN_VERTICAL = "gx-margin-vertical";
+	public static String STYLE_MARGIN_HORIZONTAL = "gx-margin-horizontal";
+	public static String STYLE_MARGIN_TOP = "gx-margin-top";
+	public static String STYLE_MARGIN_LEFT = "gx-margin-left";
+	public static String STYLE_MARGIN_BOTTOM = "gx-margin-bottom";
+	public static String STYLE_MARGIN_RIGHT = "gx-margin-right";
 
 }

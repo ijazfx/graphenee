@@ -25,8 +25,13 @@ $v-card-footer: #FFFFFF !default;
 @import "views/reports";
 
 // Main layout padding
-$view-padding: round($v-unit-size * 0.85) !default;
-
+$view-padding: round($v-unit-size * 0.5) !default;
+$v-margin-left: round($v-unit-size * 0.5) !default;
+$v-margin-right: round($v-unit-size * 0.5) !default;
+$v-margin-top: round($v-unit-size * 0.5) !default;
+$v-margin-bottom: round($v-unit-size * 0.5) !default;
+$v-layout-spacing-vertical: round($v-unit-size * 0.5) !default;
+$v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 // Optimize the CSS output
 //$v-included-components: remove($v-included-components, accordion);
 //$v-included-components: remove($v-included-components, colorpicker);
@@ -50,10 +55,43 @@ $view-padding: round($v-unit-size * 0.85) !default;
   @include dashboard-transactions-view;
   @include dashboard-reports-view;
   @include valo-checkbox(v-grid-select-all-checkbox);
-  @include valo-checkbox(v-grid-selection-checkbox);
-  
+  @include valo-checkbox(v-grid-selection-checkbox);  
+
   * {
   	  -ms-overflow-style: none;
+  }
+
+  .gx-margin-all {
+	margin-top: $v-margin-top;
+	margin-left: $v-margin-left;
+	margin-bottom: $v-margin-bottom;
+	margin-right: $v-margin-right;
+  }
+
+  .gx-margin-horizontal {
+	margin-left: $v-margin-left;
+	margin-right: $v-margin-right;
+  }
+
+.gx-margin-vertical {
+	margin-top: $v-margin-top;
+	margin-bottom: $v-margin-bottom;
+  }
+
+.gx-margin-top {
+	margin-top: $v-margin-top;
+  }
+
+.gx-margin-left {
+	margin-left: $v-margin-left;
+  }
+
+ .gx-margin-bottom {
+	margin-bottom: $v-margin-bottom;
+  }
+
+ .gx-margin-right {
+	margin-right: $v-margin-right;
   }
   
   .v-formlayout-captioncell {
@@ -61,19 +99,19 @@ $view-padding: round($v-unit-size * 0.85) !default;
   }
   
   .v-margin-left {
-  	padding: ($view-padding / 2) !important;
+  	padding-left: $v-margin-left !important;
   }
   
   .v-margin-right {
-  	padding: ($view-padding / 2) !important;
+  	padding-right: $v-margin-right !important;
   }
   
   .v-margin-top {
-  	padding: ($view-padding / 2) !important;
+  	padding-top: $v-margin-top !important;
   }
   
   .v-margin-bottom {
-  	padding: ($view-padding / 2) !important;
+  	padding-bottom: $v-margin-bottom !important;
   }
   
   .code {
@@ -292,7 +330,6 @@ $view-padding: round($v-unit-size * 0.85) !default;
 		font-size: 0.65em;
 		padding: round($v-unit-size * 0.65) !important;
 	}
-
 }
 
 @media print {

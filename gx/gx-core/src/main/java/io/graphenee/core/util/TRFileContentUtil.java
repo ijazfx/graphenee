@@ -21,7 +21,7 @@ public class TRFileContentUtil {
 
 	public static String getExtensionFromFilename(String filename) {
 		if (filename != null) {
-			String[] parts = filename.trim().split("\\.");
+			String[] parts = filename.trim().toLowerCase().split("\\.");
 			if (parts.length > 1) {
 				return parts[parts.length - 1];
 			}
@@ -44,7 +44,7 @@ public class TRFileContentUtil {
 	}
 
 	public static String getMimeType(String filename) {
-		String[] parts = filename.split("[.]");
+		String[] parts = filename.toLowerCase().split("[.]");
 		String ext = parts[parts.length - 1];
 		if (ext.matches("(jpg|jpeg|gif|png|bmp|tiff)")) {
 			return "image/" + ext;
