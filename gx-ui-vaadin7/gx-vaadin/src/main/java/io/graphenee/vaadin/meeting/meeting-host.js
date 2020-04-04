@@ -1,8 +1,27 @@
 var configuration = {
-    'iceServers': [
-        {
-            'urls': 'stun:stun.l.google.com:19302'
-        }
+	"iceServers": [
+      {
+        "url": "stun:global.stun.twilio.com:3478?transport=udp",
+        "urls": "stun:global.stun.twilio.com:3478?transport=udp"
+      },
+      {
+        "url": "turn:global.turn.twilio.com:3478?transport=udp",
+        "username": "a494d642d5f2eae2e9c6e7cc8b32801d96e129b6b24e51fec31de96e6785f053",
+        "urls": "turn:global.turn.twilio.com:3478?transport=udp",
+        "credential": "6mfV4MNuOhbdXfrvVsYY7v2oIC8cNsGrEREI1NyKH0c="
+      },
+      {
+        "url": "turn:global.turn.twilio.com:3478?transport=tcp",
+        "username": "a494d642d5f2eae2e9c6e7cc8b32801d96e129b6b24e51fec31de96e6785f053",
+        "urls": "turn:global.turn.twilio.com:3478?transport=tcp",
+        "credential": "6mfV4MNuOhbdXfrvVsYY7v2oIC8cNsGrEREI1NyKH0c="
+      },
+      {
+        "url": "turn:global.turn.twilio.com:443?transport=tcp",
+        "username": "a494d642d5f2eae2e9c6e7cc8b32801d96e129b6b24e51fec31de96e6785f053",
+        "urls": "turn:global.turn.twilio.com:443?transport=tcp",
+        "credential": "6mfV4MNuOhbdXfrvVsYY7v2oIC8cNsGrEREI1NyKH0c="
+      }
     ]
 }
 
@@ -171,6 +190,30 @@ async function startScreen() {
 	} catch(error) {
 		console.log(error);
 	}
+}
+
+// mute all attendees...
+function muteAllAttendees() {
+	videos.forEach(v => {
+		document.getElementById(v).muted=true;
+ 	});
+}
+
+// unmute all attendees...
+function unmuteAllAttendees() {
+	videos.forEach(v => {
+		document.getElementById(v).muted=false;
+ 	});
+}
+
+// mute single attendee...
+function muteAttendee(userId) {
+	document.getElementById(createVideoId(userId)).muted = true;
+}
+
+//unmute single attendee...
+function unmuteAttendee(userId) {
+	document.getElementById(createVideoId(userId)).muted = false;
 }
 
 function createVideoId(userId) {

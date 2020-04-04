@@ -1,6 +1,8 @@
 package io.graphenee.vaadin.meeting;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MPanel;
@@ -19,7 +21,6 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.GxMeeting;
 import io.graphenee.core.model.GxMeetingUser;
-import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.CardCollectionPanel;
 
 @SuppressWarnings("serial")
@@ -36,6 +37,10 @@ public class GxMeetingHost extends VerticalLayout {
 	private MButton endButton;
 	private MButton cameraButton;
 	private MButton screenButton;
+	private MButton muteAllButton;
+
+	private Map<String, Boolean> muteMap = new HashMap<>();
+	private Boolean allMuted = false;
 
 	public GxMeetingHost() {
 		setWidth("100%");
@@ -78,6 +83,7 @@ public class GxMeetingHost extends VerticalLayout {
 
 		cameraButton = new MButton().withIcon(FontAwesome.VIDEO_CAMERA).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		screenButton = new MButton().withIcon(FontAwesome.DESKTOP).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
+		muteAllButton = new MButton().withIcon(FontAwesome.MICROPHONE).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
 		cameraButton.addClickListener(e -> {
 			String statement = String.format("startCamera()");
@@ -89,7 +95,19 @@ public class GxMeetingHost extends VerticalLayout {
 			com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 		});
 
-		toolbar.addComponents(startButton, endButton, cameraButton, screenButton);
+		muteAllButton.addClickListener(e -> {
+			if (!allMuted) {
+				com.vaadin.ui.JavaScript.getCurrent().execute("muteAllAttendees()");
+				allMuted = true;
+				muteAllButton.setIcon(FontAwesome.MICROPHONE_SLASH);
+			} else {
+				com.vaadin.ui.JavaScript.getCurrent().execute("unmuteAllAttendees()");
+				allMuted = false;
+				muteAllButton.setIcon(FontAwesome.MICROPHONE);
+			}
+		});
+
+		toolbar.addComponents(startButton, endButton, cameraButton, screenButton, muteAllButton);
 
 		return toolbar;
 	}
@@ -99,18 +117,12 @@ public class GxMeetingHost extends VerticalLayout {
 
 			@Override
 			protected void layoutCard(MPanel cardPanel, GxMeetingUser item) {
+				cardPanel.removeStyleName("card-item");
 				if (!item.getUserId().equals(user.getUserId())) {
-					cardPanel.setStyleName(GrapheneeTheme.STYLE_ELEVATED);
-					Label video = new Label();
-					video.setPrimaryStyleName("remotePeerStream");
-					video.setWidthUndefined();
-					video.setContentMode(ContentMode.HTML);
-					String html = "<span class=\"remotePeerTitle\">" + item.getFullName() + "</span>" + "<video id=\"" + getVideoTagId(item.getUserId())
-							+ "\" width=\"160px\" height=\"120px\" autoplay></video>";
-					video.setValue(html);
-					cardPanel.setContent(video);
-					cardPanel.setWidth("160px");
-					cardPanel.setHeight("120px");
+					GxMeetingUserCardComponent component = new GxMeetingUserCardComponent(item);
+					component.build().buildFooter(item);
+					cardPanel.setContent(component);
+					cardPanel.setWidth("200px");
 				}
 			}
 
@@ -118,7 +130,7 @@ public class GxMeetingHost extends VerticalLayout {
 		roomPanel.setSizeFull();
 
 		CssLayout roomLayout = new CssLayout();
-		roomLayout.setSizeFull();
+		//roomLayout.setSizeFull();
 
 		roomLayout.addComponent(roomPanel);
 

@@ -15,6 +15,7 @@
 	position: absolute;
 	bottom: 20px;
 	right: 50px;
+	z-index: 100;
 }
 
 .remoteVideo {
@@ -38,12 +39,9 @@
 
 .remotePeerTitle {
 	display: block;
-	background-color: #202020cc;
-	padding: 8px 8px;
-	color: white;
-	font-size: 0.90em;
-	font-weight: 600;
+	padding: 4px 8px;
+	font-size: 0.80em;
 	position: absolute;
-	width: 100%;
 	bottom: 0px;
+	z-index: 10;
 }
