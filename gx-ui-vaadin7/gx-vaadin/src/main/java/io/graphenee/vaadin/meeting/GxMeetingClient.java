@@ -56,12 +56,13 @@ public class GxMeetingClient extends VerticalLayout {
 				return;
 			}
 			meeting.join(user);
-			createOffer(user);
+			join(user);
 			joinButton.setEnabled(false);
 			leaveButton.setEnabled(true);
 		});
 		leaveButton = new MButton("Leave").withStyleName(ValoTheme.BUTTON_DANGER).withListener(e -> {
 			meeting.leave(user);
+			leave(user);
 			leaveButton.setEnabled(false);
 			joinButton.setEnabled(true);
 		});
@@ -143,8 +144,13 @@ public class GxMeetingClient extends VerticalLayout {
 		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 	}
 
-	private void createOffer(GxMeetingUser user) {
-		String statement = String.format("createOffer()");
+	private void join(GxMeetingUser user) {
+		String statement = String.format("joinMeeting()");
+		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
+	}
+
+	private void leave(GxMeetingUser user) {
+		String statement = String.format("leaveMeeting()");
 		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 	}
 
