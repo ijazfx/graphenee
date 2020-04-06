@@ -117,6 +117,8 @@ public class GxMeetingHost extends VerticalLayout {
 
 			@Override
 			protected void layoutCard(MPanel cardPanel, GxMeetingUser item) {
+				cardPanel.setId(getVideoTagId(item.getUserId()) + "_container");
+				cardPanel.setStyleName("hidden");
 				cardPanel.removeStyleName("card-item");
 				if (!item.getUserId().equals(user.getUserId())) {
 					GxMeetingUserCardComponent component = new GxMeetingUserCardComponent(item);
@@ -130,14 +132,14 @@ public class GxMeetingHost extends VerticalLayout {
 		roomPanel.setSizeFull();
 
 		CssLayout roomLayout = new CssLayout();
-		//roomLayout.setSizeFull();
+		roomLayout.setSizeFull();
 
 		roomLayout.addComponent(roomPanel);
 
 		Label localVideo = new Label();
 		localVideo.setWidthUndefined();
 		localVideo.setContentMode(ContentMode.HTML);
-		String localVideoHtml = "<video id=\"localVideo\" width=\"160px\" height=\"120px\" autoplay muted></video>";
+		String localVideoHtml = "<video id=\"localVideo\" width=\"200px\" height=\"150px\" autoplay muted></video>";
 		localVideo.setValue(localVideoHtml);
 		roomLayout.addComponent(localVideo);
 
@@ -150,24 +152,18 @@ public class GxMeetingHost extends VerticalLayout {
 	public void initializeWithMeetingUserAndMeeting(GxMeetingUser user, GxMeeting meeting) {
 		this.user = user;
 		this.meeting = meeting;
-		if (meeting != null) {
-			if (user.getUserId().equals(meeting.getHost().getUserId())) {
-				startButton.setVisible(true);
-				endButton.setVisible(true);
-			} else {
-				startButton.setVisible(false);
-				endButton.setVisible(false);
-			}
-
-			boolean started = meeting.isStarted();
-
-			startButton.setEnabled(!started);
-			endButton.setEnabled(started);
-
+		if (user.getUserId().equals(meeting.getHost().getUserId())) {
+			startButton.setVisible(true);
+			endButton.setVisible(true);
 		} else {
 			startButton.setVisible(false);
 			endButton.setVisible(false);
 		}
+
+		boolean started = meeting.isStarted();
+
+		startButton.setEnabled(!started);
+		endButton.setEnabled(started);
 		initializeWebSocket(user);
 	}
 

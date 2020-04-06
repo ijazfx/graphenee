@@ -98,7 +98,7 @@ public class GxMeetingClient extends VerticalLayout {
 		Label localVideo = new Label();
 		localVideo.setWidthUndefined();
 		localVideo.setContentMode(ContentMode.HTML);
-		String localVideoHtml = "<video id=\"localVideo\" width=\"160px\" height=\"120px\" autoplay muted></video>";
+		String localVideoHtml = "<video id=\"localVideo\" width=\"200px\" height=\"150px\" autoplay muted></video>";
 		localVideo.setValue(localVideoHtml);
 		roomLayout.addComponent(localVideo);
 
@@ -108,24 +108,19 @@ public class GxMeetingClient extends VerticalLayout {
 	public void initializeWithMeetingUserAndMeeting(GxMeetingUser user, GxMeeting meeting) {
 		this.user = user;
 		this.meeting = meeting;
-		if (meeting != null) {
-			if (user.getUserId().equals(meeting.getHost().getUserId())) {
-				joinButton.setVisible(false);
-				leaveButton.setVisible(false);
-			} else {
-				joinButton.setVisible(true);
-				leaveButton.setVisible(true);
-			}
-
-			boolean online = meeting.isOnline(user);
-			boolean started = meeting.isStarted();
-
-			joinButton.setEnabled(!online && started);
-			leaveButton.setEnabled(online && started);
-		} else {
+		if (user.getUserId().equals(meeting.getHost().getUserId())) {
 			joinButton.setVisible(false);
 			leaveButton.setVisible(false);
+		} else {
+			joinButton.setVisible(true);
+			leaveButton.setVisible(true);
 		}
+
+		boolean online = meeting.isOnline(user);
+		boolean started = meeting.isStarted();
+
+		joinButton.setEnabled(!online && started);
+		leaveButton.setEnabled(online && started);
 		initializeWebSocket(user);
 	}
 

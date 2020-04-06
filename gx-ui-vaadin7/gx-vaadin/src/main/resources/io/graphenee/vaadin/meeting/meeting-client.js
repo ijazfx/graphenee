@@ -2,7 +2,10 @@ let configuration = {
     "iceServers": [
         {
             "url": "stun:global.stun.twilio.com:3478?transport=udp",
-            "urls": "stun:global.stun.twilio.com:3478?transport=udp"
+            "urls": [
+            	"stun:stun.l.google.com:19302",
+            	"stun:global.stun.twilio.com:3478?transport=udp"
+            ]
         }
     ]
 }
@@ -201,9 +204,6 @@ async function startCamera() {
         audio: true
     }
     try {
-        pc.getSenders().forEach(sender => {
-            pc.removeTrack(sender);
-        });
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         let myVideo = document.getElementById('localVideo');
         myVideo.muted = true;
@@ -219,9 +219,6 @@ async function startCamera() {
 // called when screen button is clicked on the meeting component.
 async function startScreen() {
     try {
-        pc.getSenders().forEach(sender => {
-            pc.removeTrack(sender);
-        });
         const stream = await navigator.mediaDevices.getDisplayMedia();
         let myVideo = document.getElementById('localVideo');
         myVideo.muted = true;

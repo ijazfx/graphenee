@@ -2,7 +2,10 @@ let configuration = {
     "iceServers": [
         {
             "url": "stun:global.stun.twilio.com:3478?transport=udp",
-            "urls": "stun:global.stun.twilio.com:3478?transport=udp"
+            "urls": [
+            	"stun:stun.l.google.com:19302",
+            	"stun:global.stun.twilio.com:3478?transport=udp"
+            ]
         }
     ]
 }
@@ -58,10 +61,12 @@ function initializeWebSocket(wsurl, userId) {
 function handleJoining(userId) {
     let pc = createPeer(userId);
     console.log(userId, "joined");
-    ws.send(JSON.stringify({
-        event: "request-offer",
-        userId: userId
-    }));
+    createOffer(userId);
+    try {
+    	document.getElementById(createVideoId(userId) + "_container").style.display = 'inline-block';
+    } catch(err) {
+    	
+    }
 }
 
 function handleLeaving(userId) {
@@ -70,6 +75,11 @@ function handleLeaving(userId) {
     peers.delete(userId);
     console.log(userId, "left");
     pc.close();
+    try {
+    	document.getElementById(createVideoId(userId) + "_container").style.display = 'none';
+    } catch(err) {
+    	
+    }
 }
 
 // called when websocket will receive candidate

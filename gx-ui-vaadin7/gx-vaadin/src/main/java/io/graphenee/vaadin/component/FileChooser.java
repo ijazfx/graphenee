@@ -165,7 +165,7 @@ public class FileChooser extends CustomField<String> {
 			if (extension != null)
 				extension = extension.toLowerCase();
 			Resource resource = null;
-			if (!mimeType.startsWith("image/") && !extension.matches("(pdf)")) {
+			if (!mimeType.startsWith("image/")) {
 				previewImage.setHeight("32px");
 				previewImage.setWidth("32px");
 				resource = GrapheneeTheme.fileExtensionIconResource(extension);
@@ -300,7 +300,7 @@ public class FileChooser extends CustomField<String> {
 			if (fileName != null) {
 				String mimeType = TRFileContentUtil.getMimeType(fileName);
 				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
-				if (!mimeType.startsWith("image/") && !extension.matches("(pdf)")) {
+				if (!mimeType.startsWith("image/")) {
 					resource = GrapheneeTheme.fileExtensionIconResource(extension);
 					if (resource == null)
 						resource = GrapheneeTheme.fileExtensionIconResource("bin");
