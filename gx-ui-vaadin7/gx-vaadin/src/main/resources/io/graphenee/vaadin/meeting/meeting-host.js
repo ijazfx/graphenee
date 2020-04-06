@@ -3,24 +3,6 @@ let configuration = {
         {
             "url": "stun:global.stun.twilio.com:3478?transport=udp",
             "urls": "stun:global.stun.twilio.com:3478?transport=udp"
-        },
-        {
-            "url": "turn:global.turn.twilio.com:3478?transport=udp",
-            "username": "a494d642d5f2eae2e9c6e7cc8b32801d96e129b6b24e51fec31de96e6785f053",
-            "urls": "turn:global.turn.twilio.com:3478?transport=udp",
-            "credential": "6mfV4MNuOhbdXfrvVsYY7v2oIC8cNsGrEREI1NyKH0c="
-        },
-        {
-            "url": "turn:global.turn.twilio.com:3478?transport=tcp",
-            "username": "a494d642d5f2eae2e9c6e7cc8b32801d96e129b6b24e51fec31de96e6785f053",
-            "urls": "turn:global.turn.twilio.com:3478?transport=tcp",
-            "credential": "6mfV4MNuOhbdXfrvVsYY7v2oIC8cNsGrEREI1NyKH0c="
-        },
-        {
-            "url": "turn:global.turn.twilio.com:443?transport=tcp",
-            "username": "a494d642d5f2eae2e9c6e7cc8b32801d96e129b6b24e51fec31de96e6785f053",
-            "urls": "turn:global.turn.twilio.com:443?transport=tcp",
-            "credential": "6mfV4MNuOhbdXfrvVsYY7v2oIC8cNsGrEREI1NyKH0c="
         }
     ]
 }
@@ -87,8 +69,6 @@ function handleLeaving(userId) {
     videos.delete(pc);
     peers.delete(userId);
     console.log(userId, "left");
-    pc.setLocalDescription(null);
-    pc.setRemoteDescription(null);
     pc.close();
 }
 
