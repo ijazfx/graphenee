@@ -1,8 +1,6 @@
 package io.graphenee.vaadin.meeting;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MPanel;
@@ -39,7 +37,6 @@ public class GxMeetingHost extends VerticalLayout {
 	private MButton screenButton;
 	private MButton muteAllButton;
 
-	private Map<String, Boolean> muteMap = new HashMap<>();
 	private Boolean allMuted = false;
 
 	public GxMeetingHost() {

@@ -3,8 +3,8 @@ let configuration = {
         {
             "url": "stun:global.stun.twilio.com:3478?transport=udp",
             "urls": [
-            	"stun:stun.l.google.com:19302",
-            	"stun:global.stun.twilio.com:3478?transport=udp"
+                "stun:stun.l.google.com:19302",
+                "stun:global.stun.twilio.com:3478?transport=udp"
             ]
         }
     ]
@@ -68,6 +68,11 @@ async function handleCandidate(candidate) {
 // called when websocket will receive offer from any of the connected peer,
 // typically from the host peer.
 async function handleOffer(offer) {
+    try {
+        document.getElementById('remoteVideo').srcObject = null;
+    } catch (error) {
+        console.log(error);
+    }
     let pc = createPeer();
     let session = new RTCSessionDescription(offer);
     await pc.setRemoteDescription(session);
@@ -142,8 +147,6 @@ function leaveMeeting() {
             event: "leaving",
             userId: localUserId,
         }));
-        pc.setLocalDescription(null);
-        pc.setRemoteDescription(null);
         pc.close();
         pc = null;
     } catch (error) {
@@ -204,27 +207,39 @@ async function startCamera() {
         audio: true
     }
     try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        let myVideo = document.getElementById('localVideo');
-        myVideo.muted = true;
-        myVideo.srcObject = stream;
-        stream.getTracks().forEach(track => {
-            pc.addTrack(track, stream);
+        navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+            let myVideo = document.getElementById('localVideo');
+            if (myVideo.srcObject != null) {
+                myVideo.srcObject.getTracks().forEach(track => track.stop());
+            }
+            myVideo.muted = true;
+            myVideo.srcObject = stream;
+            stream.getTracks().forEach(track => {
+                pc.addTrack(track, stream);
+            });
+        }).catch(reason => {
+            console.log(reason);
         });
     } catch (error) {
-        console.log("Error", error);
+        console.log(error);
     }
 }
 
 // called when screen button is clicked on the meeting component.
 async function startScreen() {
     try {
-        const stream = await navigator.mediaDevices.getDisplayMedia();
-        let myVideo = document.getElementById('localVideo');
-        myVideo.muted = true;
-        myVideo.srcObject = stream;
-        stream.getTracks().forEach(track => {
-            pc.addTrack(track, stream);
+        navigator.mediaDevices.getDisplayMedia().then(stream => {
+            let myVideo = document.getElementById('localVideo');
+            if (myVideo.srcObject != null) {
+                myVideo.srcObject.getTracks().forEach(track => track.stop());
+            }
+            myVideo.muted = true;
+            myVideo.srcObject = stream;
+            stream.getTracks().forEach(track => {
+                pc.addTrack(track, stream);
+            });
+        }).catch(reason => {
+            console.log(reason);
         });
     } catch (error) {
         console.log(error);

@@ -51,7 +51,7 @@ public class GxMeetingClient extends VerticalLayout {
 		toolbar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
 		joinButton = new MButton("Join").withStyleName(ValoTheme.BUTTON_PRIMARY).withListener(e -> {
-			if (!meeting.isStarted()) {
+			if (meeting == null || !meeting.isStarted()) {
 				GxNotification.tray("Notification", "Meeting is not yet started or has ended already.").show(Page.getCurrent());
 				return;
 			}
@@ -108,7 +108,7 @@ public class GxMeetingClient extends VerticalLayout {
 	public void initializeWithMeetingUserAndMeeting(GxMeetingUser user, GxMeeting meeting) {
 		this.user = user;
 		this.meeting = meeting;
-		if (user.getUserId().equals(meeting.getHost().getUserId())) {
+		if (meeting != null && user.getUserId().equals(meeting.getHost().getUserId())) {
 			joinButton.setVisible(false);
 			leaveButton.setVisible(false);
 		} else {
@@ -116,11 +116,10 @@ public class GxMeetingClient extends VerticalLayout {
 			leaveButton.setVisible(true);
 		}
 
-		boolean online = meeting.isOnline(user);
-		boolean started = meeting.isStarted();
+		boolean online = meeting != null && meeting.isOnline(user);
 
-		joinButton.setEnabled(!online && started);
-		leaveButton.setEnabled(online && started);
+		joinButton.setEnabled(!online);
+		leaveButton.setEnabled(online);
 		initializeWebSocket(user);
 	}
 
