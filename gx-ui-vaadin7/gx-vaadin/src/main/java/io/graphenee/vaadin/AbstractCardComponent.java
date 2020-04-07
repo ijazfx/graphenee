@@ -44,6 +44,7 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 
 	public AbstractCardComponent<T> build() {
 		if (!isBuilt) {
+			removeAllComponents();
 			setSizeFull();
 			setMargin(false);
 			setSpacing(false);
@@ -55,6 +56,12 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 			isBuilt = true;
 		}
 		return this;
+	}
+
+	public void rebuild() {
+		isBuilt = false;
+		build();
+		buildFooter(getEntity());
 	}
 
 	protected String getCardWidth() {

@@ -1,7 +1,7 @@
 let configuration = {
     "iceServers": [
         {
-            "url": "stun:global.stun.twilio.com:3478?transport=udp",
+            "url": "stun:stun.l.google.com:19302",
             "urls": [
                 "stun:stun.l.google.com:19302",
                 "stun:global.stun.twilio.com:3478?transport=udp"
