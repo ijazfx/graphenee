@@ -37,12 +37,14 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 	private boolean isBuilt;
 	private T entity;
 	private MHorizontalLayout toolBar;
+	private Button deleteButton;
+	private Button editButton;
 
 	public AbstractCardComponent(T entity) {
 		this.setEntity(entity);
 	}
 
-	public AbstractCardComponent<T> build() {
+	protected AbstractCardComponent<T> build() {
 		if (!isBuilt) {
 			removeAllComponents();
 			setSizeFull();
@@ -52,16 +54,19 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 			addComponentToLayout(cardLayout);
 			addComponent(cardLayout);
 			setHeight(getCardHeight());
+			if (shouldShowFooter()) {
+				buildFooter(getEntity());
+			}
 			postBuild();
 			isBuilt = true;
 		}
 		return this;
 	}
 
-	public void rebuild() {
+	public AbstractCardComponent<T> rebuild() {
 		isBuilt = false;
 		build();
-		buildFooter(getEntity());
+		return this;
 	}
 
 	protected String getCardWidth() {
@@ -94,23 +99,38 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 		return true;
 	}
 
-	public AbstractCardComponent<T> buildFooter(T item) {
-		HorizontalLayout footer = new HorizontalLayout();
-		footer.setMargin(false);
+	protected AbstractCardComponent<T> buildFooter(T item) {
+		if (!isBuilt) {
+			HorizontalLayout footer = new HorizontalLayout();
+			footer.setMargin(false);
 
-		HorizontalLayout toolbar = getToolbar(entity);
-		addButtonsToFooter(toolbar);
+			HorizontalLayout toolbar = getToolbar(entity);
+			addButtonsToFooter(toolbar);
 
-		//		if (shouldShowDeleteButton() || shouldShowEditButton() || toolbar.getComponentCount() > 1) {
-		//			footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
-		//		}
-		footer.addStyleName("popup-footer");
-		footer.setWidth(100.0f, Unit.PERCENTAGE);
-		footer.addComponentAsFirst(toolbar);
-		footer.setComponentAlignment(toolbar, Alignment.MIDDLE_RIGHT);
+			if (shouldShowEditButton()) {
+				if (toolBar != null && editButton != null) {
+					editButton.setStyleName(ValoTheme.BUTTON_SMALL);
+					editButton.addStyleName(ValoTheme.BUTTON_QUIET);
+					toolBar.addComponent(editButton);
+				}
+			}
 
-		addComponent(footer);
-		setComponentAlignment(footer, Alignment.BOTTOM_LEFT);
+			if (shouldShowDeleteButton()) {
+				if (toolBar != null && deleteButton != null) {
+					deleteButton.setStyleName(ValoTheme.BUTTON_SMALL);
+					deleteButton.addStyleName(ValoTheme.BUTTON_QUIET);
+					toolBar.addComponent(deleteButton);
+				}
+			}
+
+			footer.addStyleName("popup-footer");
+			footer.setWidth(100.0f, Unit.PERCENTAGE);
+			footer.addComponentAsFirst(toolbar);
+			footer.setComponentAlignment(toolbar, Alignment.MIDDLE_RIGHT);
+
+			addComponent(footer);
+			setComponentAlignment(footer, Alignment.BOTTOM_LEFT);
+		}
 		return this;
 	}
 
@@ -126,24 +146,12 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 	}
 
 	public AbstractCardComponent<T> withDeleteButton(Button deleteButton) {
-		if (shouldShowDeleteButton()) {
-			if (toolBar != null && deleteButton != null) {
-				deleteButton.setStyleName(ValoTheme.BUTTON_SMALL);
-				deleteButton.addStyleName(ValoTheme.BUTTON_QUIET);
-				toolBar.addComponent(deleteButton);
-			}
-		}
+		this.deleteButton = deleteButton;
 		return this;
 	}
 
 	public AbstractCardComponent<T> withEditButton(Button editButton) {
-		if (shouldShowEditButton()) {
-			if (toolBar != null && editButton != null) {
-				editButton.setStyleName(ValoTheme.BUTTON_SMALL);
-				editButton.addStyleName(ValoTheme.BUTTON_QUIET);
-				toolBar.addComponent(editButton);
-			}
-		}
+		this.editButton = editButton;
 		return this;
 	}
 
