@@ -47,6 +47,7 @@ import com.vaadin.util.FileTypeResolver;
 import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.storage.ResolveFailedException;
 import io.graphenee.core.util.TRFileContentUtil;
+import io.graphenee.core.util.TRImageUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.ResourcePreviewPanel;
 import server.droporchoose.UploadComponent;
@@ -159,8 +160,24 @@ public class FileChooser extends CustomField<String> {
 		this.uploadedFileName = inputFileName;
 		setValue(uploadedFilePath);
 
+		File compressedFile = null;
+
+		// resize file..
+		String mimeType = TRFileContentUtil.getMimeType(uploadedFilePath);
+		if (mimeType != null && mimeType.startsWith("image/")) {
+			try {
+				compressedFile = File.createTempFile(inputFileName, "resized");
+				if (!TRImageUtil.resizeImage(new File(uploadedFilePath), compressedFile)) {
+					compressedFile = null;
+				} else {
+					compressedFile.renameTo(targetFile);
+				}
+			} catch (Exception ex) {
+				L.warn("Resize failed so using original file", ex);
+			}
+		}
+
 		UI.getCurrent().access(() -> {
-			String mimeType = TRFileContentUtil.getMimeType(uploadedFilePath);
 			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
 			if (extension != null)
 				extension = extension.toLowerCase();
