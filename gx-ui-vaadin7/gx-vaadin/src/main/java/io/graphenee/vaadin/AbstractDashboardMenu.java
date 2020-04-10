@@ -372,7 +372,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			badge.setVisible(false);
 			badge.setWidthUndefined();
 			badge.setPrimaryStyleName(ValoTheme.MENU_BADGE);
-			DashboardEventBus.sessionInstance().register(this);
 			withListener(listener);
 			addComponents(button, badge);
 		}

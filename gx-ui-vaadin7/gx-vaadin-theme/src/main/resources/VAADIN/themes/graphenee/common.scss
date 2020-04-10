@@ -21,6 +21,7 @@
     img {
       padding: 10px;
       background: transparent;
+	  border-radius: 80px;
     }
   }
 
@@ -41,6 +42,7 @@
       img.v-icon {
         width: 48px;
         height: 48px;
+		border-radius: 48px;
       }
     }
   }
@@ -106,12 +108,15 @@
       }
 
       img {
-        width: 20px;
+        width: 24px;
         min-width: 1em;
-        margin-right: 20px;
+        margin-right: 24px;
         text-align: center;
         vertical-align: middle;
-      }
+   		background-color: #DFE7EA;
+	    padding: 3px;
+	    border-radius: 24px;
+	  }
     }
   }
 
@@ -141,7 +146,7 @@
       font-size: 10pt;
       line-height: 0px;
       top: 5px;
-      right: 3px;
+      right: 10px;
       img.v-icon {
         width: 16px;
         height: 16px;
@@ -325,7 +330,6 @@
   }
 
   .viewheader {
-    padding-bottom: $view-padding;
     width: 100%;
     text-align: right;
     white-space: normal;
@@ -339,15 +343,10 @@
     }
 
     @include width-range($max: 700px) {
-      padding-bottom: round($v-unit-size / 2);
       text-align: left;
 
       .v-slot-h1 {
         float: none;
-      }
-
-      .h1 {
-        font-size: round($v-font-size--h1 * 0.8);
       }
 
       > .v-slot {
