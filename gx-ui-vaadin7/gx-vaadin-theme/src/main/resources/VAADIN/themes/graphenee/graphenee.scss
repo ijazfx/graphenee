@@ -1,9 +1,10 @@
+$v-app-background-color: #ffffff;
 $v-font-size: 13px !default;
 $v-font-weight: 400 !default;
 $v-font-family: "Roboto", "Open Sans", sans-serif !default;
 $v-bevel-depth: 15% !default;
 $v-gradient: v-linear 0% !default;
-$v-shadow-opacity: 0% !default;
+$v-shadow-opacity: 20% !default;
 $gx-base-color: #2AB27B !default;
 $v-border-radius: 2px !default;
 $v-focus-color: $gx-base-color !default;
@@ -74,8 +75,21 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
   }
 
   .v-button {
-	background-image: none !important;
-	box-shadow: 1px 2px 2px 0px #eeeeee !important;
+	background-image: none !important;	
+	text-shadow: none !important;
+	--webkit-text-shadow: none !important;
+  }
+
+  .v-component-group {
+	box-shadow: 2px 2px 3px 0px #ddd;
+	--webkit-box-shadow: 2px 2px 3px 0px #ddd;
+	border-radius: $v-border-radius;
+	* {
+		box-shadow: none !important;
+		--webkit-box-shadow: none !important;
+		border-right: none !important;
+		border-bottom: none !important;
+	}
   }
 
   .v-menubar-user-menu {

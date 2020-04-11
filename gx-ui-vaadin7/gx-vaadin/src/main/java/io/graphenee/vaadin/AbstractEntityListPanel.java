@@ -55,6 +55,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid.CellReference;
 import com.vaadin.ui.Grid.CellStyleGenerator;
 import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.Grid.FooterCell;
+import com.vaadin.ui.Grid.FooterRow;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.DateRenderer;
@@ -99,6 +101,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private MVerticalLayout rootLayout;
 
 	private MarginInfo rootLayoutMargin;
+
+	private FooterCell statusBar;
 
 	public AbstractEntityListPanel(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -255,6 +259,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		}
 		if (isGridCellFilterEnabled()) {
 			gridCellFilter = new GridCellFilter(grid);
+			gridCellFilter.addCellFilterChangedListener(event -> {
+				if (entityGrid().getSelectedRows().size() > 0) {
+					statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
+				} else {
+					statusBar.setText(String.format("%d records", mainGridContainer.size()));
+				}
+			});
 			if (visibleProperties != null) {
 				addCellFiltersForVisibleProperties(gridCellFilter, visibleProperties);
 			}
@@ -286,6 +297,11 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			}
 		});
 		grid.addSelectionListener(event -> {
+			if (event.getSelected() != null && !event.getSelected().isEmpty()) {
+				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(), mainGridContainer.size()));
+			} else {
+				statusBar.setText(String.format("%d records", mainGridContainer.size()));
+			}
 			if (onSelection != null) {
 				Boolean value = onSelection.apply((Collection<T>) event.getSelected());
 				if (value != null && value == true) {
@@ -337,6 +353,9 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			event.getContextMenu().removeItems();
 			addMenuItemsToContextMenu(contextMenu, (T) event.getItemId(), grid.getSelectedRowsWithType());
 		});
+
+		FooterRow footerRow = grid.appendFooterRow();
+		statusBar = footerRow.join((String[]) visibleProperties());
 
 		return grid;
 	}
@@ -563,6 +582,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (entities != null) {
 				mainGridContainer.addAll(entities);
 			}
+			statusBar.setText(String.format("%d records", mainGridContainer.size()));
 			UI.getCurrent().push();
 		});
 		return this;
@@ -575,6 +595,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			List<T> entities = postFetch(fetchEntities(filter));
 			mainGridContainer.removeAllItems();
 			mainGridContainer.addAll(entities);
+			statusBar.setText(String.format("%d records", mainGridContainer.size()));
 			UI.getCurrent().push();
 		});
 		return this;

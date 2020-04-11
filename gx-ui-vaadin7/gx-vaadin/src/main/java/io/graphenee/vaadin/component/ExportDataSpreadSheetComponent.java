@@ -92,7 +92,7 @@ public class ExportDataSpreadSheetComponent {
 			downloadButton.setCaption("Download");
 			downloadButton.setIcon(FontAwesome.FILE_EXCEL_O);
 			if (StringUtils.isEmpty(fileName)) {
-				fileName = TRCalendarUtil.getFormattedDateTime(TRCalendarUtil.getCurrentTimeStamp(), "yyyyMMdd") + FILE_EXTENSION_XLS;
+				fileName = TRCalendarUtil.getFormattedDateTime(TRCalendarUtil.getCurrentTimeStamp(), "yyyyMMdd-HHmmss") + FILE_EXTENSION_XLS;
 			}
 			downloadButton.setFileName(fileName);
 			downloadButton.setWriter(new ContentWriter() {
