@@ -17,6 +17,7 @@ package io.graphenee.vaadin.event;
 
 import java.util.Map;
 
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.AbstractDashboardView.Dashlet;
 
 /*
@@ -140,6 +141,15 @@ public abstract class DashboardEvent {
 	}
 
 	public static class UserLoggedOutEvent {
+		private GxAuthenticatedUser authenticatedUser;
+
+		public UserLoggedOutEvent(GxAuthenticatedUser authenticatedUser) {
+			this.authenticatedUser = authenticatedUser;
+		}
+
+		public GxAuthenticatedUser getAuthenticatedUser() {
+			return authenticatedUser;
+		}
 
 	}
 
