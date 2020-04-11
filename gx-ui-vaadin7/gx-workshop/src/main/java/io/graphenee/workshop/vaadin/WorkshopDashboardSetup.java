@@ -57,12 +57,12 @@ public class WorkshopDashboardSetup extends AbstractDashboardSetup {
 	protected List<TRMenuItem> menuItems() {
 		List<TRMenuItem> menus = new ArrayList<>();
 		menus.add(TRSimpleMenuItem.createMenuItemForView(MetroStyleDashboardView.VIEW_NAME, "Home", FontAwesome.HOME));
-		TRSimpleMenuItem dmMenuItem = TRSimpleMenuItem.createMenuItem("Data Maintenance", FontAwesome.WRENCH);
+		menus.add(TRSimpleMenuItem.createMenuItemForView(MeetingHostView.VIEW_NAME, "Meeting Host", FontAwesome.VIDEO_CAMERA));
+		menus.add(TRSimpleMenuItem.createMenuItemForView(MeetingClientView.VIEW_NAME, "Meeting Client", FontAwesome.VIDEO_CAMERA));
+		TRSimpleMenuItem dmMenuItem = TRSimpleMenuItem.createMenuItemForView(SystemView.VIEW_NAME, "Data Maintenance", FontAwesome.WRENCH);
 		dmMenuItem.addChild(TRSimpleMenuItem.createMenuItemForView(SystemView.VIEW_NAME, "System", FontAwesome.SERVER));
-		dmMenuItem.addChild(
-				TRSimpleMenuItem.createMenuItemForView(LocalizationView.VIEW_NAME, "Localization", FontAwesome.GLOBE));
-		dmMenuItem.addChild(
-				TRSimpleMenuItem.createMenuItemForView(SecurityView.VIEW_NAME, "Security", FontAwesome.USER_SECRET));
+		dmMenuItem.addChild(TRSimpleMenuItem.createMenuItemForView(LocalizationView.VIEW_NAME, "Localization", FontAwesome.GLOBE));
+		dmMenuItem.addChild(TRSimpleMenuItem.createMenuItemForView(SecurityView.VIEW_NAME, "Security", FontAwesome.USER_SECRET));
 		menus.add(dmMenuItem);
 		return menus;
 	}

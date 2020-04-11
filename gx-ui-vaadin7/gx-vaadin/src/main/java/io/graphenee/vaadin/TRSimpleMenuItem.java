@@ -28,14 +28,28 @@ public class TRSimpleMenuItem implements TRMenuItem {
 	private Resource icon;
 	private Command command;
 	private String viewName;
-	private List<TRMenuItem> children = new ArrayList<>();
+	private String badge;
+	private String badgeId;
 	private TRMenuItem parent;
+	private List<TRMenuItem> children = new ArrayList<>();
 
-	private TRSimpleMenuItem(String viewName, String caption, Resource icon, Command command) {
+	private TRSimpleMenuItem(String viewName, String caption, Resource icon, Command command, String badgeId, String badge) {
 		this.viewName = viewName;
 		this.caption = caption;
 		this.icon = icon;
 		this.command = command;
+		this.badgeId = badgeId;
+		this.badge = badge;
+	}
+
+	@Override
+	public String badgeId() {
+		return badgeId;
+	}
+
+	@Override
+	public String badge() {
+		return badge;
 	}
 
 	@Override
@@ -83,18 +97,33 @@ public class TRSimpleMenuItem implements TRMenuItem {
 	}
 
 	public static TRSimpleMenuItem createMenuItem(String caption, Resource icon) {
-		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(null, caption, icon, null);
+		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(null, caption, icon, null, null, null);
 		return menuItem;
 	}
 
 	public static TRSimpleMenuItem createMenuItem(String caption, Resource icon, Command command) {
-		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(null, caption, icon, command);
+		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(null, caption, icon, command, null, null);
 		return menuItem;
 	}
 
 	public static TRSimpleMenuItem createMenuItemForView(String view, String caption, Resource icon) {
-		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(view, caption, icon, null);
+		TRSimpleMenuItem menuItem = new TRSimpleMenuItem(view, caption, icon, null, null, null);
 		return menuItem;
+	}
+
+	public TRSimpleMenuItem withBadge(String badge) {
+		this.badge = badge;
+		return this;
+	}
+
+	public TRSimpleMenuItem clearBadge() {
+		this.badge = null;
+		return this;
+	}
+
+	public TRSimpleMenuItem withBadgeId(String badgeId) {
+		this.badgeId = badgeId;
+		return this;
 	}
 
 	@Override

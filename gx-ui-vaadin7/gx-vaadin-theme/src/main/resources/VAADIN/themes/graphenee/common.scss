@@ -5,60 +5,56 @@
 }
 
 @mixin dashboard-common {
-	
-	.v-menubar-popup {
- 		box-shadow: 0px 1px 5px 1px rgba(0, 0, 0, 0.1);
- 	}
- 	
- 	.v-filterselect-suggestpopup {
- 		box-shadow: 0px 1px 5px 1px rgba(0, 0, 0, 0.1);
- 	}
-	
-	.valo-menu-title-with-image {
-		* {
-			text-align: center;
-		}
-		
-		img {
-			padding: 10px;
-			background: transparent;
-		}  		
-  	}
+  .v-menubar-popup {
+    box-shadow: 0px 1px 5px 1px rgba(0, 0, 0, 0.1);
+  }
 
-	.dashboard-panel-toolbar {
-		.v-label {
-			color: $v-card-caption-color;
-			text-transform: none;
-			font-weight: 400;
-		}
-		
-		.v-icon {
-			color: $v-card-icon-color;
-		}
-		
-	}
+  .v-filterselect-suggestpopup {
+    box-shadow: 0px 1px 5px 1px rgba(0, 0, 0, 0.1);
+  }
 
-	.v-menubar-user-menu {
-      
-      .v-menubar-menuitem {
-      	
-      	img.v-icon {
-      		width: 48px;
-      		height: 48px;
-      	}
-      	
-      }
-      
+  .valo-menu-title-with-image {
+    * {
+      text-align: center;
     }
 
+    img {
+      padding: 10px;
+      background: transparent;
+	  border-radius: 80px;
+    }
+  }
+
+  .dashboard-panel-toolbar {
+    .v-label {
+      color: $v-card-caption-color;
+      text-transform: none;
+      font-weight: 400;
+    }
+
+    .v-icon {
+      color: $v-card-icon-color;
+    }
+  }
+
+  .v-menubar-user-menu {
+    .v-menubar-menuitem {
+      img.v-icon {
+        width: 48px;
+        height: 48px;
+		border-radius: 48px;
+      }
+    }
+  }
+
   .valo-menu {
-  	.valo-menu-part {
-  		width: 100%;
-  	}
-    
+    .valo-menu-part {
+      width: 100%;
+    }
+
     border-right: none;
     width: 200px;
-    
+
     .badgewrapper {
       position: relative;
       padding: 0 !important;
@@ -68,138 +64,135 @@
       display: block;
     }
   }
-  
+
   .valo-menu-item-hide {
-		opacity: 0.0;
-		height: 0px;
-	}
+    opacity: 0;
+    height: 0px;
+  }
 
   .valo-menu-item-show {
-		opacity: 1.0;
-		height: inherit;
-		-webkit-transition: opacity 300ms;
-    	transition: opacity 300ms;	
-	}
+    opacity: 1;
+    height: inherit;
+    -webkit-transition: opacity 300ms;
+    transition: opacity 300ms;
+  }
 
   .valo-menu-item {
     overflow: hidden;
     width: 100%;
-    
+
     &.selected {
-    	border-left: 4px solid $gx-base-color;
-    	
-    	.v-icon {
-    		color: white;
-    	}
+      border-left: 4px solid $gx-base-color;
+
+      .v-icon {
+        color: white;
+      }
     }
-    
+
     &:hover {
-    	background-color: $gx-base-color;
+      background-color: $gx-base-color;
     }
-    
+
     [class*="badge"] {
-    	margin: 10px 0px;
+      margin: 10px 0px;
     }
-    
+
     .valo-menu-item-wrap {
-    	padding: 8px 0px 10px 0px;
-    	display: block;
-    	
-		span {
-    		line-height: 19px;
-    		height: 19px;    		
-	    	margin-left: -2px;    	
-    	}
-    	
-    	img {
-    		width: 20px;
-	    	min-width: 1em;
-		    margin-right: 20px;
-		    text-align: center;
-		    vertical-align: middle;
-    	}
-    	
+      padding: 8px 0px 10px 0px;
+      display: block;
+
+      span {
+        line-height: 19px;
+        height: 19px;
+        margin-left: -2px;
+      }
+
+      img {
+        width: 24px;
+        min-width: 1em;
+        margin-right: 24px;
+        text-align: center;
+        vertical-align: middle;
+   		background-color: #DFE7EA;
+	    padding: 3px;
+	    border-radius: 24px;
+	  }
     }
-    
   }
-  
 
   .v-ui[width-range~="0-800px"] {
-  
-  	.valo-menu-title-with-image {
-  		* {
-			text-align: center;
-		}
-  	
-		img {
-			display: none;
-		}  		
-  	}
-  
-    .valo-menu-title {
-	  height: 36px !important;
+    .valo-menu-title-with-image {
       * {
-			text-align: center;
-			font-size: 10pt;
-	  }
+        text-align: center;
+      }
+
+      img {
+        display: none;
+      }
+    }
+
+    .valo-menu-title {
+      height: 36px !important;
+      * {
+        text-align: center;
+        font-size: 10pt;
+      }
       @include valo-gradient($color: $valo-menu-background-color);
       border-bottom-color: first-color(valo-border($color: $valo-menu-background-color));
     }
-    
+
     .valo-menu .v-menubar-user-menu {
       color: inherit;
       font-size: 10pt;
       line-height: 0px;
       top: 5px;
-      right: 3px;
+      right: 10px;
       img.v-icon {
-      	width: 16px;
-      	height: 16px;
-      	border-radius: 16px;
+        width: 16px;
+        height: 16px;
+        border-radius: 16px;
       }
     }
-    
+
     .valo-menu .valo-menu-toggle {
       color: inherit;
       font-size: 10pt;
       top: 5px;
       left: 3px;
       img.v-icon {
-      	width: 16px;
-      	height: 16px;
-      	border-radius: 16px;
+        width: 16px;
+        height: 16px;
+        border-radius: 16px;
       }
     }
-    
+
     .valo-menu .valo-menuitems {
       top: 36px !important;
       width: 200px;
     }
-    
   }
-  
+
   .v-ui[width-range~="801px-1100px"] {
-  	.valo-menu {
-  		width: inherit;
-  	}
-  	
-  	.valo-menu-item {
-    	width: inherit;
-    	padding-top: 0px !important;
-    	padding-bottom: 0px !important;
+    .valo-menu {
+      width: inherit;
+    }
+
+    .valo-menu-item {
+      width: inherit;
+      padding-top: 0px !important;
+      padding-bottom: 0px !important;
     }
   }
 
   .v-ui[width-range~="801px-"] {
-  
     .valo-menu {
       /* @include animation(valo-animate-in-slide-right 700ms 700ms backwards); */
     }
 
     .valo-menu-title {
       * {
-			text-align: center;
-	  }
+        text-align: center;
+      }
       background: transparent;
       @include box-shadow(none);
       border-bottom: none;
@@ -208,8 +201,8 @@
 
   .valo-menu-title {
     * {
-			text-align: center;
-	}
+      text-align: center;
+    }
     line-height: 1.2;
   }
 
@@ -235,17 +228,17 @@
   }
 
   .v-ui[width-range~="0-800px"] {
-  	.valo-menu {
-  		width: inherit;	
-  	}
-  
-  	.valo-menuitems {
-	  	box-shadow: 3px 10px 10px 0px rgba(0, 0, 0, 0.5);		
- 	}
-  
+    .valo-menu {
+      width: inherit;
+    }
+
+    .valo-menuitems {
+      box-shadow: 3px 10px 10px 0px rgba(0, 0, 0, 0.5);
+    }
+
     .v-menubar-user-menu > .v-menubar-menuitem {
       max-width: none;
-      margin-right: .5em;
+      margin-right: 0.5em;
 
       .v-menubar-menuitem-caption:after {
         margin-right: 0;
@@ -257,8 +250,7 @@
   .dashboard-view .notifications.unread .v-button-caption {
     @include valo-badge-style($active-color: $gx-base-color);
     position: absolute;
-    right: round($v-unit-size/3);
-    font-size: round($v-font-size * 0.6);
+    font-size: round($v-font-size * 0.8);
     color: white;
     pointer-events: none;
   }
@@ -334,11 +326,10 @@
   }
 
   .vaadin-chart {
-  	transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   .viewheader {
-	padding-bottom: $view-padding;
     width: 100%;
     text-align: right;
     white-space: normal;
@@ -352,15 +343,10 @@
     }
 
     @include width-range($max: 700px) {
-      padding-bottom: round($v-unit-size / 2);
       text-align: left;
 
       .v-slot-h1 {
         float: none;
-      }
-
-      .h1 {
-        font-size: round($v-font-size--h1 * 0.8);
       }
 
       > .v-slot {
@@ -374,7 +360,6 @@
           height: round($v-unit-size / 4);
         }
       }
-      
     }
   }
 
@@ -384,7 +369,6 @@
     line-height: 37px;
     margin-right: $v-layout-spacing-horizontal;
   }
-
 
   // iOS7 & iOS8 status bar needs more space
   .v-ios7,
@@ -400,8 +384,8 @@
     }
     .valo-menu-title {
       * {
-			text-align: center;
-	  }
+        text-align: center;
+      }
       padding-top: 10px;
     }
     .view-content {
@@ -421,8 +405,8 @@
 
     .valo-menu-title {
       * {
-			text-align: center;
-	  }
+        text-align: center;
+      }
       height: 20px + $v-unit-size !important;
       padding-top: 20px;
     }
@@ -437,12 +421,10 @@
       border-radius: 0;
     }
   }
-  
+
   .v-ui {
-  	.valo-menu {
-	  	box-shadow: 3px 10px 10px 0px rgba(0, 0, 0, 0.5);		
- 	}
- 	
+    .valo-menu {
+      box-shadow: 3px 10px 10px 0px rgba(0, 0, 0, 0.5);
+    }
   }
-  
 }

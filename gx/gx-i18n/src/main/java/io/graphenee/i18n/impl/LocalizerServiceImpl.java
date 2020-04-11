@@ -19,14 +19,16 @@ import java.util.List;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 
+import io.graphenee.i18n.GrapheneeI18nConfiguration;
 import io.graphenee.i18n.api.LocalizerMapService;
 import io.graphenee.i18n.api.LocalizerService;
 
 @Service
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
+@ConditionalOnClass(GrapheneeI18nConfiguration.class)
+//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
 public class LocalizerServiceImpl implements LocalizerService {
 
 	@Autowired

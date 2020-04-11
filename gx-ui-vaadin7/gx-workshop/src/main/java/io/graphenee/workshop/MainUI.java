@@ -27,12 +27,15 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 
 import io.graphenee.vaadin.AbstractDashboardSetup;
 import io.graphenee.vaadin.AbstractDashboardUI;
+import io.graphenee.vaadin.GxSecuredUI;
 import io.graphenee.workshop.vaadin.WorkshopDashboardSetup;
 
+@SuppressWarnings("serial")
 @SpringUI
 @Theme("graphenee")
 @Push(transport = Transport.WEBSOCKET, value = PushMode.MANUAL)
 @Viewport(value = "width=device-width")
+@GxSecuredUI
 public class MainUI extends AbstractDashboardUI {
 
 	@Autowired

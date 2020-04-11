@@ -26,6 +26,14 @@ public interface TRMenuItem {
 
 	String caption();
 
+	default String badgeId() {
+		return null;
+	}
+
+	default String badge() {
+		return null;
+	}
+
 	Resource icon();
 
 	Command command();

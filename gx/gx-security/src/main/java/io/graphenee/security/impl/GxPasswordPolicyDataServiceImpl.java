@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +27,12 @@ import io.graphenee.core.model.jpa.repository.GxPasswordPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
 import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.security.GrapheneeSecurityConfiguration;
 import io.graphenee.security.api.GxPasswordPolicyDataService;
 
 @Service
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
+@ConditionalOnClass(GrapheneeSecurityConfiguration.class)
+//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
 @Transactional
 public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataService {
 

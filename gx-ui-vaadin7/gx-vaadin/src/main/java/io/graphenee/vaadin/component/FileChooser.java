@@ -47,6 +47,7 @@ import com.vaadin.util.FileTypeResolver;
 import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.storage.ResolveFailedException;
 import io.graphenee.core.util.TRFileContentUtil;
+import io.graphenee.core.util.TRImageUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.ResourcePreviewPanel;
 import server.droporchoose.UploadComponent;
@@ -68,8 +69,6 @@ public class FileChooser extends CustomField<String> {
 	private String rootFolder;
 	private MButton deleteButton;
 	private FileDownloader fileDownloader;
-
-	ResourcePreviewPanel previewPanel;
 
 	private MHorizontalLayout imageLayout;
 
@@ -94,8 +93,8 @@ public class FileChooser extends CustomField<String> {
 	public FileChooser(String caption, Function<String, String> fileNameTranslator) {
 		setCaption(caption);
 		this.fileNameTranslator = fileNameTranslator;
-		componentHeight = "100px";
-		componentWidth = "280px";
+		componentHeight = "-1px";
+		componentWidth = "-1px";
 	}
 
 	public void setStorage(FileStorage storage) {
@@ -116,8 +115,9 @@ public class FileChooser extends CustomField<String> {
 	}
 
 	private void preview(String filePath) {
-		String extension = FilenameUtils.getExtension(filePath);
-		if (extension != null && extension.matches("(png|jpg|gif|bmp|jpeg|pdf)")) {
+		String mimeType = TRFileContentUtil.getMimeType(filePath);
+		String extension = TRFileContentUtil.getExtensionFromFilename(filePath);
+		if (mimeType.startsWith("image/") || extension.matches("(pdf)")) {
 			File file = new File(filePath);
 			Resource resource = null;
 			if (file.exists()) {
@@ -141,12 +141,11 @@ public class FileChooser extends CustomField<String> {
 					resource = null;
 				}
 			}
-			if (previewPanel == null) {
-				previewPanel = new ResourcePreviewPanel();
+			if (fileDownloader == null) {
+				ResourcePreviewPanel previewPanel = new ResourcePreviewPanel();
+				previewPanel.build();
+				previewPanel.preview(resource);
 			}
-			previewPanel.build();
-			previewPanel.preview(resource);
-			previewPanel.openInModalPopup();
 		}
 	}
 
@@ -161,16 +160,37 @@ public class FileChooser extends CustomField<String> {
 		this.uploadedFileName = inputFileName;
 		setValue(uploadedFilePath);
 
+		File compressedFile = null;
+
+		// resize file..
+		String mimeType = TRFileContentUtil.getMimeType(uploadedFilePath);
+		if (mimeType != null && mimeType.startsWith("image/")) {
+			try {
+				compressedFile = File.createTempFile(inputFileName, "resized");
+				if (!TRImageUtil.resizeImage(new File(uploadedFilePath), compressedFile)) {
+					compressedFile = null;
+				} else {
+					compressedFile.renameTo(targetFile);
+				}
+			} catch (Exception ex) {
+				L.warn("Resize failed so using original file", ex);
+			}
+		}
+
 		UI.getCurrent().access(() -> {
-			String extension = FilenameUtils.getExtension(uploadedFilePath);
+			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
 			if (extension != null)
 				extension = extension.toLowerCase();
 			Resource resource = null;
-			if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg)")) {
+			if (!mimeType.startsWith("image/")) {
+				previewImage.setHeight("32px");
+				previewImage.setWidth("32px");
 				resource = GrapheneeTheme.fileExtensionIconResource(extension);
 				if (resource == null)
 					resource = GrapheneeTheme.fileExtensionIconResource("bin");
 			} else {
+				previewImage.setWidth("100px");
+				previewImage.setHeightUndefined();
 				try {
 					InputStream inputStream = new FileInputStream(targetFile);
 					StreamSource source = new InputStreamSource(inputStream);
@@ -295,10 +315,14 @@ public class FileChooser extends CustomField<String> {
 			String fileName = getValue();
 			Resource resource = null;
 			if (fileName != null) {
-				String extension = FilenameUtils.getExtension(fileName);
-				if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg)")) {
+				String mimeType = TRFileContentUtil.getMimeType(fileName);
+				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
+				if (!mimeType.startsWith("image/")) {
 					resource = GrapheneeTheme.fileExtensionIconResource(extension);
+					if (resource == null)
+						resource = GrapheneeTheme.fileExtensionIconResource("bin");
 					previewImage.setHeight("32px");
+					previewImage.setWidth("32px");
 					previewImage.setSource(resource);
 				} else {
 					File file = new File(fileName);
@@ -314,11 +338,12 @@ public class FileChooser extends CustomField<String> {
 							resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
 						}
 					}
-					previewImage.setHeight(componentHeight);
+					previewImage.setWidth("100px");
+					previewImage.setHeightUndefined();
 					previewImage.setSource(resource);
 				}
 
-				if (extension == null || !extension.matches("(png|jpg|gif|bmp|jpeg|pdf)")) {
+				if (!mimeType.startsWith("image/") && !extension.matches("(pdf)")) {
 					try {
 						File file = new File(fileName);
 						if (file.isFile() && file.exists()) {

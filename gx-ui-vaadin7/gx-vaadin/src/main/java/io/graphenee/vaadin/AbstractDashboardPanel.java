@@ -19,9 +19,13 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import org.vaadin.viritin.button.MButton;
+
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -38,6 +42,7 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 	private VerticalLayout componentLayout;
 	private HorizontalLayout header;
 	private Label titleLabel;
+	private MButton notificationButton;
 
 	public AbstractDashboardPanel() {
 		if (!isSpringComponent()) {
@@ -82,16 +87,21 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 
 	private Component buildHeader() {
 		header = new HorizontalLayout();
+		header.setMargin(false);
+		header.setSpacing(false);
+		header.setDefaultComponentAlignment(Alignment.TOP_LEFT);
 		header.addStyleName("viewheader");
-		header.setSpacing(true);
 		Responsive.makeResponsive(header);
 
 		titleLabel = new Label(localizedSingularValue(panelTitle()));
-		titleLabel.setSizeUndefined();
+		titleLabel.setWidth("100%");
 		titleLabel.addStyleName(ValoTheme.LABEL_H1);
 		titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
 		header.addComponent(titleLabel);
-		header.addComponent(buildToolbar());
+		Component toolbar = buildToolbar();
+		header.addComponent(toolbar);
+		header.setWidth("100%");
+		header.setExpandRatio(titleLabel, 1);
 
 		return header;
 	}
@@ -100,7 +110,21 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 		toolbar = new HorizontalLayout();
 		toolbar.addStyleName("toolbar");
 		toolbar.setSpacing(true);
+		toolbar.setMargin(false);
+		toolbar.setVisible(true);
+
+		notificationButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_BORDERLESS).withIcon(FontAwesome.BELL);
+		BadgeWrapper badgeWrapper = new BadgeWrapper(notificationButton);
+		badgeWrapper.setBadgeValue("3");
+		toolbar.addComponent(badgeWrapper);
+		toolbar.setComponentAlignment(badgeWrapper, Alignment.MIDDLE_RIGHT);
+		badgeWrapper.setVisible(shouldShowNotifications());
+
 		return toolbar;
+	}
+
+	protected boolean shouldShowNotifications() {
+		return false;
 	}
 
 	protected abstract String panelTitle();
@@ -108,12 +132,14 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 	protected abstract void postInitialize();
 
 	protected void addButtons(Button... buttons) {
+		toolbar.setVisible(true);
 		for (Button button : buttons) {
 			toolbar.addComponent(button);
 		}
 	}
 
 	protected void addComponentsToToolbar(Component... components) {
+		toolbar.setVisible(true);
 		for (Component component : components) {
 			toolbar.addComponent(component);
 		}

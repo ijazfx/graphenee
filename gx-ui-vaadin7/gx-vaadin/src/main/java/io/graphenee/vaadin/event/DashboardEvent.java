@@ -199,4 +199,24 @@ public abstract class DashboardEvent {
 	public static class RequestRefreshNotificationsEvent {
 	}
 
+	public static final class BadgeUpdateEvent {
+
+		private final String badgeId;
+		private final String badgeValue;
+
+		public BadgeUpdateEvent(final String badgeId, final String badgeValue) {
+			this.badgeId = badgeId;
+			this.badgeValue = badgeValue;
+		}
+
+		public String getBadgeId() {
+			return badgeId;
+		}
+
+		public String getBadgeValue() {
+			return badgeValue;
+		}
+
+	}
+
 }

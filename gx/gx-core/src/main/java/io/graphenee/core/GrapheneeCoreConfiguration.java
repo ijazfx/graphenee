@@ -18,21 +18,19 @@ package io.graphenee.core;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
-import org.flywaydb.core.api.callback.Callback;
-import org.flywaydb.core.api.callback.Context;
-import org.flywaydb.core.api.callback.Event;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import io.graphenee.core.util.DataSourceUtil;
 
 @Configuration
 @ConditionalOnClass(DataSource.class)
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
+//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
+@EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
+@EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
 @ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeCoreConfiguration {
 
@@ -40,55 +38,11 @@ public class GrapheneeCoreConfiguration {
 	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
 	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
 
-	@Bean
-	public FlywayMigrationInitializer flywayInitializer(DataSource dataSource, Flyway flyway) {
-
-		Flyway fw = Flyway.configure().dataSource(dataSource).callbacks(new Callback() {
-
-			@Override
-			public boolean supports(Event event, Context context) {
-				if (event == Event.BEFORE_MIGRATE)
-					return true;
-				return false;
-			}
-
-			@Override
-			public void handle(Event event, Context context) {
-				//				Flyway flyway = new Flyway();
-				//				flyway.setDataSource(dataSource);
-				String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-				//				flyway.setLocations("classpath:db/graphenee/migration/" + dbVendor);
-				//				flyway.setTable("graphenee_schema_version");
-				//				flyway.setBaselineOnMigrate(true);
-				//				flyway.setBaselineVersionAsString("0");
-				//				flyway.migrate();
-				Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version")
-						.baselineOnMigrate(true).baselineVersion("0").load();
-				fw.migrate();
-			}
-
-			@Override
-			public boolean canHandleInTransaction(Event event, Context context) {
-				return true;
-			}
-		}).load();
-
-		//		flyway.setCallbacks(new BaseFlywayCallback() {
-		//
-		//			@Override
-		//			public void beforeMigrate(Connection connection) {
-		//				Flyway flyway = new Flyway();
-		//				flyway.setDataSource(dataSource);
-		//				String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-		//				flyway.setLocations("classpath:db/graphenee/migration/" + dbVendor);
-		//				flyway.setTable("graphenee_schema_version");
-		//				flyway.setBaselineOnMigrate(true);
-		//				flyway.setBaselineVersionAsString("0");
-		//				flyway.migrate();
-		//				super.beforeMigrate(connection);
-		//			}
-		//		});
-		return new FlywayMigrationInitializer(fw);
+	public GrapheneeCoreConfiguration(DataSource dataSource) {
+		String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
+		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
+				.baselineVersion("0").load();
+		fw.migrate();
 	}
 
 }

@@ -770,6 +770,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	public void setSaveCaption(String saveCaption) {
 		this.saveCaption = saveCaption;
+		if (saveButton != null)
+			saveButton.setCaption(saveCaption);
 	}
 
 	public String getDeleteCaption() {

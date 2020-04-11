@@ -20,7 +20,6 @@ import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MPasswordField;
 import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.server.Page;
@@ -58,31 +57,35 @@ public class ResetPasswordPanel extends Panel {
 		rootLayout.setWidth("330px");
 		rootLayout.setStyleName("login-panel");
 
-		MVerticalLayout sendResetKeyLayout = new MVerticalLayout().withMargin(false);
+		MVerticalLayout sendResetKeyLayout = new MVerticalLayout().withMargin(false).withSpacing(false);
 
 		MLabel forgotPasswordTitle = new MLabel("Reset Password").withStyleName(ValoTheme.LABEL_H3);
 		sendResetKeyLayout.addComponent(forgotPasswordTitle);
 
-		MHorizontalLayout layout1 = new MHorizontalLayout().withFullWidth().withMargin(false).withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
+		MVerticalLayout layout1 = new MVerticalLayout().withFullWidth().withMargin(false).withSpacing(false).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
+		layout1.setWidth("100%");
 		usernameTextField = new MTextField().withCaption("Username / Email").withFullWidth();
 
 		MButton sendResetKeyButton = new MButton("Send Reset Key");
+		sendResetKeyButton.setStyleName(GrapheneeTheme.STYLE_MARGIN_VERTICAL);
 		sendResetKeyButton.setEnabled(false);
 
 		layout1.addComponents(usernameTextField, sendResetKeyButton);
-		layout1.setExpandRatio(usernameTextField, 1);
+		//layout1.setExpandRatio(usernameTextField, 1);
 		sendResetKeyLayout.addComponent(layout1);
 
-		MHorizontalLayout layout2 = new MHorizontalLayout().withFullWidth().withMargin(false).withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
+		MVerticalLayout layout2 = new MVerticalLayout().withFullWidth().withMargin(false).withSpacing(false).withDefaultComponentAlignment(Alignment.BOTTOM_RIGHT);
+		layout2.setWidth("100%");
 		MTextField resetKeyTextField = new MTextField().withInputPrompt("Enter Reset Key").withFullWidth();
 		resetKeyTextField.setMaxLength(6);
 		resetKeyTextField.setEnabled(false);
 
 		MButton nextButton = new MButton("Next").withStyleName(ValoTheme.BUTTON_PRIMARY);
+		nextButton.addStyleName(GrapheneeTheme.STYLE_MARGIN_TOP);
 		nextButton.setEnabled(false);
 
 		layout2.addComponents(resetKeyTextField, nextButton);
-		layout2.setExpandRatio(resetKeyTextField, 1);
+		//layout2.setExpandRatio(resetKeyTextField, 1);
 		sendResetKeyLayout.addComponent(layout2);
 
 		passwordField = new MPasswordField("New Password").withFullWidth();

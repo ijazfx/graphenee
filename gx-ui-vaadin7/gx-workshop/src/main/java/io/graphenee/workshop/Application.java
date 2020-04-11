@@ -15,20 +15,28 @@
  *******************************************************************************/
 package io.graphenee.workshop;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Bean;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
+import io.graphenee.core.api.GxMeetingService;
+import io.graphenee.core.impl.DefaultMeetingServiceImpl;
 
 @SpringBootApplication
-@EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
-@EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
 public class Application {
+
+	@Autowired
+	GrapheneeCoreConfiguration graphenee;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
+	}
+
+	@Bean
+	public GxMeetingService meetingService() {
+		return new DefaultMeetingServiceImpl();
 	}
 
 }

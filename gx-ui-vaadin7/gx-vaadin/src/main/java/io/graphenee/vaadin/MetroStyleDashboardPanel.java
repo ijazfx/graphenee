@@ -28,21 +28,19 @@ import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
-import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
-import io.graphenee.vaadin.event.DashboardEventBus;
 
 @SuppressWarnings("serial")
 public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 
 	AbstractDashboardSetup dashboardSetup;
-	private int maxTileCount = 7;
-	private MVerticalLayout rootLayout;
+	//private int maxTileCount = 7;
+	private CssLayout rootLayout;
 
 	public MetroStyleDashboardPanel(AbstractDashboardSetup dashboardSetup) {
 		this.dashboardSetup = dashboardSetup;
@@ -55,26 +53,26 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 
 	@Override
 	protected void postInitialize() {
-		rootLayout = new MVerticalLayout().withMargin(false).withSpacing(true).withFullWidth();
+		rootLayout = new CssLayout(); //.withMargin(false).withSpacing(true).withFullWidth();
 		List<TRMenuItem> menuItems = dashboardSetup.menuItems();
 		generateTiles(rootLayout, menuItems);
 		addComponent(rootLayout);
 
-		DashboardEventBus.sessionInstance().register(this);
+		//		DashboardEventBus.sessionInstance().register(this);
 
 	}
 
-	@Subscribe
-	public void onBrowserResize(BrowserResizeEvent event) {
-		maxTileCount = event.getWidth() / 150;
-		rootLayout.removeAllComponents();
-		List<TRMenuItem> menuItems = dashboardSetup.menuItems();
-		generateTiles(rootLayout, menuItems);
-	}
+	//	@Subscribe
+	//	public void onBrowserResize(BrowserResizeEvent event) {
+	//		maxTileCount = event.getWidth() / 150;
+	//		rootLayout.removeAllComponents();
+	//		List<TRMenuItem> menuItems = dashboardSetup.menuItems();
+	//		generateTiles(rootLayout, menuItems);
+	//	}
 
-	private void generateTiles(MVerticalLayout mainLayout, Collection<TRMenuItem> menuItems) {
+	private void generateTiles(CssLayout mainLayout, Collection<TRMenuItem> menuItems) {
 		Iterator<TRMenuItem> iter = menuItems.iterator();
-		MHorizontalLayout rowLayout = new MHorizontalLayout().withMargin(false).withSpacing(true);
+		//		MHorizontalLayout rowLayout = new MHorizontalLayout().withMargin(false).withSpacing(true);
 		Random random = new Random(menuItems.size());
 		Random colorRandom = new Random(System.currentTimeMillis());
 		Set<Integer> colorUsedSet = new HashSet<>();
@@ -118,7 +116,7 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 
 				}
 			});
-			int value = random.nextInt(2) + 1;
+			int value = 1; //random.nextInt(2) + 1;
 			if (colorUsedSet.size() == maxColors) {
 				colorUsedSet.clear();
 			}
@@ -127,12 +125,14 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			} while (colorUsedSet.contains(color) || color == lastColor);
 			colorUsedSet.add(color);
 			lastColor = color;
-			if (value + tileCount == 5) {
-				value = 1;
-			}
-			tileCount += value;
+			//			if (value + tileCount == 5) {
+			//				value = 1;
+			//			}
+			//			tileCount += value;
 			// System.err.print(value + ",");
 			panel.setStyleName("metro-tile-" + value);
+			panel.addStyleName(GrapheneeTheme.STYLE_MARGIN_TOP);
+			panel.addStyleName(GrapheneeTheme.STYLE_MARGIN_LEFT);
 			panel.setWidth(value == 1 ? "120px" : "250px");
 			panel.setHeight("120px");
 			if (shouldShowColoredTiles()) {
@@ -140,15 +140,16 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			} else {
 				panel.addStyleName("color-default");
 			}
-			rowLayout.add(panel);
-			if (tileCount >= maxTileCount) {
-				mainLayout.add(rowLayout);
-				rowLayout = new MHorizontalLayout().withMargin(false).withSpacing(true);
-				tileCount = 0;
-				// System.err.println();
-			}
+			mainLayout.addComponent(panel);
+			//			rowLayout.add(panel);
+			//			if (tileCount >= maxTileCount) {
+			//				mainLayout.add(rowLayout);
+			//				rowLayout = new MHorizontalLayout().withMargin(false).withSpacing(true);
+			//				tileCount = 0;
+			//				// System.err.println();
+			//			}
 		}
-		mainLayout.add(rowLayout);
+		//		mainLayout.add(rowLayout);
 	}
 
 	@Override

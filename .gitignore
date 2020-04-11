@@ -13,3 +13,8 @@ target
 .designer
 .factorypath
 .metadata
+.settings
+.idea
+.vscode
+.classpath
+.project

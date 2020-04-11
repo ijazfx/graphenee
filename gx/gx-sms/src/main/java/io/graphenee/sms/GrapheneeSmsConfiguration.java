@@ -18,12 +18,13 @@ package io.graphenee.sms;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxSmsProviderBean;
@@ -32,7 +33,8 @@ import io.graphenee.sms.impl.EoceanSmsServiceImpl;
 import io.graphenee.sms.impl.TwilioSmsServiceImpl;
 
 @Configuration
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
+@ConditionalOnClass(GrapheneeCoreConfiguration.class)
+//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
 @ComponentScan("io.graphenee.sms")
 public class GrapheneeSmsConfiguration {
 

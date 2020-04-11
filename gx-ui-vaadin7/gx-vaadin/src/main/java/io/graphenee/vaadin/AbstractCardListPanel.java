@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -72,10 +71,15 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		this.entityClass = entityClass;
 		contentLayout = new CssLayout();
 		contentLayout.setSizeFull();
-		contentLayout.addStyleName("card-collection");
+		contentLayout.setPrimaryStyleName("card-collection");
 		if (!isSpringComponent()) {
 			postConstruct();
 		}
+	}
+
+	@Override
+	public void setPrimaryStyleName(String style) {
+		contentLayout.setPrimaryStyleName(style);
 	}
 
 	protected boolean isSpringComponent() {
@@ -102,9 +106,10 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 				rootLayout.addComponent(toolbar);
 			}
 			rootLayout.addComponent(contentLayout);
-			rootLayout.setExpandRatio(contentLayout, 1);
-			rootLayout.setHeightUndefined();
+			//			rootLayout.setExpandRatio(contentLayout, 1);
+			//			rootLayout.setHeightUndefined();
 			setContent(rootLayout);
+			//			setHeightUndefined();
 
 			postBuild();
 			isBuilt = true;
@@ -121,7 +126,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	}
 
 	private Component buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false).withSpacing(true);
+		MVerticalLayout layout = new MVerticalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withFullWidth().withMargin(false).withSpacing(true);
 		addButton = new MButton(FontAwesome.PLUS, localizedSingularValue(addButtonCaption()), event -> {
 			try {
 				onAddButtonClick(initializeEntity(entityClass.newInstance()));
@@ -267,7 +272,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 					});
 					AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
-					cardPanel.setContent(cardLayout);
+					cardPanel.setContent(cardLayout.build());
 					cardPanel.setWidth(cardLayout.getCardWidth());
 					contentLayout.addComponent(cardPanel);
 
