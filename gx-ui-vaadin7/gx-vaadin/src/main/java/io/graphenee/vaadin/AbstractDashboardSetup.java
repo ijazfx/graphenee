@@ -20,10 +20,12 @@ import java.util.List;
 
 import com.google.common.eventbus.EventBus;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.Resource;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Image;
 
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.view.DashboardMenu;
 import io.graphenee.vaadin.view.MainComponent;
@@ -119,6 +121,14 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	public boolean shouldShowPoweredByGraphenee() {
 		return true;
+	}
+
+	public Resource femaleAvatar() {
+		return GrapheneeTheme.AVATAR_FEMALE;
+	}
+
+	public Resource maleAvatar() {
+		return GrapheneeTheme.AVATAR_MALE;
 	}
 
 }

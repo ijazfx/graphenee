@@ -179,9 +179,9 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 				}, user.getUsername() + "_photo");
 			} else {
 				if (user.getGender() == GenderEnum.Female) {
-					photo = GrapheneeTheme.AVATAR_FEMALE;
+					photo = dashboardSetup().femaleAvatar();
 				} else {
-					photo = GrapheneeTheme.AVATAR_MALE;
+					photo = dashboardSetup().maleAvatar();
 				}
 			}
 			boolean shouldAddSeparator = false;

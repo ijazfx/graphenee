@@ -74,6 +74,18 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}	
   }
 
+  .v-menubar-user-menu {
+    .v-menubar-menuitem {
+      img.v-icon {
+        width: 48px;
+        height: 48px;
+		border-radius: 48px;
+		background-color: white;
+		border: 2px solid $gx-base-color;
+      }
+    }
+  }
+
   .gx-margin-all {
 	margin-top: $v-margin-top;
 	margin-left: $v-margin-left;
@@ -345,6 +357,17 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	.card-item {
 		min-width: 33%;
   	}
+
+  .v-menubar-user-menu {
+    .v-menubar-menuitem {
+      img.v-icon {
+        width: 48px;
+        height: 48px;
+		border-radius: 48px;
+      }
+    }
+  }
+
 }
 
 @media (min-width: 801px) and (max-width: 1024px) {
@@ -364,6 +387,16 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		margin-top: 8px;
 		font-size: 0.65em;
 	}
+	
+  .v-menubar-user-menu {
+    .v-menubar-menuitem {
+      img.v-icon {
+        width: 32px;
+        height: 32px;
+		border-radius: 32px;
+      }
+    }
+  }
 }
 
 @media print {
