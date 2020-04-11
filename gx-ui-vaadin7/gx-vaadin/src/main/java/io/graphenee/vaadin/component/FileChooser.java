@@ -284,7 +284,7 @@ public class FileChooser extends CustomField<String> {
 
 		deleteButton = new MButton(FontAwesome.CLOSE).withListener(event -> {
 			setValue(null);
-		}).withStyleName(ValoTheme.BUTTON_TINY, ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_QUIET);
+		}).withStyleName(ValoTheme.BUTTON_SMALL, ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_QUIET);
 
 		imageLayout.addComponent(deleteButton);
 		imageLayout.setComponentAlignment(deleteButton, Alignment.BOTTOM_RIGHT);
@@ -374,6 +374,12 @@ public class FileChooser extends CustomField<String> {
 				uploadComponent.setVisible(true);
 			}
 		}
+	}
+
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		if (deleteButton != null)
+			deleteButton.setVisible(!readOnly);
 	}
 
 	@Override

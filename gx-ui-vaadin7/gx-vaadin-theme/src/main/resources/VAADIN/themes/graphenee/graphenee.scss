@@ -1,8 +1,7 @@
-$v-background-color: #ffffff;
 $v-font-size: 13px !default;
 $v-font-weight: 400 !default;
 $v-font-family: "Roboto", "Open Sans", sans-serif !default;
-$v-bevel-depth: 20% !default;
+$v-bevel-depth: 15% !default;
 $v-gradient: v-linear 0% !default;
 $v-shadow-opacity: 0% !default;
 $gx-base-color: #2AB27B !default;
@@ -72,6 +71,11 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		width: 24px;
 		height: 24px;
 	}	
+  }
+
+  .v-button {
+	background-image: none !important;
+	box-shadow: 1px 2px 2px 0px #eeeeee !important;
   }
 
   .v-menubar-user-menu {
