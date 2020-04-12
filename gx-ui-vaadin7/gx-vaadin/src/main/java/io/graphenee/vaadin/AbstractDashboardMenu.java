@@ -438,7 +438,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	public void updateBadge(final BadgeUpdateEvent event) {
 		UI.getCurrent().access(() -> {
 			buttonsMap.values().forEach(button -> {
-				System.err.println(button.badgeId);
 				if (button.badgeId != null && button.badgeId.equals(event.getBadgeId())) {
 					button.setBadge(event.getBadgeValue());
 					button.markAsDirty();

@@ -15,9 +15,10 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
+import io.graphenee.core.api.GxNotificationSubscriber;
 import io.graphenee.core.model.GxAuthenticatedUser;
 
-public abstract class AbstractDashboardUser<T> implements GxAuthenticatedUser {
+public abstract class AbstractDashboardUser<T> implements GxAuthenticatedUser, GxNotificationSubscriber {
 
 	private T user;
 

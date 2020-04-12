@@ -17,12 +17,27 @@ package io.graphenee.vaadin.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 
 public class DashboardUtils {
+
+	private static final Map<GxAuthenticatedUser, UI> UI_MAP = new ConcurrentHashMap<>(new HashMap<>());
+
+	public static void setCurrentUI(GxAuthenticatedUser user, UI ui) {
+		UI_MAP.put(user, ui);
+	}
+
+	public static UI getCurrentUI(GxAuthenticatedUser user) {
+		UI ui = UI_MAP.get(user);
+		if (ui != null && ui.isAttached())
+			return ui;
+		return UI.getCurrent();
+	}
 
 	@SuppressWarnings("unchecked")
 	public static <T extends GxAuthenticatedUser> T getLoggedInUser() {

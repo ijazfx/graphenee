@@ -33,6 +33,7 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
+import io.graphenee.vaadin.util.DashboardUtils;
 import io.graphenee.vaadin.util.VaadinUtils;
 import io.graphenee.vaadin.view.MainComponent;
 
@@ -58,6 +59,7 @@ public abstract class AbstractDashboardUI extends UI {
 				Page.getCurrent().setLocation("/login");
 				return;
 			}
+			DashboardUtils.setCurrentUI(user, AbstractDashboardUI.this);
 		}
 
 		if (dashboardSetup().shouldLocalize()) {
