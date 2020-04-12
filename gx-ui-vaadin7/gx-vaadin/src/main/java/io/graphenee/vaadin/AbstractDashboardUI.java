@@ -20,8 +20,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.vaadin.server.Page;
-import com.vaadin.server.Page.BrowserWindowResizeEvent;
-import com.vaadin.server.Page.BrowserWindowResizeListener;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
@@ -31,8 +29,6 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.i18n.api.LocalizerService;
-import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.util.DashboardUtils;
 import io.graphenee.vaadin.util.VaadinUtils;
 import io.graphenee.vaadin.view.MainComponent;
@@ -76,26 +72,11 @@ public abstract class AbstractDashboardUI extends UI {
 			setLocale(locale);
 		}
 
-		DashboardEventBus.sessionInstance().register(AbstractDashboardUI.this);
-
 		Responsive.makeResponsive(this);
 		addStyleName(ValoTheme.UI_WITH_MENU);
 
 		Component contentComponent = createComponent();
 		setContent(contentComponent);
-
-		// Some views need to be aware of browser resize events so a
-		// BrowserResizeEvent gets fired to the event bus on every occasion.
-		Page.getCurrent().addBrowserWindowResizeListener(new BrowserWindowResizeListener() {
-			@Override
-			public void browserWindowResized(final BrowserWindowResizeEvent event) {
-				DashboardEventBus.sessionInstance().post(new BrowserResizeEvent(event.getWidth(), event.getHeight()));
-			}
-		});
-
-		addDetachListener(event -> {
-			DashboardEventBus.sessionInstance().unregister(AbstractDashboardUI.this);
-		});
 
 		localizeRecursively(this);
 

@@ -1,4 +1,3 @@
-$v-app-background-color: #ffffff;
 $v-font-size: 13px !default;
 $v-font-weight: 400 !default;
 $v-font-family: "Roboto", "Open Sans", sans-serif !default;
@@ -72,6 +71,10 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		width: 24px;
 		height: 24px;
 	}	
+  }
+
+  .v-Notification .v-icon {
+  	width: 24px !important;
   }
 
   .v-button {

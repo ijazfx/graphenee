@@ -99,7 +99,6 @@ public abstract class AbstractMainComponent extends HorizontalLayout {
 				public void afterViewChange(final ViewChangeEvent event) {
 					DashboardEventBus dashboardEventBus = DashboardEventBus.sessionInstance();
 					dashboardEventBus.post(new PostViewChangeEvent(event.getViewName(), event.getParameters()));
-					// dashboardEventBus.post(new BrowserResizeEvent(-1, -1));
 					dashboardEventBus.post(new CloseOpenWindowsEvent());
 				}
 			});

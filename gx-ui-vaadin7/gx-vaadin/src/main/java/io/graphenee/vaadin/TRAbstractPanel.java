@@ -25,7 +25,6 @@ import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.AbstractField;
@@ -139,6 +138,7 @@ public abstract class TRAbstractPanel extends MPanel {
 	public Window openInModalPopup() {
 		build();
 		window = new Window(panelTitle(), this);
+		window.setStyleName("gx-popup");
 		UI.getCurrent().addWindow(window);
 
 		window.setModal(isPopupModal());
@@ -148,8 +148,8 @@ public abstract class TRAbstractPanel extends MPanel {
 		window.setHeight(popupHeight());
 		window.setStyleName("popupWindow");
 		window.addCloseShortcut(KeyCode.ESCAPE, null);
-
-		Responsive.makeResponsive(window);
+		//
+		//		Responsive.makeResponsive(window);
 		window.setCaption(panelTitle());
 		focusFirst();
 		return window;

@@ -57,18 +57,7 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 		List<TRMenuItem> menuItems = dashboardSetup.menuItems();
 		generateTiles(rootLayout, menuItems);
 		addComponent(rootLayout);
-
-		//		DashboardEventBus.sessionInstance().register(this);
-
 	}
-
-	//	@Subscribe
-	//	public void onBrowserResize(BrowserResizeEvent event) {
-	//		maxTileCount = event.getWidth() / 150;
-	//		rootLayout.removeAllComponents();
-	//		List<TRMenuItem> menuItems = dashboardSetup.menuItems();
-	//		generateTiles(rootLayout, menuItems);
-	//	}
 
 	private void generateTiles(CssLayout mainLayout, Collection<TRMenuItem> menuItems) {
 		Iterator<TRMenuItem> iter = menuItems.iterator();
