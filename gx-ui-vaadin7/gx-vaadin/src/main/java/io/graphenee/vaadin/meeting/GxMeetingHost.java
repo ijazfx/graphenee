@@ -119,7 +119,7 @@ public class GxMeetingHost extends VerticalLayout {
 				cardPanel.removeStyleName("card-item");
 				if (!item.getUserId().equals(user.getUserId())) {
 					GxMeetingUserCardComponent component = new GxMeetingUserCardComponent(item);
-					cardPanel.setContent(component);
+					cardPanel.setContent(component.rebuild());
 					cardPanel.setWidth("200px");
 				}
 			}

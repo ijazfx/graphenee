@@ -24,8 +24,6 @@ import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.GxNotificationEvent;
 import io.graphenee.core.model.bean.GxUserAccountBean;
-import io.graphenee.vaadin.event.DashboardEvent.BadgeUpdateEvent;
-import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.ui.GxNotification;
 import io.graphenee.vaadin.util.DashboardUtils;
 
@@ -135,7 +133,6 @@ public class GxDashboardUser implements GxAuthenticatedUser, GxNotificationSubsc
 		if (event != null && event.test(this)) {
 			UI ui = DashboardUtils.getCurrentUI(this);
 			ui.access(() -> {
-				DashboardEventBus.sessionInstance(ui.getSession()).post(new BadgeUpdateEvent("notifications", "*"));
 				GxNotification notification = GxNotification.tray(event.getTitle(), event.getDescription());
 				notification.setDelayMsec(10000);
 				notification.setIcon(FontAwesome.BELL_O);

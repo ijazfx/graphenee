@@ -105,7 +105,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 					setPrimaryStyleName("valo-menu");
 					setSizeUndefined();
 					DashboardEventBus.sessionInstance().register(this);
-					dashboardSetup().eventBus().register(this);
 					setCompositionRoot(buildContent());
 					postBuild();
 					shouldBuild = false;
