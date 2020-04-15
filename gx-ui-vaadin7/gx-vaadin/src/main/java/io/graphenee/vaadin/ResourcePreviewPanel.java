@@ -23,12 +23,17 @@ import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
+import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.FileDownloader;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import io.graphenee.vaadin.ui.GxNotification;
 
 @SuppressWarnings("serial")
 public class ResourcePreviewPanel extends TRAbstractPanel {
@@ -118,6 +123,17 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 			note.setVisible(true);
 			if (downloader == null) {
 				downloader = new FileDownloader(resource);
+				downloader.setErrorHandler(new ErrorHandler() {
+
+					@Override
+					public void error(com.vaadin.server.ErrorEvent event) {
+						UI.getCurrent().access(() -> {
+							GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
+									.show(Page.getCurrent());
+							UI.getCurrent().push();
+						});
+					}
+				});
 				downloader.extend(downloadButton);
 			} else {
 				downloader.setFileDownloadResource(resource);
@@ -134,6 +150,17 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		note.setVisible(true);
 		if (downloader == null) {
 			downloader = new FileDownloader(resource);
+			downloader.setErrorHandler(new ErrorHandler() {
+
+				@Override
+				public void error(com.vaadin.server.ErrorEvent event) {
+					UI.getCurrent().access(() -> {
+						GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
+								.show(Page.getCurrent());
+						UI.getCurrent().push();
+					});
+				}
+			});
 			downloader.extend(downloadButton);
 		} else {
 			downloader.setFileDownloadResource(resource);
