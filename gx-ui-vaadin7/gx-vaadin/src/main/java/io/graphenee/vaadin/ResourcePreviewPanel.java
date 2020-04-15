@@ -128,6 +128,7 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 	}
 
 	public void download(Resource resource) {
+		downloadButton.setEnabled(true);
 		viewer.setSource(null);
 		viewer.setVisible(false);
 		note.setVisible(true);
