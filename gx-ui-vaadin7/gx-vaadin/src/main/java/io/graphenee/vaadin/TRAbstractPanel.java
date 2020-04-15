@@ -92,7 +92,7 @@ public abstract class TRAbstractPanel extends MPanel {
 	private Component buildFooter() {
 		MHorizontalLayout layout = new MHorizontalLayout().withFullWidth().withMargin(false).withSpacing(true);
 		layout.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
-		layout.setDefaultComponentAlignment(Alignment.TOP_RIGHT);
+		layout.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
 		addButtonsToFooter(layout);
 		for (int i = 0; i < layout.getComponentCount(); i++) {
 			layout.setComponentAlignment(layout.getComponent(i), footerAlignment());
@@ -101,12 +101,12 @@ public abstract class TRAbstractPanel extends MPanel {
 		MButton dismissButton = new MButton("Dismiss").withListener(event -> {
 			closePopup();
 		}).withVisible(shouldShowDismissButton());
-		layout.add(dismissButton, footerAlignment());
+		layout.add(dismissButton);
 		return layout;
 	}
 
 	public Alignment footerAlignment() {
-		return Alignment.TOP_RIGHT;
+		return Alignment.MIDDLE_LEFT;
 	}
 
 	protected boolean shouldShowDismissButton() {

@@ -30,8 +30,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
-
 @SuppressWarnings("serial")
 public class ResourcePreviewPanel extends TRAbstractPanel {
 
@@ -81,9 +79,10 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		viewer.setSizeFull();
 		layout.add(viewer);
 		layout.setExpandRatio(viewer, 1);
-		note = new MLabel().withFullWidth().withStyleName(ValoTheme.LABEL_LARGE, GrapheneeTheme.STYLE_MARGIN_ALL);
-		note.setValue("No preview is available, please download the file using Download button.");
-		layout.add(note);
+		note = new MLabel().withFullWidth();
+		note.setValue(
+				"Download the file using 'Download' button. After download, the file should open automatically using device default viewer for the file type. If not, you may need to download an application from the Internet to open the file such as Adope PDF Viewer for PDF files or Media Player for Audio/Video files.");
+		layout.add(new MVerticalLayout(note));
 	}
 
 	@Override
@@ -100,7 +99,7 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		Window wnd = super.openInModalPopup();
 		if (!visible) {
 			wnd.setWidth("350px");
-			wnd.setHeight("200px");
+			wnd.setHeight("210px");
 		}
 		return wnd;
 	}
@@ -126,6 +125,20 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 			downloadButton.setVisible(true);
 			openInModalPopup(false);
 		}
+	}
+
+	public void download(Resource resource) {
+		viewer.setSource(null);
+		viewer.setVisible(false);
+		note.setVisible(true);
+		if (downloader == null) {
+			downloader = new FileDownloader(resource);
+			downloader.extend(downloadButton);
+		} else {
+			downloader.setFileDownloadResource(resource);
+		}
+		downloadButton.setVisible(true);
+		openInModalPopup(false);
 	}
 
 }
