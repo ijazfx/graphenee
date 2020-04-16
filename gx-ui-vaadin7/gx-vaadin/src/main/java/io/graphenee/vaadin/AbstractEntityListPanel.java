@@ -355,8 +355,11 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		});
 
 		FooterRow footerRow = grid.appendFooterRow();
-		statusBar = footerRow.join((String[]) visibleProperties());
-
+		String[] props = visibleProperties();
+		if (props.length > 1)
+			statusBar = footerRow.join((String[]) visibleProperties());
+		else
+			statusBar = footerRow.getCell(props[0]);
 		return grid;
 	}
 
