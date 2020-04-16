@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 
 import org.vaadin.viritin.button.MButton;
 
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -30,9 +31,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.vaadin.event.DashboardEvent;
+import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 @SuppressWarnings("serial")
@@ -43,6 +47,7 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 	private HorizontalLayout header;
 	private Label titleLabel;
 	private MButton notificationButton;
+	private BadgeWrapper notificationBadge;
 
 	public AbstractDashboardPanel() {
 		if (!isSpringComponent()) {
@@ -114,17 +119,24 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 		toolbar.setVisible(true);
 
 		notificationButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_BORDERLESS).withIcon(FontAwesome.BELL);
-		BadgeWrapper badgeWrapper = new BadgeWrapper(notificationButton);
-		badgeWrapper.setBadgeValue("3");
-		toolbar.addComponent(badgeWrapper);
-		toolbar.setComponentAlignment(badgeWrapper, Alignment.MIDDLE_RIGHT);
-		badgeWrapper.setVisible(shouldShowNotifications());
+		notificationButton.addClickListener(event -> {
+			UI.getCurrent().getNavigator().navigateTo("notifications");
+		});
+
+		notificationBadge = new BadgeWrapper(notificationButton);
+		notificationBadge.setId(BadgeWrapper.NOTIFICATIONS_BADGE_ID);
+		notificationBadge.clearBadgeValue();
+		toolbar.addComponent(notificationBadge);
+		toolbar.setComponentAlignment(notificationBadge, Alignment.MIDDLE_RIGHT);
+		notificationBadge.setVisible(shouldShowNotifications());
+
+		DashboardEventBus.sessionInstance().register(this);
 
 		return toolbar;
 	}
 
 	protected boolean shouldShowNotifications() {
-		return false;
+		return true;
 	}
 
 	protected abstract String panelTitle();
@@ -185,6 +197,39 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 				titleLabel.setValue(panelTitle);
 			else
 				titleLabel.setValue(panelTitle());
+		}
+	}
+
+	@Subscribe
+	public void onBadgeUpdateEvent(DashboardEvent.BadgeUpdateEvent event) {
+		if (event.getBadgeId().equals(notificationBadge.getId())) {
+			UI ui = UI.getCurrent();
+			if (ui != null && ui.isAttached()) {
+				ui.access(() -> {
+					String value = event.getBadgeValue();
+					if (value == null || value.trim().length() == 0) {
+						notificationBadge.clearBadgeValue();
+					} else {
+						value = value.trim();
+						if (!value.startsWith("+")) {
+							notificationBadge.setBadgeValue(value);
+						} else {
+							value = value.substring(1);
+							try {
+								int count = Integer.parseInt(value);
+								if (count > 0) {
+									notificationBadge.badgeUp(count);
+								} else {
+									notificationBadge.clearBadgeValue();
+								}
+							} catch (Exception ex) {
+								notificationBadge.setBadgeValue(event.getBadgeValue().trim());
+							}
+						}
+					}
+					ui.push();
+				});
+			}
 		}
 	}
 
