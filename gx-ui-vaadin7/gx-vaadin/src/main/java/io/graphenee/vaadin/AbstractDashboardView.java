@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,15 +25,11 @@ import org.vaadin.viritin.layouts.MPanel;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
-import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -46,18 +40,14 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.vaadin.domain.DashboardNotification;
 import io.graphenee.vaadin.event.DashboardEvent;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
-import io.graphenee.vaadin.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
-import io.graphenee.vaadin.view.dashboard.DashboardEdit.DashboardEditListener;
 
 @SuppressWarnings("serial")
-public abstract class AbstractDashboardView extends Panel implements TRView, DashboardEditListener {
+public abstract class AbstractDashboardView extends Panel implements TRView {
 
 	public static final String VIEW_NAME = "dashboard";
 
@@ -65,14 +55,10 @@ public abstract class AbstractDashboardView extends Panel implements TRView, Das
 	public static final String TITLE_ID = "dashboard-title";
 
 	private Label titleLabel;
-	private NotificationsButton notificationsButton;
 	private CssLayout dashboardPanels;
 	private VerticalLayout root;
-	private Window notificationsWindow;
 
 	private boolean isBuilt;
-
-	private Collection<DashboardNotification> notifications;
 
 	private Component sparkline;
 
@@ -225,34 +211,13 @@ public abstract class AbstractDashboardView extends Panel implements TRView, Das
 		tools.addStyleName("toolbar");
 		header.addComponent(tools);
 
-		notificationsButton = buildNotificationsButton();
-		notifications = new ArrayList<>();
-		if (isDashboardNotificationEnabled()) {
-			tools.addComponent(notificationsButton);
-		}
-
 		return header;
 	}
 
 	protected void postInitialize() {
 	}
 
-	protected boolean isDashboardNotificationEnabled() {
-		return true;
-	}
-
 	protected abstract String dashboardTitle();
-
-	private NotificationsButton buildNotificationsButton() {
-		NotificationsButton result = new NotificationsButton();
-		result.addClickListener(new ClickListener() {
-			@Override
-			public void buttonClick(final ClickEvent event) {
-				openNotificationsPopup(event);
-			}
-		});
-		return result;
-	}
 
 	private Component buildContent() {
 		dashboardPanels = new CssLayout();
@@ -266,83 +231,9 @@ public abstract class AbstractDashboardView extends Panel implements TRView, Das
 		return dashboardPanels;
 	}
 
-	protected void addNotification(DashboardNotification notification) {
-		notifications.add(notification);
-		notificationsButton.setUnreadCount(notifications.size());
-	}
-
-	private void openNotificationsPopup(final ClickEvent event) {
-		VerticalLayout notificationsLayout = new VerticalLayout();
-		notificationsLayout.setMargin(true);
-		notificationsLayout.setSpacing(true);
-
-		Label title = new Label("Notifications");
-		title.addStyleName(ValoTheme.LABEL_H3);
-		title.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-		notificationsLayout.addComponent(title);
-
-		DashboardEventBus.sessionInstance().post(new NotificationsCountUpdatedEvent(0));
-
-		for (DashboardNotification notification : notifications) {
-			VerticalLayout notificationLayout = new VerticalLayout();
-			notificationLayout.addStyleName("notification-item");
-
-			Label titleLabel = new Label(notification.getFirstName() + " " + notification.getLastName() + " " + notification.getAction());
-			titleLabel.addStyleName("notification-title");
-
-			Label timeLabel = new Label(notification.getPrettyTime());
-			timeLabel.addStyleName("notification-time");
-
-			Label contentLabel = new Label(notification.getContent());
-			contentLabel.addStyleName("notification-content");
-
-			notificationLayout.addComponents(titleLabel, timeLabel, contentLabel);
-			notificationsLayout.addComponent(notificationLayout);
-		}
-
-		HorizontalLayout footer = new HorizontalLayout();
-		footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
-		footer.setWidth("100%");
-		Button showAll = new Button("View All Notifications", new ClickListener() {
-			@Override
-			public void buttonClick(final ClickEvent event) {
-				Notification.show("Not implemented in this demo");
-			}
-		});
-		showAll.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED);
-		showAll.addStyleName(ValoTheme.BUTTON_SMALL);
-		footer.addComponent(showAll);
-		footer.setComponentAlignment(showAll, Alignment.TOP_CENTER);
-		notificationsLayout.addComponent(footer);
-
-		if (notificationsWindow == null) {
-			notificationsWindow = new Window();
-			notificationsWindow.setWidth(300.0f, Unit.PIXELS);
-			notificationsWindow.addStyleName("notifications");
-			notificationsWindow.setClosable(false);
-			notificationsWindow.setResizable(false);
-			notificationsWindow.setDraggable(false);
-			notificationsWindow.addCloseShortcut(KeyCode.ESCAPE, null);
-			notificationsWindow.setContent(notificationsLayout);
-		}
-
-		if (!notificationsWindow.isAttached()) {
-			notificationsWindow.setPositionY(event.getClientY() - event.getRelativeY() + 40);
-			getUI().addWindow(notificationsWindow);
-			notificationsWindow.focus();
-		} else {
-			notificationsWindow.close();
-		}
-	}
-
 	@Override
 	public void enter(final ViewChangeEvent event) {
 		build();
-	}
-
-	@Override
-	public void dashboardNameEdited(final String name) {
-		titleLabel.setValue(name);
 	}
 
 	private void toggleMaximized(final Component panel, final boolean maximized) {
@@ -361,39 +252,6 @@ public abstract class AbstractDashboardView extends Panel implements TRView, Das
 			panel.addStyleName("max");
 		} else {
 			panel.removeStyleName("max");
-		}
-	}
-
-	public static final class NotificationsButton extends Button {
-		private static final String STYLE_UNREAD = "unread";
-		public static final String ID = "dashboard-notifications";
-
-		public NotificationsButton() {
-			setIcon(FontAwesome.BELL);
-			setId(ID);
-			addStyleName("notifications");
-			addStyleName(ValoTheme.BUTTON_ICON_ONLY);
-			DashboardEventBus.sessionInstance().register(this);
-		}
-
-		@Subscribe
-		public void updateNotificationsCount(final NotificationsCountUpdatedEvent event) {
-			if (event != null) {
-				setUnreadCount(event.getCount());
-			}
-		}
-
-		public void setUnreadCount(final int count) {
-			setCaption(String.valueOf(count));
-
-			String description = "Notifications";
-			if (count > 0) {
-				addStyleName(STYLE_UNREAD);
-				description += " (" + count + " unread)";
-			} else {
-				removeStyleName(STYLE_UNREAD);
-			}
-			setDescription(description);
 		}
 	}
 

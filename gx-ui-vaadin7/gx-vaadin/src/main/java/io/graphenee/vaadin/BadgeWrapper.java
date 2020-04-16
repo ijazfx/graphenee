@@ -1,12 +1,9 @@
 package io.graphenee.vaadin;
 
 import com.google.common.base.Strings;
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
-
-import io.graphenee.vaadin.event.DashboardEvent;
 
 public class BadgeWrapper extends CssLayout {
 
@@ -48,13 +45,6 @@ public class BadgeWrapper extends CssLayout {
 	public void setBadgeValue(String value) {
 		badge.setCaption(value);
 		badge.setVisible(value != null);
-	}
-
-	@Subscribe
-	public void onBadgeEvent(DashboardEvent.BadgeUpdateEvent event) {
-		if (event.getBadgeId().equals(badgeId)) {
-			setBadgeValue(event.getBadgeValue());
-		}
 	}
 
 }
