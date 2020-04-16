@@ -303,6 +303,35 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		transition-timing-function: ease-out;
 	}
 	
+	.notifications-card-collection {
+		padding: 0px;
+		
+		.card-item-content {
+			overflow: scroll;
+		}
+		
+		.popup-footer {
+			z-index: 300;
+			background-color: $v-card-footer;
+			border-top: 1px solid $v-card-border-color;
+		}
+		
+		> .card-item {
+			border-radius: $v-border-radius;
+			transition-duration: 100ms;
+			transition-timing-function: ease-in;
+			min-width: 100%;
+		}
+		
+		> .card-item:hover {
+			z-index: 2;
+			border-radius: $v-border-radius;
+			background: #efefef;
+			transition-duration: 100ms;
+			transition-timing-function: ease-out;
+		}
+	}
+	
 	.comments-card-collection {
 		padding: 0px;
 		

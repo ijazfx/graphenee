@@ -35,8 +35,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.event.DashboardEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
+import io.graphenee.vaadin.util.DashboardUtils;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 @SuppressWarnings("serial")
@@ -125,7 +127,14 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 
 		notificationBadge = new BadgeWrapper(notificationButton);
 		notificationBadge.setId(BadgeWrapper.NOTIFICATIONS_BADGE_ID);
-		notificationBadge.clearBadgeValue();
+
+		GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
+		if (user != null && user.getUnreadNotificationCount() > 0) {
+			notificationBadge.setBadgeValue(user.getUnreadNotificationCount() + "");
+		} else {
+			notificationBadge.clearBadgeValue();
+		}
+
 		toolbar.addComponent(notificationBadge);
 		toolbar.setComponentAlignment(notificationBadge, Alignment.MIDDLE_RIGHT);
 		notificationBadge.setVisible(shouldShowNotifications());
@@ -203,29 +212,14 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 	@Subscribe
 	public void onBadgeUpdateEvent(DashboardEvent.BadgeUpdateEvent event) {
 		if (event.getBadgeId().equals(notificationBadge.getId())) {
-			UI ui = UI.getCurrent();
+			UI ui = DashboardUtils.getCurrentUI(event.getUser());
 			if (ui != null && ui.isAttached()) {
 				ui.access(() -> {
 					String value = event.getBadgeValue();
-					if (value == null || value.trim().length() == 0) {
+					if (value == null || value.equals("0")) {
 						notificationBadge.clearBadgeValue();
 					} else {
-						value = value.trim();
-						if (!value.startsWith("+")) {
-							notificationBadge.setBadgeValue(value);
-						} else {
-							value = value.substring(1);
-							try {
-								int count = Integer.parseInt(value);
-								if (count > 0) {
-									notificationBadge.badgeUp(count);
-								} else {
-									notificationBadge.clearBadgeValue();
-								}
-							} catch (Exception ex) {
-								notificationBadge.setBadgeValue(event.getBadgeValue().trim());
-							}
-						}
+						notificationBadge.setBadgeValue(value);
 					}
 					ui.push();
 				});

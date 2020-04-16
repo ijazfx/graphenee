@@ -15,13 +15,13 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.UI;
 
-import io.graphenee.core.api.GxNotificationSubscriber;
 import io.graphenee.core.enums.GenderEnum;
-import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.GxNotificationEvent;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.vaadin.BadgeWrapper;
@@ -30,91 +30,87 @@ import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.ui.GxNotification;
 import io.graphenee.vaadin.util.DashboardUtils;
 
-public class GxDashboardUser implements GxAuthenticatedUser, GxNotificationSubscriber {
+public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 
-	private GxUserAccountBean user;
+	private AtomicInteger notificationCount = new AtomicInteger();
 
 	public GxDashboardUser(GxUserAccountBean user) {
-		this.user = user;
-	}
-
-	public GxUserAccountBean getUser() {
-		return user;
+		super(user);
 	}
 
 	@Override
 	public String getFirstName() {
-		return user.getFirstName();
+		return getUser().getFirstName();
 	}
 
 	@Override
 	public void setFirstName(String firstName) {
-		user.setFirstName(firstName);
+		getUser().setFirstName(firstName);
 	}
 
 	@Override
 	public String getLastName() {
-		return user.getLastName();
+		return getUser().getLastName();
 	}
 
 	@Override
 	public void setLastName(String lastName) {
-		user.setLastName(lastName);
+		getUser().setLastName(lastName);
 	}
 
 	@Override
 	public String getUsername() {
-		return user.getUsername();
+		return getUser().getUsername();
 	}
 
 	@Override
 	public void setUsername(String username) {
-		user.setUsername(username);
+		getUser().setUsername(username);
 	}
 
 	@Override
 	public String getPassword() {
-		return user.getPassword();
+		return getUser().getPassword();
 	}
 
 	@Override
 	public void setPassword(String password) {
-		user.setPassword(password);
+		getUser().setPassword(password);
 	}
 
 	@Override
 	public boolean isPasswordChangeRequired() {
-		return user.getIsPasswordChangeRequired();
+		return getUser().getIsPasswordChangeRequired();
 	}
 
 	@Override
 	public GenderEnum getGender() {
-		return user.getGender();
+		return getUser().getGender();
 	}
 
 	@Override
 	public void setGender(GenderEnum gender) {
-		user.setGender(gender);
+		getUser().setGender(gender);
 	}
 
 	@Override
 	public boolean canDoAction(String resource, String action) {
-		return user.canDoAction(resource, action);
+		return getUser().canDoAction(resource, action);
 	}
 
 	@Override
 	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
-		return user.canDoAction(resource, action, forceRefresh);
+		return getUser().canDoAction(resource, action, forceRefresh);
 	}
 
 	@Override
 	public String getEmail() {
-		return user.getEmail();
+		return getUser().getEmail();
 	}
 
 	@Override
 	public void setEmail(String email) {
-		user.setEmail(email);
+		getUser().setEmail(email);
 	}
 
 	@Override
@@ -127,13 +123,14 @@ public class GxDashboardUser implements GxAuthenticatedUser, GxNotificationSubsc
 	}
 
 	public byte[] getProfilePhoto() {
-		return user.getProfileImage();
+		return getUser().getProfileImage();
 	}
 
 	@Subscribe
 	@Override
 	public void onNotification(GxNotificationEvent event) {
 		if (event != null && event.test(this)) {
+			notificationCount.incrementAndGet();
 			UI ui = DashboardUtils.getCurrentUI(this);
 			ui.access(() -> {
 				GxNotification notification = GxNotification.tray(event.getTitle(), event.getDescription());
@@ -141,9 +138,20 @@ public class GxDashboardUser implements GxAuthenticatedUser, GxNotificationSubsc
 				notification.setIcon(FontAwesome.BELL);
 				notification.show(ui.getPage());
 				ui.push();
-				DashboardEventBus.sessionInstance(ui.getSession()).post(new DashboardEvent.BadgeUpdateEvent(BadgeWrapper.NOTIFICATIONS_BADGE_ID, "+1"));
+				DashboardEventBus.sessionInstance(ui.getSession())
+						.post(new DashboardEvent.BadgeUpdateEvent(this, BadgeWrapper.NOTIFICATIONS_BADGE_ID, getUnreadNotificationCount() + ""));
 			});
 		}
+	}
+
+	@Override
+	public int getUnreadNotificationCount() {
+		return notificationCount.get();
+	}
+
+	@Override
+	public void setUnreadNotificationCount(int count) {
+		notificationCount.set(count);
 	}
 
 }

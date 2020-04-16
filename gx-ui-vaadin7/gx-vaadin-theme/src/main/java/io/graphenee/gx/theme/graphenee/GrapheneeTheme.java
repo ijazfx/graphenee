@@ -37,6 +37,8 @@ public class GrapheneeTheme extends BaseTheme {
 
 	public static final Resource APPLE_LOGO = iconResource("apple_logo.png");
 	public static final Resource GOOGLE_LOGO = iconResource("google_logo.png");
+	public static final Resource APP_STORE_LOGO = iconResource("app_store.png");
+	public static final Resource PLAY_STORE_LOGO = iconResource("play_store.png");
 	public static final Resource CELEBRATE = iconResource("celebrate.png");
 	public static final Resource APPLAUSE = iconResource("applause.png");
 	public static final Resource LIKE = iconResource("like.png");

@@ -15,16 +15,23 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
-import io.graphenee.core.enums.GenderEnum;
-import io.graphenee.core.model.GxAuthenticatedUser;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public final class MockUser implements GxAuthenticatedUser {
+import io.graphenee.core.enums.GenderEnum;
+import io.graphenee.core.model.GxNotificationEvent;
+
+public final class MockUser extends AbstractDashboardUser<String> {
 
 	String firstName;
 	String lastName;
 	String username;
 	String password;
 	GenderEnum gender;
+	private AtomicInteger notificationCount = new AtomicInteger();
+
+	public MockUser() {
+		super("Mock User");
+	}
 
 	@Override
 	public String getFirstName() {
@@ -99,4 +106,19 @@ public final class MockUser implements GxAuthenticatedUser {
 	public void setMobileNumber(String mobileNumber) {
 	}
 
+	@Override
+	public int getUnreadNotificationCount() {
+		return notificationCount.get();
+	}
+
+	@Override
+	public void setUnreadNotificationCount(int count) {
+		notificationCount.set(count);
+	}
+
+	@Override
+	public void onNotification(GxNotificationEvent event) {
+		// TODO Auto-generated method stub
+
+	}
 }

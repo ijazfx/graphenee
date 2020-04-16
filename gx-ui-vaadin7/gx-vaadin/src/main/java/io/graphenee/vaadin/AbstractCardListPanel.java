@@ -283,6 +283,18 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		}
 	}
 
+	protected void removeCard(AbstractCardComponent<T> card) {
+		Component c = card;
+		while (c.getParent() != null) {
+			if (contentLayout.getComponentIndex(c) != -1)
+				break;
+			c = c.getParent();
+		}
+		if (c != null) {
+			contentLayout.removeComponent(c);
+		}
+	}
+
 	protected abstract AbstractCardComponent<T> getCardComponent(T entity);
 
 	protected abstract String panelCaption();

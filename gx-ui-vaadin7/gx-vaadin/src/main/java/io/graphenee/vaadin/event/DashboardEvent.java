@@ -17,6 +17,7 @@ package io.graphenee.vaadin.event;
 
 import java.util.Map;
 
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.AbstractDashboardView.Dashlet;
 
 /*
@@ -185,8 +186,10 @@ public abstract class DashboardEvent {
 
 		private final String badgeId;
 		private final String badgeValue;
+		private GxAuthenticatedUser user;
 
-		public BadgeUpdateEvent(final String badgeId, final String badgeValue) {
+		public BadgeUpdateEvent(final GxAuthenticatedUser user, final String badgeId, final String badgeValue) {
+			this.user = user;
 			this.badgeId = badgeId;
 			this.badgeValue = badgeValue;
 		}
@@ -197,6 +200,10 @@ public abstract class DashboardEvent {
 
 		public String getBadgeValue() {
 			return badgeValue;
+		}
+
+		public GxAuthenticatedUser getUser() {
+			return user;
 		}
 
 	}
