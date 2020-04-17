@@ -36,7 +36,8 @@ public class DashboardUtils {
 		UI ui = UI_MAP.get(user);
 		if (ui != null && ui.isAttached())
 			return ui;
-		return UI.getCurrent();
+		UI_MAP.remove(user);
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

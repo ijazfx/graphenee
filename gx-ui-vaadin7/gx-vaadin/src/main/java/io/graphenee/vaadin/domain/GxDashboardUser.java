@@ -129,18 +129,20 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 	@Subscribe
 	@Override
 	public void onNotification(GxNotificationEvent event) {
-		if (event != null && event.test(this)) {
-			notificationCount.incrementAndGet();
-			UI ui = DashboardUtils.getCurrentUI(this);
-			ui.access(() -> {
-				GxNotification notification = GxNotification.tray(event.getTitle(), event.getDescription());
-				notification.setDelayMsec(10000);
-				notification.setIcon(FontAwesome.BELL);
-				notification.show(ui.getPage());
-				ui.push();
-				DashboardEventBus.sessionInstance(ui.getSession())
-						.post(new DashboardEvent.BadgeUpdateEvent(this, BadgeWrapper.NOTIFICATIONS_BADGE_ID, getUnreadNotificationCount() + ""));
-			});
+		UI ui = DashboardUtils.getCurrentUI(this);
+		if (ui != null && ui.isAttached()) {
+			if (event != null && event.test(this)) {
+				notificationCount.incrementAndGet();
+				ui.access(() -> {
+					GxNotification notification = GxNotification.tray(event.getTitle(), event.getDescription());
+					notification.setDelayMsec(10000);
+					notification.setIcon(FontAwesome.BELL);
+					notification.show(ui.getPage());
+					ui.push();
+					DashboardEventBus.sessionInstance(ui.getSession())
+							.post(new DashboardEvent.BadgeUpdateEvent(this, BadgeWrapper.NOTIFICATIONS_BADGE_ID, getUnreadNotificationCount() + ""));
+				});
+			}
 		}
 	}
 
