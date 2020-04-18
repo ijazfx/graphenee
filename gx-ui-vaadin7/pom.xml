@@ -53,7 +53,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>3.2.0</version>
+				<configuration>
+					<source>8</source>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -90,19 +93,19 @@
 		</plugins>
 	</build>
 	<modules>
-		
+
 
 		<module>gx-vaadin</module>
 		<module>gx-vaadin-theme</module>
 
-		
+
 		<module>gx-i18n-vaadin</module>
-		
+
 		<module>gx-security-vaadin</module>
 		<module>gx-core-vaadin</module>
-		
+
 		<module>gx-jbpm-embedded</module>
-		
+
 		<module>gx-sms-vaadin</module>
 	</modules>
 	<dependencyManagement>
