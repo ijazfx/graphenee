@@ -4,7 +4,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
-	<artifactId>graphenee</artifactId>
+	<artifactId>gx</artifactId>
 	<packaging>pom</packaging>
 	<version>2.0.0-SNAPSHOT</version>
 	<name>Graphenee Parent</name>
@@ -13,13 +13,13 @@
 
 	<!-- Modules -->
 	<modules>
-		<module>blockchain</module>
-		<module>core</module>
-		<module>jbpm</module>
-		<module>kitchensink</module>
-		<module>vaadin7</module>
+		<module>gx-blockchain</module>
+		<module>gx-core</module>
+		<module>gx-jbpm-embedded</module>
+		<module>gx-vaadin7</module>
+		<module>gx-workshop</module>
 	</modules>
-
+	
 	<!-- License -->
 	<licenses>
 		<license>
@@ -105,22 +105,22 @@
 		<dependencies>
 			<dependency>
 				<groupId>io.graphenee</groupId>
-				<artifactId>blockchain</artifactId>
+				<artifactId>gx-blockchain</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.graphenee</groupId>
-				<artifactId>core</artifactId>
+				<artifactId>gx-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.graphenee</groupId>
-				<artifactId>vaadin7</artifactId>
+				<artifactId>gx-vaadin7</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.graphenee</groupId>
-				<artifactId>jbpm</artifactId>
+				<artifactId>gx-jbpm-embedded</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -372,13 +372,13 @@
 
 	<!-- Source Code Management -->
 	<scm>
-		<url>https://github.com/trigsoft-ltd/graphenee.git</url>
+		<url>https://github.com/ijazfx/graphenee.git</url>
 		<developerConnection>Farrukh Ijaz</developerConnection>
 	</scm>
 
 	<!-- Issue Management -->
 	<issueManagement>
-		<url>https://github.com/trigsoft-ltd/graphenee/issues</url>
+		<url>https://github.com/ijazfx/graphenee/issues</url>
 	</issueManagement>
 
 	<!-- Distribution Management -->
