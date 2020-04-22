@@ -19,7 +19,7 @@
 		<module>gx-vaadin7</module>
 		<module>gx-workshop</module>
 	</modules>
-	
+
 	<!-- License -->
 	<licenses>
 		<license>
@@ -64,6 +64,7 @@
 		<version.vaadin.confirm.dialog>2.1.3</version.vaadin.confirm.dialog>
 		<version.vaadin.autocompletetextfield>1.0-alpha-4</version.vaadin.autocompletetextfield>
 		<version.vaadin.autocomplete>1.1.1</version.vaadin.autocomplete>
+		<version.vaadin.chartjs>0.4.0</version.vaadin.chartjs>
 		<version.markdown4j>2.2-cj-1.1</version.markdown4j>
 		<version.jbpm>6.4.0.Final</version.jbpm>
 		<version.drools>6.4.0.Final</version.drools>
@@ -71,6 +72,7 @@
 		<version.sawtooth>v0.1.2</version.sawtooth>
 		<version.jasper>6.12.2</version.jasper>
 		<version.grpc>1.23.0</version.grpc>
+		<version.firebase.admin>6.12.2</version.firebase.admin>
 	</properties>
 
 	<!-- Repositories -->
@@ -285,6 +287,11 @@
 				<version>${version.vaadin.autocomplete}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.byteowls</groupId>
+				<artifactId>vaadin-chartjs</artifactId>
+				<version>${version.vaadin.chartjs}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.commonjava.googlecode.markdown4j</groupId>
 				<artifactId>markdown4j</artifactId>
 				<version>${version.markdown4j}</version>
@@ -357,6 +364,11 @@
 				<groupId>io.grpc</groupId>
 				<artifactId>grpc-stub</artifactId>
 				<version>${version.grpc}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.firebase</groupId>
+				<artifactId>firebase-admin</artifactId>
+				<version>${version.firebase.admin}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
