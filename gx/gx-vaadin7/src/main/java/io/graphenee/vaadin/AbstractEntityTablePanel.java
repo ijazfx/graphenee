@@ -19,10 +19,13 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -39,6 +42,7 @@ import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 import org.vaadin.viritin.ui.MNotification;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -52,6 +56,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Grid.CellReference;
@@ -62,11 +67,14 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
 import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class AbstractEntityTablePanel<T> extends MPanel {
+
+	private static final String SELECTED_CHECKBOX = "selected";
 
 	private static final Logger L = LoggerFactory.getLogger(AbstractEntityTablePanel.class);
 
@@ -99,6 +107,8 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	private MVerticalLayout rootLayout;
 
 	private boolean rootLayoutMargin = false;
+
+	private Set<Object> selectedItemIds;
 
 	public AbstractEntityTablePanel(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -161,7 +171,8 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 										}
 									} catch (Exception e1) {
 										if (e1.getMessage().contains("ConstraintViolationException"))
-											MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
+											MNotification.tray("Operation Denied",
+													"Record is in use therefore cannot be removed.");
 										else
 											MNotification.tray("Operation Failed", e1.getMessage());
 									}
@@ -229,7 +240,14 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 			for (Object o : mainTable.getVisibleColumns()) {
 				if (o != null) {
-					applyRendererForColumn(new TableColumn(mainTable, o.toString()));
+					TableColumn column = new TableColumn(mainTable, o.toString());
+					if (column.getPropertyId().equals(SELECTED_CHECKBOX)) {
+						column.setWidth(34);
+						column.setHeader("");
+					} else {
+						applyRendererForColumn(column);
+					}
+
 				}
 			}
 
@@ -244,6 +262,25 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 		mainTableContainer = new BeanItemContainer<>(entityClass);
 		table.setContainerDataSource(mainTableContainer);
 		table.setSizeFull();
+		selectedItemIds = new HashSet<Object>();
+
+		table.addGeneratedColumn(SELECTED_CHECKBOX, new Table.ColumnGenerator() {
+			@Override
+			public Object generateCell(Table source, final Object itemId, Object columnId) {
+				boolean selected = selectedItemIds.contains(itemId);
+				final CheckBox cb = new CheckBox("", selected);
+				cb.addValueChangeListener(e -> {
+					if (selectedItemIds.contains(itemId)) {
+						selectedItemIds.remove(itemId);
+						table.unselect(itemId);
+					} else {
+						table.select(itemId);
+						selectedItemIds.add(itemId);
+					}
+				});
+				return cb;
+			}
+		});
 		String[] visibleProperties = visibleProperties();
 		if (visibleProperties != null) {
 			for (String propertyId : visibleProperties()) {
@@ -251,22 +288,23 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 					mainTableContainer.addNestedContainerProperty(propertyId);
 				}
 			}
-			table.withProperties(visibleProperties());
+			List<String> propertiesList = Arrays.asList(visibleProperties).stream().collect(Collectors.toList());
+			propertiesList.add(0, SELECTED_CHECKBOX);
+			table.withProperties(propertiesList);
 		}
+		
 		if (isGridCellFilterEnabled()) {
-			// gridCellFilter = new GridCellFilter(table);
-			// if (visibleProperties != null) {
-			// addCellFiltersForVisibleProperties(gridCellFilter,
-			// visibleProperties);
-			// }
+			//TODO: Add table column filter
 		}
 
 		if (isSelectionEnabled) {
 			table.setMultiSelectMode(MultiSelectMode.DEFAULT);
+			table.setMultiSelect(true);
 			table.setSelectable(true);
 		} else {
 			table.setSelectable(false);
 		}
+
 		table.addItemClickListener(new TRItemClickListener() {
 
 			@Override
@@ -277,10 +315,12 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 						if (onItemClick != null) {
 							Boolean value = onItemClick.apply(item.getBean());
 							if (value != null && value == true) {
-								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+								onGridItemClicked(item.getBean(),
+										event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 							}
 						} else {
-							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							onGridItemClicked(item.getBean(),
+									event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 						}
 					}
 				}
@@ -297,43 +337,41 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			}
 		});
 
-		//
-		// table.getColumns().forEach(column -> {
-		// if (column.getPropertyId() != null) {
-		// column.setHeaderCaption(localizedSingularValue(column.getHeaderCaption()));
-		// }
-		// });
-		//
-		// table.setCellStyleGenerator(new CellStyleGenerator() {
-		//
-		// @Override
-		// public String getStyle(CellReference cell) {
-		// if (cell.getPropertyId() == null) {
-		// return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
-		// }
-		// String cellStyle = generateCellStyle(cell);
-		// Alignment alignment =
-		// alignmentForProperty(cell.getPropertyId().toString());
-		//
-		// if (Strings.isNullOrEmpty(cellStyle)) {
-		// if (alignment.isLeft()) {
-		// return GrapheneeTheme.STYLE_V_ALIGN_LEFT;
-		// }
-		// if (alignment.isRight()) {
-		// return GrapheneeTheme.STYLE_V_ALIGN_RIGHT;
-		// }
-		// return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
-		// } else {
-		// if (alignment.isLeft()) {
-		// return GrapheneeTheme.STYLE_V_ALIGN_LEFT + " " + cellStyle;
-		// }
-		// if (alignment.isRight()) {
-		// return GrapheneeTheme.STYLE_V_ALIGN_RIGHT + " " + cellStyle;
-		// }
-		// return GrapheneeTheme.STYLE_V_ALIGN_CENTER + " " + cellStyle;
-		// }
-		// }
-		// });
+		for (Object columnHeader : table.getColumnHeaders()) {
+			if (columnHeader != null) {
+				table.setColumnHeader(columnHeader, localizedSingularValue(columnHeader.toString()));
+			}
+		}
+
+		// Set cell style generator
+		table.setCellStyleGenerator(new Table.CellStyleGenerator() {
+			@Override
+			public String getStyle(Table source, Object itemId, Object propertyId) {
+				if (propertyId == null) {
+					return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
+				}
+				String cellStyle = null;
+				Alignment alignment = alignmentForProperty(propertyId.toString());
+
+				if (Strings.isNullOrEmpty(cellStyle)) {
+					if (alignment.isLeft()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_LEFT;
+					}
+					if (alignment.isRight()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_RIGHT;
+					}
+					return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
+				} else {
+					if (alignment.isLeft()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_LEFT + " " + cellStyle;
+					}
+					if (alignment.isRight()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_RIGHT + " " + cellStyle;
+					}
+					return GrapheneeTheme.STYLE_V_ALIGN_CENTER + " " + cellStyle;
+				}
+			}
+		});
 
 		table.setTableFieldFactory(new TableFieldFactory() {
 
@@ -388,6 +426,9 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	protected Alignment alignmentForProperty(String propertyId) {
+		if (propertyId.matches("(selected)")) {
+			return Alignment.MIDDLE_CENTER;
+		}
 		if (propertyId.matches("(is|should|has)[A-Z].*")) {
 			return Alignment.MIDDLE_LEFT;
 		}
@@ -404,16 +445,11 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	protected void onTableItemSelect(ValueChangeEvent event) {
-		//TODO: Uncomment when using Table instead of MTable
 		if (mainTable.getMultiSelectMode() == MultiSelectMode.DEFAULT) {
 			Collection<T> selected = (Collection<T>) mainTable.getValue();
 			editButton.setEnabled(selected.size() == 1);
 			deleteButton.setEnabled(selected.size() > 0);
 		}
-		//		Object selected = event.getProperty().getValue();
-		//		editButton.setEnabled(selected != null);
-		//		deleteButton.setEnabled(selected != null);
-
 		if (delegate != null) {
 			delegate.onGridItemSelect(event);
 		}
@@ -430,7 +466,8 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar")
+				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
 				.withSpacing(true);
 
 		layout.add(addButton);
@@ -465,7 +502,8 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar")
+				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
 				.withSpacing(true);
 
 		addButtonsToSecondaryToolbar(layout);
@@ -531,12 +569,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	private void openEditorForm(T item) {
 		if (cachedForm() != null) {
-			// BeanItem<T> beanItem = mainGridContainer.getItem(item);
-			// if (beanItem == null) {
-			// cachedForm().setEntity(entityClass, item);
-			// } else {
-			// cachedForm().setEntity(entityClass, beanItem.getBean());
-			// }
 			cachedForm().setEntity(entityClass, item);
 			cachedForm().setSavedHandler(entity -> {
 				try {
@@ -545,13 +577,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 							delegate.onSave(entity);
 						}
 						cachedForm().closePopup();
-						// UI.getCurrent().access(() -> {
-						// if (!mainGridContainer.containsId(entity)) {
-						// mainGridContainer.addBean(entity);
-						// }
-						// mainGrid.clearSortOrder();
-						// UI.getCurrent().push();
-						// });
 						refresh();
 					}
 				} catch (Exception e) {
@@ -613,10 +638,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	protected abstract TRAbstractForm<T> editorForm();
 
 	private TRAbstractForm<T> cachedForm() {
-		// if (cachedForm == null) {
-		// cachedForm = editorForm();
-		// }
-		// return cachedForm;
 		return editorForm();
 	}
 
@@ -693,14 +714,16 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	public AbstractEntityTablePanel<T> withSelectionEnabled(boolean isSelectionEnabled) {
-		this.isSelectionEnabled = isSelectionEnabled;
-		if (isSelectionEnabled) {
-			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
-			mainTable.setMultiSelect(true);
-			mainTable.setSelectable(true);
-		} else {
-			mainTable.setSelectable(false);
-		}
+		//TODO: Temporary commented will do some refactoring.
+//		this.isSelectionEnabled = isSelectionEnabled;
+//		if (isSelectionEnabled) {
+//			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
+//			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
+//			mainTable.setMultiSelect(true);
+//			mainTable.setSelectable(true);
+//		} else {
+//			mainTable.setSelectable(false);
+//		}
 		return this;
 	}
 
