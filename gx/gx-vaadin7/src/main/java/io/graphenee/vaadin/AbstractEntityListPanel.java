@@ -694,7 +694,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	public AbstractEntityListPanel<T> withSelectionEnabled(boolean isSelectionEnabled) {
 		this.isSelectionEnabled = isSelectionEnabled;
-		mainGrid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
 		return this;
 	}
 
