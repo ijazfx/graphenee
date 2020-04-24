@@ -11,12 +11,11 @@ import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.grid.MGrid;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
-import org.vaadin.viritin.ui.MNotification;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.api.GxImportDataProcessor;
@@ -47,38 +46,19 @@ public class GxImportDataForm extends TRAbstractPanel {
 
 	@Override
 	protected void addButtonsToFooter(MHorizontalLayout layout) {
-		String fileName = "import-template.csv";
-		DownloadButton downloadButton = new DownloadButton((OutputStream out) -> {
-			try {
-				out.write(CSVUtil.getHeaderRow(importDataProcessor.requiredColoumnHeader()).getBytes("UTF-8"));
-			} catch (Exception e2) {
-			}
-		}).setFileNameProvider(() -> {
-			return fileName;
-		}).setMimeTypeProvider(() -> {
-			return "text/csv";
-		}).withCaption("Download Import Template");
+		layout.setVisible(false);
+	}
 
-		importDataButton = new MButton("Confirm Import").withStyleName(ValoTheme.BUTTON_PRIMARY);
-		importDataButton.setEnabled(false);
-		importDataButton.addClickListener(e -> {
-
-			ConfirmDialog.show(UI.getCurrent(), null, "Do you want to import selected file?", "Yes", "No", p -> {
-				if (p.isConfirmed()) {
-					importDataProcessor.saveData();
-					List importDataBeans = importDataProcessor.getImportDataBeans();
-					closePopup();
-					MNotification.tray("Data Import Complete", importDataBeans.size() + " records processed successfully.");
-					if (onImportCompletion != null) {
-						onImportCompletion.accept(importDataBeans);
-					}
+	public void importData() {
+		ConfirmDialog.show(UI.getCurrent(), null, "Do you want to import selected file?", "Yes", "No", p -> {
+			if (p.isConfirmed()) {
+				importDataProcessor.saveData();
+				List importDataBeans = importDataProcessor.getImportDataBeans();
+				if (onImportCompletion != null) {
+					onImportCompletion.accept(importDataBeans);
 				}
-			});
+			}
 		});
-		layout.addComponentAsFirst(downloadButton);
-		layout.addComponent(importDataButton);
-		layout.setExpandRatio(importDataButton, 1);
-
 	}
 
 	@Override
@@ -99,21 +79,39 @@ public class GxImportDataForm extends TRAbstractPanel {
 		filePath = new FileChooser("Select File");
 		filePath.addValueChangeListener(e -> {
 			importBeanContainer.removeAllItems();
-			importDataButton.setEnabled(filePath.getValue() != null);
 			if (filePath.getValue() != null) {
 				importDataProcessor.loadFile(filePath.getValue());
 				importBeanContainer.addAll(importDataProcessor.getImportDataBeans());
 			}
 		});
-		layout.addComponents(filePath, importDataGrid);
+		String fileName = "import-template.csv";
+		DownloadButton downloadButton = new DownloadButton((OutputStream out) -> {
+			try {
+				out.write(CSVUtil.getHeaderRow(importDataProcessor.requiredColoumnHeader()).getBytes("UTF-8"));
+			} catch (Exception e2) {
+			}
+		}).setFileNameProvider(() -> {
+			return fileName;
+		}).setMimeTypeProvider(() -> {
+			return "text/csv";
+		}).withCaption("Download Template");
+		downloadButton.withStyleName(ValoTheme.BUTTON_LINK);
+		MHorizontalLayout downloadImportFileLayout = new MHorizontalLayout();
+		downloadImportFileLayout.setDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
+		downloadImportFileLayout.addComponents(filePath, downloadButton);
+		downloadImportFileLayout.setComponentAlignment(downloadButton, Alignment.BOTTOM_RIGHT);
+		downloadImportFileLayout.setSizeFull();
+
+		layout.addComponents(downloadImportFileLayout, importDataGrid);
 
 		layout.setExpandRatio(importDataGrid, 1);
 	}
 
 	@Override
-	public Window openInModalPopup() {
+	public TRAbstractPanel build() {
+		TRAbstractPanel build = super.build();
 		filePath.setValue(null);
-		return super.openInModalPopup();
+		return build;
 	}
 
 	public void initializeWithDataProcessor(GxImportDataProcessor importDataProcessor) {
