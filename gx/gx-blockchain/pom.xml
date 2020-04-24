@@ -56,6 +56,10 @@
 			<groupId>org.web3j</groupId>
 			<artifactId>abi</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-autoconfigure</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>
