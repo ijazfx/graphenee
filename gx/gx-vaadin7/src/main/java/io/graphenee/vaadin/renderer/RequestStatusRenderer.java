@@ -6,12 +6,15 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.renderers.ImageRenderer;
 
-import io.graphenee.core.vaadin.enums.RequestStatus;
+import io.graphenee.core.enums.RequestStatus;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
+/**
+ * @author Ahmad Shafique
+ */
 public class RequestStatusRenderer extends ImageRenderer {
 
-	public static final StatusRepresentation STATUS_IMAGE = new StatusRepresentation();
+	public static final RequestStatusConverter REQUEST_STATUS_CONVERTER = new RequestStatusConverter();
 
 	public RequestStatusRenderer() {
 	}
@@ -29,6 +32,8 @@ public class RequestStatusRenderer extends ImageRenderer {
 				return RequestStatus.PENDING;
 			else if (value == approvedStateResource())
 				return RequestStatus.APPROVED;
+			else if (value == objectionStateResource())
+				return RequestStatus.OBJECTION;
 			return RequestStatus.REJECTED;
 
 		}
@@ -40,6 +45,8 @@ public class RequestStatusRenderer extends ImageRenderer {
 				return pendingStateResource();
 			else if (value == RequestStatus.APPROVED)
 				return approvedStateResource();
+			else if (value == RequestStatus.OBJECTION)
+				return objectionStateResource();
 			return rejectedStateResource();
 		}
 
@@ -59,18 +66,22 @@ public class RequestStatusRenderer extends ImageRenderer {
 
 		protected abstract Resource rejectedStateResource();
 
+		protected abstract Resource objectionStateResource();
+
 	}
 
-	public static class StatusRepresentation extends StatusConverter {
+	public static class RequestStatusConverter extends StatusConverter {
 
 		Resource pendingStateResource;
 		Resource approvedStateResource;
 		Resource rejectedStateResource;
+		Resource objectionStateResource;
 
-		public StatusRepresentation() {
+		public RequestStatusConverter() {
 			pendingStateResource = GrapheneeTheme.themeResource("images/status-pending.png");
 			approvedStateResource = GrapheneeTheme.themeResource("images/status-approved.png");
 			rejectedStateResource = GrapheneeTheme.themeResource("images/status-rejected.png");
+			objectionStateResource = GrapheneeTheme.themeResource("images/status-objection.png");
 		}
 
 		@Override
@@ -86,6 +97,11 @@ public class RequestStatusRenderer extends ImageRenderer {
 		@Override
 		protected Resource rejectedStateResource() {
 			return rejectedStateResource;
+		}
+
+		@Override
+		protected Resource objectionStateResource() {
+			return objectionStateResource;
 		}
 
 	}

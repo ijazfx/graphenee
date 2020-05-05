@@ -1,9 +1,10 @@
-package io.graphenee.core.vaadin.enums;
+package io.graphenee.core.enums;
 
 public enum RequestStatus {
 	PENDING("Pending", 0),
 	APPROVED("Approved", 1),
-	REJECTED("Rejected", 2);
+	REJECTED("Rejected", 2),
+	OBJECTION("Objection", 3);
 
 	private int statusCode;
 	private String statusName;
