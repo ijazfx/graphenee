@@ -31,7 +31,6 @@ import com.vaadin.ui.UI;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
-import io.graphenee.vaadin.view.DashboardMenu;
 
 /*
  * Dashboard MainView is a simple HorizontalLayout that wraps the menu on the
@@ -41,7 +40,6 @@ import io.graphenee.vaadin.view.DashboardMenu;
 public abstract class AbstractMainComponent extends HorizontalLayout {
 
 	private ComponentContainer componentContainer;
-	private DashboardMenu dashboardMenu;
 	private boolean isBuilt;
 	private MVerticalLayout headerLayout;
 
@@ -87,7 +85,7 @@ public abstract class AbstractMainComponent extends HorizontalLayout {
 			setExpandRatio(mainLayout, 1.0f);
 
 			componentContainer = content;
-			Navigator navigator = new DashboardNavigator(componentContainer);
+			Navigator navigator = new Navigator(UI.getCurrent(), componentContainer);
 			dashboardSetup().registerViewProviders(navigator);
 			navigator.addViewChangeListener(new ViewChangeListener() {
 				@Override
