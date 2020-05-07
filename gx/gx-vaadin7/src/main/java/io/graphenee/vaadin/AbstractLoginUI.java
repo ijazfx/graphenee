@@ -15,6 +15,9 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
@@ -32,6 +35,8 @@ import io.graphenee.vaadin.view.LoginComponent;
 @SuppressWarnings("serial")
 public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends GxAuthenticatedUser> extends AbstractDashboardUI {
 
+	private static final Logger L = LoggerFactory.getLogger(AbstractLoginUI.class);
+
 	@SuppressWarnings("unchecked")
 	protected Component createComponent() {
 		setStyleName("loginview");
@@ -47,7 +52,8 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 					location = location.replaceAll("/login", "/reset-password");
 					Page.getCurrent().setLocation(location);
 				} else {
-
+					String log = String.format("Remote IP: %s, Login Succeed for User: %s", getRemoteIpAddress(), username);
+					L.warn(log);
 					try {
 						dashboardSetup().eventBus().unregister(user);
 						DashboardUtils.setCurrentUI(user, null);
@@ -61,12 +67,12 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 					location = location.replaceAll("/login", "");
 					Page.getCurrent().setLocation(location);
 				}
-			} catch (AuthenticationFailedException e) {
+			} catch (Exception e) {
+				String log = String.format("Remote IP: %s, Login Failed for User: %s", getRemoteIpAddress(), username);
+				L.warn(log);
 				String loginLink = Page.getCurrent().getLocation().toString();
 				String resetPasswordLink = loginLink.replaceAll("/login", "/reset-password");
 				StringBuilder sb = new StringBuilder();
-				sb.append(e.getMessage());
-				sb.append("&nbsp;");
 				sb.append("If you don't remember your password then <a style=\"color: white;\" href=\"" + resetPasswordLink + "\">Click here!</a> to reset.");
 				GxNotification notification = GxNotification.closable("Access Denied", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
 				notification.setDelayMsec(5000);

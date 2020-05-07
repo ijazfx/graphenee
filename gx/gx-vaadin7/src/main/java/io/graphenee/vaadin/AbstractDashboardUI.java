@@ -36,8 +36,11 @@ import io.graphenee.vaadin.view.MainComponent;
 @SuppressWarnings("serial")
 public abstract class AbstractDashboardUI extends UI {
 
+	private String remoteIpAddress;
+
 	@Override
 	protected void init(final VaadinRequest request) {
+		remoteIpAddress = request.getRemoteAddr();
 
 		Map<String, String[]> parameterMap = request.getParameterMap();
 		Map<String, String[]> queryMap = new HashMap<>();
@@ -103,6 +106,10 @@ public abstract class AbstractDashboardUI extends UI {
 
 		Page.getCurrent().setTitle(dashboardSetup().applicationTitle());
 
+	}
+
+	public String getRemoteIpAddress() {
+		return remoteIpAddress;
 	}
 
 	private String findNavigableState(GxAuthenticatedUser user, String currentState) {
