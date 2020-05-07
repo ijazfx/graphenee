@@ -271,16 +271,22 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 						}
 
 					});
-					AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
-					cardPanel.setContent(cardLayout.build());
-					cardPanel.setWidth(cardLayout.getCardWidth());
+					AbstractCardComponent<T> cardComponent = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
+					MVerticalLayout cardLayout = new MVerticalLayout().withMargin(false).withSpacing(false).withFullWidth();
+					cardLayout.addComponent(cardComponent.build());
+					cardPanel.setContent(cardLayout);
+					cardPanel.setWidth(cardComponent.getCardWidth());
 					contentLayout.addComponent(cardPanel);
+					addComponentBetweenCards(cardLayout,entity);
 
 				});
 				MLabel dummyLabel = new MLabel().withHeight("-1px");
 				contentLayout.addComponent(dummyLabel);
 			}
 		}
+	}
+
+	protected void addComponentBetweenCards(MVerticalLayout cardLayout, T entity) {
 	}
 
 	protected void removeCard(AbstractCardComponent<T> card) {
@@ -393,7 +399,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 			rootLayout.setMargin(margins);
 		return this;
 	}
-
+	
 	public void showMargin() {
 		rootLayoutMargin = true;
 		rootLayout.setMargin(true);
