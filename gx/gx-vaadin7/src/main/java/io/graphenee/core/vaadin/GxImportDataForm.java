@@ -9,6 +9,7 @@ import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.grid.MGrid;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
@@ -68,9 +69,7 @@ public class GxImportDataForm extends TRAbstractPanel {
 
 	@Override
 	protected void addComponentsToContentLayout(MVerticalLayout layout) {
-
 		layout.withMargin(true).withSpacing(true);
-
 		importBeanContainer = new BeanItemContainer<>(importDataProcessor.getEntityClass());
 		importDataGrid = new MGrid<>();
 		importDataGrid.setSizeFull();
@@ -96,11 +95,10 @@ public class GxImportDataForm extends TRAbstractPanel {
 			return "text/csv";
 		}).withCaption("Download Template");
 		downloadButton.withStyleName(ValoTheme.BUTTON_LINK);
-		MHorizontalLayout downloadImportFileLayout = new MHorizontalLayout();
+		MHorizontalLayout downloadImportFileLayout = new MHorizontalLayout().withHeightUndefined().withWidth("100%");
 		downloadImportFileLayout.setDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
 		downloadImportFileLayout.addComponents(filePath, downloadButton);
 		downloadImportFileLayout.setComponentAlignment(downloadButton, Alignment.BOTTOM_RIGHT);
-		downloadImportFileLayout.setSizeFull();
 
 		layout.addComponents(downloadImportFileLayout, importDataGrid);
 
