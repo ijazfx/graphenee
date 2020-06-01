@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.gridutil.cell.GridCellFilter;
-import org.vaadin.viritin.button.DownloadButton;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.fields.MTable;
 import org.vaadin.viritin.label.MLabel;
@@ -102,7 +101,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	private ExportDataSpreadSheetComponent exportDataSpreadSheetComponent;
 
-	private DownloadButton exportDataDownloadButton;
+	private MButton exportDataDownloadButton;
 
 	private MVerticalLayout rootLayout;
 
@@ -221,7 +220,9 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 				}
 				return new ArrayList<>(mainTableContainer.getItemIds());
 			});
-			exportDataDownloadButton = exportDataSpreadSheetComponent.getDownloadButton();
+			exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O).withListener(cl -> {
+				exportDataSpreadSheetComponent.prepareDownload();
+			});
 			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
 
 			toolbar = buildToolbar();
@@ -542,13 +543,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			}
 		}
 		return headerCaptionList;
-	}
-
-	protected DownloadButton getDownloadButton() {
-		if (exportDataSpreadSheetComponent != null) {
-			return exportDataSpreadSheetComponent.getDownloadButton();
-		}
-		return null;
 	}
 
 	protected boolean shouldShowExportDataButton() {

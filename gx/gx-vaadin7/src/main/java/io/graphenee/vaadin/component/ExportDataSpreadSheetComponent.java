@@ -15,10 +15,13 @@
  *******************************************************************************/
 package io.graphenee.vaadin.component;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -28,10 +31,9 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.vaadin.viritin.button.DownloadButton;
-import org.vaadin.viritin.button.DownloadButton.ContentWriter;
 
-import com.vaadin.server.FontAwesome;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.Page;
 
 import io.graphenee.core.util.KeyValueWrapper;
 import io.graphenee.core.util.TRCalendarUtil;
@@ -47,7 +49,6 @@ public class ExportDataSpreadSheetComponent {
 	private Supplier<Collection<String>> columnsCaptionsSupplier;
 	private Supplier<Collection<String>> dataColumnSupplier;
 	private Supplier<Collection<Object>> dataItemsSupplier;
-	private DownloadButton downloadButton;
 
 	private CellStyle defaultDateStyle = null;
 
@@ -86,27 +87,21 @@ public class ExportDataSpreadSheetComponent {
 		return this;
 	}
 
-	public DownloadButton getDownloadButton() {
-		if (downloadButton == null) {
-			downloadButton = new DownloadButton();
-			downloadButton.setCaption("Download");
-			downloadButton.setIcon(FontAwesome.FILE_EXCEL_O);
-			if (StringUtils.isEmpty(fileName)) {
-				fileName = TRCalendarUtil.getFormattedDateTime(TRCalendarUtil.getCurrentTimeStamp(), "yyyyMMdd-HHmmss") + FILE_EXTENSION_XLS;
-			}
-			downloadButton.setFileName(fileName);
-			downloadButton.setWriter(new ContentWriter() {
-				@Override
-				public void write(OutputStream stream) {
-					try {
-						writeToOutputStream(stream);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			});
+	public void prepareDownload() {
+		try {
+			File file = File.createTempFile(UUID.randomUUID().toString(), "xls");
+			FileOutputStream fos = new FileOutputStream(file);
+			writeToOutputStream(fos);
+			fos.close();
+			FileResource resource = new FileResource(file) {
+				public String getFilename() {
+					return ExportDataSpreadSheetComponent.this.fileName != null ? ExportDataSpreadSheetComponent.this.fileName : "exported-data.xls";
+				};
+			};
+			Page.getCurrent().open(resource, "_blank", false);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return downloadButton;
 	}
 
 	public void writeToOutputStream(OutputStream stream) throws IOException {
