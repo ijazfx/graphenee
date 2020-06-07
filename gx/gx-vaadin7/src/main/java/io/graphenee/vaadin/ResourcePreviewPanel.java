@@ -42,6 +42,7 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 	private MButton downloadButton;
 	private FileDownloader downloader;
 	private MLabel note;
+	private MVerticalLayout noteLayout;
 
 	@Override
 	protected boolean isSpringComponent() {
@@ -87,7 +88,8 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		note = new MLabel().withFullWidth();
 		note.setValue(
 				"Download the file using 'Download' button. After download, the file should open automatically using device default viewer for the file type. If not, you may need to download an application from the Internet to open the file such as Adope PDF Viewer for PDF files or Media Player for Audio/Video files.");
-		layout.add(new MVerticalLayout(note));
+		noteLayout = new MVerticalLayout(note);
+		layout.add(noteLayout);
 	}
 
 	@Override
@@ -114,13 +116,13 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		if (resource.getMIMEType().startsWith("image/") || resource.getMIMEType().endsWith("/pdf")) {
 			viewer.setSource(resource);
 			downloadButton.setVisible(false);
-			note.setVisible(false);
+			noteLayout.setVisible(false);
 			viewer.setVisible(true);
 			openInModalPopup(true);
 		} else {
 			viewer.setSource(null);
 			viewer.setVisible(false);
-			note.setVisible(true);
+			noteLayout.setVisible(true);
 			if (downloader == null) {
 				downloader = new FileDownloader(resource);
 				downloader.setErrorHandler(new ErrorHandler() {
@@ -147,7 +149,7 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		downloadButton.setEnabled(true);
 		viewer.setSource(null);
 		viewer.setVisible(false);
-		note.setVisible(true);
+		noteLayout.setVisible(true);
 		if (downloader == null) {
 			downloader = new FileDownloader(resource);
 			downloader.setErrorHandler(new ErrorHandler() {
