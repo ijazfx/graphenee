@@ -67,8 +67,7 @@ public class CopyLabel extends CustomField<String> {
 		copyText.setDescription("copy to clipboard");
 		copyText.addClickListener(event -> {
 			String value = textLabel.getValue();
-			//			String statement = String.format("setClipboardText('%s')", value);
-			String statement = String.format("copyToClipboard('%s')", value);
+			String statement = String.format("setClipboardText('%s')", value);
 			com.vaadin.ui.JavaScript current = com.vaadin.ui.JavaScript.getCurrent();
 			current.execute(statement);
 			copyText.setStyleName(GrapheneeTheme.STYLE_ELEVATED);
