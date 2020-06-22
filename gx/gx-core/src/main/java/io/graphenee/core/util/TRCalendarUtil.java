@@ -114,26 +114,26 @@ public class TRCalendarUtil {
 
 		if (between >= 60l) {
 			between = ChronoUnit.MINUTES.between(localDateTime, currentLocalDateTime);
-			value = between + " minutes ago";
+			value = between == 1 ? between + " minute" : between + " minutes";
 			if (between >= 60l) {
 				between = ChronoUnit.HOURS.between(localDateTime, currentLocalDateTime);
-				value = between + " hours ago";
+				value = between == 1 ? between + " hour" : between + " hours";
 
 				if (between >= 24l) {
 					between = ChronoUnit.DAYS.between(localDateTime, currentLocalDateTime);
-					value = between + " days ago";
+					value = between == 1 ? between + " day" : between + " days";
 
 					if (between >= 7l) {
 						between = ChronoUnit.WEEKS.between(localDateTime, currentLocalDateTime);
-						value = between + " weeks ago";
+						value = between == 1 ? between + " week" : between + " weeks";
 
 						if (between >= 4l) {
 							between = ChronoUnit.MONTHS.between(localDateTime, currentLocalDateTime);
-							value = between + " months ago";
+							value = between == 1 ? between + " month" : between + " months";
 
 							if (between >= 12l) {
 								between = ChronoUnit.YEARS.between(localDateTime, currentLocalDateTime);
-								value = between + " years ago";
+								value = between == 1 ? between + " year" : between + " years";
 
 							}
 						}
@@ -142,8 +142,10 @@ public class TRCalendarUtil {
 			}
 
 		} else {
-			value = between + " seconds ago";
+			value = between == 1 ? between + " second" : between + " seconds";
 		}
+
+		value += " ago";
 
 		return value;
 	}
@@ -500,30 +502,30 @@ public class TRCalendarUtil {
 
 		long between = ChronoUnit.SECONDS.between(currentDateTime, endDateTime);
 		if (between > 0 && between < 60) {
-			value = "After " + between + " Seconds.";
+			value = between == 1 ? between + " second" : between + " seconds";
 		}
 		if (between >= 60l) {
 			between = ChronoUnit.MINUTES.between(currentDateTime, endDateTime);
-			value = "After " + between + " Minutes.";
+			value = between == 1 ? between + " minute" : between + " minutes";
 			if (between >= 60l) {
 				between = ChronoUnit.HOURS.between(currentDateTime, endDateTime);
-				value = "After " + between + " Hours.";
+				value = between == 1 ? between + " hour" : between + " hours";
 
 				if (between >= 24l) {
 					between = ChronoUnit.DAYS.between(currentDateTime, endDateTime);
-					value = "After " + between + " Days.";
+					value = between == 1 ? between + " day" : between + " days";
 
 					if (between >= 7l) {
 						between = ChronoUnit.WEEKS.between(currentDateTime, endDateTime);
-						value = "After " + between + " Week.";
+						value = between == 1 ? between + " week" : between + " weeks";
 
 						if (between >= 4l) {
 							between = ChronoUnit.MONTHS.between(currentDateTime, endDateTime);
-							value = "After " + between + " Months.";
+							value = between == 1 ? between + " month" : between + " months";
 
 							if (between >= 12l) {
 								between = ChronoUnit.YEARS.between(currentDateTime, endDateTime);
-								value = "After " + between + " Years.";
+								value = between == 1 ? between + " year" : between + " years";
 							}
 						}
 					}
@@ -531,6 +533,7 @@ public class TRCalendarUtil {
 			}
 
 		}
+
 		return value;
 	}
 
