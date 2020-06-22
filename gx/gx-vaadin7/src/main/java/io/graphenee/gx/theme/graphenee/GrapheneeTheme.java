@@ -51,6 +51,7 @@ public class GrapheneeTheme extends BaseTheme {
 	public static final Resource CRYING = iconResource("crying.png");
 	public static final Resource UNDO = iconResource("undo.png");
 	public static final Resource SEND = iconResource("send.png");
+	public static final Resource COPY = iconResource("clipboard.png");
 
 	public static Resource fileExtensionIconResource(String extension) {
 		return iconResource(extension + ".png");
