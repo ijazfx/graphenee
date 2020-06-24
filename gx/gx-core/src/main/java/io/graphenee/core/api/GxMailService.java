@@ -15,11 +15,20 @@
  *******************************************************************************/
 package io.graphenee.core.api;
 
+import java.util.List;
+
+import javax.mail.MessagingException;
+
+import io.graphenee.core.model.bean.GxMailAttachmentBean;
+
+
 public interface GxMailService {
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) throws  Exception;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList) throws Exception;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail) throws Exception;
+
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, List<GxMailAttachmentBean> attachmentBeans) throws  Exception;
 }
