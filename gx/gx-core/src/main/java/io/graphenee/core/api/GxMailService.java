@@ -30,5 +30,6 @@ public interface GxMailService {
 
 	void sendEmail(String subject, String content, String senderEmail, String recipientEmail) throws Exception;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, List<GxMailAttachmentBean> attachmentBeans) throws  Exception;
+	void sendEmailWithAttachment(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList,
+			List<GxMailAttachmentBean> attachmentBeans) throws Exception;
 }
