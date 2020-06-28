@@ -1,5 +1,7 @@
 package io.graphenee.core.model;
 
+import java.util.Date;
+
 public interface GxNotificationEvent {
 
 	boolean test(GxAuthenticatedUser user);
@@ -7,5 +9,7 @@ public interface GxNotificationEvent {
 	String getTitle();
 
 	String getDescription();
+
+	Date notificationDate();
 
 }

@@ -30,13 +30,24 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setSubject(subject);
 		message.setText(content);
-		message.setTo(recipientEmail);
+		if (recipientEmail != null)
+			message.setTo(recipientEmail);
 		message.setFrom(senderEmail);
 		message.setSentDate(new Date());
-		if (!StringUtils.isEmpty(bccEmailList))
-			message.setBcc(bccEmailList);
-		if (!StringUtils.isEmpty(ccEmailList))
-			message.setCc(ccEmailList);
+		if (!StringUtils.isEmpty(ccEmailList)) {
+			if (ccEmailList.contains(";")) {
+				String[] emails = ccEmailList.split(";");
+				message.setCc(emails);
+			} else
+				message.setCc(ccEmailList);
+		}
+		if (!StringUtils.isEmpty(bccEmailList)) {
+			if (bccEmailList.contains(";")) {
+				String[] emails = bccEmailList.split(";");
+				message.setBcc(emails);
+			} else
+				message.setBcc(bccEmailList);
+		}
 		getJavaMailSender().send(message);
 	}
 

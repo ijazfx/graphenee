@@ -24,6 +24,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Image;
 
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.i18n.api.LocalizerService;
@@ -38,7 +39,7 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	public abstract String applicationTitle();
 
-	private BaseProfileForm profileForm = null;
+	private BaseProfileForm<GxAuthenticatedUser> profileForm = null;
 
 	public EventBus eventBus() {
 		if (eventBus == null) {
@@ -83,9 +84,10 @@ public abstract class AbstractDashboardSetup implements Serializable {
 		return new DashboardMenu(this).build();
 	}
 
+	@SuppressWarnings("rawtypes")
 	public BaseProfileForm profileComponent() {
 		if (profileForm == null) {
-			profileForm = new BaseProfileForm();
+			profileForm = new BaseProfileForm<>();
 			profileForm.setSavedHandler(event -> {
 
 			});

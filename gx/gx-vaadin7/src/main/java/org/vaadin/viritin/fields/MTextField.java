@@ -58,6 +58,7 @@ public class MTextField extends TextField implements EagerValidateable {
 	private void configureMaddonStuff() {
 		setNullRepresentation("");
 		setTextChangeEventMode(TextChangeEventMode.LAZY);
+		// setTextChangeTimeout(1200);
 		autocomplete = AutoComplete.off;
 		autocorrect = AutoCorrect.off;
 		autocapitalize = AutoCapitalize.off;
@@ -368,9 +369,9 @@ public class MTextField extends TextField implements EagerValidateable {
 				throw new Validator.EmptyValueException(errorMessage);
 			}
 			validate(getLastKnownTextContent());
-			if (!wasvalid) {
-				markAsDirty();
-			}
+			//			if (!wasvalid) {
+			//				markAsDirty();
+			//			}
 			// Also eagerly pass content to backing bean to make top level
 			// validation eager, but do not listen the value back in value change
 			// event
@@ -383,7 +384,7 @@ public class MTextField extends TextField implements EagerValidateable {
 		} catch (Validator.InvalidValueException e) {
 			eagerValidationError = e;
 			eagerValidationStatus = false;
-			markAsDirty();
+			//			markAsDirty();
 		}
 	}
 
