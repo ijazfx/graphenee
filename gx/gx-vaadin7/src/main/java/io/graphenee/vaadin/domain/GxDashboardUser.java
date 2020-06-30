@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.UI;
 
 import io.graphenee.core.enums.GenderEnum;
@@ -135,8 +136,9 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 				notificationCount.incrementAndGet();
 				ui.access(() -> {
 					GxNotification notification = GxNotification.tray(event.getTitle(), event.getDescription());
-					notification.setDelayMsec(10000);
+					notification.setDelayMsec(3000);
 					notification.setIcon(FontAwesome.BELL);
+					notification.setPosition(Position.TOP_RIGHT);
 					notification.show(ui.getPage());
 					ui.push();
 					DashboardEventBus.sessionInstance(ui.getSession())

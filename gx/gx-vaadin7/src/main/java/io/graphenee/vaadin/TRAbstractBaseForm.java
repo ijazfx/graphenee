@@ -66,6 +66,8 @@ import io.graphenee.vaadin.util.VaadinUtils;
  */
 public abstract class TRAbstractBaseForm<T> extends CustomComponent implements FieldGroupListener<T> {
 
+	private static final long serialVersionUID = 1L;
+
 	private boolean binding = false;
 
 	private String modalWindowTitle = "Edit entry";

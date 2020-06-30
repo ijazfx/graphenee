@@ -33,12 +33,13 @@ import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
+	private static final long serialVersionUID = 1L;
+
 	private Image entityImage;
 	private Component detailsForm;
 	private MButton dismissButton;
 
 	protected boolean isBuilt;
-	private Component cachedComponent;
 	private boolean footerVisibility = true;
 	private HorizontalLayout footer;
 

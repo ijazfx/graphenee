@@ -10,7 +10,7 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.component.FileChooser;
 
 @SuppressWarnings("serial")
-public class BaseProfileForm extends TRAbstractForm<GxAuthenticatedUser> {
+public class BaseProfileForm<T extends GxAuthenticatedUser> extends TRAbstractForm<T> {
 
 	MTextField firstName;
 

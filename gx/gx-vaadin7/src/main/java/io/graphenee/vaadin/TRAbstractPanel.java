@@ -92,7 +92,7 @@ public abstract class TRAbstractPanel extends MPanel {
 	private Component buildFooter() {
 		MHorizontalLayout layout = new MHorizontalLayout().withFullWidth().withMargin(false).withSpacing(true);
 		layout.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
-		layout.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+		layout.setDefaultComponentAlignment(footerAlignment());
 		addButtonsToFooter(layout);
 		for (int i = 0; i < layout.getComponentCount(); i++) {
 			layout.setComponentAlignment(layout.getComponent(i), footerAlignment());
