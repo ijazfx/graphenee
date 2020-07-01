@@ -105,7 +105,7 @@ public class Fault<KEY, T> {
 					lastHashcode = value.hashCode();
 				}
 			} catch (Exception ex) {
-				L.warn(ex.getMessage());
+				L.warn(ex.getMessage(), ex);
 				value = null;
 			}
 		}

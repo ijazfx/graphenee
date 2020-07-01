@@ -52,32 +52,25 @@ public class TRFileContentUtil {
 		if (ext.matches("(pdf)")) {
 			return "application/" + ext;
 		}
-		if (ext.matches("(txt)")) {
-			return "text/plain";
-		}
 		if (ext.matches("(js)")) {
 			return "text/javascript";
 		}
-		if (ext.matches("(css)")) {
-			return "text/css";
-		}
-		if (ext.matches("(csv)")) {
-			return "text/csv";
+		if (ext.matches("(css|csv)")) {
+			return "text/" + ext;
 		}
 		if (ext.matches("(avi)")) {
-			return "video/avi";
+			return "video/x-msvideo";
 		}
-		if (ext.matches("(m1v|m2v|mp2|mp3|mp4|mpa|mpe|mpeg|mpg)")) {
-			return "video/mpeg";
+		if (ext.matches("(mpeg|webm)")) {
+			return "video/" + ext;
 		}
-		if (ext.matches("(m1v|m2v|mp2|mp3|mp4|mpa|mpe|mpeg|mpg)")) {
+		if (ext.matches("acc|opus|wav|m4a|mp1|mp2|mp3|mp4"))
+			return "audio/" + ext;
+		if (ext.matches("(mpeg|mpg)")) {
 			return "video/mpeg";
 		}
 		if (ext.matches("(mov)")) {
 			return "video/quicktime";
-		}
-		if (ext.matches("(wav)")) {
-			return "audio/wav";
 		}
 		if (ext.matches("(doc|docx)")) {
 			return "application/msword";

@@ -58,7 +58,7 @@ public abstract class AbstractDashboardUI extends UI {
 				Page.getCurrent().setLocation("/login");
 				return;
 			}
-			DashboardUtils.setCurrentUI(user, AbstractDashboardUI.this);
+			DashboardUtils.setCurrentUI(user, getUI());
 		}
 
 		if (dashboardSetup().shouldLocalize()) {
