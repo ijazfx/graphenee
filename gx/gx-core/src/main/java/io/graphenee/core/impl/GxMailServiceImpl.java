@@ -15,10 +15,14 @@
  *******************************************************************************/
 package io.graphenee.core.impl;
 
+import java.util.Collection;
 import java.util.Date;
 
-import org.springframework.mail.SimpleMailMessage;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.util.StringUtils;
 
 public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
@@ -26,39 +30,59 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 	private JavaMailSender javaMailSender;
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) {
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setSubject(subject);
-		message.setText(content);
-		if (recipientEmail != null)
-			message.setTo(recipientEmail);
-		message.setFrom(senderEmail);
-		message.setSentDate(new Date());
-		if (!StringUtils.isEmpty(ccEmailList)) {
-			if (ccEmailList.contains(";")) {
-				String[] emails = ccEmailList.split(";");
-				message.setCc(emails);
-			} else
-				message.setCc(ccEmailList);
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList,
+			Collection<GxMailAttachment> attachments) {
+		MimeMessage message = javaMailSender.createMimeMessage();
+		MimeMessageHelper mimeMessage;
+		try {
+			mimeMessage = new MimeMessageHelper(message, true);
+			mimeMessage.setSubject(subject);
+			mimeMessage.setText(content);
+			if (toEmailList != null)
+				mimeMessage.setTo(toEmailList);
+			mimeMessage.setFrom(senderEmail);
+			mimeMessage.setSentDate(new Date());
+			if (!StringUtils.isEmpty(ccEmailList)) {
+				if (ccEmailList.contains(";")) {
+					String[] emails = ccEmailList.split(";");
+					mimeMessage.setCc(emails);
+				} else
+					mimeMessage.setCc(ccEmailList);
+			}
+			if (!StringUtils.isEmpty(bccEmailList)) {
+				if (bccEmailList.contains(";")) {
+					String[] emails = bccEmailList.split(";");
+					mimeMessage.setBcc(emails);
+				} else
+					mimeMessage.setBcc(bccEmailList);
+			}
+			// process attachments
+			if (attachments != null) {
+				for (GxMailAttachment attachment : attachments) {
+					mimeMessage.addAttachment(attachment.fileName(), attachment.streamSource(), attachment.contentType());
+				}
+			}
+			getJavaMailSender().send(message);
+		} catch (MessagingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		if (!StringUtils.isEmpty(bccEmailList)) {
-			if (bccEmailList.contains(";")) {
-				String[] emails = bccEmailList.split(";");
-				message.setBcc(emails);
-			} else
-				message.setBcc(bccEmailList);
-		}
-		getJavaMailSender().send(message);
+
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList) {
-		sendEmail(subject, content, senderEmail, recipientEmail, ccEmailList, null);
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList) {
+		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, null, null);
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String recipientEmail) {
-		sendEmail(subject, content, senderEmail, recipientEmail, null, null);
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList) {
+		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, null);
+	}
+
+	@Override
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList) {
+		sendEmail(subject, content, senderEmail, toEmailList, null);
 	}
 
 	public JavaMailSender getJavaMailSender() {
