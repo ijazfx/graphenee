@@ -412,7 +412,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxTermBean> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale) {
-		PageRequest pageRequest = new PageRequest(page, size);
+		PageRequest pageRequest = PageRequest.of(page, size);
 		Page<GxTerm> result = null;
 		if (namespace != null && supportedLocale != null) {
 			result = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(pageRequest, namespace.getOid(), supportedLocale.getOid());
@@ -526,7 +526,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public void delete(GxNamespaceBean bean) {
 		if (bean.getOid() != null && !bean.getIsProtected()) {
-			securityGroupRepo.deleteById(bean.getOid());
+			namespaceRepo.deleteById(bean.getOid());
 		}
 	}
 
@@ -664,7 +664,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxUserAccountBean> findUserAccount() {
-		return userAccountRepo.findAll(new Sort("username")).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
+		return userAccountRepo.findAll(Sort.by("username")).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	@Override
@@ -1430,7 +1430,7 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxEmailTemplateBean> findEmailTemplate() {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
-		beans.addAll(emailTemplateRepository.findAll(new Sort("templateName")).stream().map(template -> {
+		beans.addAll(emailTemplateRepository.findAll(Sort.by("templateName")).stream().map(template -> {
 			return makeEmailTemplateBean(template, null);
 		}).collect(Collectors.toList()));
 		return beans;
@@ -1767,7 +1767,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxAccessKeyBean> findAccessKey() {
-		return accessKeyRepo.findAll(new Sort("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		return accessKeyRepo.findAll(Sort.by("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 	}
 
 	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {
@@ -2002,7 +2002,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxSmsProviderBean> findSmsProvider() {
-		return makeSmsProviderBean(smsProviderRepo.findAll(new Sort("providerName")));
+		return makeSmsProviderBean(smsProviderRepo.findAll(Sort.by("providerName")));
 	}
 
 	@Override
@@ -2084,9 +2084,9 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespaceBean namespaceBean = findNamespace(namespace);
 		if (namespaceBean == null)
 			throw new RegisterDeviceFailedException("Namespace " + namespace + " does not exist.");
-		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(namespace, deviceToken, ownerId);
 		if (device != null)
-			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " already registered");
+			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + "and ownerId " + ownerId + " for namespace " + namespace + " already registered");
 		GxRegisteredDevice entity = new GxRegisteredDevice();
 		entity.setBrand(brand);
 		entity.setIsActive(true);
@@ -2109,6 +2109,13 @@ public class GxDataServiceImpl implements GxDataService {
 
 	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceToken(String namespace, String deviceToken) {
 		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceToken(namespace, deviceToken);
+		if (device == null)
+			return null;
+		return makeGxRegisteredDeviceBean(device);
+	}
+	
+	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace, String deviceToken, String ownerId) {
+		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(namespace, deviceToken, ownerId);
 		if (device == null)
 			return null;
 		return makeGxRegisteredDeviceBean(device);

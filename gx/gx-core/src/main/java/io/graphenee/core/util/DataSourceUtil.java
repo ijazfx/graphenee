@@ -23,6 +23,9 @@ import javax.sql.DataSource;
 
 import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.H2Dialect;
+import org.hibernate.dialect.PostgreSQL95Dialect;
+import org.hibernate.dialect.SQLServer2012Dialect;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 
 public class DataSourceUtil {
@@ -53,18 +56,17 @@ public class DataSourceUtil {
 		String vendor = null;
 		try (Connection c = dataSource.getConnection()) {
 			vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
-			String hibernateDialect = null;
-			if (vendor.contains("postgresql"))
-				hibernateDialect = "org.hibernate.dialect.PostgreSQL82Dialect";
-			else if (vendor.contains("sqlserver"))
-				hibernateDialect = "org.hibernate.dialect.SQLServer2012Dialect";
-			else if (vendor.contains("h2"))
-				hibernateDialect = "org.hibernate.dialect.H2Dialect";
+			if (vendor.contains("postgresql")) {
+				return new PostgreSQL95Dialect();
+			}
+			else if (vendor.contains("sqlserver")) {
+				return new SQLServer2012Dialect();
+			}
+			else if (vendor.contains("h2")) {
+				return new H2Dialect();
+			}
 			else
 				throw new Error("Unable to determine dialect from datasource.");
-			Properties props = new Properties();
-			props.put(Environment.DIALECT, hibernateDialect);
-			return Dialect.getDialect(props);
 		} catch (SQLException e) {
 			throw new Error("Unable to determine hibernate dialect for " + vendor);
 		}

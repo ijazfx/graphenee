@@ -21,7 +21,7 @@ public class TRFileContentUtil {
 
 	public static String getExtensionFromFilename(String filename) {
 		if (filename != null) {
-			String[] parts = filename.trim().split("\\.");
+			String[] parts = filename.trim().toLowerCase().split("\\.");
 			if (parts.length > 1) {
 				return parts[parts.length - 1];
 			}
@@ -41,6 +41,50 @@ public class TRFileContentUtil {
 			}
 		}
 		return null;
+	}
+
+	public static String getMimeType(String filename) {
+		String[] parts = filename.toLowerCase().split("[.]");
+		String ext = parts[parts.length - 1];
+		if (ext.matches("(jpg|jpeg|gif|png|bmp|tiff)")) {
+			return "image/" + ext;
+		}
+		if (ext.matches("(pdf)")) {
+			return "application/" + ext;
+		}
+		if (ext.matches("(js)")) {
+			return "text/javascript";
+		}
+		if (ext.matches("(css|csv)")) {
+			return "text/" + ext;
+		}
+		if (ext.matches("(avi)")) {
+			return "video/x-msvideo";
+		}
+		if (ext.matches("(mpeg|webm)")) {
+			return "video/" + ext;
+		}
+		if (ext.matches("acc|opus|wav|m4a|mp1|mp2|mp3|mp4"))
+			return "audio/" + ext;
+		if (ext.matches("(mpeg|mpg)")) {
+			return "video/mpeg";
+		}
+		if (ext.matches("(mov)")) {
+			return "video/quicktime";
+		}
+		if (ext.matches("(doc|docx)")) {
+			return "application/msword";
+		}
+		if (ext.matches("(xls|xlsx)")) {
+			return "application/vnd.ms-excel";
+		}
+		if (ext.matches("(ppt|pptx)")) {
+			return "application/vnd.ms-powerpoint";
+		}
+		if (ext.matches("(epub)")) {
+			return "application/epub+zip";
+		}
+		return "application/" + ext;
 	}
 
 }

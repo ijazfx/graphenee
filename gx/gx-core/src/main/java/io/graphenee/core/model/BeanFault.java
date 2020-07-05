@@ -100,7 +100,7 @@ public class BeanFault<ID, T> {
 					lastHashcode = bean.hashCode();
 				}
 			} catch (Exception ex) {
-				L.warn(ex.getMessage());
+				L.warn(ex.getMessage(), ex);
 				bean = null;
 			}
 		}
