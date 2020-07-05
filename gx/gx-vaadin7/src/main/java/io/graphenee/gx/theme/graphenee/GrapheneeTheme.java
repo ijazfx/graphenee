@@ -86,5 +86,6 @@ public class GrapheneeTheme extends BaseTheme {
 	public static String STYLE_MARGIN_BOTTOM = "gx-margin-bottom";
 	public static String STYLE_MARGIN_RIGHT = "gx-margin-right";
 	public static String STYLE_SMALL_ICON = "gx-small-icon";
+	public static String STYLE_SMALL_BUTTON = "gx-small-button";
 
 }
