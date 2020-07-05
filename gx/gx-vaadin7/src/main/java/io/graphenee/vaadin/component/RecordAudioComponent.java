@@ -4,15 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Base64;
-import java.util.UUID;
 
 import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.MLabel;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CssLayout;
@@ -26,6 +23,8 @@ import elemental.json.JsonArray;
 @JavaScript({ "record-audio.js" })
 public class RecordAudioComponent extends HorizontalLayout {
 
+	private RecordAudioDelegate delegate;
+
 	private int status = 0;
 
 	public RecordAudioComponent() {
@@ -35,19 +34,20 @@ public class RecordAudioComponent extends HorizontalLayout {
 	public RecordAudioComponent(Resource recordIcon, Resource stopIcon, Resource playIcon, Resource deleteIcon) {
 		MButton recordButton = new MButton().withIcon(recordIcon).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
 		MButton deleteButton = new MButton().withIcon(deleteIcon).withStyleName(ValoTheme.BUTTON_ICON_ONLY).withVisible(false);
-		String audioId = "audio" + UUID.randomUUID().toString().replace("-", "");
-		MLabel audioHtml = new MLabel().withContentMode(ContentMode.HTML).withValue("<audio id=\"" + audioId + "\" />");
 
 		final FileOutputStream[] tempFos = new FileOutputStream[1];
 
 		recordButton.addClickListener(new ClickListener() {
+
+			private File audioFile;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
 				switch (status) {
 				case 0:
 					try {
-						tempFos[0] = new FileOutputStream(File.createTempFile("recording", "webm"));
+						audioFile = File.createTempFile("recording", "webm");
+						tempFos[0] = new FileOutputStream(audioFile);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -61,13 +61,8 @@ public class RecordAudioComponent extends HorizontalLayout {
 					com.vaadin.ui.JavaScript.eval("gxStopRecording()");
 					status = 2;
 					recordButton.setIcon(playIcon);
-					try {
-						Thread.sleep(3000);
-						if (tempFos[0] != null)
-							tempFos[0].close();
-					} catch (InterruptedException | IOException e) {
-						e.printStackTrace();
-					}
+					if (delegate != null)
+						delegate.onAudioAvailable(audioFile);
 				break;
 				case 2:
 					// play audio
@@ -95,20 +90,13 @@ public class RecordAudioComponent extends HorizontalLayout {
 				status = 0;
 				recordButton.setIcon(recordIcon);
 				deleteButton.setVisible(false);
-				if (tempFos[0] != null) {
-					try {
-						tempFos[0].close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
 			}
 		});
 
 		CssLayout buttonLayout = new CssLayout();
 		buttonLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
-		buttonLayout.addComponents(recordButton, deleteButton, audioHtml);
+		buttonLayout.addComponents(recordButton, deleteButton);
 
 		addComponents(buttonLayout);
 
@@ -145,6 +133,18 @@ public class RecordAudioComponent extends HorizontalLayout {
 				}
 			}
 		});
+	}
+
+	public RecordAudioDelegate getDelegate() {
+		return delegate;
+	}
+
+	public void setDelegate(RecordAudioDelegate delegate) {
+		this.delegate = delegate;
+	}
+
+	public static interface RecordAudioDelegate {
+		void onAudioAvailable(File audioFile);
 	}
 
 }
