@@ -319,6 +319,10 @@ public class FileChooser extends CustomField<String> {
 				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
 				if (!mimeType.startsWith("image/")) {
 					resource = GrapheneeTheme.fileExtensionIconResource(extension);
+					if (mimeType.startsWith("audio"))
+						resource = GrapheneeTheme.fileExtensionIconResource("audio");
+					if (mimeType.startsWith("video"))
+						resource = GrapheneeTheme.fileExtensionIconResource("video");
 					if (resource == null)
 						resource = GrapheneeTheme.fileExtensionIconResource("bin");
 					previewImage.setHeight("32px");

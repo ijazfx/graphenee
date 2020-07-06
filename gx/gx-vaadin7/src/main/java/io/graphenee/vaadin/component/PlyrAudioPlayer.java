@@ -13,10 +13,10 @@ import com.vaadin.ui.HorizontalLayout;
 public class PlyrAudioPlayer extends HorizontalLayout {
 
 	public PlyrAudioPlayer() {
-		MLabel html = new MLabel().withContentMode(ContentMode.HTML);
+		MLabel html = new MLabel().withContentMode(ContentMode.HTML).withFullWidth();
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("<audio id=\"player\" controls>");
+		sb.append("<audio width=\"100%\" id=\"player\" controls>");
 		sb.append("</audio>");
 
 		html.setValue(sb.toString());
@@ -26,7 +26,6 @@ public class PlyrAudioPlayer extends HorizontalLayout {
 
 			@Override
 			public void attach(AttachEvent event) {
-				System.err.println(event.getConnector());
 				com.vaadin.ui.JavaScript.eval("gxPlyrInit('player');");
 			}
 		});
@@ -34,7 +33,6 @@ public class PlyrAudioPlayer extends HorizontalLayout {
 	}
 
 	public void setAudioUrl(String streamUrl) {
-		System.err.println(streamUrl);
 		com.vaadin.ui.JavaScript.eval("gxPlyrSetAudioUrl('player', '" + streamUrl + "')");
 	}
 
