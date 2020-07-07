@@ -29,7 +29,6 @@ import io.graphenee.core.model.GxAbstractCredentials;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.GxUsernamePasswordCredentials;
 import io.graphenee.vaadin.ui.GxNotification;
-import io.graphenee.vaadin.util.DashboardUtils;
 import io.graphenee.vaadin.view.LoginComponent;
 
 @SuppressWarnings("serial")
@@ -43,6 +42,8 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 		LoginComponent loginComponent = new LoginComponent(dashboardSetup());
 		loginComponent.addLoginListener(event -> {
 			String username = event.getLoginParameter(LoginComponent.USERNAME);
+			if (username != null)
+				username = username.trim();
 			String password = event.getLoginParameter(LoginComponent.PASSWORD);
 			GxUsernamePasswordCredentials credentials = new GxUsernamePasswordCredentials(username, password);
 			try {
@@ -56,7 +57,6 @@ public abstract class AbstractLoginUI<C extends GxAbstractCredentials, R extends
 					L.warn(log);
 					try {
 						dashboardSetup().eventBus().unregister(user);
-						DashboardUtils.setCurrentUI(user, null);
 					} catch (Exception ex) {
 						// will come here if user is not already registered.
 					}

@@ -73,6 +73,13 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}	
   }
 
+  .gx-small-button {
+    * img {
+		width: 24px;
+		height: 24px;
+	}	
+  }
+
   .v-Notification .v-icon {
   	width: 24px !important;
   }

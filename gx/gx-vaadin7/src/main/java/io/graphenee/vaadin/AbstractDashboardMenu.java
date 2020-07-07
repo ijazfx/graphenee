@@ -420,16 +420,18 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 				}
 			}
 		}
-		if (focusedMenuItem.getParent() == null) {
-			backButton.setVisible(false);
-			buttonsMap.keySet().forEach(mi -> {
-				buttonsMap.get(mi).setVisible(mi.getParent() == null);
-			});
-		} else {
-			backButton.setVisible(true);
-			buttonsMap.keySet().forEach(mi -> {
-				buttonsMap.get(mi).setVisible(mi.getParent() != null && mi.getParent().equals(focusedMenuItem.getParent()));
-			});
+		if (focusedMenuItem != null) {
+			if (focusedMenuItem.getParent() == null) {
+				backButton.setVisible(false);
+				buttonsMap.keySet().forEach(mi -> {
+					buttonsMap.get(mi).setVisible(mi.getParent() == null);
+				});
+			} else {
+				backButton.setVisible(true);
+				buttonsMap.keySet().forEach(mi -> {
+					buttonsMap.get(mi).setVisible(mi.getParent() != null && mi.getParent().equals(focusedMenuItem.getParent()));
+				});
+			}
 		}
 	}
 

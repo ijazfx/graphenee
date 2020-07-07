@@ -15,10 +15,12 @@
  *******************************************************************************/
 package io.graphenee.vaadin.util;
 
+import java.net.URI;
 import java.util.Locale;
 
 import com.google.common.base.Strings;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
@@ -36,6 +38,19 @@ import com.vaadin.ui.UI;
 import io.graphenee.i18n.api.LocalizerService;
 
 public class VaadinUtils {
+
+	public static String getHostUrl() {
+		URI pageUri = Page.getCurrent().getLocation();
+		StringBuilder sb = new StringBuilder();
+		if (pageUri.getScheme().startsWith("https"))
+			sb.append("https://").append(pageUri.getHost());
+		else
+			sb.append("http://").append(pageUri.getHost());
+		if (pageUri.getPort() != -1 && pageUri.getPort() != 443) {
+			sb.append(":").append(pageUri.getPort());
+		}
+		return sb.toString();
+	}
 
 	public static String getUriWithContextPath(String uri) {
 		String contextPath = VaadinServletService.getCurrentServletRequest().getServletContext().getContextPath();

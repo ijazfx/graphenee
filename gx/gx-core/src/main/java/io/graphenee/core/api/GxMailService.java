@@ -15,18 +15,26 @@
  *******************************************************************************/
 package io.graphenee.core.api;
 
-import java.util.List;
+import java.util.Collection;
 
-import io.graphenee.core.model.bean.GxMailAttachmentBean;
+import org.springframework.core.io.InputStreamSource;
 
 public interface GxMailService {
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) throws Exception;
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, Collection<GxMailAttachment> attachments);
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList) throws Exception;
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList);
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail) throws Exception;
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList);
 
-	void sendEmailWithAttachment(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList,
-			List<GxMailAttachmentBean> attachmentBeans) throws Exception;
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail);
+
+	public static interface GxMailAttachment {
+
+		String fileName();
+
+		InputStreamSource streamSource();
+
+		String contentType();
+	}
 }

@@ -15,9 +15,6 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
@@ -52,22 +49,6 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 	@Override
 	protected void addButtonsToFooter(MHorizontalLayout layout) {
 		downloadButton = new MButton("Download").withStyleName(ValoTheme.BUTTON_PRIMARY).withVisible(true);
-		downloadButton.addClickListener(event -> {
-			downloadButton.setEnabled(false);
-			TimerTask task = new TimerTask() {
-
-				@Override
-				public void run() {
-					UI.getCurrent().access(() -> {
-						closePopup();
-						UI.getCurrent().push();
-					});
-				}
-			};
-
-			Timer t = new Timer();
-			t.schedule(task, 3000);
-		});
 		layout.addComponentAsFirst(downloadButton);
 		layout.setExpandRatio(downloadButton, 1);
 		layout.setWidth("100%");
@@ -129,6 +110,7 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 
 					@Override
 					public void error(com.vaadin.server.ErrorEvent event) {
+						event.getThrowable().printStackTrace();
 						UI.getCurrent().access(() -> {
 							GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
 									.show(Page.getCurrent());
@@ -157,10 +139,12 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 				@Override
 				public void error(com.vaadin.server.ErrorEvent event) {
 					UI.getCurrent().access(() -> {
+						event.getThrowable().printStackTrace();
 						GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
 								.show(Page.getCurrent());
 						UI.getCurrent().push();
 					});
+					// Let's figure out how to fix this issue.
 				}
 			});
 			downloader.extend(downloadButton);
