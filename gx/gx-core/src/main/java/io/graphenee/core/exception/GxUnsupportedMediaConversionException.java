@@ -13,20 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.core.api;
+package io.graphenee.core.exception;
 
-import java.util.List;
+@SuppressWarnings("serial")
+public class GxUnsupportedMediaConversionException extends Exception {
 
-import io.graphenee.core.model.bean.GxMailAttachmentBean;
+	public GxUnsupportedMediaConversionException() {
+		super();
+	}
 
-public interface GxMailService {
+	public GxUnsupportedMediaConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) throws Exception;
+	public GxUnsupportedMediaConversionException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList) throws Exception;
+	public GxUnsupportedMediaConversionException(String message) {
+		super(message);
+	}
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail) throws Exception;
+	public GxUnsupportedMediaConversionException(Throwable cause) {
+		super(cause);
+	}
 
-	void sendEmailWithAttachment(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList,
-			List<GxMailAttachmentBean> attachmentBeans) throws Exception;
 }

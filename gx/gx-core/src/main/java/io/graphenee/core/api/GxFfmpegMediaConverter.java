@@ -15,18 +15,16 @@
  *******************************************************************************/
 package io.graphenee.core.api;
 
-import java.util.List;
+import io.graphenee.core.enums.GxAudioType;
+import io.graphenee.core.enums.GxImageType;
+import io.graphenee.core.enums.GxVideoType;
 
-import io.graphenee.core.model.bean.GxMailAttachmentBean;
+public interface GxFfmpegMediaConverter {
 
-public interface GxMailService {
+	void convertAudioMedia(String filepath, GxAudioType sourceType, GxAudioType destinationType) throws Exception;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) throws Exception;
+	void convertVideoMedia(String filepath, GxVideoType sourceType, GxVideoType destinationType) throws Exception;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList) throws Exception;
+	void convertImageMedia(String filepath, GxImageType sourceType, GxImageType destinationType) throws Exception;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail) throws Exception;
-
-	void sendEmailWithAttachment(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList,
-			List<GxMailAttachmentBean> attachmentBeans) throws Exception;
 }
