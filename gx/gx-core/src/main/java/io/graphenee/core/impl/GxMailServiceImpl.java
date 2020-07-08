@@ -70,7 +70,7 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 
 	@Override
 	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList) {
-		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, null, null);
+		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, bccEmailList, null);
 	}
 
 	@Override
