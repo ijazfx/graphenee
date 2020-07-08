@@ -37,5 +37,4 @@ public interface GxMailService {
 
 		String contentType();
 	}
-
 }
