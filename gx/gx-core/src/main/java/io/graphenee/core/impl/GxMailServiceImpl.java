@@ -56,7 +56,6 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 				} else
 					mimeMessage.setBcc(bccEmailList);
 			}
-			// process attachments
 			if (attachments != null) {
 				for (GxMailAttachment attachment : attachments) {
 					mimeMessage.addAttachment(attachment.fileName(), attachment.streamSource(), attachment.contentType());
@@ -64,7 +63,6 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 			}
 			getJavaMailSender().send(message);
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
