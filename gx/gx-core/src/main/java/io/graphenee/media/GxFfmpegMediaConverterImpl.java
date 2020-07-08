@@ -38,34 +38,36 @@ public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 	public void convertAudioMedia(String sourceFilepath, String destinationFilepath, GxAudioType sourceType, GxAudioType destinationType) throws Exception {
 		String[] sourceExtension = sourceFilepath.split("\\.");
 		String[] destinationExtension = destinationFilepath.split("\\.");
-		if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
-			if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
+		if (sourceType.equals(destinationType)) {
+			if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
+				if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
 
-				String cmd = "ffmpeg -y -i " + sourceFilepath + " -vn " + destinationFilepath;
-				String[] command = new String[] { "bash", "-l", "-c", cmd };
-				File file = new File(sourceFilepath);
-				if (file.exists() && file.isFile()) {
-					try {
+					String cmd = "ffmpeg -y -i " + sourceFilepath + " -vn " + destinationFilepath;
+					String[] command = new String[] { "bash", "-l", "-c", cmd };
+					File file = new File(sourceFilepath);
+					if (file.exists() && file.isFile()) {
+						try {
 
-						Process process = Runtime.getRuntime().exec(command, null, null);
-						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-						String line;
-						while ((line = reader.readLine()) != null) {
-							System.out.println(line);
+							Process process = Runtime.getRuntime().exec(command, null, null);
+							BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+							String line;
+							while ((line = reader.readLine()) != null) {
+								System.out.println(line);
+							}
+							reader.close();
+							process.destroy();
+
+						} catch (Exception e) {
+							throw new GxUnsupportedMediaConversionException(e);
 						}
-						reader.close();
-						process.destroy();
-
-					} catch (Exception e) {
-						throw new GxUnsupportedMediaConversionException(e);
-					}
+					} else
+						throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
 				} else
-					throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
+					throw new GxUnsupportedMediaConversionException("Destination extension do not match file extension");
 			} else
-				throw new GxUnsupportedMediaConversionException("Destination extension do not match file extension");
-
+				throw new GxUnsupportedMediaConversionException("Source extension do not match file extension");
 		} else
-			throw new GxUnsupportedMediaConversionException("Source extension do not match file extension");
+			throw new GxUnsupportedMediaConversionException("Same source and destination extension");
 
 	}
 
@@ -73,38 +75,41 @@ public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 	public void convertVideoMedia(String sourceFilepath, String destinationFilepath, GxVideoType sourceType, GxVideoType destinationType) throws Exception {
 		String[] sourceExtension = sourceFilepath.split("\\.");
 		String[] destinationExtension = destinationFilepath.split("\\.");
-		if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
-			if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
+		if (sourceType.equals(destinationType)) {
+			if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
+				if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
 
-				String mpegFlag = "";
-				if (destinationType.equals(GxVideoType.MPEG)) {
-					mpegFlag = " -c:v mpeg2video ";
-				}
-				String cmd = "ffmpeg -y -i " + sourceFilepath + mpegFlag + " " + destinationFilepath;
-				String[] command = new String[] { "bash", "-l", "-c", cmd };
-				File file = new File(sourceFilepath);
-				if (file.exists() && file.isFile()) {
-					try {
-
-						Process process = Runtime.getRuntime().exec(command, null, null);
-						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-						String line;
-						while ((line = reader.readLine()) != null) {
-							System.out.println(line);
-						}
-						reader.close();
-						process.waitFor();
-						process.destroy();
-
-					} catch (Exception e) {
-						throw new GxUnsupportedMediaConversionException(e);
+					String mpegFlag = "";
+					if (destinationType.equals(GxVideoType.MPEG)) {
+						mpegFlag = " -c:v mpeg2video ";
 					}
+					String cmd = "ffmpeg -y -i " + sourceFilepath + mpegFlag + " " + destinationFilepath;
+					String[] command = new String[] { "bash", "-l", "-c", cmd };
+					File file = new File(sourceFilepath);
+					if (file.exists() && file.isFile()) {
+						try {
+
+							Process process = Runtime.getRuntime().exec(command, null, null);
+							BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+							String line;
+							while ((line = reader.readLine()) != null) {
+								System.out.println(line);
+							}
+							reader.close();
+							process.waitFor();
+							process.destroy();
+
+						} catch (Exception e) {
+							throw new GxUnsupportedMediaConversionException(e);
+						}
+					} else
+						throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
 				} else
-					throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
+					throw new GxUnsupportedMediaConversionException("Destination extension do not match with file extension");
 			} else
-				throw new GxUnsupportedMediaConversionException("Destination extension do not match with file extension");
+				throw new GxUnsupportedMediaConversionException("Source extension do not match with file extension");
 		} else
-			throw new GxUnsupportedMediaConversionException("Source extension do not match with file extension");
+			throw new GxUnsupportedMediaConversionException("Same source and destination extension");
 
 	}
 
@@ -112,34 +117,37 @@ public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 	public void convertImageMedia(String sourceFilepath, String destinationFilepath, GxImageType sourceType, GxImageType destinationType) throws Exception {
 		String[] sourceExtension = sourceFilepath.split("\\.");
 		String[] destinationExtension = destinationFilepath.split("\\.");
-		if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
-			if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
+		if (sourceType.equals(destinationType)) {
+			if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
+				if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
 
-				String cmd = "ffmpeg -y -i " + sourceFilepath + " " + destinationFilepath;
-				String[] command = new String[] { "bash", "-l", "-c", cmd };
-				File file = new File(sourceFilepath);
-				if (file.exists() && file.isFile()) {
-					try {
+					String cmd = "ffmpeg -y -i " + sourceFilepath + " " + destinationFilepath;
+					String[] command = new String[] { "bash", "-l", "-c", cmd };
+					File file = new File(sourceFilepath);
+					if (file.exists() && file.isFile()) {
+						try {
 
-						Process process = Runtime.getRuntime().exec(command, null, null);
-						BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-						String line;
-						while ((line = reader.readLine()) != null) {
-							System.out.println(line);
+							Process process = Runtime.getRuntime().exec(command, null, null);
+							BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+							String line;
+							while ((line = reader.readLine()) != null) {
+								System.out.println(line);
+							}
+							reader.close();
+							process.waitFor();
+							process.destroy();
+
+						} catch (Exception e) {
+							throw new GxUnsupportedMediaConversionException(e);
 						}
-						reader.close();
-						process.waitFor();
-						process.destroy();
-
-					} catch (Exception e) {
-						throw new GxUnsupportedMediaConversionException(e);
-					}
+					} else
+						throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
 				} else
-					throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
+					throw new GxUnsupportedMediaConversionException("Destination extension do not match with file extension");
 			} else
-				throw new GxUnsupportedMediaConversionException("Destination extension do not match with file extension");
+				throw new GxUnsupportedMediaConversionException("Source extension do not match with file extension");
 		} else
-			throw new GxUnsupportedMediaConversionException("Source extension do not match with file extension");
+			throw new GxUnsupportedMediaConversionException("Same source and destination extension");
 
 	}
 

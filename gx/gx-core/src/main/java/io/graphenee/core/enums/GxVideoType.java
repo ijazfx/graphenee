@@ -20,7 +20,6 @@ public enum GxVideoType {
 	MP4("video/mp4", "mp4"),
 	M4V("video/m4v", "m4v"),
 	MPEG("video/mpeg", "mpeg"),
-	MOV("video/quicktime", "mov"),
 	OGG_VIDEO("video/ogg", "ogg");
 
 	private String mimeType;
