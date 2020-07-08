@@ -24,11 +24,11 @@ public enum GxAudioType {
 
 	private String mimeType;
 
-	private String Extension;
+	private String extension;
 
 	private GxAudioType(String mimeType, String extension) {
 		this.mimeType = mimeType;
-		Extension = extension;
+		this.extension = extension;
 	}
 
 	public String getMimeType() {
@@ -40,11 +40,11 @@ public enum GxAudioType {
 	}
 
 	public String getExtension() {
-		return Extension;
+		return this.extension;
 	}
 
 	public void setExtension(String extension) {
-		Extension = extension;
+		this.extension = extension;
 	}
 
 	public static GxAudioType accessKeyType(String mimeType) {

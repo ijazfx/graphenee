@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 import io.graphenee.core.enums.GxAudioType;
 import io.graphenee.core.enums.GxImageType;
 import io.graphenee.core.enums.GxVideoType;
-import io.graphenee.core.exception.GxUnsupportedMediaConversionException;
+import io.graphenee.core.exception.GxMediaConversionException;
 
 /**
  * 
@@ -35,7 +35,7 @@ import io.graphenee.core.exception.GxUnsupportedMediaConversionException;
 @Service
 public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 	@Override
-	public void convertAudioMedia(String sourceFilepath, String destinationFilepath, GxAudioType sourceType, GxAudioType destinationType) throws Exception {
+	public void convertAudioMedia(String sourceFilepath, String destinationFilepath, GxAudioType sourceType, GxAudioType destinationType) throws GxMediaConversionException {
 		String[] sourceExtension = sourceFilepath.split("\\.");
 		String[] destinationExtension = destinationFilepath.split("\\.");
 		if (sourceType.equals(destinationType)) {
@@ -58,21 +58,21 @@ public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 							process.destroy();
 
 						} catch (Exception e) {
-							throw new GxUnsupportedMediaConversionException(e);
+							throw new GxMediaConversionException(e);
 						}
 					} else
-						throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
+						throw new GxMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
 				} else
-					throw new GxUnsupportedMediaConversionException("Destination extension do not match file extension");
+					throw new GxMediaConversionException("Destination extension do not match file extension");
 			} else
-				throw new GxUnsupportedMediaConversionException("Source extension do not match file extension");
+				throw new GxMediaConversionException("Source extension do not match file extension");
 		} else
-			throw new GxUnsupportedMediaConversionException("Same source and destination extension");
+			throw new GxMediaConversionException("Same source and destination extension");
 
 	}
 
 	@Override
-	public void convertVideoMedia(String sourceFilepath, String destinationFilepath, GxVideoType sourceType, GxVideoType destinationType) throws Exception {
+	public void convertVideoMedia(String sourceFilepath, String destinationFilepath, GxVideoType sourceType, GxVideoType destinationType) throws GxMediaConversionException {
 		String[] sourceExtension = sourceFilepath.split("\\.");
 		String[] destinationExtension = destinationFilepath.split("\\.");
 		if (sourceType.equals(destinationType)) {
@@ -100,21 +100,21 @@ public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 							process.destroy();
 
 						} catch (Exception e) {
-							throw new GxUnsupportedMediaConversionException(e);
+							throw new GxMediaConversionException(e);
 						}
 					} else
-						throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
+						throw new GxMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
 				} else
-					throw new GxUnsupportedMediaConversionException("Destination extension do not match with file extension");
+					throw new GxMediaConversionException("Destination extension do not match with file extension");
 			} else
-				throw new GxUnsupportedMediaConversionException("Source extension do not match with file extension");
+				throw new GxMediaConversionException("Source extension do not match with file extension");
 		} else
-			throw new GxUnsupportedMediaConversionException("Same source and destination extension");
+			throw new GxMediaConversionException("Same source and destination extension");
 
 	}
 
 	@Override
-	public void convertImageMedia(String sourceFilepath, String destinationFilepath, GxImageType sourceType, GxImageType destinationType) throws Exception {
+	public void convertImageMedia(String sourceFilepath, String destinationFilepath, GxImageType sourceType, GxImageType destinationType) throws GxMediaConversionException {
 		String[] sourceExtension = sourceFilepath.split("\\.");
 		String[] destinationExtension = destinationFilepath.split("\\.");
 		if (sourceType.equals(destinationType)) {
@@ -138,16 +138,16 @@ public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
 							process.destroy();
 
 						} catch (Exception e) {
-							throw new GxUnsupportedMediaConversionException(e);
+							throw new GxMediaConversionException(e);
 						}
 					} else
-						throw new GxUnsupportedMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
+						throw new GxMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
 				} else
-					throw new GxUnsupportedMediaConversionException("Destination extension do not match with file extension");
+					throw new GxMediaConversionException("Destination extension do not match with file extension");
 			} else
-				throw new GxUnsupportedMediaConversionException("Source extension do not match with file extension");
+				throw new GxMediaConversionException("Source extension do not match with file extension");
 		} else
-			throw new GxUnsupportedMediaConversionException("Same source and destination extension");
+			throw new GxMediaConversionException("Same source and destination extension");
 
 	}
 

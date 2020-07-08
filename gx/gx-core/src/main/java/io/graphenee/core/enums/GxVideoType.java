@@ -24,11 +24,11 @@ public enum GxVideoType {
 
 	private String mimeType;
 
-	private String Extension;
+	private String extension;
 
 	private GxVideoType(String mimeType, String extension) {
 		this.mimeType = mimeType;
-		Extension = extension;
+		this.extension = extension;
 	}
 
 	public String getMimeType() {
@@ -40,11 +40,11 @@ public enum GxVideoType {
 	}
 
 	public String getExtension() {
-		return Extension;
+		return extension;
 	}
 
 	public void setExtension(String extension) {
-		Extension = extension;
+		this.extension = extension;
 	}
 
 	public static GxVideoType accessKeyType(String mimeType) {
