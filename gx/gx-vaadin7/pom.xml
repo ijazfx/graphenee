@@ -45,10 +45,6 @@
 			<artifactId>vaadin-autocompletetextfield</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.zybnet</groupId>
-			<artifactId>vaadin-autocomplete</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>io.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
