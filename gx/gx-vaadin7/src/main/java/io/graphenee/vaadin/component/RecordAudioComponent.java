@@ -100,9 +100,9 @@ public class RecordAudioComponent extends HorizontalLayout {
 								delegate.onAudioAvailable(targetFile);
 							} catch (GxMediaConversionException e) {
 								L.warn("File: " + sourceFile.getName(), e);
-								File targetFile = new File(audioFile.getParentFile(),
+								File targetFile = new File(sourceFile.getParentFile(),
 										UUID.randomUUID().toString() + ".webm");
-								audioFile.renameTo(targetFile);
+								sourceFile.renameTo(targetFile);
 								delegate.onAudioAvailable(targetFile);
 							}
 						}

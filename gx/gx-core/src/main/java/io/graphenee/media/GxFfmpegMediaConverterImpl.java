@@ -110,8 +110,13 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 
 	protected void convertMedia(String cmd) throws GxMediaConversionException {
 		String[] command = new String[] { "bash", "-l", "-c", cmd };
+		if (System.getProperty("os.name").toLowerCase().contains("windows"))
+			command = new String[] { cmd };
 		try {
-			Process process = Runtime.getRuntime().exec(command, null, null);
+			// Process process = Runtime.getRuntime().exec(command, null, null);
+			ProcessBuilder pb = new ProcessBuilder(command);
+			System.err.println(pb.environment());
+			Process process = pb.start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line;
 			while ((line = reader.readLine()) != null) {
