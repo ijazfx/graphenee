@@ -26,6 +26,7 @@ import io.graphenee.core.enums.GxAudioType;
 import io.graphenee.core.enums.GxImageType;
 import io.graphenee.core.enums.GxVideoType;
 import io.graphenee.core.exception.GxMediaConversionException;
+import io.graphenee.core.util.TRFileContentUtil;
 
 /**
  * 
@@ -33,122 +34,94 @@ import io.graphenee.core.exception.GxMediaConversionException;
  * @since 2.0.0
  */
 @Service
-public class GxFfmpegMediaConverterImpl implements GxFfmpegMediaConverter {
+public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 	@Override
-	public void convertAudioMedia(String sourceFilepath, String destinationFilepath, GxAudioType sourceType, GxAudioType destinationType) throws GxMediaConversionException {
-		String[] sourceExtension = sourceFilepath.split("\\.");
-		String[] destinationExtension = destinationFilepath.split("\\.");
-		if (sourceType.equals(destinationType)) {
-			if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
-				if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
-
-					String cmd = "ffmpeg -y -i " + sourceFilepath + " -vn " + destinationFilepath;
-					String[] command = new String[] { "bash", "-l", "-c", cmd };
-					File file = new File(sourceFilepath);
-					if (file.exists() && file.isFile()) {
-						try {
-
-							Process process = Runtime.getRuntime().exec(command, null, null);
-							BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-							String line;
-							while ((line = reader.readLine()) != null) {
-								System.out.println(line);
-							}
-							reader.close();
-							process.destroy();
-
-						} catch (Exception e) {
-							throw new GxMediaConversionException(e);
-						}
-					} else
-						throw new GxMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
-				} else
-					throw new GxMediaConversionException("Destination extension do not match file extension");
-			} else
-				throw new GxMediaConversionException("Source extension do not match file extension");
-		} else
-			throw new GxMediaConversionException("Same source and destination extension");
-
+	public void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType)
+			throws GxMediaConversionException {
+		if (sourceType.equals(targetType))
+			throw new GxMediaConversionException(
+					"Both source and target types are same thus conversion is not required.");
+		convertAudioMedia(sourceFile, targetFile, targetType);
 	}
 
 	@Override
-	public void convertVideoMedia(String sourceFilepath, String destinationFilepath, GxVideoType sourceType, GxVideoType destinationType) throws GxMediaConversionException {
-		String[] sourceExtension = sourceFilepath.split("\\.");
-		String[] destinationExtension = destinationFilepath.split("\\.");
-		if (sourceType.equals(destinationType)) {
-			if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
-				if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
-
-					String mpegFlag = "";
-					if (destinationType.equals(GxVideoType.MPEG)) {
-						mpegFlag = " -c:v mpeg2video ";
-					}
-					String cmd = "ffmpeg -y -i " + sourceFilepath + mpegFlag + " " + destinationFilepath;
-					String[] command = new String[] { "bash", "-l", "-c", cmd };
-					File file = new File(sourceFilepath);
-					if (file.exists() && file.isFile()) {
-						try {
-
-							Process process = Runtime.getRuntime().exec(command, null, null);
-							BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-							String line;
-							while ((line = reader.readLine()) != null) {
-								System.out.println(line);
-							}
-							reader.close();
-							process.waitFor();
-							process.destroy();
-
-						} catch (Exception e) {
-							throw new GxMediaConversionException(e);
-						}
-					} else
-						throw new GxMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
-				} else
-					throw new GxMediaConversionException("Destination extension do not match with file extension");
-			} else
-				throw new GxMediaConversionException("Source extension do not match with file extension");
-		} else
-			throw new GxMediaConversionException("Same source and destination extension");
-
+	public void convertVideoMedia(String sourceFile, GxVideoType sourceType, String targetFile, GxVideoType targetType)
+			throws GxMediaConversionException {
+		if (sourceType.equals(targetType))
+			throw new GxMediaConversionException(
+					"Both source and target types are same thus conversion is not required.");
+		convertVideoMedia(sourceFile, targetFile, targetType);
 	}
 
 	@Override
-	public void convertImageMedia(String sourceFilepath, String destinationFilepath, GxImageType sourceType, GxImageType destinationType) throws GxMediaConversionException {
-		String[] sourceExtension = sourceFilepath.split("\\.");
-		String[] destinationExtension = destinationFilepath.split("\\.");
-		if (sourceType.equals(destinationType)) {
-			if (sourceExtension[1] != null && sourceExtension[1].equals(sourceType.getExtension()) && sourceExtension.length <= 2) {
-				if (destinationExtension[1] != null && destinationExtension[1].equals(destinationType.getExtension()) && destinationExtension.length <= 2) {
+	public void convertImageMedia(String sourceFile, GxImageType sourceType, String targetFile, GxImageType targetType)
+			throws GxMediaConversionException {
+		if (sourceType.equals(targetType))
+			throw new GxMediaConversionException(
+					"Both source and target types are same thus conversion is not required.");
+		convertImageMedia(sourceFile, targetFile, targetType);
+	}
 
-					String cmd = "ffmpeg -y -i " + sourceFilepath + " " + destinationFilepath;
-					String[] command = new String[] { "bash", "-l", "-c", cmd };
-					File file = new File(sourceFilepath);
-					if (file.exists() && file.isFile()) {
-						try {
+	@Override
+	public void convertAudioMedia(String sourceFile, String targetFile, GxAudioType targetType)
+			throws GxMediaConversionException {
+		File source = new File(sourceFile);
+		if (!source.exists())
+			throw new GxMediaConversionException(sourceFile + " does not exist.");
+		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
+		if (!targetExtension.equals(targetType.getExtension()))
+			throw new GxMediaConversionException(
+					targetFile + " file extension does not match with target type " + targetType.getExtension());
+		String cmd = "ffmpeg -y -i " + sourceFile + " -vn " + targetFile;
+		convertMedia(cmd);
+	}
 
-							Process process = Runtime.getRuntime().exec(command, null, null);
-							BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-							String line;
-							while ((line = reader.readLine()) != null) {
-								System.out.println(line);
-							}
-							reader.close();
-							process.waitFor();
-							process.destroy();
+	@Override
+	public void convertVideoMedia(String sourceFile, String targetFile, GxVideoType targetType)
+			throws GxMediaConversionException {
+		File source = new File(sourceFile);
+		if (!source.exists())
+			throw new GxMediaConversionException(sourceFile + " does not exist.");
+		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
+		if (!targetExtension.equals(targetType.getExtension()))
+			throw new GxMediaConversionException(
+					targetFile + " file extension does not match with target type " + targetType.getExtension());
+		String mpegFlag = "";
+		if (targetType.equals(GxVideoType.MPEG)) {
+			mpegFlag = "-c:v mpeg2video";
+		}
+		String cmd = "ffmpeg -y -i " + sourceFile + " " + mpegFlag + " " + targetFile;
+		convertMedia(cmd);
+	}
 
-						} catch (Exception e) {
-							throw new GxMediaConversionException(e);
-						}
-					} else
-						throw new GxMediaConversionException("File not found in the specific path (" + sourceFilepath + ")");
-				} else
-					throw new GxMediaConversionException("Destination extension do not match with file extension");
-			} else
-				throw new GxMediaConversionException("Source extension do not match with file extension");
-		} else
-			throw new GxMediaConversionException("Same source and destination extension");
+	@Override
+	public void convertImageMedia(String sourceFile, String targetFile, GxImageType targetType)
+			throws GxMediaConversionException {
+		File source = new File(sourceFile);
+		if (!source.exists())
+			throw new GxMediaConversionException(sourceFile + " does not exist.");
+		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
+		if (!targetExtension.equals(targetType.getExtension()))
+			throw new GxMediaConversionException(
+					targetFile + " file extension does not match with target type " + targetType.getExtension());
+		String cmd = "ffmpeg -y -i " + sourceFile + " " + targetFile;
+		convertMedia(cmd);
+	}
 
+	protected void convertMedia(String cmd) throws GxMediaConversionException {
+		String[] command = new String[] { "bash", "-l", "-c", cmd };
+		try {
+			Process process = Runtime.getRuntime().exec(command, null, null);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+			reader.close();
+			process.destroy();
+		} catch (Exception e) {
+			throw new GxMediaConversionException(e);
+		}
 	}
 
 }

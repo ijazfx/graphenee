@@ -20,6 +20,10 @@ import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.themes.ValoTheme;
 
 import elemental.json.JsonArray;
+import io.graphenee.core.enums.GxAudioType;
+import io.graphenee.core.exception.GxMediaConversionException;
+import io.graphenee.media.GxMediaConverter;
+import io.graphenee.media.GxFfmpegMediaConverterImpl;
 
 @SuppressWarnings("serial")
 @JavaScript({ "record-audio.js" })
@@ -37,7 +41,8 @@ public class RecordAudioComponent extends HorizontalLayout {
 
 	public RecordAudioComponent(Resource recordIcon, Resource stopIcon) {
 		MButton startRecordingButton = new MButton("Record").withIcon(recordIcon).withStyleName(ValoTheme.BUTTON_SMALL);
-		MButton stopRecordingButton = new MButton("Stop").withIcon(stopIcon).withStyleName(ValoTheme.BUTTON_SMALL).withVisible(false);
+		MButton stopRecordingButton = new MButton("Stop").withIcon(stopIcon).withStyleName(ValoTheme.BUTTON_SMALL)
+				.withVisible(false);
 
 		startRecordingButton.addClickListener(cl -> {
 			try {
@@ -69,56 +74,75 @@ public class RecordAudioComponent extends HorizontalLayout {
 		addComponents(buttonLayout);
 
 		// To be called when recording is complete.
-		com.vaadin.ui.JavaScript.getCurrent().addFunction("io.graphenee.vaadin.component.record_audio.recordingStopped", new JavaScriptFunction() {
+		com.vaadin.ui.JavaScript.getCurrent().addFunction("io.graphenee.vaadin.component.record_audio.recordingStopped",
+				new JavaScriptFunction() {
 
-			@Override
-			public void call(JsonArray arguments) {
-				if (audioFileOutputStream != null) {
-					try {
-						audioFileOutputStream.close();
-					} catch (IOException e) {
-						L.warn(e.getMessage());
-					}
-				}
-				if (delegate != null && audioFile != null && audioFile.exists()) {
-					String filename = UUID.randomUUID().toString() + ".webm";
-					File recordingFile = new File(audioFile.getParentFile(), filename);
-					audioFile.renameTo(recordingFile);
-					delegate.onAudioAvailable(recordingFile);
-				}
-			}
-
-		});
-
-		/* To be used as this is efficient to transfer smaller chucks of data while recording in progress. However, we may need to close the 
-		 * stream when recording is stopped which can be notified using recordingStopped method.*/
-		com.vaadin.ui.JavaScript.getCurrent().addFunction("io.graphenee.vaadin.component.record_audio.uploadChunk", new JavaScriptFunction() {
-
-			@Override
-			public void call(JsonArray arguments) {
-				if (audioFileOutputStream == null) {
-					synchronized (RecordAudioComponent.this) {
-						if (audioFileOutputStream == null) {
+					@Override
+					public void call(JsonArray arguments) {
+						if (audioFileOutputStream != null) {
 							try {
-								audioFileOutputStream = new FileOutputStream(audioFile);
-							} catch (FileNotFoundException e) {
+								audioFileOutputStream.close();
+							} catch (IOException e) {
+								L.warn(e.getMessage());
+							}
+						}
+						if (delegate != null && audioFile != null && audioFile.exists()) {
+							String filename = audioFile.getName() + ".webm";
+							File sourceFile = new File(audioFile.getParentFile(), filename);
+							audioFile.renameTo(sourceFile);
+
+							GxMediaConverter mediaConverter = new GxFfmpegMediaConverterImpl();
+							try {
+								File targetFile = new File(audioFile.getParentFile(),
+										UUID.randomUUID().toString() + ".mp3");
+								mediaConverter.convertAudioMedia(sourceFile.getAbsolutePath(),
+										targetFile.getAbsolutePath(), GxAudioType.MP3);
+								delegate.onAudioAvailable(targetFile);
+							} catch (GxMediaConversionException e) {
+								L.warn("File: " + sourceFile.getName(), e);
+								File targetFile = new File(audioFile.getParentFile(),
+										UUID.randomUUID().toString() + ".webm");
+								audioFile.renameTo(targetFile);
+								delegate.onAudioAvailable(targetFile);
+							}
+						}
+					}
+
+				});
+
+		/*
+		 * To be used as this is efficient to transfer smaller chucks of data while
+		 * recording in progress. However, we may need to close the stream when
+		 * recording is stopped which can be notified using recordingStopped method.
+		 */
+		com.vaadin.ui.JavaScript.getCurrent().addFunction("io.graphenee.vaadin.component.record_audio.uploadChunk",
+				new JavaScriptFunction() {
+
+					@Override
+					public void call(JsonArray arguments) {
+						if (audioFileOutputStream == null) {
+							synchronized (RecordAudioComponent.this) {
+								if (audioFileOutputStream == null) {
+									try {
+										audioFileOutputStream = new FileOutputStream(audioFile);
+									} catch (FileNotFoundException e) {
+										L.warn(e.getMessage());
+									}
+								}
+							}
+						}
+						String content = arguments.getString(0);
+						String[] parts = content.split("base64,");
+						if (audioFileOutputStream != null) {
+							try {
+								byte[] decoded = Base64.getDecoder().decode(parts[1].getBytes());
+								audioFileOutputStream.write(decoded);
+							} catch (Exception e) {
 								L.warn(e.getMessage());
 							}
 						}
 					}
-				}
-				String content = arguments.getString(0);
-				String[] parts = content.split("base64,");
-				if (audioFileOutputStream != null) {
-					try {
-						byte[] decoded = Base64.getDecoder().decode(parts[1].getBytes());
-						audioFileOutputStream.write(decoded);
-					} catch (Exception e) {
-						L.warn(e.getMessage());
-					}
-				}
-			}
-		});
+				});
 	}
 
 	public RecordAudioDelegate getDelegate() {

@@ -20,12 +20,18 @@ import io.graphenee.core.enums.GxImageType;
 import io.graphenee.core.enums.GxVideoType;
 import io.graphenee.core.exception.GxMediaConversionException;
 
-public interface GxFfmpegMediaConverter {
+public interface GxMediaConverter {
 
-	void convertAudioMedia(String sourceFilepath, String destinationFilepath, GxAudioType sourceType, GxAudioType destinationType) throws GxMediaConversionException;
+	void convertAudioMedia(String sourceFile, String targetFile, GxAudioType targetType) throws GxMediaConversionException;
+	
+	void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType) throws GxMediaConversionException;
 
-	void convertVideoMedia(String sourceFilepath, String destinationFilepath, GxVideoType sourceType, GxVideoType destinationType) throws GxMediaConversionException;
+	void convertVideoMedia(String sourceFile, String targetFile, GxVideoType targetType) throws GxMediaConversionException;
 
-	void convertImageMedia(String sourceFilepath, String destinationFilepath, GxImageType sourceType, GxImageType destinationType) throws GxMediaConversionException;
+	void convertVideoMedia(String sourceFile, GxVideoType sourceType, String targetFile, GxVideoType targetType) throws GxMediaConversionException;
+
+	void convertImageMedia(String sourceFile, String targetFile, GxImageType targetType) throws GxMediaConversionException;
+
+	void convertImageMedia(String sourceFile, GxImageType sourceType, String targetFile, GxImageType targetType) throws GxMediaConversionException;
 
 }
