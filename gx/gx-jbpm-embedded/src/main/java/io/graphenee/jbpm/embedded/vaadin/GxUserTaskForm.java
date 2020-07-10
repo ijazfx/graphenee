@@ -58,7 +58,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	private MButton skipButton;
 	private MButton assignButton;
 
-	public Set<GxTaskActionListener> listeners = new HashSet<>();
+	public Set<GxTaskActionListener<T>> listeners = new HashSet<>();
 
 	@Override
 	protected boolean eagerValidationEnabled() {
@@ -314,7 +314,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	protected void onComplete(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
-	@SuppressWarnings("unchecked")
 	private void notifyGxTaskActionListeners(GxTaskAction taskAction, GxUserTask userTask, T entity) {
 		listeners.forEach(listener -> {
 			listener.onAction(taskAction, userTask, entity);

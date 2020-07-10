@@ -66,6 +66,7 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 				return gxSmsResponse;
 			}
 		} catch (Exception e) {
+			L.warn(e.getMessage());
 			throw new GxSmsSendException(e.getMessage(), e);
 		}
 		return null;

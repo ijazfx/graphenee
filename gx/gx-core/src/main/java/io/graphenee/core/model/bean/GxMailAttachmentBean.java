@@ -16,21 +16,6 @@
 package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.commons.lang3.RandomStringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.graphenee.core.enums.AccessKeyType;
-import io.graphenee.core.model.BeanCollectionFault;
-import io.graphenee.core.model.BeanFault;
 
 public class GxMailAttachmentBean implements Serializable {
 	private static final long serialVersionUID = 1L;

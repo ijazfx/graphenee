@@ -142,6 +142,7 @@ public class BeanFault<ID, T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -149,7 +150,7 @@ public class BeanFault<ID, T> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BeanFault other = (BeanFault) obj;
+		BeanFault<ID, T> other = (BeanFault<ID, T>) obj;
 		if (oid == null) {
 			if (other.oid != null)
 				return false;

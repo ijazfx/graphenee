@@ -4,7 +4,6 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 
-import io.graphenee.aws.api.GxS3Service;
 import io.graphenee.aws.impl.GxS3ServiceImpl;
 
 public class GxS3ServiceBuilder {
@@ -41,20 +40,6 @@ public class GxS3ServiceBuilder {
 		if (credentialsProvider == null)
 			throw new IllegalStateException("Please provide aws credentials.");
 		return new GxS3ServiceImpl(credentialsProvider, rootBucket, region);
-	}
-
-	public static void main(String[] args) {
-		if (args.length < 4) {
-			System.out.println("Required <accessKey> <secretKey> <phone> <message>");
-			System.exit(-1);
-		}
-		String accessKey = args[0];
-		String secretKey = args[1];
-		String phone = args[2];
-		String message = args[3];
-
-		GxS3Service service = GxS3ServiceBuilder.newBuilder().withCredentials(accessKey, secretKey).build();
-
 	}
 
 }
