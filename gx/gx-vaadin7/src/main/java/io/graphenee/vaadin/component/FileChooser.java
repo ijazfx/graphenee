@@ -23,12 +23,6 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Function;
 
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
@@ -44,11 +38,21 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.FileTypeResolver;
 
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+
+import io.graphenee.core.enums.GxAudioType;
+import io.graphenee.core.enums.GxVideoType;
 import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.storage.ResolveFailedException;
 import io.graphenee.core.util.TRFileContentUtil;
 import io.graphenee.core.util.TRImageUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
+import io.graphenee.media.GxFfmpegMediaConverterImpl;
+import io.graphenee.media.GxMediaConverter;
 import io.graphenee.vaadin.ResourcePreviewPanel;
 import server.droporchoose.UploadComponent;
 
@@ -127,7 +131,8 @@ public class FileChooser extends CustomField<String> {
 					String resourcePath = storage.resourcePath(getRootFolder(), filePath);
 					InputStream inputStream = storage.resolve(resourcePath);
 					InputStreamSource source = new InputStreamSource(inputStream);
-					resource = new StreamResource(source, UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
+					resource = new StreamResource(source,
+							UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
 						@Override
 						public String getMIMEType() {
 							String mimeType = FileTypeResolver.getMIMEType(filePath);
@@ -149,33 +154,58 @@ public class FileChooser extends CustomField<String> {
 		}
 	}
 
-	private void uploadReceived(String inputFileName, Path inputFilePath) {
-		String fileName = fileNameTranslator != null ? fileNameTranslator.apply(inputFileName) : inputFileName;
-		File targetFile = new File(inputFilePath.getParent().toFile(), fileName);
-		if (targetFile.exists()) {
-			targetFile.delete();
-		}
-		inputFilePath.toFile().renameTo(targetFile);
-		this.uploadedFilePath = targetFile.getAbsolutePath();
-		this.uploadedFileName = inputFileName;
-		setValue(uploadedFilePath);
+	private void uploadReceived(String receivedFileName, Path receivedFilePath) {
+		// String desiredFileName = fileNameTranslator != null ? fileNameTranslator.apply(receivedFileName)
+		// 		: receivedFileName;
+		String desiredFileName = receivedFileName;
+		File receivedFile = new File(receivedFilePath.toFile().getAbsolutePath());
+		File newFile = new File(receivedFile.getParent(), desiredFileName);
+		receivedFile.renameTo(newFile);
+		receivedFile = newFile;
+		uploadedFilePath = receivedFile.getAbsolutePath();
 
-		File compressedFile = null;
+		// determine type of received file to apply conversion.
+		String mimeType = TRFileContentUtil.getMimeType(receivedFileName);
+		String ext = TRFileContentUtil.getExtensionFromFilename(receivedFileName);
 
-		// resize file..
-		String mimeType = TRFileContentUtil.getMimeType(uploadedFilePath);
-		if (mimeType != null && mimeType.startsWith("image/")) {
+		if (mimeType.startsWith("image/")) {
 			try {
-				compressedFile = File.createTempFile(inputFileName, "resized");
-				if (!TRImageUtil.resizeImage(new File(uploadedFilePath), compressedFile)) {
-					compressedFile = null;
+				File convertedFile = new File(receivedFile.getParent(), desiredFileName);
+				if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
+					uploadedFilePath = receivedFilePath.toFile().getAbsolutePath();
 				} else {
-					compressedFile.renameTo(targetFile);
+					uploadedFilePath = convertedFile.getAbsolutePath();
 				}
 			} catch (Exception ex) {
-				L.warn("Resize failed so using original file", ex);
+				uploadedFilePath = receivedFilePath.toString();
+				L.warn("Conversion failed so using original file", ex);
+			}
+		} else if (mimeType.startsWith("audio/") && !ext.equals("mp3")) {
+			try {
+				File convertedFile = File.createTempFile(receivedFileName, desiredFileName + ".mp3");
+				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
+				conv.convertAudioMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
+						GxAudioType.MP3);
+				uploadedFilePath = convertedFile.getAbsolutePath();
+			} catch (Exception ex) {
+				uploadedFilePath = receivedFile.getAbsolutePath();
+				L.warn("Conversion failed so using original file", ex);
+			}
+		} else if (mimeType.startsWith("video/") && !ext.equals("mpeg")) {
+			try {
+				File convertedFile = File.createTempFile(receivedFileName, desiredFileName + ".mpeg");
+				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
+				conv.convertVideoMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
+						GxVideoType.MPEG);
+				uploadedFilePath = convertedFile.getAbsolutePath();
+			} catch (Exception ex) {
+				uploadedFilePath = receivedFile.getAbsolutePath();
+				L.warn("Conversion failed so using original file", ex);
 			}
 		}
+
+		uploadedFileName = new File(uploadedFilePath).getName();
+		setValue(uploadedFilePath);
 
 		UI.getCurrent().access(() -> {
 			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
@@ -192,7 +222,7 @@ public class FileChooser extends CustomField<String> {
 				previewImage.setWidth("100px");
 				previewImage.setHeightUndefined();
 				try {
-					InputStream inputStream = new FileInputStream(targetFile);
+					InputStream inputStream = new FileInputStream(uploadedFilePath);
 					StreamSource source = new InputStreamSource(inputStream);
 					resource = new StreamResource(source, UUID.randomUUID().toString());
 				} catch (FileNotFoundException e) {
@@ -248,7 +278,8 @@ public class FileChooser extends CustomField<String> {
 
 	@Override
 	protected Component initContent() {
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withMargin(false).withSpacing(true).withWidthUndefined();
+		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT)
+				.withMargin(false).withSpacing(true).withWidthUndefined();
 		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER).withSpacing(false);
 		imageLayout.setHeight(componentHeight);
 		progressBar = new ProgressBar();

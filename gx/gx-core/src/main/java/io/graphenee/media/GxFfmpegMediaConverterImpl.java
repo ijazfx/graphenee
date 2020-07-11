@@ -20,6 +20,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
+import com.google.common.base.Strings;
+
 import org.springframework.stereotype.Service;
 
 import io.graphenee.core.enums.GxAudioType;
@@ -72,7 +74,7 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		if (!targetExtension.equals(targetType.getExtension()))
 			throw new GxMediaConversionException(
 					targetFile + " file extension does not match with target type " + targetType.getExtension());
-		String cmd = "ffmpeg -y -i " + sourceFile + " -vn " + targetFile;
+		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " -vn " + sanitize(targetFile);
 		convertMedia(cmd);
 	}
 
@@ -90,7 +92,7 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		if (targetType.equals(GxVideoType.MPEG)) {
 			mpegFlag = "-c:v mpeg2video";
 		}
-		String cmd = "ffmpeg -y -i " + sourceFile + " " + mpegFlag + " " + targetFile;
+		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " " + mpegFlag + " " + sanitize(targetFile);
 		convertMedia(cmd);
 	}
 
@@ -104,18 +106,24 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		if (!targetExtension.equals(targetType.getExtension()))
 			throw new GxMediaConversionException(
 					targetFile + " file extension does not match with target type " + targetType.getExtension());
-		String cmd = "ffmpeg -y -i " + sourceFile + " " + targetFile;
+		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " " + sanitize(targetFile);
 		convertMedia(cmd);
 	}
 
 	protected void convertMedia(String cmd) throws GxMediaConversionException {
-		String[] command = new String[] { "bash", "-l", "-c", cmd };
-		if (System.getProperty("os.name").toLowerCase().contains("windows"))
-			command = new String[] { cmd };
 		try {
 			// Process process = Runtime.getRuntime().exec(command, null, null);
-			ProcessBuilder pb = new ProcessBuilder(command);
-			System.err.println(pb.environment());
+			ProcessBuilder pb = new ProcessBuilder("echo");
+			String[] command = new String[] { "bash", "-l", "-c", cmd };
+			if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+				String ffmpegBinary = pb.environment().get("FFMPEG_BINARY");
+				System.err.println(ffmpegBinary);
+				if (!Strings.isNullOrEmpty(ffmpegBinary)) {
+					cmd = cmd.replaceFirst("ffmpeg", sanitize(ffmpegBinary));
+				} 
+			}
+			command = new String[] { cmd };
+			pb = new ProcessBuilder(command);
 			Process process = pb.start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line;
@@ -127,6 +135,10 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		} catch (Exception e) {
 			throw new GxMediaConversionException(e);
 		}
+	}
+
+	private String sanitize(String value) {
+		return "\"" + value.replaceAll("\\\\", "\\\\\\\\")  + "\"";
 	}
 
 }

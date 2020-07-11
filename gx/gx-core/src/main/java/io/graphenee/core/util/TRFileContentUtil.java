@@ -61,10 +61,7 @@ public class TRFileContentUtil {
 		if (ext.matches("(avi)")) {
 			return "video/x-msvideo";
 		}
-		if (ext.matches("(mpeg|webm)")) {
-			return "video/" + ext;
-		}
-		if (ext.matches("acc|opus|wav|m4a|mp1|mp2|mp3|mp4"))
+		if (ext.matches("webm|acc|opus|wav|m4a|mp1|mp2|mp3|mp4"))
 			return "audio/" + ext;
 		if (ext.matches("(mpeg|mpg)")) {
 			return "video/mpeg";
