@@ -3,13 +3,6 @@ var gxAudioElement;
 var gxAudioData;
 
 function gxStartRecording() {
-	if(gxAudioElement !== null) {
-		try {
-			gxAudioElement.remove();
-		} catch(e) {
-			console.log(e);
-		}
-	}
 	navigator.mediaDevices.getUserMedia({ audio: true })
 	  .then(stream => {
 		gxMediaRecorder = new MediaRecorder(stream);

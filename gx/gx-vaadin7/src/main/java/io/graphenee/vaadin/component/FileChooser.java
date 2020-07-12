@@ -191,12 +191,12 @@ public class FileChooser extends CustomField<String> {
 				uploadedFilePath = receivedFile.getAbsolutePath();
 				L.warn("Conversion failed so using original file", ex);
 			}
-		} else if (mimeType.startsWith("video/") && !ext.equals("mpeg")) {
+		} else if (mimeType.startsWith("video/") && !ext.equals("mp4")) {
 			try {
-				File convertedFile = File.createTempFile(receivedFileName, desiredFileName + ".mpeg");
+				File convertedFile = File.createTempFile(receivedFileName, desiredFileName + ".mp4");
 				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
 				conv.convertVideoMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
-						GxVideoType.MPEG);
+						GxVideoType.MP4);
 				uploadedFilePath = convertedFile.getAbsolutePath();
 			} catch (Exception ex) {
 				uploadedFilePath = receivedFile.getAbsolutePath();

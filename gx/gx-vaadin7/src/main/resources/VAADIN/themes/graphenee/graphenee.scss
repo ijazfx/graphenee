@@ -61,6 +61,11 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		/* IE and Edge */
 		scrollbar-width: none;
 	}
+
+	.gx-display-inline {
+		display: inline;
+	}
+
 	.gx-small-icon {
 		border: 0px !important;
 		padding: 0px !important;
