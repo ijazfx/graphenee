@@ -13,12 +13,11 @@ import org.vaadin.viritin.label.MLabel;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
 @SuppressWarnings("serial")
-@JavaScript({ "https://cdn.plyr.io/3.6.2/plyr.polyfilled.js" })
-@StyleSheet({ "https://cdn.plyr.io/3.6.2/plyr.css" })
+// @JavaScript({ "https://cdn.plyr.io/3.6.2/plyr.polyfilled.js" })
+// @StyleSheet({ "https://cdn.plyr.io/3.6.2/plyr.css" })
 public class AudioPlayer extends VerticalLayout {
 
 	String playerId = "player_" + UUID.randomUUID().toString().replace("-", "");
-	String srcId = "src_" + UUID.randomUUID().toString().replace("-", "");
 	
 	public AudioPlayer() {
 		MLabel html = new MLabel().withContentMode(ContentMode.HTML).withStyleName(GrapheneeTheme.STYLE_DISPLAY_INLINE);
@@ -31,13 +30,13 @@ public class AudioPlayer extends VerticalLayout {
 		addComponent(html);
 		setComponentAlignment(html, Alignment.MIDDLE_CENTER);
 
-		addAttachListener(new AttachListener() {
+		// addAttachListener(new AttachListener() {
 
-			@Override
-			public void attach(AttachEvent event) {
-				com.vaadin.ui.JavaScript.eval("new Plyr(document.getElementById('" + playerId + "'));");
-			}
-		});
+		// 	@Override
+		// 	public void attach(AttachEvent event) {
+		// 		com.vaadin.ui.JavaScript.eval("new Plyr(document.getElementById('" + playerId + "'));");
+		// 	}
+		// });
 
 	}
 
