@@ -23,15 +23,16 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
+
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MPanel;
 import org.vaadin.viritin.layouts.MVerticalLayout;
-
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
@@ -72,29 +73,31 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 		while (iter.hasNext()) {
 			TRMenuItem menuItem = iter.next();
 			MPanel panel = new MPanel();
-			MLabel icon = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN, "tile-icon").withWidthUndefined();
-			icon.setIcon(menuItem.icon());
-			MHorizontalLayout iconLayout = new MHorizontalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.TOP_CENTER);
-			iconLayout.add(icon);
-
-			MLabel label = new MLabel(menuItem.caption()).withStyleName(ValoTheme.LABEL_NO_MARGIN);
-			MVerticalLayout iconLabelLayout = new MVerticalLayout(iconLayout, label);
-			iconLabelLayout.setComponentAlignment(iconLayout, Alignment.MIDDLE_CENTER);
-			iconLabelLayout.setExpandRatio(iconLayout, 1);
+			Image icon = new Image(null, menuItem.icon());
+			// MLabel icon = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN, "tile-icon").withWidthUndefined();
+			// icon.setIcon(menuItem.icon());
+			icon.setWidth("52px");
+			MLabel label = new MLabel(menuItem.caption()).withStyleName(ValoTheme.LABEL_NO_MARGIN, ValoTheme.LABEL_BOLD)
+					.withWidthUndefined();
+			MVerticalLayout iconLabelLayout = new MVerticalLayout(icon, label).withMargin(true).withSpacing(false);
+			iconLabelLayout.setComponentAlignment(icon, Alignment.TOP_CENTER);
+			iconLabelLayout.setComponentAlignment(label, Alignment.BOTTOM_CENTER);
+			iconLabelLayout.setExpandRatio(label, 1);
 			iconLabelLayout.setHeight("120px");
 			panel.setContent(iconLabelLayout);
 			panel.addClickListener(event -> {
 				if (menuItem.hasChildren()) {
 					mainLayout.removeAllComponents();
 					List<TRMenuItem> subMenuItems = new ArrayList<>(menuItem.getChildren());
-					TRSimpleMenuItem backMenuItem = TRSimpleMenuItem.createMenuItem("Back", GrapheneeTheme.BACK_ICON, event2 -> {
-						mainLayout.removeAllComponents();
-						if (menuItem.getParent() != null) {
-							generateTiles(mainLayout, menuItem.getParent().getChildren());
-						} else {
-							generateTiles(mainLayout, dashboardSetup.menuItems());
-						}
-					});
+					TRSimpleMenuItem backMenuItem = TRSimpleMenuItem.createMenuItem("Back", GrapheneeTheme.BACK_ICON,
+							event2 -> {
+								mainLayout.removeAllComponents();
+								if (menuItem.getParent() != null) {
+									generateTiles(mainLayout, menuItem.getParent().getChildren());
+								} else {
+									generateTiles(mainLayout, dashboardSetup.menuItems());
+								}
+							});
 					subMenuItems.add(0, backMenuItem);
 					generateTiles(mainLayout, subMenuItems);
 				} else {

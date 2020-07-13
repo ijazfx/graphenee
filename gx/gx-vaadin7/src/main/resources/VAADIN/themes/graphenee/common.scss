@@ -118,10 +118,10 @@
     }
 
     .valo-menu-title {
-      height: 36px !important;
+      height: 40px !important;
       * {
         text-align: center;
-        font-size: 10pt;
+        font-size: 14pt;
       }
       @include valo-gradient($color: $valo-menu-background-color);
       border-bottom-color: first-color(valo-border($color: $valo-menu-background-color));
@@ -134,9 +134,9 @@
       top: 5px;
       right: 10px;
       img.v-icon {
-        width: 16px;
-        height: 16px;
-        border-radius: 16px;
+        width: 24px;
+        height: 24px;
+        border-radius: 2px;
       }
     }
 

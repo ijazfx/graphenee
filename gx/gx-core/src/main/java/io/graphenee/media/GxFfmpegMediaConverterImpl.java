@@ -120,9 +120,9 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 				System.err.println(ffmpegBinary);
 				if (!Strings.isNullOrEmpty(ffmpegBinary)) {
 					cmd = cmd.replaceFirst("ffmpeg", sanitize(ffmpegBinary));
-				} 
+				}
+				command = new String[] { cmd };
 			}
-			command = new String[] { cmd };
 			pb = new ProcessBuilder(command);
 			Process process = pb.start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -138,7 +138,9 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 	}
 
 	private String sanitize(String value) {
-		return "\"" + value.replaceAll("\\\\", "\\\\\\\\")  + "\"";
+		// if (System.getProperty("os.name").toLowerCase().contains("windows"))
+		return "\"" + value.replaceAll("\\\\", "\\\\\\\\") + "\"";
+		// return value;
 	}
 
 }
