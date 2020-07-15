@@ -88,9 +88,12 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		if (!targetExtension.equals(targetType.getExtension()))
 			throw new GxMediaConversionException(
 					targetFile + " file extension does not match with target type " + targetType.getExtension());
-		String mpegFlag = "-vf scale=\"720:-1\"";
+		String mpegFlag = "";
 		if (targetType.equals(GxVideoType.MPEG)) {
 			mpegFlag = mpegFlag + " -c:v mpeg2video";
+		}
+		if (targetType.equals(GxVideoType.MP4)) {
+			mpegFlag = mpegFlag + " -c:v libx264 -b:v 1M";
 		}
 		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " " + mpegFlag + " " + sanitize(targetFile);
 		convertMedia(cmd);

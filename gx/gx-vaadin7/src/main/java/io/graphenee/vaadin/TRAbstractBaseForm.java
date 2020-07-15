@@ -36,6 +36,7 @@ import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.label.RichText;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
+import com.vaadin.server.Page;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.AbstractField;
@@ -817,6 +818,22 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	protected void localizeRecursively(Locale locale, Component component) {
 		VaadinUtils.localizeRecursively(component);
+	}
+
+	protected int browserWidth() {
+		return VaadinUtils.browserWidth();
+	}
+
+	protected int browserHeight() {
+		return VaadinUtils.browserHeight();
+	}
+
+	protected String safeWidthInPixels(int width) {
+		return VaadinUtils.safeWidth(width)+ "px";
+	}
+
+	protected String safeHeightInPixels(int height) {
+		return VaadinUtils.safeHeight(height)+ "px";
 	}
 
 }

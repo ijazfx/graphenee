@@ -214,6 +214,23 @@ public class VaadinUtils {
 		if (component instanceof AbstractSingleComponentContainer) {
 			applyStyleRecursively(((AbstractSingleComponentContainer) component).getContent(), style);
 		}
+
+	}
+
+	public static int browserWidth() {
+		return Page.getCurrent().getBrowserWindowWidth();
+	}
+
+	public static int browserHeight() {
+		return Page.getCurrent().getBrowserWindowHeight();
+	}
+
+	public static int safeWidth(int width) {
+		return (browserWidth() > width ? width : browserWidth() - 8);
+	}
+
+	public static int safeHeight(int height) {
+		return (browserHeight() > height ? height : browserHeight() - 10);
 	}
 
 }

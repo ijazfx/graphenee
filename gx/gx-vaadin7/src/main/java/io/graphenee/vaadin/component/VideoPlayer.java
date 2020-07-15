@@ -2,6 +2,7 @@ package io.graphenee.vaadin.component;
 
 import java.util.UUID;
 
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.VerticalLayout;
@@ -20,8 +21,19 @@ public class VideoPlayer extends VerticalLayout {
 	public VideoPlayer() {
 		MLabel html = new MLabel().withContentMode(ContentMode.HTML).withStyleName(GrapheneeTheme.STYLE_DISPLAY_INLINE);
 
+		int wndHeight = Page.getCurrent().getBrowserWindowHeight();
+		int wndWidth = Page.getCurrent().getBrowserWindowWidth();
+
+		if(wndHeight > wndWidth)
+			wndHeight /= 1.5;
+		else
+			wndWidth *= 0.67;
+
+		int videoHeight = (int) (wndHeight * 0.9);
+		int videoWidth = (int) (wndWidth * 0.9);
+
 		StringBuilder sb = new StringBuilder();
-		sb.append("<video width=\"auto\" height=\"auto\" id=\"" + playerId + "\" preload=\"metadata\" playsinline controls>");
+		sb.append("<video width=\"" + videoWidth + "\" height=\"" + videoHeight + "\" id=\"" + playerId + "\" playsinline controls>");
 		sb.append("</video>");
 
 		html.setValue(sb.toString());
