@@ -157,22 +157,26 @@ public class FileChooser extends CustomField<String> {
 	private void uploadReceived(String receivedFileName, Path receivedFilePath) {
 		// String desiredFileName = fileNameTranslator != null ? fileNameTranslator.apply(receivedFileName)
 		// 		: receivedFileName;
-		String desiredFileName = receivedFileName;
-		File receivedFile = new File(receivedFilePath.toFile().getAbsolutePath());
-		File newFile = new File(receivedFile.getParent(), desiredFileName);
-		receivedFile.renameTo(newFile);
-		receivedFile = newFile;
-		uploadedFilePath = receivedFile.getAbsolutePath();
 
 		// determine type of received file to apply conversion.
 		String mimeType = TRFileContentUtil.getMimeType(receivedFileName);
 		String ext = TRFileContentUtil.getExtensionFromFilename(receivedFileName);
+		String storageFileName = UUID.randomUUID().toString() + "." + ext;
+
+		String desiredFileName = receivedFileName;
+		File receivedFile = receivedFilePath.toFile();
+		File newFile = new File(receivedFile.getParent(), storageFileName);
+		receivedFile.renameTo(newFile);
+		receivedFile = newFile;
+		uploadedFilePath = receivedFile.getAbsolutePath();
+		
+		
 
 		if (mimeType.startsWith("image/")) {
 			try {
-				File convertedFile = new File(receivedFile.getParent(), desiredFileName);
+				File convertedFile = new File(receivedFile.getParent(), "resized-" + storageFileName);
 				if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
-					uploadedFilePath = receivedFilePath.toFile().getAbsolutePath();
+					uploadedFilePath = receivedFile.getAbsolutePath();
 				} else {
 					uploadedFilePath = convertedFile.getAbsolutePath();
 				}
@@ -182,7 +186,7 @@ public class FileChooser extends CustomField<String> {
 			}
 		} else if (mimeType.startsWith("audio/") && !ext.equals("mp3")) {
 			try {
-				File convertedFile = File.createTempFile(receivedFileName, desiredFileName + ".mp3");
+				File convertedFile = File.createTempFile(receivedFileName, storageFileName + ".mp3");
 				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
 				conv.convertAudioMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
 						GxAudioType.MP3);
@@ -193,7 +197,7 @@ public class FileChooser extends CustomField<String> {
 			}
 		} else if (mimeType.startsWith("video/") && !ext.equals("mp4")) {
 			try {
-				File convertedFile = File.createTempFile(receivedFileName, desiredFileName + ".mp4");
+				File convertedFile = File.createTempFile(receivedFileName, storageFileName + ".mp4");
 				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
 				conv.convertVideoMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
 						GxVideoType.MP4);
@@ -205,6 +209,13 @@ public class FileChooser extends CustomField<String> {
 		}
 
 		uploadedFileName = new File(uploadedFilePath).getName();
+		String uploadedFileExtension = TRFileContentUtil.getExtensionFromFilename(uploadedFileName);
+		if (!desiredFileName.endsWith(uploadedFileExtension)) {
+			uploadedFileName = desiredFileName + "." + uploadedFileExtension;
+		} else {
+			uploadedFileName = desiredFileName;
+		}
+
 		setValue(uploadedFilePath);
 
 		UI.getCurrent().access(() -> {

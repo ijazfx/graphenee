@@ -26,17 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.vaadin.viritin.BeanBinder;
-import org.vaadin.viritin.MBeanFieldGroup;
-import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
-import org.vaadin.viritin.button.DeleteButton;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.button.PrimaryButton;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.label.RichText;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-
-import com.vaadin.server.Page;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.AbstractField;
@@ -54,6 +43,16 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
+
+import org.vaadin.viritin.BeanBinder;
+import org.vaadin.viritin.MBeanFieldGroup;
+import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
+import org.vaadin.viritin.button.DeleteButton;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.button.PrimaryButton;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.label.RichText;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 import io.graphenee.vaadin.util.VaadinUtils;
 
