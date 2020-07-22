@@ -179,11 +179,12 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	protected String popupWidth() {
-		return "600px";
+		return safeWidthInPixels(browserWidth());
 	}
 
+	@Deprecated
 	protected String popupHeight() {
-		return "500px";
+		return safeHeightInPixels(browserHeight());
 	}
 
 	public void hideFooter() {

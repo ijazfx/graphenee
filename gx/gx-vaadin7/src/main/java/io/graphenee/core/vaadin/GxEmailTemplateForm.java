@@ -165,9 +165,4 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 		return "Message Template";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "550px";
-	}
-
 }

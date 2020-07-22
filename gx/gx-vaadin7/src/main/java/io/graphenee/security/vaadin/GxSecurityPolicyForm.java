@@ -249,11 +249,6 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 	}
 
 	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
-	@Override
 	public boolean isValid() {
 		if (selectedDocumentBean != null && Strings.isNullOrEmpty(selectedDocumentBean.getDocumentJson())) {
 			return false;

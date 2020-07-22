@@ -51,14 +51,4 @@ public class GxResourceForm extends TRAbstractForm<GxResourceBean> {
 		return "Resource Form";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "300px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "500px";
-	}
-
 }

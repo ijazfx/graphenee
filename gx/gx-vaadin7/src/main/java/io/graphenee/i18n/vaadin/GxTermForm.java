@@ -137,16 +137,6 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "475px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
-	@Override
 	public void setSaveButton(Button saveButton) {
 		this.saveButton = saveButton;
 		saveButton.addClickListener(new Button.ClickListener() {

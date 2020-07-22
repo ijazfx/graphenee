@@ -134,10 +134,5 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	protected String formTitle() {
 		return "Security Group";
 	}
-
-	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
+	
 }

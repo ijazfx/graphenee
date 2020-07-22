@@ -120,16 +120,6 @@ public class GxAwsSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "300px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "500px";
-	}
-
-	@Override
 	protected boolean eagerValidationEnabled() {
 		return true;
 	}

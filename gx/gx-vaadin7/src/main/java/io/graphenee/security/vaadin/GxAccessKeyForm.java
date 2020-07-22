@@ -123,9 +123,4 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 		this.namespaceBean = namespaceBean;
 	}
 
-	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
 }

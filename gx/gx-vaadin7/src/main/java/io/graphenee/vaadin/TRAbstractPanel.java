@@ -19,11 +19,6 @@ import java.util.Iterator;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractComponentContainer;
@@ -36,6 +31,13 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
+import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class TRAbstractPanel extends MPanel {
 
@@ -214,12 +216,30 @@ public abstract class TRAbstractPanel extends MPanel {
 		return true;
 	}
 
+	protected int browserWidth() {
+		return VaadinUtils.browserWidth();
+	}
+
+	protected int browserHeight() {
+		return VaadinUtils.browserHeight();
+	}
+
+	protected String safeWidthInPixels(int width) {
+		return VaadinUtils.safeWidth(width) + "px";
+	}
+
+	protected String safeHeightInPixels(int height) {
+		return VaadinUtils.safeHeight(height) + "px";
+	}
+
 	protected String popupWidth() {
-		return "400px";
+		return safeWidthInPixels(browserWidth());
 	}
 
+	@Deprecated
 	protected String popupHeight() {
-		return "150px";
+		return safeHeightInPixels(browserHeight());
 	}
 
+	
 }

@@ -58,13 +58,4 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 		return "Device Details";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "300";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "475px";
-	}
 }

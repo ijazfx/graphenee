@@ -99,14 +99,4 @@ public class GxCountryForm extends TRAbstractForm<GxCountryBean> {
 		return "Country";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "600px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "600px";
-	}
-
 }

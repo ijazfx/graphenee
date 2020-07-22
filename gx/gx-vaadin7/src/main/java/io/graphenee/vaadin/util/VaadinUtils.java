@@ -226,11 +226,11 @@ public class VaadinUtils {
 	}
 
 	public static int safeWidth(int width) {
-		return (browserWidth() > width ? width : browserWidth() - 8);
+		return (int) (browserWidth() > width ? width : browserWidth() * 0.9);
 	}
 
 	public static int safeHeight(int height) {
-		return (browserHeight() > height ? height : browserHeight() - 10);
+		return (int) (browserHeight() > height ? height : browserHeight() * 0.9);
 	}
 
 }

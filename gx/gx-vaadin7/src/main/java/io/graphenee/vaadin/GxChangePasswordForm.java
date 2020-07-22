@@ -52,16 +52,6 @@ public class GxChangePasswordForm extends TRAbstractForm<GxChangePasswordBean> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "190px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "450px";
-	}
-
-	@Override
 	protected boolean isPopupResizable() {
 		return false;
 	}

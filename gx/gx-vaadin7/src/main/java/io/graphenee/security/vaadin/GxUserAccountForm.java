@@ -150,9 +150,4 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		return "User Account";
 	}
 
-	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
 }
