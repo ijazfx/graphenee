@@ -21,19 +21,11 @@ public class VideoPlayer extends VerticalLayout {
 	public VideoPlayer() {
 		MLabel html = new MLabel().withContentMode(ContentMode.HTML).withStyleName(GrapheneeTheme.STYLE_DISPLAY_INLINE);
 
-		int wndHeight = Page.getCurrent().getBrowserWindowHeight();
-		int wndWidth = Page.getCurrent().getBrowserWindowWidth();
-
-		if(wndHeight > wndWidth)
-			wndHeight /= 1.5;
-		else
-			wndWidth *= 0.67;
-
-		int videoHeight = (int) (wndHeight * 0.9);
-		int videoWidth = (int) (wndWidth * 0.9);
+		int wndWidth = (int) (Page.getCurrent().getBrowserWindowWidth() * 0.75);
+		int wndHeight = (int) (wndWidth * 0.5625);
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("<video width=\"" + videoWidth + "\" height=\"" + videoHeight + "\" id=\"" + playerId + "\" playsinline controls>");
+		sb.append("<video width=\"" + wndWidth + "\" height=\"" + wndHeight + "\" id=\"" + playerId + "\" playsinline controls>");
 		sb.append("</video>");
 
 		html.setValue(sb.toString());

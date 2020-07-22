@@ -16,7 +16,7 @@ public class MVerticalLayout extends VerticalLayout {
 
     public MVerticalLayout() {
         super.setSpacing(true);
-        super.setMargin(true);
+        super.setMargin(false);
     }
 
     public MVerticalLayout(Component... components) {

@@ -25,18 +25,6 @@ import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.gridutil.cell.GridCellFilter;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.grid.MGrid;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-import org.vaadin.viritin.ui.MNotification;
-
 import com.google.common.base.Strings;
 import com.vaadin.addon.contextmenu.ContextMenu;
 import com.vaadin.addon.contextmenu.GridContextMenu;
@@ -60,6 +48,18 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.gridutil.cell.GridCellFilter;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.grid.MGrid;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.viritin.ui.MNotification;
 
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
@@ -692,12 +692,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	public AbstractEntityListPanel<T> withMargin(boolean margins) {
-		this.rootLayoutMargin = null;
-		return this;
+		return withMargin(new MarginInfo(margins));
 	}
 
-	public AbstractEntityListPanel<T> withMargin(MarginInfo marginInfo) {
-		this.rootLayoutMargin = marginInfo;
+	public AbstractEntityListPanel<T> withMargin(MarginInfo margins) {
+		this.rootLayoutMargin = margins;
+		if (rootLayout != null)
+			rootLayout.setMargin(margins);
 		return this;
 	}
 

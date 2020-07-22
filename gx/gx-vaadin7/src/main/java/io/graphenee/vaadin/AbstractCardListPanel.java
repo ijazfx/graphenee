@@ -28,14 +28,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -44,6 +36,14 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.util.VaadinUtils;
@@ -243,7 +243,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		if (entities.isEmpty()) {
 			contentLayout.removeAllComponents();
 			MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
-			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)));
+			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)).withMargin(true));
 			contentLayout.addComponent(cardPanel);
 		} else {
 			contentLayout.removeAllComponents();
@@ -267,7 +267,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 						String key = keyOrders.get(i);
 						List<T> grouped = groupedEntities.get(key);
 						MLabel headerLabel = new MLabel(key).withHeight("-1px").withStyleName(ValoTheme.LABEL_H3, ValoTheme.LABEL_NO_MARGIN);
-						contentLayout.addComponent(new MVerticalLayout(headerLabel));
+						contentLayout.addComponent(new MVerticalLayout(headerLabel).withMargin(true));
 						prepareCardList(grouped);
 						MLabel dummyLabel = new MLabel().withHeight("-1px");
 						contentLayout.addComponent(dummyLabel);

@@ -53,10 +53,11 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	@include dashboard-reports-view;
 	@include valo-checkbox(v-grid-select-all-checkbox);
 	@include valo-checkbox(v-grid-selection-checkbox);
-	*::-webkit-scrollbar {
+	
+	card-collection *::-webkit-scrollbar {
 		display: none;
 	}
-	* {
+	card-collection * {
 		-ms-overflow-style: none;
 		/* IE and Edge */
 		scrollbar-width: none;

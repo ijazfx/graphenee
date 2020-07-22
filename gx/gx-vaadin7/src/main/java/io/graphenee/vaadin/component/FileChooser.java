@@ -33,7 +33,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.FileTypeResolver;
@@ -42,6 +41,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 import io.graphenee.core.enums.GxAudioType;
@@ -66,7 +66,7 @@ public class FileChooser extends CustomField<String> {
 	private FileStorage storage;
 	private String componentHeight;
 	private String componentWidth;
-	private ProgressBar progressBar;
+	private MLabel progressBar;
 	private String uploadedFilePath;
 	private String uploadedFileName;
 	private Function<String, String> fileNameTranslator;
@@ -155,6 +155,11 @@ public class FileChooser extends CustomField<String> {
 	}
 
 	private void uploadReceived(String receivedFileName, Path receivedFilePath) {
+		UI.getCurrent().access(() -> {
+			// float value = (float) readBytes / contentLength;
+			progressBar.setValue("Processing file, please wait!");
+			UI.getCurrent().push();
+		});
 		// String desiredFileName = fileNameTranslator != null ? fileNameTranslator.apply(receivedFileName)
 		// 		: receivedFileName;
 
@@ -169,8 +174,7 @@ public class FileChooser extends CustomField<String> {
 		receivedFile.renameTo(newFile);
 		receivedFile = newFile;
 		uploadedFilePath = receivedFile.getAbsolutePath();
-		
-		
+		uploadedFileName = desiredFileName;
 
 		if (mimeType.startsWith("image/")) {
 			try {
@@ -253,7 +257,7 @@ public class FileChooser extends CustomField<String> {
 			uploadComponent.setVisible(false);
 			imageLayout.setVisible(true);
 			previewImage.setVisible(false);
-			progressBar.setValue(0F);
+			progressBar.setValue("N/A");
 			progressBar.setVisible(true);
 			UI.getCurrent().push();
 		});
@@ -261,8 +265,8 @@ public class FileChooser extends CustomField<String> {
 
 	private void uploadProgress(String fileName, long readBytes, long contentLength) {
 		UI.getCurrent().access(() -> {
-			float value = (float) readBytes / contentLength;
-			progressBar.setValue(value);
+			// float value = (float) readBytes / contentLength;
+			progressBar.setValue(readBytes + " / " + contentLength + " bytes uploaded.");
 			UI.getCurrent().push();
 		});
 	}
@@ -293,8 +297,8 @@ public class FileChooser extends CustomField<String> {
 				.withMargin(false).withSpacing(true).withWidthUndefined();
 		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER).withSpacing(false);
 		imageLayout.setHeight(componentHeight);
-		progressBar = new ProgressBar();
-		progressBar.setIndeterminate(false);
+		progressBar = new MLabel("Progress");
+		// progressBar.setIndeterminate(false);
 		previewImage = new Image();
 		// previewImage.setHeight("32px");
 		previewImage.setSource(GrapheneeTheme.UPLOAD_ICON);
