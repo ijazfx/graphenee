@@ -236,10 +236,8 @@ public abstract class TRAbstractPanel extends MPanel {
 		return safeWidthInPixels(browserWidth());
 	}
 
-	@Deprecated
 	protected String popupHeight() {
 		return safeHeightInPixels(browserHeight());
 	}
 
-	
 }

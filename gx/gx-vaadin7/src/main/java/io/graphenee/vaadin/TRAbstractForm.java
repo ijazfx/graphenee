@@ -182,7 +182,6 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 		return safeWidthInPixels(browserWidth());
 	}
 
-	@Deprecated
 	protected String popupHeight() {
 		return safeHeightInPixels(browserHeight());
 	}
