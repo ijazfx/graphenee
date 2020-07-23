@@ -60,15 +60,6 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		white-space: pre-wrap !important;
 	}
 
-	.card-collection *::-webkit-scrollbar {
-		display: none;
-	}
-	.card-collection * {
-		-ms-overflow-style: none;
-		/* IE and Edge */
-		scrollbar-width: none;
-	}
-
 	.gx-display-inline {
 		display: inline;
 	}
@@ -286,7 +277,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	.notifications-card-collection {
 		padding: 0px;
 		.card-item-content {
-			overflow: hidden;
+			overflow: visible;
 		}
 		.popup-footer {
 			z-index: 300;
@@ -310,7 +301,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	.comments-card-collection {
 		padding: 0px;
 		.card-item-content {
-			overflow: hidden;
+			overflow: visible;
 		}
 		.popup-footer {
 			z-index: 300;
@@ -334,7 +325,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	.card-collection {
 		padding: 0px;
 		.card-item-content {
-			overflow: hidden;
+			overflow: visible;
 		}
 		.popup-footer {
 			z-index: 300;
