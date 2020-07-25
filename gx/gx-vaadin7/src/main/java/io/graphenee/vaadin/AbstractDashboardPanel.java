@@ -87,7 +87,7 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 		VerticalLayout layout = new VerticalLayout();
 		layout.setSizeFull();
 		layout.addStyleName("viewlayout");
-		layout.setMargin(false);
+		layout.setMargin(true);
 		layout.setSpacing(true);
 		return layout;
 	}

@@ -17,6 +17,11 @@ package io.graphenee.vaadin;
 
 import javax.annotation.PostConstruct;
 
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MFormLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
@@ -26,11 +31,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MFormLayout;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
@@ -109,14 +109,15 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	protected Component getFormComponent(T entity) {
-		MHorizontalLayout details = new MHorizontalLayout();
-		details.setWidth(100.0f, Unit.PERCENTAGE);
-		details.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-		detailsForm = buildDetailsForm();
-		details.addComponent(detailsForm);
-		details.setExpandRatio(detailsForm, 1);
-
-		return details;
+		//		MHorizontalLayout details = new MHorizontalLayout();
+		//		details.setWidth(100.0f, Unit.PERCENTAGE);
+		//		details.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+		//		detailsForm = buildDetailsForm();
+		//		details.addComponent(detailsForm);
+		//		details.setExpandRatio(detailsForm, 1);
+		//
+		//		return details;
+		return buildDetailsForm();
 	}
 
 	private Component buildDetailsForm() {

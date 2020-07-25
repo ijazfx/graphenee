@@ -23,13 +23,13 @@ $v-card-footer: #FFFFFF !default;
 @import "views/transactions";
 @import "views/reports";
 // Main layout padding
-$view-padding: round($v-unit-size * 0.5) !default;
-$v-margin-left: round($v-unit-size * 0.5) !default;
-$v-margin-right: round($v-unit-size * 0.5) !default;
-$v-margin-top: round($v-unit-size * 0.5) !default;
-$v-margin-bottom: round($v-unit-size * 0.5) !default;
-$v-layout-spacing-vertical: round($v-unit-size * 0.5) !default;
-$v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
+$view-padding: round($v-unit-size * 0.25) !default;
+$v-margin-left: round($v-unit-size * 0.25) !default;
+$v-margin-right: round($v-unit-size * 0.25) !default;
+$v-margin-top: round($v-unit-size * 0.25) !default;
+$v-margin-bottom: round($v-unit-size * 0.25) !default;
+$v-layout-spacing-vertical: round($v-unit-size * 0.25) !default;
+$v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
 // Optimize the CSS output
 //$v-included-components: remove($v-included-components, accordion);
 //$v-included-components: remove($v-included-components, colorpicker);
@@ -276,9 +276,6 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.notifications-card-collection {
 		padding: 0px;
-		.card-item-content {
-			overflow: visible;
-		}
 		.popup-footer {
 			z-index: 300;
 			background-color: $v-card-footer;
@@ -300,9 +297,6 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.comments-card-collection {
 		padding: 0px;
-		.card-item-content {
-			overflow: visible;
-		}
 		.popup-footer {
 			z-index: 300;
 			background-color: $v-card-footer;
@@ -324,9 +318,6 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.card-collection {
 		padding: 0px;
-		.card-item-content {
-			overflow: visible;
-		}
 		.popup-footer {
 			z-index: 300;
 			background-color: $v-card-footer;

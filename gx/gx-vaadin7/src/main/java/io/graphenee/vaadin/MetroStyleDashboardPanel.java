@@ -23,16 +23,15 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
@@ -54,7 +53,8 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 
 	@Override
 	protected void postInitialize() {
-		rootLayout = new CssLayout(); //.withMargin(false).withSpacing(true).withFullWidth();
+		rootLayout = new CssLayout();
+		rootLayout.setStyleName("metro-layout");
 		List<TRMenuItem> menuItems = dashboardSetup.menuItems();
 		generateTiles(rootLayout, menuItems);
 		addComponent(rootLayout);
@@ -77,8 +77,7 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			// MLabel icon = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN, "tile-icon").withWidthUndefined();
 			// icon.setIcon(menuItem.icon());
 			icon.setWidth("52px");
-			MLabel label = new MLabel(menuItem.caption()).withStyleName(ValoTheme.LABEL_NO_MARGIN, ValoTheme.LABEL_BOLD)
-					.withWidthUndefined();
+			MLabel label = new MLabel(menuItem.caption()).withStyleName(ValoTheme.LABEL_NO_MARGIN, ValoTheme.LABEL_BOLD).withWidthUndefined();
 			MVerticalLayout iconLabelLayout = new MVerticalLayout(icon, label).withMargin(true).withSpacing(false);
 			iconLabelLayout.setComponentAlignment(icon, Alignment.TOP_CENTER);
 			iconLabelLayout.setComponentAlignment(label, Alignment.BOTTOM_CENTER);
@@ -89,15 +88,14 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 				if (menuItem.hasChildren()) {
 					mainLayout.removeAllComponents();
 					List<TRMenuItem> subMenuItems = new ArrayList<>(menuItem.getChildren());
-					TRSimpleMenuItem backMenuItem = TRSimpleMenuItem.createMenuItem("Back", GrapheneeTheme.BACK_ICON,
-							event2 -> {
-								mainLayout.removeAllComponents();
-								if (menuItem.getParent() != null) {
-									generateTiles(mainLayout, menuItem.getParent().getChildren());
-								} else {
-									generateTiles(mainLayout, dashboardSetup.menuItems());
-								}
-							});
+					TRSimpleMenuItem backMenuItem = TRSimpleMenuItem.createMenuItem("Back", GrapheneeTheme.BACK_ICON, event2 -> {
+						mainLayout.removeAllComponents();
+						if (menuItem.getParent() != null) {
+							generateTiles(mainLayout, menuItem.getParent().getChildren());
+						} else {
+							generateTiles(mainLayout, dashboardSetup.menuItems());
+						}
+					});
 					subMenuItems.add(0, backMenuItem);
 					generateTiles(mainLayout, subMenuItems);
 				} else {
@@ -122,7 +120,8 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			//			}
 			//			tileCount += value;
 			// System.err.print(value + ",");
-			panel.setStyleName("metro-tile-" + value);
+			panel.setStyleName("metro-tile");
+			panel.addStyleName("metro-tile-" + value);
 			panel.addStyleName(GrapheneeTheme.STYLE_MARGIN_TOP);
 			panel.addStyleName(GrapheneeTheme.STYLE_MARGIN_LEFT);
 			panel.setWidth(value == 1 ? "120px" : "250px");

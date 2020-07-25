@@ -21,12 +21,7 @@
     }
     
     .viewlayout {
-    	padding-top: $view-padding;
-    	padding-left: $view-padding;
-    	padding-right: $view-padding;
-    	padding-bottom: 0px;
     	height: 100%;
-    	overflow: scroll;    
     	
     	.v-panel-content-color-default {
     		background-color: #DFE7EA;
@@ -136,11 +131,9 @@
 		}
 		
 		.v-panel-metro-tile-1 {
-			overflow: hidden;
 		}
 
 		.v-panel-metro-tile-2 {
-			overflow: hidden;
 		}
     		
     }
