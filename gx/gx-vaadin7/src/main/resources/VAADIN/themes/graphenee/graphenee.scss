@@ -55,6 +55,21 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	@include valo-checkbox(v-grid-select-all-checkbox);
 	@include valo-checkbox(v-grid-selection-checkbox);
 	
+	.metro-tile {
+		flex: auto;
+	}
+	
+	.metro-layout {
+		display: flex;
+		flex-direction: row;
+		flex-flow: wrap;
+		margin-inline-end: $v-margin-right;
+	}
+	
+	.viewlayout {
+		overflow: auto;
+	}
+
 	.toolbar {
     	display: flex;
     	flex-direction: row;
