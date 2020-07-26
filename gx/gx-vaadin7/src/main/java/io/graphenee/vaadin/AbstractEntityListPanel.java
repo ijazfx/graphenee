@@ -247,7 +247,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		mainGridContainer = new BeanItemContainer<>(entityClass);
 		grid.setContainerDataSource(mainGridContainer);
 		grid.setSizeFull();
-		grid.setHeightMode(HeightMode.CSS);
+		grid.setHeightMode(HeightMode.ROW);
 		String[] visibleProperties = visibleProperties();
 		if (visibleProperties != null) {
 			for (String propertyId : visibleProperties()) {
@@ -434,7 +434,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); //.withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 
 		layout.add(addButton);
 		layout.add(editButton);
@@ -468,7 +468,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); //.withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
