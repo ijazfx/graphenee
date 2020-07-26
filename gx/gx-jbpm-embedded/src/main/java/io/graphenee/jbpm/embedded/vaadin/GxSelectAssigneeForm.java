@@ -66,16 +66,6 @@ public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 		return "Assign Task";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "180px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "400px";
-	}
-
 	public static class GxAssigneeHolder {
 		GxAssignee assignee;
 

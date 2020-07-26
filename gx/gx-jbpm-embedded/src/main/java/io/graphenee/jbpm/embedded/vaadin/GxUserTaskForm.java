@@ -377,16 +377,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "350px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "450px";
-	}
-
-	@Override
 	protected void adjustSaveButtonState() {
 		super.adjustSaveButtonState();
 		boolean valid = isValid();

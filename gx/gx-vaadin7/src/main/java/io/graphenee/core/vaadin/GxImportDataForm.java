@@ -115,16 +115,6 @@ public class GxImportDataForm extends TRAbstractPanel {
 		this.importDataProcessor = importDataProcessor;
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "500px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
 	public Consumer<List> getOnImportCompletion() {
 		return onImportCompletion;
 	}

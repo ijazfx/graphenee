@@ -24,6 +24,7 @@ $v-card-footer: #FFFFFF !default;
 @import "views/reports";
 // Main layout padding
 $view-padding: round($v-unit-size * 0.5) !default;
+$v-half-margin: round($v-unit-size * 0.25) !default;
 $v-margin-left: round($v-unit-size * 0.5) !default;
 $v-margin-right: round($v-unit-size * 0.5) !default;
 $v-margin-top: round($v-unit-size * 0.5) !default;
@@ -286,11 +287,12 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		padding: 0px;
 		.popup-footer {
 			z-index: 300;
+			padding: $v-half-margin;
 			background-color: $v-card-footer;
 			border-top: 1px solid $v-card-border-color;
 		}
 		>.card-item {
-			margin-right: $v-margin-right;
+			margin: $v-half-margin;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
@@ -308,10 +310,12 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		padding: 0px;
 		.popup-footer {
 			z-index: 300;
+			padding: $v-half-margin;
 			background-color: $v-card-footer;
 			border-top: 1px solid $v-card-border-color;
 		}
 		>.card-item {
+			margin: $v-half-margin;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
@@ -334,12 +338,12 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		padding: 0px;
 		.popup-footer {
 			z-index: 300;
+			padding: $v-half-margin;
 			background-color: $v-card-footer;
 			border-top: 1px solid $v-card-border-color;
 		}
 		>.card-item {
-			margin-right: $v-margin-right;
-			border-radius: $v-border-radius;
+			margin: $v-half-margin;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
 		}

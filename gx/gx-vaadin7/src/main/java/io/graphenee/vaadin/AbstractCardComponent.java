@@ -133,7 +133,7 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 	}
 
 	public MHorizontalLayout getToolbar(T entity) {
-		toolBar = new MHorizontalLayout().withMargin(true).withSpacing(true).withDefaultComponentAlignment(Alignment.MIDDLE_LEFT).withFullWidth();
+		toolBar = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.MIDDLE_LEFT).withFullWidth();
 		MLabel blankLabel = new MLabel("").withWidth("1px");
 		toolBar.addComponentAsFirst(blankLabel);
 		toolBar.setExpandRatio(blankLabel, 1);
