@@ -15,38 +15,25 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
-import org.vaadin.viritin.layouts.MPanel;
-
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.SingleComponentContainer;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 public abstract class ListViewCollectionPanel<T> extends AbstractCollectionPanel<T> {
 
-	private VerticalLayout layout;
+	private MVerticalLayout layout;
 	private boolean hoverShadow;
 
 	@Override
 	protected AbstractLayout collectionLayout() {
 		if (layout == null) {
-			layout = new VerticalLayout();
+			layout = new MVerticalLayout();
 			layout.setSizeFull();
 		}
 		return layout;
-	}
-
-	public ListViewCollectionPanel<T> withMargin(boolean value) {
-		collectionLayout();
-		layout.setMargin(value);
-		return this;
-	}
-
-	public ListViewCollectionPanel<T> withMargin(MarginInfo marginInfo) {
-		collectionLayout();
-		layout.setMargin(marginInfo);
-		return this;
 	}
 
 	public ListViewCollectionPanel<T> withSpacing(boolean value) {

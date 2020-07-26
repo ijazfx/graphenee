@@ -1,21 +1,22 @@
 package org.vaadin.viritin.layouts;
 
+import java.util.Collection;
+
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import org.vaadin.viritin.MSize;
 
-import java.util.Collection;
+import org.vaadin.viritin.MSize;
 
 public class MVerticalLayout extends VerticalLayout {
 
     private static final long serialVersionUID = -1806208156595232451L;
 
     public MVerticalLayout() {
-        super.setSpacing(true);
-        super.setMargin(true);
+        setSpacing(false);
+        setMargin(false);
     }
 
     public MVerticalLayout(Component... components) {

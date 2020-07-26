@@ -15,11 +15,6 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.Page;
@@ -27,19 +22,20 @@ import com.vaadin.server.Resource;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import io.graphenee.vaadin.ui.GxNotification;
+import io.graphenee.vaadin.util.VaadinUtils;
 
 @SuppressWarnings("serial")
 public class ResourcePreviewPanel extends TRAbstractPanel {
 
 	private BrowserFrame viewer;
 	private MButton downloadButton;
-	private FileDownloader downloader;
-	private MLabel note;
-	private MVerticalLayout noteLayout;
 
 	@Override
 	protected boolean isSpringComponent() {
@@ -66,93 +62,41 @@ public class ResourcePreviewPanel extends TRAbstractPanel {
 		viewer.setSizeFull();
 		layout.add(viewer);
 		layout.setExpandRatio(viewer, 1);
-		note = new MLabel().withFullWidth();
-		note.setValue(
-				"Download the file using 'Download' button. After download, the file should open automatically using device default viewer for the file type. If not, you may need to download an application from the Internet to open the file such as Adope PDF Viewer for PDF files or Media Player for Audio/Video files.");
-		noteLayout = new MVerticalLayout(note);
-		layout.add(noteLayout);
 	}
 
 	@Override
 	protected String popupHeight() {
-		return "600px";
+		return Math.round(VaadinUtils.browserHeight() * 0.9) + "px";
 	}
 
 	@Override
 	protected String popupWidth() {
-		return "800px";
-	}
-
-	public Window openInModalPopup(boolean visible) {
-		Window wnd = super.openInModalPopup();
-		if (!visible) {
-			wnd.setWidth("350px");
-			wnd.setHeight("210px");
-		}
-		return wnd;
+		return Math.round(VaadinUtils.browserWidth() * 0.9) + "px";
 	}
 
 	public void preview(Resource resource) {
-		downloadButton.setEnabled(true);
-		if (resource.getMIMEType().startsWith("image/") || resource.getMIMEType().endsWith("/pdf")) {
-			viewer.setSource(resource);
-			downloadButton.setVisible(false);
-			noteLayout.setVisible(false);
-			viewer.setVisible(true);
-			openInModalPopup(true);
-		} else {
-			viewer.setSource(null);
-			viewer.setVisible(false);
-			noteLayout.setVisible(true);
-			if (downloader == null) {
-				downloader = new FileDownloader(resource);
-				downloader.setErrorHandler(new ErrorHandler() {
+		build();
+		viewer.setSource(resource);
+		FileDownloader downloader = new FileDownloader(resource);
+		downloader.setErrorHandler(new ErrorHandler() {
 
-					@Override
-					public void error(com.vaadin.server.ErrorEvent event) {
-						event.getThrowable().printStackTrace();
-						UI.getCurrent().access(() -> {
-							GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
-									.show(Page.getCurrent());
-							UI.getCurrent().push();
-						});
-					}
+			@Override
+			public void error(com.vaadin.server.ErrorEvent event) {
+				event.getThrowable().printStackTrace();
+				UI.getCurrent().access(() -> {
+					GxNotification.closable(
+							"Download the file again and wait until the download is finished before you open the file.",
+							Type.ERROR_MESSAGE).show(Page.getCurrent());
+					UI.getCurrent().push();
 				});
-				downloader.extend(downloadButton);
-			} else {
-				downloader.setFileDownloadResource(resource);
 			}
-			downloadButton.setVisible(true);
-			openInModalPopup(false);
-		}
+		});
+		downloader.extend(downloadButton);
+		openInModalPopup();
 	}
 
 	public void download(Resource resource) {
-		downloadButton.setEnabled(true);
-		viewer.setSource(null);
-		viewer.setVisible(false);
-		noteLayout.setVisible(true);
-		if (downloader == null) {
-			downloader = new FileDownloader(resource);
-			downloader.setErrorHandler(new ErrorHandler() {
-
-				@Override
-				public void error(com.vaadin.server.ErrorEvent event) {
-					UI.getCurrent().access(() -> {
-						event.getThrowable().printStackTrace();
-						GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
-								.show(Page.getCurrent());
-						UI.getCurrent().push();
-					});
-					// Let's figure out how to fix this issue.
-				}
-			});
-			downloader.extend(downloadButton);
-		} else {
-			downloader.setFileDownloadResource(resource);
-		}
-		downloadButton.setVisible(true);
-		openInModalPopup(false);
+		preview(resource);
 	}
 
 }

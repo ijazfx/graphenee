@@ -25,18 +25,6 @@ import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.gridutil.cell.GridCellFilter;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.grid.MGrid;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-import org.vaadin.viritin.ui.MNotification;
-
 import com.google.common.base.Strings;
 import com.vaadin.addon.contextmenu.ContextMenu;
 import com.vaadin.addon.contextmenu.GridContextMenu;
@@ -46,6 +34,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -60,6 +49,18 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.gridutil.cell.GridCellFilter;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.grid.MGrid;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.viritin.ui.MNotification;
 
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
@@ -98,8 +99,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private MButton exportDataDownloadButton;
 
 	private MVerticalLayout rootLayout;
-
-	private MarginInfo rootLayoutMargin;
 
 	private FooterCell statusBar;
 
@@ -231,8 +230,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout();
-			showMargin();
+			rootLayout = new MVerticalLayout().withMargin(new MarginInfo(true, false)).withSpacing(true);
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
 			rootLayout.setExpandRatio(mainGrid, 1);
@@ -249,6 +247,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		mainGridContainer = new BeanItemContainer<>(entityClass);
 		grid.setContainerDataSource(mainGridContainer);
 		grid.setSizeFull();
+		grid.setHeightMode(HeightMode.CSS);
 		String[] visibleProperties = visibleProperties();
 		if (visibleProperties != null) {
 			for (String propertyId : visibleProperties()) {
@@ -435,8 +434,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
-				.withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); //.withFullWidth();
 
 		layout.add(addButton);
 		layout.add(editButton);
@@ -470,8 +468,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
-				.withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); //.withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -691,16 +688,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		return this;
 	}
 
-	public AbstractEntityListPanel<T> withMargin(boolean margins) {
-		this.rootLayoutMargin = null;
-		return this;
-	}
-
-	public AbstractEntityListPanel<T> withMargin(MarginInfo marginInfo) {
-		this.rootLayoutMargin = marginInfo;
-		return this;
-	}
-
 	public AbstractEntityListPanel<T> withDelegate(AbstractEntityListPanelDelegate delegate) {
 		setDelegate(delegate);
 		return this;
@@ -784,17 +771,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	public void hideSecondaryToolbar() {
 		secondaryToolbar.setVisible(false);
-	}
-
-	public void showMargin() {
-		if (rootLayoutMargin != null)
-			rootLayout.setMargin(rootLayoutMargin);
-		else
-			rootLayout.setMargin(true);
-	}
-
-	public void hideMargin() {
-		rootLayout.setMargin(false);
 	}
 
 	public MButton getAddButton() {

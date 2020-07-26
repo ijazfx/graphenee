@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
-import com.vaadin.ui.HorizontalLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 public abstract class TRAbstractSearchForm<T> extends TRAbstractForm<T> {
 
@@ -29,7 +29,7 @@ public abstract class TRAbstractSearchForm<T> extends TRAbstractForm<T> {
 	}
 
 	@Override
-	protected void addButtonsToFooter(HorizontalLayout footer) {
+	protected void addButtonsToFooter(MHorizontalLayout footer) {
 		super.addButtonsToFooter(footer);
 		setSavedHandler(event -> {
 			if (searchFormDelegate != null) {

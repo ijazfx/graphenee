@@ -96,14 +96,4 @@ public class GxStateForm extends TRAbstractForm<GxStateBean> {
 		return "State";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "450px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "600px";
-	}
-
 }

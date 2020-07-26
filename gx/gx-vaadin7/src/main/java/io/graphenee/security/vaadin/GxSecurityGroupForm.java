@@ -62,7 +62,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	@Override
 	protected Component getFormComponent() {
 		// detail form
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
+		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 		// namespaceFault = new ComboBox("Namespace");
 		// namespaceFault.setConverter(new
 		// BeanFaultToBeanConverter(GxNamespaceBean.class));
@@ -109,7 +109,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
 		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -134,10 +134,5 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	protected String formTitle() {
 		return "Security Group";
 	}
-
-	@Override
-	protected String popupWidth() {
-		return "700px";
-	}
-
+	
 }

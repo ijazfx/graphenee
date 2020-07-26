@@ -43,14 +43,4 @@ public class GxSaveQueryForm extends TRAbstractForm<GxSavedQueryBean> {
 		form.addComponent(queryName);
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "150px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "400px";
-	}
-
 }

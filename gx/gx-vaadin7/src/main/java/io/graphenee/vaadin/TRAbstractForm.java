@@ -17,31 +17,30 @@ package io.graphenee.vaadin;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.button.MButton;
-
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MFormLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	private static final long serialVersionUID = 1L;
 
-	private Image entityImage;
 	private Component detailsForm;
 	private MButton dismissButton;
 
 	protected boolean isBuilt;
 	private boolean footerVisibility = true;
-	private HorizontalLayout footer;
+	private MHorizontalLayout footer;
 
 	public TRAbstractForm() {
 		setHeight(100.0f, Unit.PERCENTAGE);
@@ -80,8 +79,8 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	private Component buildFooter() {
 		if (footer == null) {
-			footer = new HorizontalLayout();
-			HorizontalLayout toolbar = getToolbar();
+			footer = new MHorizontalLayout();
+			MHorizontalLayout toolbar = getToolbar();
 			dismissButton = new MButton("Dismiss").withListener(event -> {
 				onDismissButtonClick();
 			}).withVisible(shouldShowDismissButton());
@@ -109,30 +108,21 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	protected Component getFormComponent(T entity) {
-		HorizontalLayout details = new HorizontalLayout();
-		details.setWidth(100.0f, Unit.PERCENTAGE);
-		details.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-		details.setMargin(true);
-		details.setSpacing(true);
-
-		if (entityImage != null) {
-			Image coverImage = new Image(entityImage.getCaption(), entityImage.getSource());
-			coverImage.addStyleName("cover");
-			details.addComponent(coverImage);
-		}
-
-		detailsForm = buildDetailsForm();
-		details.addComponent(detailsForm);
-		details.setExpandRatio(detailsForm, 1);
-
-		return details;
+		//		MHorizontalLayout details = new MHorizontalLayout();
+		//		details.setWidth(100.0f, Unit.PERCENTAGE);
+		//		details.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+		//		detailsForm = buildDetailsForm();
+		//		details.addComponent(detailsForm);
+		//		details.setExpandRatio(detailsForm, 1);
+		//
+		//		return details;
+		return buildDetailsForm();
 	}
 
 	private Component buildDetailsForm() {
-		FormLayout form = new FormLayout();
+		MFormLayout form = new MFormLayout();
+		//@TODO: remove this.
 		form.setStyleName(ValoTheme.FORMLAYOUT_LIGHT);
-		form.setSpacing(false);
-		form.setMargin(false);
 		addFieldsToForm(form);
 		return form;
 	}
@@ -146,15 +136,14 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	protected abstract String formTitle();
 
-	public void setEntityImage(Image entityImage) {
-		this.entityImage = entityImage;
-	};
-
 	@Override
 	protected Component createContent() {
-		VerticalLayout content = new VerticalLayout();
+		MVerticalLayout content = new MVerticalLayout().withMargin(true);
 		content.setSizeFull();
-		Panel detailsWrapper = new Panel(getFormComponent());
+		MVerticalLayout contentLayout = new MVerticalLayout().withStyleName("content-layout");
+		contentLayout.setSizeFull();
+		contentLayout.add(getFormComponent());
+		Panel detailsWrapper = new Panel(contentLayout);
 		detailsWrapper.setSizeFull();
 		detailsWrapper.addStyleName(ValoTheme.PANEL_BORDERLESS);
 		detailsWrapper.addStyleName("scroll-divider");
@@ -193,11 +182,11 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	protected String popupWidth() {
-		return "600px";
+		return safeWidthInPixels(browserWidth());
 	}
 
 	protected String popupHeight() {
-		return "500px";
+		return safeHeightInPixels(browserHeight());
 	}
 
 	public void hideFooter() {

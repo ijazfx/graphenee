@@ -26,16 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.vaadin.viritin.BeanBinder;
-import org.vaadin.viritin.MBeanFieldGroup;
-import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
-import org.vaadin.viritin.button.DeleteButton;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.button.PrimaryButton;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.label.RichText;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.AbstractField;
@@ -46,13 +36,22 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
+
+import org.vaadin.viritin.BeanBinder;
+import org.vaadin.viritin.MBeanFieldGroup;
+import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
+import org.vaadin.viritin.button.DeleteButton;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.button.PrimaryButton;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.label.RichText;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.util.VaadinUtils;
 
@@ -79,7 +78,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	public static class ValidityChangedEvent<T> extends Component.Event {
 
-		private static final Method method = ReflectTools.findMethod(ValidityChangedListener.class, "onValidityChanged", ValidityChangedEvent.class);
+		private static final Method method = ReflectTools.findMethod(ValidityChangedListener.class, "onValidityChanged",
+				ValidityChangedEvent.class);
 
 		public ValidityChangedEvent(Component source) {
 			super(source);
@@ -110,7 +110,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 			@Override
 			public void attach(AttachEvent event) {
 				lazyInit();
-				//				adjustResetButtonState();
+				// adjustResetButtonState();
 			}
 		});
 
@@ -129,18 +129,17 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	protected void lazyInit() {
 		if (getCompositionRoot() == null) {
-			setCompositionRoot(new VerticalLayout());
-			//			adjustSaveButtonState();
-			//			adjustResetButtonState();
+			setCompositionRoot(new MVerticalLayout());
+			// adjustSaveButtonState();
+			// adjustResetButtonState();
 		}
 	}
 
 	private MBeanFieldGroup<T> fieldGroup;
 
 	/**
-	 * The validity checked and cached on last change. Should be pretty much
-	 * always up to date due to eager changes. At least after onFieldGroupChange
-	 * call.
+	 * The validity checked and cached on last change. Should be pretty much always
+	 * up to date due to eager changes. At least after onFieldGroupChange call.
 	 */
 	boolean isValid = false;
 
@@ -268,8 +267,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	/**
 	 * In case one is working with "detached entities" enabling eager validation
-	 * will highly improve usability. The validity of the form will be updated
-	 * on each changes and save/cancel buttons will reflect to the validity and
+	 * will highly improve usability. The validity of the form will be updated on
+	 * each changes and save/cancel buttons will reflect to the validity and
 	 * possible changes.
 	 *
 	 * @param eagerValidation true if the form should have eager validation
@@ -339,7 +338,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		return bindEntityWithComponentAndNestedProperties(entity, c, getNestedProperties());
 	}
 
-	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c, String... nestedProperties) {
+	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c,
+			String... nestedProperties) {
 		preBinding(entity);
 		MBeanFieldGroup<T> beanFieldGroup = BeanBinder.bind(entity, c, nestedProperties);
 		beanFieldGroup.setValidateAllProperties(false);
@@ -364,8 +364,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	/**
-	 * Sets the given object to be a handler for saved,reset,deleted, based on
-	 * what it happens to implement.
+	 * Sets the given object to be a handler for saved,reset,deleted, based on what
+	 * it happens to implement.
 	 *
 	 * @param handler the handler to be set as saved/reset/delete handler
 	 */
@@ -421,16 +421,16 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	/**
-	 * @return the last Popup into which the Form was opened with
-	 * #openInModalPopup method or null if the form hasn't been use in window
+	 * @return the last Popup into which the Form was opened with #openInModalPopup
+	 *         method or null if the form hasn't been use in window
 	 */
 	public Window getPopup() {
 		return popup;
 	}
 
 	/**
-	 * If the form is opened into a popup window using openInModalPopup(), you
-	 * you can use this method to close the popup.
+	 * If the form is opened into a popup window using openInModalPopup(), you you
+	 * can use this method to close the popup.
 	 */
 	public void closePopup() {
 		if (popup != null) {
@@ -442,18 +442,18 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	/**
 	 * @return A default toolbar containing save/cancel/delete buttons
 	 */
-	public HorizontalLayout getToolbar() {
+	public MHorizontalLayout getToolbar() {
 		MLabel spacer = new MLabel("").withFullWidth();
 		busyIndicator.setVisible(false);
 		busyIndicator.setIndeterminate(true);
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
 		addButtonsToFooter(layout);
 		layout.addComponents(spacer, busyIndicator, getSaveButton(), getResetButton(), getDeleteButton());
 		layout.setExpandRatio(spacer, 1);
 		return layout;
 	}
 
-	protected void addButtonsToFooter(HorizontalLayout footer) {
+	protected void addButtonsToFooter(MHorizontalLayout footer) {
 	}
 
 	protected Button createCancelButton() {
@@ -655,8 +655,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	/**
-	 * This method should return the actual content of the form, including
-	 * possible toolbar. Use setEntity(T entity) to fill in the data. Am example
+	 * This method should return the actual content of the form, including possible
+	 * toolbar. Use setEntity(T entity) to fill in the data. Am example
 	 * implementation could look like this:
 	 * 
 	 * <pre>
@@ -704,13 +704,13 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	/**
-	 * EXPERIMENTAL: The cross field validation support is still experimental
-	 * and its API is likely to change.
+	 * EXPERIMENTAL: The cross field validation support is still experimental and
+	 * its API is likely to change.
 	 *
-	 * @param validator a validator that validates the whole bean making cross
-	 * field validation much simpler
-	 * @param fields the ui fields that this validator affects and on which a
-	 * possible error message is shown.
+	 * @param validator a validator that validates the whole bean making cross field
+	 *                  validation much simpler
+	 * @param fields    the ui fields that this validator affects and on which a
+	 *                  possible error message is shown.
 	 * @return this FieldGroup
 	 */
 	public TRAbstractBaseForm<T> addValidator(MBeanFieldGroup.MValidator<T> validator, AbstractComponent... fields) {
@@ -817,6 +817,22 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	protected void localizeRecursively(Locale locale, Component component) {
 		VaadinUtils.localizeRecursively(component);
+	}
+
+	protected int browserWidth() {
+		return VaadinUtils.browserWidth();
+	}
+
+	protected int browserHeight() {
+		return VaadinUtils.browserHeight();
+	}
+
+	protected String safeWidthInPixels(int width) {
+		return VaadinUtils.safeWidth(width) + "px";
+	}
+
+	protected String safeHeightInPixels(int height) {
+		return VaadinUtils.safeHeight(height) + "px";
 	}
 
 }

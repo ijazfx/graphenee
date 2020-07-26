@@ -1,20 +1,22 @@
 package org.vaadin.viritin.layouts;
 
-import org.vaadin.viritin.MSize;
-
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
+
+import org.vaadin.viritin.MSize;
 
 public class MFormLayout extends FormLayout {
 
     private static final long serialVersionUID = -4097293516833876208L;
 
     public MFormLayout() {
+        
+        
     }
 
-    public MFormLayout(Component... children) {
+    public MFormLayout(Component children) {
         super(children);
     }
 
@@ -116,7 +118,7 @@ public class MFormLayout extends FormLayout {
         setDescription(description);
         return this;
     }
-    
+
     public MFormLayout with(Component... components) {
         addComponents(components);
         return this;

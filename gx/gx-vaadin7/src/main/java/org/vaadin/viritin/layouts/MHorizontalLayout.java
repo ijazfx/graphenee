@@ -1,21 +1,23 @@
 package org.vaadin.viritin.layouts;
 
+import java.util.Collection;
+
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import org.vaadin.viritin.MSize;
 
-import java.util.Collection;
+import org.vaadin.viritin.MSize;
 
 public class MHorizontalLayout extends HorizontalLayout {
 
     private static final long serialVersionUID = 524957578263653250L;
 
     public MHorizontalLayout() {
-        super.setSpacing(true);
+        setSpacing(false);
+        setMargin(false);
     }
 
     public MHorizontalLayout(Component... components) {

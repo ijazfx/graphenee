@@ -51,14 +51,4 @@ public class BaseProfileForm<T extends GxAuthenticatedUser> extends TRAbstractFo
 		form.addComponents(firstName, lastName, gender, username, email, mobileNumber, profilePhoto);
 	}
 
-	@Override
-	protected String popupWidth() {
-		return "500px";
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "400px";
-	}
-
 }

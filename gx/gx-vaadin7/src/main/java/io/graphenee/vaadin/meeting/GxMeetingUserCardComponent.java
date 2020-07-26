@@ -1,13 +1,13 @@
 package io.graphenee.vaadin.meeting;
 
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.model.GxMeetingUser;
 import io.graphenee.vaadin.AbstractCardComponent;
@@ -23,10 +23,6 @@ public class GxMeetingUserCardComponent extends AbstractCardComponent<GxMeetingU
 
 	@Override
 	protected void addComponentToLayout(MVerticalLayout layout, GxMeetingUser user) {
-		setMargin(false);
-		setSpacing(false);
-		layout.setMargin(false);
-		layout.setSpacing(false);
 		Label video = new Label();
 		video.setPrimaryStyleName("remotePeerStream");
 		video.setContentMode(ContentMode.HTML);
@@ -37,7 +33,7 @@ public class GxMeetingUserCardComponent extends AbstractCardComponent<GxMeetingU
 	}
 
 	@Override
-	protected void addButtonsToFooter(HorizontalLayout additionalButtonToolbar) {
+	protected void addButtonsToFooter(MHorizontalLayout additionalButtonToolbar) {
 		MButton muteButton = new MButton();
 		muteButton.withStyleName(ValoTheme.BUTTON_QUIET);
 		muteButton.addStyleName(ValoTheme.BUTTON_SMALL);

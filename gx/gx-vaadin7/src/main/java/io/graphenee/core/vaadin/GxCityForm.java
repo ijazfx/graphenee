@@ -100,14 +100,4 @@ public class GxCityForm extends TRAbstractForm<GxCityBean> {
 		return "City";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "250px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "450px";
-	}
-
 }

@@ -15,21 +15,18 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -39,6 +36,14 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.util.VaadinUtils;
@@ -62,8 +67,6 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	private AbstractEntityListPanelDelegate delegate = null;
 
 	private CssLayout contentLayout;
-
-	private boolean rootLayoutMargin = false;
 
 	private MVerticalLayout rootLayout;
 
@@ -100,7 +103,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 			setStyleName(ValoTheme.PANEL_BORDERLESS);
 			setCaption(panelCaption());
 
-			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin);
+			rootLayout = new MVerticalLayout().withMargin(true).withSpacing(true);
 			if (shouldShowToolbar()) {
 				toolbar = buildToolbar();
 				rootLayout.addComponent(toolbar);
@@ -126,7 +129,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	}
 
 	private Component buildToolbar() {
-		MVerticalLayout layout = new MVerticalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withFullWidth().withMargin(false).withSpacing(true);
+		MVerticalLayout layout = new MVerticalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.TOP_LEFT).withFullWidth();
 		addButton = new MButton(FontAwesome.PLUS, localizedSingularValue(addButtonCaption()), event -> {
 			try {
 				onAddButtonClick(initializeEntity(entityClass.newInstance()));
@@ -238,30 +241,55 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 		if (entities.isEmpty()) {
 			contentLayout.removeAllComponents();
 			MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
-			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)));
+			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)).withMargin(true));
 			contentLayout.addComponent(cardPanel);
 		} else {
 			contentLayout.removeAllComponents();
 			if (entities != null) {
-				entities.forEach(entity -> {
-					MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
-					MButton editButton = new MButton(FontAwesome.PENCIL, localizedSingularValue("Edit"), event -> {
-						preEdit(entity);
-						openEditorForm(entity);
+				if (shouldGroupByCards()) {
+					AtomicInteger index = new AtomicInteger(0);
+					Map<Integer, String> keyOrders = new HashMap<>();
+					Map<String, List<T>> groupedEntities = new HashMap<>();
+					entities.stream().forEach(e -> {
+						String key = groupByFunction(e);
+						List<T> grouped = groupedEntities.get(key);
+						if (grouped == null) {
+							grouped = new ArrayList<>();
+							groupedEntities.put(key, grouped);
+							keyOrders.put(index.getAndIncrement(), key);
+						}
+						grouped.add(e);
 					});
-					MButton deleteButton = new MButton(FontAwesome.TRASH, localizedSingularValue("Delete"), event -> {
-						if (shouldShowDeleteConfirmation()) {
-							ConfirmDialog.show(UI.getCurrent(), "Are you sure to delete selected records", e -> {
-								if (e.isConfirmed()) {
-									if (onDeleteEntity(entity)) {
-										contentLayout.removeComponent(cardPanel);
-										if (delegate != null) {
-											delegate.onDelete(entity);
-										}
-									}
-								}
-							});
-						} else {
+					Stream<Integer> indexes = keyOrders.keySet().stream().sorted();
+					indexes.forEach(i -> {
+						String key = keyOrders.get(i);
+						List<T> grouped = groupedEntities.get(key);
+						MLabel headerLabel = new MLabel(key).withHeight("-1px").withStyleName(ValoTheme.LABEL_H3);
+						contentLayout.addComponent(new MVerticalLayout(headerLabel));
+						prepareCardList(grouped);
+						MLabel dummyLabel = new MLabel().withHeight("-1px");
+						contentLayout.addComponent(dummyLabel);
+					});
+				} else {
+					prepareCardList(entities);
+					MLabel dummyLabel = new MLabel().withHeight("-1px");
+					contentLayout.addComponent(dummyLabel);
+				}
+			}
+		}
+	}
+
+	private void prepareCardList(List<T> entities) {
+		entities.forEach(entity -> {
+			MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
+			MButton editButton = new MButton(FontAwesome.PENCIL, localizedSingularValue("Edit"), event -> {
+				preEdit(entity);
+				openEditorForm(entity);
+			});
+			MButton deleteButton = new MButton(FontAwesome.TRASH, localizedSingularValue("Delete"), event -> {
+				if (shouldShowDeleteConfirmation()) {
+					ConfirmDialog.show(UI.getCurrent(), "Are you sure to delete selected records", e -> {
+						if (e.isConfirmed()) {
 							if (onDeleteEntity(entity)) {
 								contentLayout.removeComponent(cardPanel);
 								if (delegate != null) {
@@ -269,18 +297,31 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 								}
 							}
 						}
-
 					});
-					AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
-					cardPanel.setContent(cardLayout.build());
-					cardPanel.setWidth(cardLayout.getCardWidth());
-					contentLayout.addComponent(cardPanel);
+				} else {
+					if (onDeleteEntity(entity)) {
+						contentLayout.removeComponent(cardPanel);
+						if (delegate != null) {
+							delegate.onDelete(entity);
+						}
+					}
+				}
 
-				});
-				MLabel dummyLabel = new MLabel().withHeight("-1px");
-				contentLayout.addComponent(dummyLabel);
-			}
-		}
+			});
+			AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
+			cardPanel.setContent(cardLayout.build());
+			cardPanel.setWidth(cardLayout.getCardWidth());
+			contentLayout.addComponent(cardPanel);
+
+		});
+	}
+
+	protected String groupByFunction(T e) {
+		return null;
+	}
+
+	protected boolean shouldGroupByCards() {
+		return false;
 	}
 
 	protected void removeCard(AbstractCardComponent<T> card) {
@@ -385,23 +426,6 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 	protected void localizeRecursively(Locale locale, Component component) {
 		VaadinUtils.localizeRecursively(component);
-	}
-
-	public AbstractCardListPanel<T> withMargin(boolean margins) {
-		this.rootLayoutMargin = margins;
-		if (rootLayout != null)
-			rootLayout.setMargin(margins);
-		return this;
-	}
-
-	public void showMargin() {
-		rootLayoutMargin = true;
-		rootLayout.setMargin(true);
-	}
-
-	public void hideMargin() {
-		rootLayoutMargin = false;
-		rootLayout.setMargin(false);
 	}
 
 	public void showToolbar() {

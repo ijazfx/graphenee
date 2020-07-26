@@ -166,7 +166,7 @@ public class TRImageUtil {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 		double aspectRatio = (height * 1.0) / (width * 1.0);
-		int targetHeight = new Double(targetWidth * aspectRatio).intValue();
+		int targetHeight = Double.valueOf(targetWidth * aspectRatio).intValue();
 		BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, type);
 		Graphics2D g = resizedImage.createGraphics();
 		g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);

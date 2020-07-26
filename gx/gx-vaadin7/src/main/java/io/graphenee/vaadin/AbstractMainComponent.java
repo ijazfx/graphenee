@@ -17,27 +17,27 @@ package io.graphenee.vaadin;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ComponentContainer;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
+
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 
 /*
- * Dashboard MainView is a simple HorizontalLayout that wraps the menu on the
+ * Dashboard MainView is a simple MHorizontalLayout that wraps the menu on the
  * left and creates a simple container for the navigator on the right.
  */
 @SuppressWarnings("serial")
-public abstract class AbstractMainComponent extends HorizontalLayout {
+public abstract class AbstractMainComponent extends MHorizontalLayout {
 
 	private ComponentContainer componentContainer;
 	private boolean isBuilt;
@@ -64,12 +64,12 @@ public abstract class AbstractMainComponent extends HorizontalLayout {
 			addStyleName("mainview");
 
 			addComponent(dashboardMenu());
-			HorizontalLayout mainLayout = new HorizontalLayout();
+			MHorizontalLayout mainLayout = new MHorizontalLayout();
 			mainLayout.setSizeFull();
 			if (leftComponent() != null) {
 				mainLayout.addComponent(leftComponent());
 			}
-			MVerticalLayout rightComponent = new MVerticalLayout().withMargin(false).withSpacing(false).withFullWidth().withFullHeight();
+			MVerticalLayout rightComponent = new MVerticalLayout().withFullWidth().withFullHeight();
 			headerLayout = new MVerticalLayout().withFullWidth().withVisible(shouldShowHeaderLayout());
 
 			ComponentContainer content = new CssLayout();

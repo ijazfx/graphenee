@@ -25,13 +25,15 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.util.StringUtils;
 
+import io.graphenee.core.exception.SendMailFailedException;
+
 public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 
 	private JavaMailSender javaMailSender;
 
 	@Override
 	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList,
-			Collection<GxMailAttachment> attachments) {
+			Collection<GxMailAttachment> attachments) throws SendMailFailedException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		MimeMessageHelper mimeMessage;
 		try {
@@ -56,7 +58,6 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 				} else
 					mimeMessage.setBcc(bccEmailList);
 			}
-			// process attachments
 			if (attachments != null) {
 				for (GxMailAttachment attachment : attachments) {
 					mimeMessage.addAttachment(attachment.fileName(), attachment.streamSource(), attachment.contentType());
@@ -64,24 +65,26 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 			}
 			getJavaMailSender().send(message);
 		} catch (MessagingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SendMailFailedException(e);
 		}
 
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList) {
-		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, null, null);
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList)
+			throws SendMailFailedException {
+		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, bccEmailList, null);
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList) {
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList)
+			throws SendMailFailedException {
 		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, null);
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList) {
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList)
+			throws SendMailFailedException {
 		sendEmail(subject, content, senderEmail, toEmailList, null);
 	}
 

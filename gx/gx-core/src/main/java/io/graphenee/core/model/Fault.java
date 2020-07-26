@@ -147,6 +147,7 @@ public class Fault<KEY, T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -154,7 +155,7 @@ public class Fault<KEY, T> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Fault other = (Fault) obj;
+		Fault<KEY, T> other = (Fault<KEY, T>) obj;
 		if (key == null) {
 			if (other.key != null)
 				return false;

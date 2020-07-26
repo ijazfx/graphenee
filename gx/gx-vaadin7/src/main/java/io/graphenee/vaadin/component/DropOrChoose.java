@@ -102,7 +102,6 @@ public class DropOrChoose extends CustomField<Resource> {
 		uploadComponent.setProgressCallback(this::uploadProgress);
 		uploadComponent.setFailedCallback(this::uploadFailed);
 		uploadComponent.setStyleName("dropBoxLayout");
-		layout.setMargin(false);
 		uploadComponent.getChoose().setVisible(true);
 		layout.addComponent(uploadComponent);
 		return layout;

@@ -19,15 +19,14 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.util.VaadinUtils;
 
@@ -48,9 +47,7 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 		if (!isBuilt) {
 			removeAllComponents();
 			setSizeFull();
-			setMargin(false);
-			setSpacing(false);
-			MVerticalLayout cardLayout = new MVerticalLayout().withMargin(true).withSpacing(false).withStyleName("card-item-content");
+			MVerticalLayout cardLayout = new MVerticalLayout().withMargin(true).withSpacing(true).withStyleName("card-item-content");
 			addComponentToLayout(cardLayout);
 			addComponent(cardLayout);
 			setHeight(getCardHeight());
@@ -101,16 +98,15 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 
 	protected AbstractCardComponent<T> buildFooter(T item) {
 		if (!isBuilt) {
-			HorizontalLayout footer = new HorizontalLayout();
-			footer.setMargin(false);
-
-			HorizontalLayout toolbar = getToolbar(entity);
+			MHorizontalLayout footer = new MHorizontalLayout();
+			MHorizontalLayout toolbar = getToolbar(entity);
 			addButtonsToFooter(toolbar);
 
 			if (shouldShowEditButton()) {
 				if (toolBar != null && editButton != null) {
 					editButton.setStyleName(ValoTheme.BUTTON_SMALL);
 					editButton.addStyleName(ValoTheme.BUTTON_QUIET);
+					editButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 					toolBar.addComponent(editButton);
 				}
 			}
@@ -119,6 +115,7 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 				if (toolBar != null && deleteButton != null) {
 					deleteButton.setStyleName(ValoTheme.BUTTON_SMALL);
 					deleteButton.addStyleName(ValoTheme.BUTTON_QUIET);
+					deleteButton.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 					toolBar.addComponent(deleteButton);
 				}
 			}
@@ -130,19 +127,20 @@ public abstract class AbstractCardComponent<T> extends MVerticalLayout {
 
 			addComponent(footer);
 			setComponentAlignment(footer, Alignment.BOTTOM_LEFT);
+			setExpandRatio(footer, 0);
 		}
 		return this;
 	}
 
-	public HorizontalLayout getToolbar(T entity) {
-		toolBar = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_LEFT).withFullWidth();
+	public MHorizontalLayout getToolbar(T entity) {
+		toolBar = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.MIDDLE_LEFT).withFullWidth();
 		MLabel blankLabel = new MLabel("").withWidth("1px");
 		toolBar.addComponentAsFirst(blankLabel);
 		toolBar.setExpandRatio(blankLabel, 1);
 		return toolBar;
 	}
 
-	protected void addButtonsToFooter(HorizontalLayout footerToolbar) {
+	protected void addButtonsToFooter(MHorizontalLayout footerToolbar) {
 	}
 
 	public AbstractCardComponent<T> withDeleteButton(Button deleteButton) {

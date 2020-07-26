@@ -17,14 +17,9 @@ package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.graphenee.core.model.BeanFault;
 
 public class GxNamespacePropertyBean implements Serializable {
-
-	private static final Logger L = LoggerFactory.getLogger(GxNamespacePropertyBean.class);
 
 	private static final long serialVersionUID = 1L;
 	private Integer oid;

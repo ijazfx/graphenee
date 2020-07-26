@@ -19,15 +19,17 @@ import java.util.Collection;
 
 import org.springframework.core.io.InputStreamSource;
 
+import io.graphenee.core.exception.SendMailFailedException;
+
 public interface GxMailService {
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, Collection<GxMailAttachment> attachments);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, Collection<GxMailAttachment> attachments) throws SendMailFailedException;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) throws SendMailFailedException;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList) throws SendMailFailedException;
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail);
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail) throws SendMailFailedException;
 
 	public static interface GxMailAttachment {
 
@@ -37,5 +39,4 @@ public interface GxMailService {
 
 		String contentType();
 	}
-
 }

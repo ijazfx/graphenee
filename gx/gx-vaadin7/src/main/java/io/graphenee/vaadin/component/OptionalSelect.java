@@ -23,8 +23,9 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 /*
  * This component extends a CustomField and implements all the necessary
@@ -35,7 +36,7 @@ public final class OptionalSelect<T> extends CustomField<T> {
 
 	private final CheckBox checkBox;
 	private final ComboBox comboBox;
-	private final HorizontalLayout content;
+	private final MHorizontalLayout content;
 
 	@Override
 	protected Component initContent() {
@@ -43,8 +44,7 @@ public final class OptionalSelect<T> extends CustomField<T> {
 	}
 
 	public OptionalSelect() {
-		content = new HorizontalLayout();
-		content.setSpacing(true);
+		content = new MHorizontalLayout();
 		content.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
 		content.setDefaultComponentAlignment(Alignment.MIDDLE_LEFT);
 

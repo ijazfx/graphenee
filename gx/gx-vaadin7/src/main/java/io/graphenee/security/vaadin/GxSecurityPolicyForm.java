@@ -80,7 +80,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 	@Override
 	protected Component getFormComponent() {
 		// detail form
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
+		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 		// namespaceFault = new ComboBox("Namespace");
 		// namespaceFault.setConverter(new
 		// BeanFaultToBeanConverter(GxNamespaceBean.class));
@@ -216,7 +216,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
 		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -246,11 +246,6 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
 		List<GxAccessKeyBean> accessKeyBeans = dataService.findAccessKeyByIsActive(true);
 		accessKeyCollectionFault.addItems(accessKeyBeans);
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "700px";
 	}
 
 	@Override

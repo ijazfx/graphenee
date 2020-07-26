@@ -17,14 +17,14 @@ package io.graphenee.core.vaadin;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.vaadin.viritin.button.MButton;
-
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.vaadin.viritin.button.MButton;
 
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;

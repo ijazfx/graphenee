@@ -57,14 +57,4 @@ public class GxNamespacePropertyForm extends TRAbstractForm<GxNamespacePropertyB
 		return "Namespace Property";
 	}
 
-	@Override
-	protected String popupWidth() {
-		return "500px";
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "200px";
-	}
-
 }

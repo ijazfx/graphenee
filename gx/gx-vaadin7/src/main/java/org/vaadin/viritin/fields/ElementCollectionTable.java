@@ -130,7 +130,6 @@ public class ElementCollectionTable<ET> extends AbstractElementCollection<ET> {
 
     private void ensureInited() {
         if (!inited) {
-            layout.setMargin(false);
             setHeight("300px");
             table = new MTable<ET>(getElementType()).withFullWidth();
             for (Object propertyId : getVisibleProperties()) {

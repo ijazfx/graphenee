@@ -19,11 +19,6 @@ import java.util.Iterator;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractComponentContainer;
@@ -36,6 +31,13 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
+import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class TRAbstractPanel extends MPanel {
 
@@ -78,7 +80,7 @@ public abstract class TRAbstractPanel extends MPanel {
 
 			content = createContent();
 
-			MVerticalLayout layout = new MVerticalLayout().withMargin(false).withSpacing(false);
+			MVerticalLayout layout = new MVerticalLayout();
 			layout.setSizeFull();
 			layout.addComponents(content);
 			setContent(layout);
@@ -90,7 +92,7 @@ public abstract class TRAbstractPanel extends MPanel {
 	}
 
 	private Component buildFooter() {
-		MHorizontalLayout layout = new MHorizontalLayout().withFullWidth().withMargin(false).withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withFullWidth();
 		layout.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
 		layout.setDefaultComponentAlignment(footerAlignment());
 		addButtonsToFooter(layout);
@@ -118,9 +120,9 @@ public abstract class TRAbstractPanel extends MPanel {
 	protected abstract String panelTitle();
 
 	protected Component createContent() {
-		MVerticalLayout content = new MVerticalLayout().withMargin(false).withSpacing(false);
+		MVerticalLayout content = new MVerticalLayout();
 		content.setSizeFull();
-		MVerticalLayout contentLayout = new MVerticalLayout().withMargin(false).withSpacing(false).withFullWidth();
+		MVerticalLayout contentLayout = new MVerticalLayout().withFullWidth().withStyleName("content-layout");
 		contentLayout.setSizeFull();
 		addComponentsToContentLayout(contentLayout);
 		Panel detailsWrapper = new Panel(contentLayout);
@@ -214,12 +216,28 @@ public abstract class TRAbstractPanel extends MPanel {
 		return true;
 	}
 
+	protected int browserWidth() {
+		return VaadinUtils.browserWidth();
+	}
+
+	protected int browserHeight() {
+		return VaadinUtils.browserHeight();
+	}
+
+	protected String safeWidthInPixels(int width) {
+		return VaadinUtils.safeWidth(width) + "px";
+	}
+
+	protected String safeHeightInPixels(int height) {
+		return VaadinUtils.safeHeight(height) + "px";
+	}
+
 	protected String popupWidth() {
-		return "400px";
+		return safeWidthInPixels(browserWidth());
 	}
 
 	protected String popupHeight() {
-		return "150px";
+		return safeHeightInPixels(browserHeight());
 	}
 
 }

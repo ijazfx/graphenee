@@ -55,14 +55,4 @@ public class GxSupportedLocaleForm extends TRAbstractForm<GxSupportedLocaleBean>
 		return "Supported Locale";
 	}
 
-	@Override
-	protected String popupHeight() {
-		return "250px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "500px";
-	}
-
 }

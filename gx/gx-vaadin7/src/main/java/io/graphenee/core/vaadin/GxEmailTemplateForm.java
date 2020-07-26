@@ -15,6 +15,12 @@
  *******************************************************************************/
 package io.graphenee.core.vaadin;
 
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.themes.ValoTheme;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
@@ -23,13 +29,6 @@ import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
-
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
@@ -54,7 +53,7 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 
 	MCheckBox isActive;
 
-	protected VerticalLayout detailsTab;
+	protected MVerticalLayout detailsTab;
 	protected TabSheet mainTabSheet;
 	final int perSMSMaxLength = 160;
 
@@ -65,14 +64,14 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 
 	@Override
 	protected Component getFormComponent() {
-		detailsTab = new MVerticalLayout().withSpacing(false);
+		detailsTab = new MVerticalLayout();
 		detailsTab.setSizeFull();
 
 		detailsTab.addComponent(constructTemplateInfoForm());
 
 		mainTabSheet = new TabSheet();
 		mainTabSheet.setSizeFull();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_FRAMED);
+		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
 		mainTabSheet.addComponent(emailTab());
 		mainTabSheet.addComponent(smsTab());
 
@@ -84,7 +83,7 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 	}
 
 	private FormLayout constructTemplateInfoForm() {
-		FormLayout templateInfoForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
+		FormLayout templateInfoForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 
 		templateName = new MTextField("Name").withRequired(true);
 		templateName.setMaxLength(50);
@@ -163,11 +162,6 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 	@Override
 	protected String formTitle() {
 		return "Message Template";
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "550px";
 	}
 
 }
