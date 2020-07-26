@@ -62,7 +62,7 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 
 	private void generateTiles(CssLayout mainLayout, Collection<TRMenuItem> menuItems) {
 		Iterator<TRMenuItem> iter = menuItems.iterator();
-		//		MHorizontalLayout rowLayout = new MHorizontalLayout().withMargin(false).withSpacing(true);
+		//		MHorizontalLayout rowLayout = new MHorizontalLayout();
 		Random random = new Random(menuItems.size());
 		Random colorRandom = new Random(System.currentTimeMillis());
 		Set<Integer> colorUsedSet = new HashSet<>();
@@ -78,7 +78,7 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			// icon.setIcon(menuItem.icon());
 			icon.setWidth("52px");
 			MLabel label = new MLabel(menuItem.caption()).withStyleName(ValoTheme.LABEL_NO_MARGIN, ValoTheme.LABEL_BOLD).withWidthUndefined();
-			MVerticalLayout iconLabelLayout = new MVerticalLayout(icon, label).withMargin(true).withSpacing(false);
+			MVerticalLayout iconLabelLayout = new MVerticalLayout(icon, label).withMargin(true);
 			iconLabelLayout.setComponentAlignment(icon, Alignment.TOP_CENTER);
 			iconLabelLayout.setComponentAlignment(label, Alignment.BOTTOM_CENTER);
 			iconLabelLayout.setExpandRatio(label, 1);
@@ -135,7 +135,7 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			//			rowLayout.add(panel);
 			//			if (tileCount >= maxTileCount) {
 			//				mainLayout.add(rowLayout);
-			//				rowLayout = new MHorizontalLayout().withMargin(false).withSpacing(true);
+			//				rowLayout = new MHorizontalLayout();
 			//				tileCount = 0;
 			//				// System.err.println();
 			//			}

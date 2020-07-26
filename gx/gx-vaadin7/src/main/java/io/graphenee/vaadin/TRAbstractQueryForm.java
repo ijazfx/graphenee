@@ -37,7 +37,7 @@ public abstract class TRAbstractQueryForm<T> extends TRAbstractForm<T> {
 	}
 
 	@Override
-	protected void addButtonsToFooter(HorizontalLayout footer) {
+	protected void addButtonsToFooter(MHorizontalLayout footer) {
 		super.addButtonsToFooter(footer);
 		footer.removeComponent(getSaveButton());
 		setSavedHandler(event -> {

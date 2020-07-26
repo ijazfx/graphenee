@@ -5,16 +5,16 @@ import java.util.UUID;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.VerticalLayout;
 
 import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 
 @SuppressWarnings("serial")
 // @JavaScript({ "https://cdn.plyr.io/3.6.2/plyr.polyfilled.js" })
 // @StyleSheet({ "https://cdn.plyr.io/3.6.2/plyr.css" })
-public class VideoPlayer extends VerticalLayout {
+public class VideoPlayer extends MVerticalLayout {
 	
 	String playerId = "player_" + UUID.randomUUID().toString().replace("-", "");
 	

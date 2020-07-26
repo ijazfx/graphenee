@@ -34,6 +34,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -98,8 +99,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private MButton exportDataDownloadButton;
 
 	private MVerticalLayout rootLayout;
-
-	private MarginInfo rootLayoutMargin;
 
 	private FooterCell statusBar;
 
@@ -231,8 +230,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout().withMargin(new MarginInfo(true, true, true, true)).withSpacing(true);
-			// showMargin();
+			rootLayout = new MVerticalLayout().withMargin(new MarginInfo(true, false)).withSpacing(true);
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
 			rootLayout.setExpandRatio(mainGrid, 1);
@@ -249,6 +247,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		mainGridContainer = new BeanItemContainer<>(entityClass);
 		grid.setContainerDataSource(mainGridContainer);
 		grid.setSizeFull();
+		grid.setHeightMode(HeightMode.CSS);
 		String[] visibleProperties = visibleProperties();
 		if (visibleProperties != null) {
 			for (String propertyId : visibleProperties()) {
@@ -435,8 +434,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
-				.withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth();
 
 		layout.add(addButton);
 		layout.add(editButton);
@@ -470,8 +468,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
-				.withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -691,18 +688,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		return this;
 	}
 
-	public AbstractEntityListPanel<T> withMargin(boolean margins) {
-		// return withMargin(new MarginInfo(margins));
-		return this;
-	}
-
-	public AbstractEntityListPanel<T> withMargin(MarginInfo margins) {
-		// this.rootLayoutMargin = margins;
-		// if (rootLayout != null)
-		// 	rootLayout.setMargin(margins);
-		return this;
-	}
-
 	public AbstractEntityListPanel<T> withDelegate(AbstractEntityListPanelDelegate delegate) {
 		setDelegate(delegate);
 		return this;
@@ -786,17 +771,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	public void hideSecondaryToolbar() {
 		secondaryToolbar.setVisible(false);
-	}
-
-	public void showMargin() {
-		if (rootLayoutMargin != null)
-			rootLayout.setMargin(rootLayoutMargin);
-		else
-			rootLayout.setMargin(true);
-	}
-
-	public void hideMargin() {
-		rootLayout.setMargin(false);
 	}
 
 	public MButton getAddButton() {

@@ -15,20 +15,14 @@ public class MGridLayout extends GridLayout {
     private static final long serialVersionUID = -4353934595461037075L;
 
     public MGridLayout() {
-        super.setSpacing(true);
-        super.setMargin(true);
     }
 
     public MGridLayout(int columns, int rows) {
         super(columns, rows);
-        super.setSpacing(true);
-        super.setMargin(true);
     }
 
     public MGridLayout(int columns, int rows, Component... children) {
         super(columns, rows, children);
-        super.setSpacing(true);
-        super.setMargin(true);
     }
     
     public MGridLayout(Component... components) {

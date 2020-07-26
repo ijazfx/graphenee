@@ -148,7 +148,7 @@ public abstract class AbstractMappedEntityListPanel<T, D> extends MPanel {
 	}
 
 	private Component buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false).withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth();
 		addButton = new MButton(FontAwesome.PLUS, "Add", event -> {
 			try {
 				onAddButtonAction(destClass.newInstance());

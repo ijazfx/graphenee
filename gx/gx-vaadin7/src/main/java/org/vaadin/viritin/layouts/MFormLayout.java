@@ -12,8 +12,8 @@ public class MFormLayout extends FormLayout {
     private static final long serialVersionUID = -4097293516833876208L;
 
     public MFormLayout() {
-        setMargin(true);
-        setSpacing(true);
+        
+        
     }
 
     public MFormLayout(Component children) {

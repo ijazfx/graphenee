@@ -7,27 +7,27 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.viritin.button.MButton;
-
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 import elemental.json.JsonArray;
 import io.graphenee.core.enums.GxAudioType;
 import io.graphenee.core.exception.GxMediaConversionException;
-import io.graphenee.media.GxMediaConverter;
 import io.graphenee.media.GxFfmpegMediaConverterImpl;
+import io.graphenee.media.GxMediaConverter;
 
 @SuppressWarnings("serial")
 @JavaScript({ "record-audio.js" })
-public class RecordAudioComponent extends HorizontalLayout {
+public class RecordAudioComponent extends MHorizontalLayout {
 
 	private static final Logger L = LoggerFactory.getLogger(RecordAudioComponent.class);
 

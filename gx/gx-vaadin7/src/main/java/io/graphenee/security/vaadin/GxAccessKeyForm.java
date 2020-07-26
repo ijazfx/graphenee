@@ -60,7 +60,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 
 	@Override
 	protected Component getFormComponent() {
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
+		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 		accessKey = new MLabel().withCaption("Access Key");
 		secret = new MLabel().withCaption("Secret");
 		accessKeyType = new ComboBox("Key Type");
@@ -92,7 +92,7 @@ public class GxAccessKeyForm extends TRAbstractForm<GxAccessKeyBean> {
 		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
 		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
 		return layout;
 	}

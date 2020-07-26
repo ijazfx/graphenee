@@ -19,7 +19,7 @@ import io.graphenee.vaadin.AbstractDashboardSetup;
 import io.graphenee.vaadin.AbstractMainComponent;
 
 /*
- * Dashboard MainView is a simple HorizontalLayout that wraps the menu on the
+ * Dashboard MainView is a simple MHorizontalLayout that wraps the menu on the
  * left and creates a simple container for the navigator on the right.
  */
 @SuppressWarnings("serial")

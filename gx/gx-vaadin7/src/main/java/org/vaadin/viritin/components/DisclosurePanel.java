@@ -12,7 +12,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 /**
  */
-public class DisclosurePanel extends VerticalLayout {
+public class DisclosurePanel extends MVerticalLayout {
 
     private static final long serialVersionUID = 6509419456771505782L;
 

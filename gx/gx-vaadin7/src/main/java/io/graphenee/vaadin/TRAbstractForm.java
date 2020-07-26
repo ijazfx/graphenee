@@ -17,20 +17,19 @@ package io.graphenee.vaadin;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MFormLayout;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MFormLayout;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
@@ -81,7 +80,7 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	private Component buildFooter() {
 		if (footer == null) {
 			footer = new MHorizontalLayout();
-			HorizontalLayout toolbar = getToolbar();
+			MHorizontalLayout toolbar = getToolbar();
 			dismissButton = new MButton("Dismiss").withListener(event -> {
 				onDismissButtonClick();
 			}).withVisible(shouldShowDismissButton());
@@ -139,9 +138,12 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	@Override
 	protected Component createContent() {
-		MVerticalLayout content = new MVerticalLayout();
+		MVerticalLayout content = new MVerticalLayout().withMargin(true);
 		content.setSizeFull();
-		Panel detailsWrapper = new Panel(getFormComponent());
+		MVerticalLayout contentLayout = new MVerticalLayout().withStyleName("content-layout");
+		contentLayout.setSizeFull();
+		contentLayout.add(getFormComponent());
+		Panel detailsWrapper = new Panel(contentLayout);
 		detailsWrapper.setSizeFull();
 		detailsWrapper.addStyleName(ValoTheme.PANEL_BORDERLESS);
 		detailsWrapper.addStyleName("scroll-divider");

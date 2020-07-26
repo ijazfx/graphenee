@@ -21,11 +21,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 /**
  * Simple name editor Window.
@@ -50,10 +51,7 @@ public class DashboardEdit extends Window {
 	}
 
 	private Component buildContent(final String currentName) {
-		VerticalLayout result = new VerticalLayout();
-		result.setMargin(true);
-		result.setSpacing(true);
-
+		MVerticalLayout result = new MVerticalLayout();
 		nameField.setValue(currentName);
 		nameField.addStyleName("caption-on-left");
 		nameField.focus();
@@ -65,8 +63,7 @@ public class DashboardEdit extends Window {
 	}
 
 	private Component buildFooter() {
-		HorizontalLayout footer = new HorizontalLayout();
-		footer.setSpacing(true);
+		MHorizontalLayout footer = new MHorizontalLayout();
 		footer.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
 		footer.setWidth(100.0f, Unit.PERCENTAGE);
 

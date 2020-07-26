@@ -23,13 +23,13 @@ $v-card-footer: #FFFFFF !default;
 @import "views/transactions";
 @import "views/reports";
 // Main layout padding
-$view-padding: round($v-unit-size * 0.25) !default;
-$v-margin-left: round($v-unit-size * 0.25) !default;
-$v-margin-right: round($v-unit-size * 0.25) !default;
-$v-margin-top: round($v-unit-size * 0.25) !default;
-$v-margin-bottom: round($v-unit-size * 0.25) !default;
-$v-layout-spacing-vertical: round($v-unit-size * 0.25) !default;
-$v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
+$view-padding: round($v-unit-size * 0.5) !default;
+$v-margin-left: round($v-unit-size * 0.5) !default;
+$v-margin-right: round($v-unit-size * 0.5) !default;
+$v-margin-top: round($v-unit-size * 0.5) !default;
+$v-margin-bottom: round($v-unit-size * 0.5) !default;
+$v-layout-spacing-vertical: round($v-unit-size * 0.5) !default;
+$v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 // Optimize the CSS output
 //$v-included-components: remove($v-included-components, accordion);
 //$v-included-components: remove($v-included-components, colorpicker);
@@ -54,6 +54,10 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
 	@include valo-checkbox(v-grid-select-all-checkbox);
 	@include valo-checkbox(v-grid-selection-checkbox);
 	
+	.content-layout {
+		overflow: auto !important;
+	}
+
 	div[class^='v-panel-content'] {
 		font-size: 12px;
 		border-radius: 4px;
@@ -275,6 +279,10 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
 		transition-timing-function: ease-out;
 	}
 	.notifications-card-collection {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
 		padding: 0px;
 		.popup-footer {
 			z-index: 300;
@@ -282,6 +290,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
 			border-top: 1px solid $v-card-border-color;
 		}
 		>.card-item {
+			margin-right: $v-margin-right;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
@@ -316,7 +325,12 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
 			transition-timing-function: ease-out;
 		}
 	}
+
 	.card-collection {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
 		padding: 0px;
 		.popup-footer {
 			z-index: 300;
@@ -324,6 +338,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.25) !default;
 			border-top: 1px solid $v-card-border-color;
 		}
 		>.card-item {
+			margin-right: $v-margin-right;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;

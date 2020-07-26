@@ -11,9 +11,9 @@ import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.themes.ValoTheme;
+
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
@@ -29,9 +29,9 @@ public class ClearableTextField extends CustomField {
 
     private final MTextField textfield = new MTextField();
     private final MButton clearButton = new MButton(FontAwesome.TIMES).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
-    private final HorizontalLayout root = new MHorizontalLayout()
+    private final MHorizontalLayout root = new MHorizontalLayout()
             .expand(textfield).add(clearButton)
-            .withSpacing(false)
+            
             .withFullWidth()
             .withStyleName("clearable-textfield");
 

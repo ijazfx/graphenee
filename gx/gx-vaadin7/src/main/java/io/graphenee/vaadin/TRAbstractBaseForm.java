@@ -36,10 +36,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.ReflectTools;
@@ -53,6 +51,7 @@ import org.vaadin.viritin.button.PrimaryButton;
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.label.RichText;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.util.VaadinUtils;
 
@@ -130,7 +129,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	protected void lazyInit() {
 		if (getCompositionRoot() == null) {
-			setCompositionRoot(new VerticalLayout());
+			setCompositionRoot(new MVerticalLayout());
 			// adjustSaveButtonState();
 			// adjustResetButtonState();
 		}
@@ -443,18 +442,18 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	/**
 	 * @return A default toolbar containing save/cancel/delete buttons
 	 */
-	public HorizontalLayout getToolbar() {
+	public MHorizontalLayout getToolbar() {
 		MLabel spacer = new MLabel("").withFullWidth();
 		busyIndicator.setVisible(false);
 		busyIndicator.setIndeterminate(true);
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
 		addButtonsToFooter(layout);
 		layout.addComponents(spacer, busyIndicator, getSaveButton(), getResetButton(), getDeleteButton());
 		layout.setExpandRatio(spacer, 1);
 		return layout;
 	}
 
-	protected void addButtonsToFooter(HorizontalLayout footer) {
+	protected void addButtonsToFooter(MHorizontalLayout footer) {
 	}
 
 	protected Button createCancelButton() {

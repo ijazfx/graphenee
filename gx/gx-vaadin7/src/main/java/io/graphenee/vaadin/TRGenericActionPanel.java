@@ -16,13 +16,11 @@
 package io.graphenee.vaadin;
 
 import com.vaadin.server.Responsive;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 public abstract class TRGenericActionPanel<T> extends TRAbstractPanel {
 
-	MarginInfo marginInfo = new MarginInfo(true);
 	boolean showDismissButton = true;
 
 	public Window openInModalPopupWithEntity(T entity) {
@@ -45,16 +43,6 @@ public abstract class TRGenericActionPanel<T> extends TRAbstractPanel {
 	}
 
 	protected abstract void initializeWithEntity(T entity);
-
-	public TRGenericActionPanel<T> withMargin(boolean margin) {
-		marginInfo = new MarginInfo(margin);
-		return this;
-	}
-
-	public TRGenericActionPanel<T> withMarginInfo(MarginInfo marginInfo) {
-		this.marginInfo = marginInfo != null ? marginInfo : new MarginInfo(true);
-		return this;
-	}
 
 	public TRGenericActionPanel<T> withDismissButton(boolean showDismissButton) {
 		this.showDismissButton = showDismissButton;

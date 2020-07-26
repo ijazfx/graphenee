@@ -294,8 +294,8 @@ public class FileChooser extends CustomField<String> {
 	@Override
 	protected Component initContent() {
 		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT)
-				.withMargin(false).withSpacing(true).withWidthUndefined();
-		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER).withSpacing(false);
+				.withWidthUndefined();
+		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		imageLayout.setHeight(componentHeight);
 		progressBar = new MLabel("Progress");
 		// progressBar.setIndeterminate(false);
@@ -310,7 +310,7 @@ public class FileChooser extends CustomField<String> {
 		});
 		imageLayout.addComponent(progressBar);
 		// MVerticalLayout imageContainer1 = new
-		// MVerticalLayout().withMargin(false).withSpacing(false).withDefaultComponentAlignment(Alignment.MIDDLE_CENTER)
+		// MVerticalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER)
 		// .withWidth(componentHeight).withHeight(componentHeight);
 		// imageContainer.addComponent(previewImage);
 		// imageLayout.addComponent(imageContainer);

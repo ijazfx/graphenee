@@ -60,7 +60,7 @@ public class CopyLabel extends CustomField<String> {
 
 	@Override
 	protected Component initContent() {
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withMargin(false).withSpacing(true).withWidthUndefined();
+		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withWidthUndefined();
 		copyText = new Image();
 		copyText.setHeight("12px");
 		copyText.setSource(GrapheneeTheme.COPY);
