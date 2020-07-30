@@ -40,7 +40,6 @@ public class GxVideoProcessingImpl implements GxVideoProcessing {
 				myWriter.write("," + line);
 			else
 				myWriter.write(line);
-			System.err.println(line);
 			lineCount++;
 		}
 		myWriter.write("]");
