@@ -76,7 +76,8 @@ public class MetroStyleDashboardPanel extends AbstractDashboardPanel {
 			Image icon = new Image(null, menuItem.icon());
 			// MLabel icon = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN, "tile-icon").withWidthUndefined();
 			// icon.setIcon(menuItem.icon());
-			icon.setWidth("52px");
+			icon.setHeight("56px");
+			icon.setWidth("56px");
 			MLabel label = new MLabel(menuItem.caption()).withStyleName(ValoTheme.LABEL_NO_MARGIN, ValoTheme.LABEL_BOLD).withWidthUndefined();
 			MVerticalLayout iconLabelLayout = new MVerticalLayout(icon, label).withMargin(true);
 			iconLabelLayout.setComponentAlignment(icon, Alignment.TOP_CENTER);
