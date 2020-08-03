@@ -431,7 +431,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.viewheader {
 		margin-top: 8px;
-		font-size: $v-font-size;
+		font-size: round($v-font-size * 0.85);
 	}
 	.v-menubar-user-menu {
 		.v-menubar-menuitem {
