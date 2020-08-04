@@ -39,15 +39,16 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -135,7 +136,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	}
 
 	private Component buildTitle() {
-		VerticalLayout layout = new VerticalLayout();
+		MVerticalLayout layout = new MVerticalLayout();
 		Image logo = dashboardSetup().dashboardLogo();
 		if (logo != null) {
 			layout.setStyleName("valo-menu-title-with-image");
@@ -143,7 +144,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 			layout.addComponent(logo);
 		}
 		Component title = new Label(dashboardSetup().dashboardTitle(), ContentMode.HTML);
-		HorizontalLayout titleWrapper = new HorizontalLayout(title);
+		MHorizontalLayout titleWrapper = new MHorizontalLayout(title);
 		titleWrapper.setComponentAlignment(title, Alignment.MIDDLE_CENTER);
 		titleWrapper.addStyleName("valo-menu-title");
 		layout.addComponents(titleWrapper);

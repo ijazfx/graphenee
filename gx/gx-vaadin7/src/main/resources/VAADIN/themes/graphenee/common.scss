@@ -67,7 +67,6 @@
   }
 
   .valo-menu-item {
-    overflow: hidden;
     width: 100%;
 
     &.selected {
@@ -102,7 +101,7 @@
         margin-right: 24px;
         text-align: center;
         vertical-align: middle;
-	  }
+      }
     }
   }
 
@@ -121,7 +120,7 @@
       height: 40px !important;
       * {
         text-align: center;
-        font-size: 14pt;
+        font-size: round($v-font-size * 0.8);
       }
       @include valo-gradient($color: $valo-menu-background-color);
       border-bottom-color: first-color(valo-border($color: $valo-menu-background-color));
@@ -145,7 +144,7 @@
       font-size: 10pt;
       top: 5px;
       left: 3px;
-	  box-shadow: none !important;
+      box-shadow: none !important;
       img.v-icon {
         width: 24px;
         height: 24px;

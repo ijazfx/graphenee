@@ -68,8 +68,6 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 	private CssLayout contentLayout;
 
-	private boolean rootLayoutMargin = false;
-
 	private MVerticalLayout rootLayout;
 
 	public AbstractCardListPanel(Class<T> entityClass) {
@@ -105,7 +103,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 			setStyleName(ValoTheme.PANEL_BORDERLESS);
 			setCaption(panelCaption());
 
-			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin);
+			rootLayout = new MVerticalLayout().withMargin(true).withSpacing(true);
 			if (shouldShowToolbar()) {
 				toolbar = buildToolbar();
 				rootLayout.addComponent(toolbar);
@@ -131,7 +129,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	}
 
 	private Component buildToolbar() {
-		MVerticalLayout layout = new MVerticalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withFullWidth().withMargin(false).withSpacing(true);
+		MVerticalLayout layout = new MVerticalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.TOP_LEFT).withFullWidth();
 		addButton = new MButton(FontAwesome.PLUS, localizedSingularValue(addButtonCaption()), event -> {
 			try {
 				onAddButtonClick(initializeEntity(entityClass.newInstance()));
@@ -266,8 +264,8 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 					indexes.forEach(i -> {
 						String key = keyOrders.get(i);
 						List<T> grouped = groupedEntities.get(key);
-						MLabel headerLabel = new MLabel(key).withHeight("-1px").withStyleName(ValoTheme.LABEL_H3, ValoTheme.LABEL_NO_MARGIN);
-						contentLayout.addComponent(new MVerticalLayout(headerLabel).withMargin(true));
+						MLabel headerLabel = new MLabel(key).withHeight("-1px").withStyleName(ValoTheme.LABEL_H3);
+						contentLayout.addComponent(new MVerticalLayout(headerLabel));
 						prepareCardList(grouped);
 						MLabel dummyLabel = new MLabel().withHeight("-1px");
 						contentLayout.addComponent(dummyLabel);
@@ -428,23 +426,6 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 	protected void localizeRecursively(Locale locale, Component component) {
 		VaadinUtils.localizeRecursively(component);
-	}
-
-	public AbstractCardListPanel<T> withMargin(boolean margins) {
-		this.rootLayoutMargin = margins;
-		if (rootLayout != null)
-			rootLayout.setMargin(margins);
-		return this;
-	}
-
-	public void showMargin() {
-		rootLayoutMargin = true;
-		rootLayout.setMargin(true);
-	}
-
-	public void hideMargin() {
-		rootLayoutMargin = false;
-		rootLayout.setMargin(false);
 	}
 
 	public void showToolbar() {

@@ -68,7 +68,7 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 	@Override
 	protected Component getFormComponent() {
 		// detail form
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
+		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
 		username = new MTextField("Username").withRequired(true);
 		username.setMaxLength(50);
 		firstName = new MTextField("First Name").withRequired(false);
@@ -117,7 +117,7 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
 		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
 		return layout;
 	}

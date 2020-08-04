@@ -2,8 +2,6 @@ package io.graphenee.vaadin.meeting;
 
 import java.net.URI;
 
-import org.vaadin.viritin.button.MButton;
-
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.server.FontAwesome;
@@ -12,8 +10,10 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.model.GxMeeting;
 import io.graphenee.core.model.GxMeetingUser;
@@ -22,7 +22,7 @@ import io.graphenee.vaadin.ui.GxNotification;
 @SuppressWarnings("serial")
 @JavaScript({ "meeting-client.js" })
 @StyleSheet({ "meeting.css" })
-public class GxMeetingClient extends VerticalLayout {
+public class GxMeetingClient extends MVerticalLayout {
 
 	private GxMeetingUser user;
 	private GxMeeting meeting;
@@ -34,8 +34,6 @@ public class GxMeetingClient extends VerticalLayout {
 	public GxMeetingClient() {
 		setWidth("100%");
 		setHeight("100%");
-		setMargin(false);
-		setSpacing(false);
 		buildComponent();
 	}
 

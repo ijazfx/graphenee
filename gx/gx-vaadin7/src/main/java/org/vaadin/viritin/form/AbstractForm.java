@@ -379,7 +379,7 @@ public abstract class AbstractForm<T> extends CustomComponent implements
     /**
      * @return A default toolbar containing save/cancel/delete buttons
      */
-    public HorizontalLayout getToolbar() {
+    public MHorizontalLayout getToolbar() {
         return new MHorizontalLayout(
                 getSaveButton(),
                 getResetButton(),

@@ -105,8 +105,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	private MVerticalLayout rootLayout;
 
-	private boolean rootLayoutMargin = false;
-
 	private Set<Object> selectedItemIds;
 
 	public AbstractEntityTablePanel(Class<T> entityClass) {
@@ -233,7 +231,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin);
+			rootLayout = new MVerticalLayout();
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainTable);
 			rootLayout.setExpandRatio(mainTable, 1);
@@ -468,8 +466,8 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	private AbstractLayout buildToolbar() {
 		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar")
-				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
-				.withSpacing(true);
+				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth()
+				;
 
 		layout.add(addButton);
 		layout.add(editButton);
@@ -504,8 +502,8 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	private AbstractLayout buildSecondaryToolbar() {
 		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar")
-				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth().withMargin(false)
-				.withSpacing(true);
+				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth()
+				;
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -721,13 +719,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 		return this;
 	}
 
-	public AbstractEntityTablePanel<T> withMargin(boolean margins) {
-		this.rootLayoutMargin = margins;
-		if (rootLayout != null)
-			rootLayout.setMargin(margins);
-		return this;
-	}
-
 	public AbstractEntityTablePanel<T> withDelegate(AbstractEntityListPanelDelegate delegate) {
 		setDelegate(delegate);
 		return this;
@@ -808,16 +799,6 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	public void hideSecondaryToolbar() {
 		secondaryToolbar.setVisible(false);
-	}
-
-	public void showMargin() {
-		rootLayoutMargin = true;
-		rootLayout.setMargin(true);
-	}
-
-	public void hideMargin() {
-		rootLayoutMargin = false;
-		rootLayout.setMargin(false);
 	}
 
 	public MButton getAddButton() {

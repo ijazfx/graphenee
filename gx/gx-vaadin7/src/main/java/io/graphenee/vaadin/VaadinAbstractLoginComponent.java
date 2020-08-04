@@ -26,14 +26,15 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.LoginForm;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
@@ -61,9 +62,9 @@ public abstract class VaadinAbstractLoginComponent extends LoginForm {
 	}
 
 	public Component build(TextField userNameField, PasswordField passwordField, Button loginButton) {
-		VerticalLayout mainLayout = null;
+		MVerticalLayout mainLayout = null;
 		if (mainLayout == null) {
-			mainLayout = new VerticalLayout();
+			mainLayout = new MVerticalLayout();
 			mainLayout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 			addLoginListener(listener -> {
 				UserLoginRequestedEvent userLoginRequestedEvent = new UserLoginRequestedEvent(listener.getLoginParameter(USERNAME), listener.getLoginParameter(PASSWORD));
@@ -82,10 +83,8 @@ public abstract class VaadinAbstractLoginComponent extends LoginForm {
 	}
 
 	private Component buildLoginForm(TextField userNameField, PasswordField passwordField, Button loginButton) {
-		final VerticalLayout loginPanel = new VerticalLayout();
+		final MVerticalLayout loginPanel = new MVerticalLayout();
 		loginPanel.setSizeUndefined();
-		loginPanel.setSpacing(true);
-		loginPanel.setMargin(false);
 		Responsive.makeResponsive(loginPanel);
 		loginPanel.addStyleName("login-panel");
 		loginPanel.addComponent(buildLabels());
@@ -129,8 +128,7 @@ public abstract class VaadinAbstractLoginComponent extends LoginForm {
 	}
 
 	private Component buildFields(TextField userNameField, PasswordField passwordField, Button loginButton) {
-		HorizontalLayout fields = new HorizontalLayout();
-		fields.setSpacing(true);
+		MHorizontalLayout fields = new MHorizontalLayout();
 		fields.addStyleName("fields");
 
 		userNameField.setIcon(FontAwesome.USER);

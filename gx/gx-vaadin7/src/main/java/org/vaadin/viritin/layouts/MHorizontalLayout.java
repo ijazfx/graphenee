@@ -16,8 +16,8 @@ public class MHorizontalLayout extends HorizontalLayout {
     private static final long serialVersionUID = 524957578263653250L;
 
     public MHorizontalLayout() {
-        super.setSpacing(true);
-        super.setMargin(false);
+        setSpacing(false);
+        setMargin(false);
     }
 
     public MHorizontalLayout(Component... components) {

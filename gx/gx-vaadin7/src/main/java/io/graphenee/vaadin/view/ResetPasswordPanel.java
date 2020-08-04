@@ -53,16 +53,16 @@ public class ResetPasswordPanel extends Panel {
 	}
 
 	protected Component createContent() {
-		MVerticalLayout rootLayout = new MVerticalLayout().withMargin(false).withSpacing(false);
+		MVerticalLayout rootLayout = new MVerticalLayout();
 		rootLayout.setWidth("330px");
 		rootLayout.setStyleName("login-panel");
 
-		MVerticalLayout sendResetKeyLayout = new MVerticalLayout().withMargin(false).withSpacing(false);
+		MVerticalLayout sendResetKeyLayout = new MVerticalLayout();
 
 		MLabel forgotPasswordTitle = new MLabel("Reset Password").withStyleName(ValoTheme.LABEL_H3);
 		sendResetKeyLayout.addComponent(forgotPasswordTitle);
 
-		MVerticalLayout layout1 = new MVerticalLayout().withFullWidth().withMargin(false).withSpacing(false).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
+		MVerticalLayout layout1 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
 		layout1.setWidth("100%");
 		usernameTextField = new MTextField().withCaption("Username / Email").withFullWidth();
 
@@ -74,7 +74,7 @@ public class ResetPasswordPanel extends Panel {
 		//layout1.setExpandRatio(usernameTextField, 1);
 		sendResetKeyLayout.addComponent(layout1);
 
-		MVerticalLayout layout2 = new MVerticalLayout().withFullWidth().withMargin(false).withSpacing(false).withDefaultComponentAlignment(Alignment.BOTTOM_RIGHT);
+		MVerticalLayout layout2 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_RIGHT);
 		layout2.setWidth("100%");
 		MTextField resetKeyTextField = new MTextField().withInputPrompt("Enter Reset Key").withFullWidth();
 		resetKeyTextField.setMaxLength(6);
@@ -94,13 +94,13 @@ public class ResetPasswordPanel extends Panel {
 		MButton changeButton = new MButton("Change").withStyleName(ValoTheme.BUTTON_PRIMARY);
 		changeButton.setEnabled(false);
 
-		MVerticalLayout layout3 = new MVerticalLayout().withFullWidth().withMargin(false).withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
+		MVerticalLayout layout3 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
 		layout3.addComponents(passwordField, retypePasswordField, changeButton);
 		layout3.setComponentAlignment(changeButton, Alignment.MIDDLE_RIGHT);
 
 		sendResetKeyLayout.addComponent(layout3);
 
-		MVerticalLayout changePasswordLayout = new MVerticalLayout().withMargin(false);
+		MVerticalLayout changePasswordLayout = new MVerticalLayout();
 
 		MLabel changePasswordTitle = new MLabel("Change Password").withStyleName(ValoTheme.LABEL_H3);
 		changePasswordLayout.addComponents(changePasswordTitle, layout3);

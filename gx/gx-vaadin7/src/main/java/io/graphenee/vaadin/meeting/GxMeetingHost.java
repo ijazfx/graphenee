@@ -2,9 +2,6 @@ package io.graphenee.vaadin.meeting;
 
 import java.net.URI;
 
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MPanel;
-
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.data.util.BeanItemContainer;
@@ -14,8 +11,11 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.model.GxMeeting;
 import io.graphenee.core.model.GxMeetingUser;
@@ -24,7 +24,7 @@ import io.graphenee.vaadin.CardCollectionPanel;
 @SuppressWarnings("serial")
 @JavaScript({ "meeting-host.js" })
 @StyleSheet({ "meeting.css" })
-public class GxMeetingHost extends VerticalLayout {
+public class GxMeetingHost extends MVerticalLayout {
 
 	private BeanItemContainer<GxMeetingUser> meetingContainer;
 	private CardCollectionPanel<GxMeetingUser> roomPanel;
@@ -42,8 +42,6 @@ public class GxMeetingHost extends VerticalLayout {
 	public GxMeetingHost() {
 		setWidth("100%");
 		setHeight("100%");
-		setMargin(false);
-		setSpacing(false);
 		buildComponent();
 	}
 

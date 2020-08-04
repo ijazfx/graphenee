@@ -4,15 +4,15 @@ $v-font-weight: 400 !default;
 $v-bevel-depth: 15% !default;
 $v-gradient: v-linear 0% !default;
 $v-shadow-opacity: 20% !default;
-$gx-base-color: #2AB27B !default;
+$gx-base-color: #2ab27b !default;
 $v-border-radius: 2px !default;
 $v-focus-color: $gx-base-color !default;
 // Slight adjustment to menu background-color
-$valo-menu-background-color: #1B1B25 !default;
+$valo-menu-background-color: #1b1b25 !default;
 $v-card-border-color: #e7eaec !default;
-$v-card-caption-color: #676A6C !default;
-$v-card-icon-color: #C4C4C4 !default;
-$v-card-footer: #FFFFFF !default;
+$v-card-caption-color: #676a6c !default;
+$v-card-icon-color: #c4c4c4 !default;
+$v-card-footer: #ffffff !default;
 @import "../valo/valo";
 @import "common";
 @import "views/login";
@@ -24,6 +24,7 @@ $v-card-footer: #FFFFFF !default;
 @import "views/reports";
 // Main layout padding
 $view-padding: round($v-unit-size * 0.5) !default;
+$v-half-margin: round($v-unit-size * 0.25) !default;
 $v-margin-left: round($v-unit-size * 0.5) !default;
 $v-margin-right: round($v-unit-size * 0.5) !default;
 $v-margin-top: round($v-unit-size * 0.5) !default;
@@ -53,9 +54,34 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	@include dashboard-reports-view;
 	@include valo-checkbox(v-grid-select-all-checkbox);
 	@include valo-checkbox(v-grid-selection-checkbox);
-	
-	div[class^='v-panel-content'] {
-		font-size: 12px;
+
+	.metro-tile {
+		flex: auto;
+	}
+
+	.metro-layout {
+		display: flex;
+		flex-direction: row;
+		flex-flow: wrap;
+		margin-inline-end: $v-margin-right;
+	}
+
+	.viewlayout {
+		overflow: auto;
+	}
+
+	.toolbar {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.content-layout {
+		overflow: auto !important;
+	}
+
+	div[class^="v-panel-content"] {
+		font-size: round($v-font-size * 0.85);
 		border-radius: 4px;
 		white-space: pre-wrap !important;
 	}
@@ -135,6 +161,9 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.gx-margin-right {
 		margin-right: $v-margin-right;
+	}
+	.v-caption {
+		font-size: round($v-font-size * 0.8);
 	}
 	.v-formlayout-captioncell {
 		min-width: 100px;
@@ -218,10 +247,10 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		white-space: normal;
 	}
 	.overflow-auto {
-		overflow: auto
+		overflow: auto;
 	}
 	.multilineGrid .title {
-		font-size: 11px;
+		font-size: round($v-font-size * 0.8);
 	}
 	.multilineGrid .title span {
 		display: block;
@@ -232,7 +261,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		padding-left: 20px;
 	}
 	.multilineGrid .crewComments {
-		font-size: 11px;
+		font-size: round($v-font-size * 0.8);
 	}
 	.multilineGrid .crewComments span {
 		display: block;
@@ -243,7 +272,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		padding-left: 20px;
 	}
 	.multilineGrid .analysisComments {
-		font-size: 11px;
+		font-size: round($v-font-size * 0.8);
 	}
 	.multilineGrid .analysisComments span {
 		display: block;
@@ -275,23 +304,29 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 		transition-timing-function: ease-out;
 	}
 	.notifications-card-collection {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
 		padding: 0px;
-		.card-item-content {
-			overflow: visible;
-		}
 		.popup-footer {
 			z-index: 300;
+			padding: $v-half-margin;
 			background-color: $v-card-footer;
 			border-top: 1px solid $v-card-border-color;
 		}
-		>.card-item {
+		> .card-item {
+			margin-right: $v-margin-right;
+			margin-bottom: $v-margin-bottom;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
 			min-width: 100%;
 		}
-		>.card-item:hover {
+		> .card-item:hover {
 			z-index: 2;
+			margin-right: $v-margin-right;
+			margin-bottom: $v-margin-bottom;
 			border-radius: $v-border-radius;
 			background: #efefef;
 			transition-duration: 100ms;
@@ -300,45 +335,54 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.comments-card-collection {
 		padding: 0px;
-		.card-item-content {
-			overflow: visible;
-		}
 		.popup-footer {
 			z-index: 300;
+			padding: $v-half-margin;
 			background-color: $v-card-footer;
 			border-top: 1px solid $v-card-border-color;
 		}
-		>.card-item {
+		> .card-item {
+			margin-right: $v-margin-right;
+			margin-bottom: $v-margin-bottom;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
 			min-width: 100%;
 		}
-		>.card-item:hover {
+		> .card-item:hover {
 			z-index: 2;
+			margin-right: $v-margin-right;
+			margin-bottom: $v-margin-bottom;
 			border-radius: $v-border-radius;
 			background: #efefef;
 			transition-duration: 100ms;
 			transition-timing-function: ease-out;
 		}
 	}
+
 	.card-collection {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+
 		padding: 0px;
-		.card-item-content {
-			overflow: visible;
-		}
 		.popup-footer {
 			z-index: 300;
+			padding: $v-half-margin;
 			background-color: $v-card-footer;
 			border-top: 1px solid $v-card-border-color;
 		}
-		>.card-item {
+		> .card-item {
+			margin-right: $v-margin-right;
+			margin-bottom: $v-margin-bottom;
 			border-radius: $v-border-radius;
 			transition-duration: 100ms;
 			transition-timing-function: ease-in;
 		}
-		>.card-item:hover {
+		> .card-item:hover {
 			z-index: 2;
+			margin-right: $v-margin-right;
+			margin-bottom: $v-margin-bottom;
 			border-radius: $v-border-radius;
 			background: #efefef;
 			transition-duration: 100ms;
@@ -387,7 +431,7 @@ $v-layout-spacing-horizontal: round($v-unit-size * 0.5) !default;
 	}
 	.viewheader {
 		margin-top: 8px;
-		font-size: 0.65em;
+		font-size: round($v-font-size * 0.85);
 	}
 	.v-menubar-user-menu {
 		.v-menubar-menuitem {

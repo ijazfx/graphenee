@@ -21,6 +21,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.vaadin.server.Page;
+import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
+
 import org.kie.api.task.model.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
-
-import com.vaadin.server.Page;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
 import io.graphenee.jbpm.embedded.GxUserTask;
@@ -89,7 +88,7 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	}
 
 	@Override
-	protected void addButtonsToFooter(HorizontalLayout footer) {
+	protected void addButtonsToFooter(MHorizontalLayout footer) {
 		approveButton = new MButton(approveButtonCaption()).withStyleName(ValoTheme.BUTTON_FRIENDLY).withListener(event -> {
 			approveTask();
 		});
@@ -375,16 +374,6 @@ public abstract class GxUserTaskForm<T> extends TRAbstractForm<T> {
 	public GxUserTask getUserTask() {
 		assert userTask != null;
 		return userTask;
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "350px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "450px";
 	}
 
 	@Override

@@ -69,7 +69,6 @@ public class GxImportDataForm extends TRAbstractPanel {
 
 	@Override
 	protected void addComponentsToContentLayout(MVerticalLayout layout) {
-		layout.withMargin(true).withSpacing(true);
 		importBeanContainer = new BeanItemContainer<>(importDataProcessor.getEntityClass());
 		importDataGrid = new MGrid<>();
 		importDataGrid.setSizeFull();
@@ -114,16 +113,6 @@ public class GxImportDataForm extends TRAbstractPanel {
 
 	public void initializeWithDataProcessor(GxImportDataProcessor importDataProcessor) {
 		this.importDataProcessor = importDataProcessor;
-	}
-
-	@Override
-	protected String popupHeight() {
-		return "500px";
-	}
-
-	@Override
-	protected String popupWidth() {
-		return "700px";
 	}
 
 	public Consumer<List> getOnImportCompletion() {

@@ -196,7 +196,6 @@ public class ElementCollectionField<ET> extends AbstractElementCollection<ET> {
 
     private void ensureInited() {
         if (!inited) {
-            layout.setSpacing(true);
             int columns = getVisibleProperties().size();
             if (isAllowRemovingItems()) {
                 columns++;

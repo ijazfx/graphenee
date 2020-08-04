@@ -19,8 +19,6 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.button.MButton;
-
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
@@ -29,11 +27,13 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.event.DashboardEvent;
@@ -42,11 +42,11 @@ import io.graphenee.vaadin.util.DashboardUtils;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 @SuppressWarnings("serial")
-public abstract class AbstractDashboardPanel extends VerticalLayout {
+public abstract class AbstractDashboardPanel extends MVerticalLayout {
 
-	private HorizontalLayout toolbar;
-	private VerticalLayout componentLayout;
-	private HorizontalLayout header;
+	private MHorizontalLayout toolbar;
+	private MVerticalLayout componentLayout;
+	private MHorizontalLayout header;
 	private Label titleLabel;
 	private MButton notificationButton;
 	private BadgeWrapper notificationBadge;
@@ -83,19 +83,15 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 		return false;
 	}
 
-	private VerticalLayout buildComponentLayout() {
-		VerticalLayout layout = new VerticalLayout();
-		layout.setSizeFull();
+	private MVerticalLayout buildComponentLayout() {
+		MVerticalLayout layout = new MVerticalLayout().withMargin(true).withSpacing(true);
+		// layout.setSizeFull();
 		layout.addStyleName("viewlayout");
-		layout.setMargin(false);
-		layout.setSpacing(true);
 		return layout;
 	}
 
 	private Component buildHeader() {
-		header = new HorizontalLayout();
-		header.setMargin(false);
-		header.setSpacing(false);
+		header = new MHorizontalLayout();
 		header.setDefaultComponentAlignment(Alignment.TOP_LEFT);
 		header.addStyleName("viewheader");
 		Responsive.makeResponsive(header);
@@ -114,10 +110,8 @@ public abstract class AbstractDashboardPanel extends VerticalLayout {
 	}
 
 	private Component buildToolbar() {
-		toolbar = new HorizontalLayout();
+		toolbar = new MHorizontalLayout();
 		toolbar.addStyleName("toolbar");
-		toolbar.setSpacing(true);
-		toolbar.setMargin(false);
 		toolbar.setVisible(true);
 
 		notificationButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_BORDERLESS).withIcon(FontAwesome.BELL);

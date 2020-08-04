@@ -1,8 +1,6 @@
 @mixin dashboard-dashboard-view {
 
   .dashboard-view.dashboard-view {
-    padding: $view-padding;
-    overflow: visible;
 
     .sparks {
       @include valo-panel-style;
@@ -67,8 +65,6 @@
 
       .card {
         height: 100%;
-        overflow: hidden;
-        padding: round($view-padding / 2);
         position: relative;
         
         .v-table, .v-table-table {
@@ -76,9 +72,6 @@
         }
         
         .v-panel-content {
-        	overflow: hidden;
-        	padding-top: $v-unit-size + 2px;
-        	
         }
         
       }
@@ -160,7 +153,6 @@
           background: #fffdf2 url(../image/notes-bg.png) repeat;
           background-attachment: local;
           color: #545145;
-          overflow: auto;
         }
       }
     }

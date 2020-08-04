@@ -80,7 +80,7 @@ public abstract class TRAbstractPanel extends MPanel {
 
 			content = createContent();
 
-			MVerticalLayout layout = new MVerticalLayout().withMargin(false).withSpacing(false);
+			MVerticalLayout layout = new MVerticalLayout();
 			layout.setSizeFull();
 			layout.addComponents(content);
 			setContent(layout);
@@ -92,7 +92,7 @@ public abstract class TRAbstractPanel extends MPanel {
 	}
 
 	private Component buildFooter() {
-		MHorizontalLayout layout = new MHorizontalLayout().withFullWidth().withMargin(false).withSpacing(true);
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withFullWidth();
 		layout.addStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
 		layout.setDefaultComponentAlignment(footerAlignment());
 		addButtonsToFooter(layout);
@@ -120,9 +120,9 @@ public abstract class TRAbstractPanel extends MPanel {
 	protected abstract String panelTitle();
 
 	protected Component createContent() {
-		MVerticalLayout content = new MVerticalLayout().withMargin(false).withSpacing(false);
+		MVerticalLayout content = new MVerticalLayout();
 		content.setSizeFull();
-		MVerticalLayout contentLayout = new MVerticalLayout().withMargin(false).withSpacing(false).withFullWidth();
+		MVerticalLayout contentLayout = new MVerticalLayout().withFullWidth().withStyleName("content-layout");
 		contentLayout.setSizeFull();
 		addComponentsToContentLayout(contentLayout);
 		Panel detailsWrapper = new Panel(contentLayout);

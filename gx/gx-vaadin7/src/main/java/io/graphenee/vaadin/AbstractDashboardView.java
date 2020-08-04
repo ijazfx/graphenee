@@ -20,8 +20,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.vaadin.viritin.layouts.MPanel;
-
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
@@ -32,15 +30,17 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.event.DashboardEvent;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
@@ -56,7 +56,7 @@ public abstract class AbstractDashboardView extends Panel implements TRView {
 
 	private Label titleLabel;
 	private CssLayout dashboardPanels;
-	private VerticalLayout root;
+	private MVerticalLayout root;
 
 	private boolean isBuilt;
 
@@ -83,9 +83,8 @@ public abstract class AbstractDashboardView extends Panel implements TRView {
 			setSizeFull();
 			DashboardEventBus.sessionInstance().register(this);
 
-			root = new VerticalLayout();
+			root = new MVerticalLayout();
 			root.setSizeFull();
-			root.setMargin(true);
 			root.addStyleName("dashboard-view");
 			setContent(root);
 			Responsive.makeResponsive(root);
@@ -143,7 +142,7 @@ public abstract class AbstractDashboardView extends Panel implements TRView {
 		card.setWidth("100%");
 		card.addStyleName(ValoTheme.LAYOUT_CARD);
 
-		HorizontalLayout toolbar = new HorizontalLayout();
+		MHorizontalLayout toolbar = new MHorizontalLayout();
 		toolbar.addStyleName("dashboard-panel-toolbar");
 		toolbar.setWidth("100%");
 
@@ -195,9 +194,8 @@ public abstract class AbstractDashboardView extends Panel implements TRView {
 	}
 
 	private Component buildHeader() {
-		HorizontalLayout header = new HorizontalLayout();
+		MHorizontalLayout header = new MHorizontalLayout();
 		header.addStyleName("viewheader");
-		header.setSpacing(true);
 
 		titleLabel = new Label(dashboardTitle());
 		titleLabel.setId(TITLE_ID);
@@ -206,8 +204,7 @@ public abstract class AbstractDashboardView extends Panel implements TRView {
 		titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
 		header.addComponent(titleLabel);
 
-		HorizontalLayout tools = new HorizontalLayout();
-		tools.setSpacing(true);
+		MHorizontalLayout tools = new MHorizontalLayout();
 		tools.addStyleName("toolbar");
 		header.addComponent(tools);
 
@@ -310,7 +307,7 @@ public abstract class AbstractDashboardView extends Panel implements TRView {
 			card.setStyleName("dashboard-panel");
 			card.addStyleName(ValoTheme.LAYOUT_CARD);
 
-			HorizontalLayout toolbar = new HorizontalLayout();
+			MHorizontalLayout toolbar = new MHorizontalLayout();
 			toolbar.addStyleName("dashboard-panel-toolbar");
 			toolbar.setWidth("100%");
 

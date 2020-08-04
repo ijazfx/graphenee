@@ -22,7 +22,6 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -81,7 +80,7 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	private Component buildFooter() {
 		if (footer == null) {
 			footer = new MHorizontalLayout();
-			HorizontalLayout toolbar = getToolbar();
+			MHorizontalLayout toolbar = getToolbar();
 			dismissButton = new MButton("Dismiss").withListener(event -> {
 				onDismissButtonClick();
 			}).withVisible(shouldShowDismissButton());
@@ -109,14 +108,15 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	protected Component getFormComponent(T entity) {
-		MHorizontalLayout details = new MHorizontalLayout();
-		details.setWidth(100.0f, Unit.PERCENTAGE);
-		details.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-		detailsForm = buildDetailsForm();
-		details.addComponent(detailsForm);
-		details.setExpandRatio(detailsForm, 1);
-
-		return details;
+		//		MHorizontalLayout details = new MHorizontalLayout();
+		//		details.setWidth(100.0f, Unit.PERCENTAGE);
+		//		details.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+		//		detailsForm = buildDetailsForm();
+		//		details.addComponent(detailsForm);
+		//		details.setExpandRatio(detailsForm, 1);
+		//
+		//		return details;
+		return buildDetailsForm();
 	}
 
 	private Component buildDetailsForm() {
@@ -138,9 +138,12 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	@Override
 	protected Component createContent() {
-		MVerticalLayout content = new MVerticalLayout();
+		MVerticalLayout content = new MVerticalLayout().withMargin(true);
 		content.setSizeFull();
-		Panel detailsWrapper = new Panel(getFormComponent());
+		MVerticalLayout contentLayout = new MVerticalLayout().withStyleName("content-layout");
+		contentLayout.setSizeFull();
+		contentLayout.add(getFormComponent());
+		Panel detailsWrapper = new Panel(contentLayout);
 		detailsWrapper.setSizeFull();
 		detailsWrapper.addStyleName(ValoTheme.PANEL_BORDERLESS);
 		detailsWrapper.addStyleName("scroll-divider");
