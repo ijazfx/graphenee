@@ -244,10 +244,11 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	private MGrid<T> buildMainGrid() {
 		MGrid<T> grid = new MGrid<>(entityClass);
+		grid.setStyleName("entity-grid");
 		mainGridContainer = new BeanItemContainer<>(entityClass);
 		grid.setContainerDataSource(mainGridContainer);
 		grid.setSizeFull();
-		grid.setHeightMode(HeightMode.ROW);
+		grid.setHeightMode(HeightMode.CSS);
 		String[] visibleProperties = visibleProperties();
 		if (visibleProperties != null) {
 			for (String propertyId : visibleProperties()) {
