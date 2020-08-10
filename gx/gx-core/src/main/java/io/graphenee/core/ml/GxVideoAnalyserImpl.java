@@ -11,7 +11,7 @@ import io.graphenee.core.enums.GxAreaPatternCode;
 import io.graphenee.core.storage.FileStorage;
 
 @Service
-public class GxVideoProcessingImpl implements GxVideoProcessing {
+public class GxVideoAnalyserImpl implements GxVideoAnalyser {
 
 	@Autowired
 	FileStorage fileStorage;
