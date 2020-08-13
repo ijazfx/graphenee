@@ -7,22 +7,24 @@ import java.util.function.Consumer;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.viritin.button.DownloadButton;
-import org.vaadin.viritin.button.MButton;
 import org.vaadin.viritin.grid.MGrid;
-import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.exception.InvalidImportFormatException;
 import io.graphenee.core.model.api.GxImportDataProcessor;
 import io.graphenee.core.util.CSVUtil;
+import io.graphenee.core.util.TRFileContentUtil;
 import io.graphenee.vaadin.TRAbstractPanel;
 import io.graphenee.vaadin.component.FileChooser;
+import io.graphenee.vaadin.ui.GxNotification;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -37,8 +39,6 @@ public class GxImportDataForm extends TRAbstractPanel {
 
 	BeanItemContainer importBeanContainer;
 
-	private MButton importDataButton;
-
 	private Consumer<List> onImportCompletion;
 
 	public GxImportDataForm() {
@@ -50,16 +50,20 @@ public class GxImportDataForm extends TRAbstractPanel {
 		layout.setVisible(false);
 	}
 
-	public void importData() {
-		ConfirmDialog.show(UI.getCurrent(), null, "Do you want to import selected file?", "Yes", "No", p -> {
-			if (p.isConfirmed()) {
-				importDataProcessor.saveData();
-				List importDataBeans = importDataProcessor.getImportDataBeans();
-				if (onImportCompletion != null) {
-					onImportCompletion.accept(importDataBeans);
+	public void importData() throws InvalidImportFormatException {
+		if (filePath.getValue() == null
+				|| !TRFileContentUtil.getExtensionFromFilename(filePath.getValue()).equals("csv")) {
+			throw new InvalidImportFormatException("File not uploaded or Invalid file format");
+		} else
+			ConfirmDialog.show(UI.getCurrent(), null, "Do you want to import selected file?", "Yes", "No", p -> {
+				if (p.isConfirmed()) {
+					importDataProcessor.saveData();
+					List importDataBeans = importDataProcessor.getImportDataBeans();
+					if (onImportCompletion != null) {
+						onImportCompletion.accept(importDataBeans);
+					}
 				}
-			}
-		});
+			});
 	}
 
 	@Override
@@ -74,12 +78,16 @@ public class GxImportDataForm extends TRAbstractPanel {
 		importDataGrid.setSizeFull();
 		importDataGrid.setContainerDataSource(importBeanContainer);
 		importDataGrid.withProperties(importDataProcessor.getVisibleProperties());
-		filePath = new FileChooser("Select File");
+		filePath = new FileChooser("Select File (Only csv file)");
 		filePath.addValueChangeListener(e -> {
 			importBeanContainer.removeAllItems();
 			if (filePath.getValue() != null) {
-				importDataProcessor.loadFile(filePath.getValue());
-				importBeanContainer.addAll(importDataProcessor.getImportDataBeans());
+				if (TRFileContentUtil.getExtensionFromFilename(filePath.getValue()).equals("csv")) {
+					importDataProcessor.loadFile(filePath.getValue());
+					importBeanContainer.addAll(importDataProcessor.getImportDataBeans());
+				} else {
+					GxNotification.tray("Invalid Format", "Please upload file in csv format").show(Page.getCurrent());
+				}
 			}
 		});
 		String fileName = "import-template.csv";
@@ -95,13 +103,12 @@ public class GxImportDataForm extends TRAbstractPanel {
 		}).withCaption("Download Template");
 		downloadButton.withStyleName(ValoTheme.BUTTON_LINK);
 		MHorizontalLayout downloadImportFileLayout = new MHorizontalLayout().withHeightUndefined().withWidth("100%");
-		downloadImportFileLayout.setDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
 		downloadImportFileLayout.addComponents(filePath, downloadButton);
 		downloadImportFileLayout.setComponentAlignment(downloadButton, Alignment.BOTTOM_RIGHT);
 
 		layout.addComponents(downloadImportFileLayout, importDataGrid);
-
 		layout.setExpandRatio(importDataGrid, 1);
+		layout.setSpacing(true);
 	}
 
 	@Override
