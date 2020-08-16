@@ -23,7 +23,7 @@ public class GxVideoAnalyserImpl implements GxVideoAnalyser {
 	public String analyse(GxAreaPatternCode areaCode, String mediaFilePath, String jsonFilePath) throws Exception {
 		Integer lineCount = 0;
 		String areaFlag = " -c " + areaCode.getCountryCode();
-		areaFlag += " -p " + areaCode.getCountryCode();
+		//		areaFlag += " -p " + areaCode.getCountryCode();
 
 		FileWriter myWriter = new FileWriter(jsonFilePath);
 		ProcessBuilder pb = new ProcessBuilder("echo");
@@ -55,9 +55,8 @@ public class GxVideoAnalyserImpl implements GxVideoAnalyser {
 
 	@Override
 	public void analyseAsync(GxAreaPatternCode areaCode, String mediaFilePath, TRParamCallback<String> jsonCallback, TRErrorCallback errorCallback) {
-		Integer lineCount = 0;
 		String areaFlag = " -c " + areaCode.getCountryCode();
-		areaFlag += " -p " + areaCode.getCountryCode();
+		//		areaFlag += " -p " + areaCode.getCountryCode();
 
 		ProcessBuilder pb = new ProcessBuilder("echo");
 
@@ -73,8 +72,8 @@ public class GxVideoAnalyserImpl implements GxVideoAnalyser {
 			String line;
 			try {
 				while ((line = reader.readLine()) != null) {
-					if (lineCount != 0)
-						jsonCallback.execute(line);
+					String jsonData = "[" + line + "]";
+					jsonCallback.execute(jsonData);
 				}
 			} catch (IOException e) {
 				errorCallback.execute(e);
