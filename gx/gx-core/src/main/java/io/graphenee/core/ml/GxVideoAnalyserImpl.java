@@ -72,8 +72,7 @@ public class GxVideoAnalyserImpl implements GxVideoAnalyser {
 			String line;
 			try {
 				while ((line = reader.readLine()) != null) {
-					String jsonData = "[" + line + "]";
-					jsonCallback.execute(jsonData);
+					jsonCallback.execute(line);
 				}
 			} catch (IOException e) {
 				errorCallback.execute(e);
