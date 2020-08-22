@@ -23,6 +23,13 @@ import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Function;
 
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
@@ -37,22 +44,11 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.FileTypeResolver;
 
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-
-import io.graphenee.core.enums.GxAudioType;
-import io.graphenee.core.enums.GxVideoType;
 import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.storage.ResolveFailedException;
 import io.graphenee.core.util.TRFileContentUtil;
 import io.graphenee.core.util.TRImageUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
-import io.graphenee.media.GxFfmpegMediaConverterImpl;
-import io.graphenee.media.GxMediaConverter;
 import io.graphenee.vaadin.ResourcePreviewPanel;
 import server.droporchoose.UploadComponent;
 
@@ -131,8 +127,7 @@ public class FileChooser extends CustomField<String> {
 					String resourcePath = storage.resourcePath(getRootFolder(), filePath);
 					InputStream inputStream = storage.resolve(resourcePath);
 					InputStreamSource source = new InputStreamSource(inputStream);
-					resource = new StreamResource(source,
-							UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
+					resource = new StreamResource(source, UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
 						@Override
 						public String getMIMEType() {
 							String mimeType = FileTypeResolver.getMIMEType(filePath);
@@ -186,28 +181,6 @@ public class FileChooser extends CustomField<String> {
 				}
 			} catch (Exception ex) {
 				uploadedFilePath = receivedFilePath.toString();
-				L.warn("Conversion failed so using original file", ex);
-			}
-		} else if (mimeType.startsWith("audio/") && !ext.equals("mp3")) {
-			try {
-				File convertedFile = File.createTempFile(receivedFileName, storageFileName + ".mp3");
-				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
-				conv.convertAudioMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
-						GxAudioType.MP3);
-				uploadedFilePath = convertedFile.getAbsolutePath();
-			} catch (Exception ex) {
-				uploadedFilePath = receivedFile.getAbsolutePath();
-				L.warn("Conversion failed so using original file", ex);
-			}
-		} else if (mimeType.startsWith("video/") && !ext.equals("mp4")) {
-			try {
-				File convertedFile = File.createTempFile(receivedFileName, storageFileName + ".mp4");
-				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
-				conv.convertVideoMedia(receivedFile.getAbsolutePath(), convertedFile.getAbsolutePath(),
-						GxVideoType.MP4);
-				uploadedFilePath = convertedFile.getAbsolutePath();
-			} catch (Exception ex) {
-				uploadedFilePath = receivedFile.getAbsolutePath();
 				L.warn("Conversion failed so using original file", ex);
 			}
 		}
@@ -293,8 +266,7 @@ public class FileChooser extends CustomField<String> {
 
 	@Override
 	protected Component initContent() {
-		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT)
-				.withWidthUndefined();
+		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withWidthUndefined();
 		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		imageLayout.setHeight(componentHeight);
 		progressBar = new MLabel("Progress");
