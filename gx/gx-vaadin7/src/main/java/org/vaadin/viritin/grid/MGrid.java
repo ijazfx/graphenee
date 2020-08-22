@@ -78,8 +78,7 @@ public class MGrid<T> extends Grid {
      * @param pageProvider the interface via entities are fetched
      * @param countProvider the interface via the count of items is detected
      */
-    public MGrid(LazyList.PagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider) {
+    public MGrid(LazyList.PagingProvider<T> pageProvider, LazyList.CountProvider countProvider) {
         this(new LazyList<T>(pageProvider, countProvider, DEFAULT_PAGE_SIZE));
     }
 
@@ -90,8 +89,7 @@ public class MGrid<T> extends Grid {
      * @param countProvider the interface via the count of items is detected
      * @param pageSize the page size (aka maxResults) that is used in paging.
      */
-    public MGrid(LazyList.PagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider, int pageSize) {
+    public MGrid(LazyList.PagingProvider<T> pageProvider, LazyList.CountProvider countProvider, int pageSize) {
         this(new LazyList<T>(pageProvider, countProvider, pageSize));
     }
 
@@ -102,8 +100,7 @@ public class MGrid<T> extends Grid {
      * @param pageProvider the interface via entities are fetched
      * @param countProvider the interface via the count of items is detected
      */
-    public MGrid(SortableLazyList.SortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider) {
+    public MGrid(SortableLazyList.SortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider) {
         this(pageProvider, countProvider, DEFAULT_PAGE_SIZE);
     }
 
@@ -114,8 +111,7 @@ public class MGrid<T> extends Grid {
      * @param pageProvider the interface via entities are fetched
      * @param countProvider the interface via the count of items is detected
      */
-    public MGrid(SortableLazyList.MultiSortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider) {
+    public MGrid(SortableLazyList.MultiSortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider) {
         this(pageProvider, countProvider, DEFAULT_PAGE_SIZE);
     }
 
@@ -126,21 +122,19 @@ public class MGrid<T> extends Grid {
      * @param countProvider the interface via the count of items is detected
      * @param pageSize the page size (aka maxResults) that is used in paging.
      */
-    public MGrid(SortableLazyList.SortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider, int pageSize) {
+    public MGrid(SortableLazyList.SortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider, int pageSize) {
         this(new SortableLazyList<T>(pageProvider, countProvider, pageSize));
         ensureSortListener();
     }
 
-        /**
-     * A shorthand to create MTable using SortableLazyList.
-     *
-     * @param pageProvider the interface via entities are fetched
-     * @param countProvider the interface via the count of items is detected
-     * @param pageSize the page size (aka maxResults) that is used in paging.
-     */
-    public MGrid(SortableLazyList.MultiSortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider, int pageSize) {
+    /**
+    * A shorthand to create MTable using SortableLazyList.
+    *
+    * @param pageProvider the interface via entities are fetched
+    * @param countProvider the interface via the count of items is detected
+    * @param pageSize the page size (aka maxResults) that is used in paging.
+    */
+    public MGrid(SortableLazyList.MultiSortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider, int pageSize) {
         this(new SortableLazyList(pageProvider, countProvider, pageSize));
         ensureSortListener();
     }
@@ -151,7 +145,7 @@ public class MGrid<T> extends Grid {
         if (sortListener == null) {
             sortListener = new SortEvent.SortListener() {
                 private static final long serialVersionUID = -8850456663417023533L;
-                
+
                 @Override
                 public void sort(SortEvent event) {
                     refreshVisibleRows();
@@ -174,17 +168,17 @@ public class MGrid<T> extends Grid {
 
     public MGrid<T> setRows(List<T> rows) {
         if (getContainerDataSource() instanceof ListContainer) {
-            
+
             Collection<?> itemIds = getListContainer().getItemIds();
             if (itemIds instanceof SortableLazyList) {
                 SortableLazyList<T> old = (SortableLazyList<T>) itemIds;
-                if(old.getSortProperty() != null && rows instanceof SortableLazyList ) {
+                if (old.getSortProperty() != null && rows instanceof SortableLazyList) {
                     SortableLazyList<T> newList = (SortableLazyList<T>) rows;
                     newList.setSortProperty(old.getSortProperty());
                     newList.setSortAscending(old.getSortAscending());
                 }
             }
-            
+
             getListContainer().setCollection(rows);
         } else {
             setContainerDataSource(new ListContainer(rows));
@@ -206,32 +200,24 @@ public class MGrid<T> extends Grid {
         return this;
     }
 
-    public <P> MGrid<T> withGeneratedColumn(String columnId,
-            Class<P> presentationType,
-            TypedPropertyValueGenerator.ValueGenerator<T, P> generator) {
-        TypedPropertyValueGenerator<T, P> lambdaPropertyValueGenerator
-                = new TypedPropertyValueGenerator<>(typeOfRows, presentationType,
-                        generator);
+    public <P> MGrid<T> withGeneratedColumn(String columnId, Class<P> presentationType, TypedPropertyValueGenerator.ValueGenerator<T, P> generator) {
+        TypedPropertyValueGenerator<T, P> lambdaPropertyValueGenerator = new TypedPropertyValueGenerator<>(typeOfRows, presentationType, generator);
         addGeneratedColumn(columnId, lambdaPropertyValueGenerator);
         return this;
     }
 
-    public MGrid<T> withGeneratedColumn(String columnId,
-            StringPropertyValueGenerator.ValueGenerator<T> generator) {
-        StringPropertyValueGenerator<T> lambdaPropertyValueGenerator
-                = new StringPropertyValueGenerator<>(typeOfRows, generator);
+    public MGrid<T> withGeneratedColumn(String columnId, StringPropertyValueGenerator.ValueGenerator<T> generator) {
+        StringPropertyValueGenerator<T> lambdaPropertyValueGenerator = new StringPropertyValueGenerator<>(typeOfRows, generator);
         addGeneratedColumn(columnId, lambdaPropertyValueGenerator);
         return this;
     }
 
-    public MGrid<T> withGeneratedColumn(String columnId,
-            final PropertyValueGenerator<?> columnGenerator) {
+    public MGrid<T> withGeneratedColumn(String columnId, final PropertyValueGenerator<?> columnGenerator) {
         addGeneratedColumn(columnId, columnGenerator);
         return this;
     }
 
-    private void addGeneratedColumn(String columnId,
-            final PropertyValueGenerator<?> columnGenerator) {
+    private void addGeneratedColumn(String columnId, final PropertyValueGenerator<?> columnGenerator) {
         Container.Indexed container = getContainerDataSource();
         GeneratedPropertyListContainer gplc;
         if (container instanceof GeneratedPropertyListContainer) {
@@ -313,15 +299,14 @@ public class MGrid<T> extends Grid {
         if (isEnabled && reloadDataEfficientlyAfterEditor == null) {
             reloadDataEfficientlyAfterEditor = new FieldGroup.CommitHandler() {
                 private static final long serialVersionUID = -9107206992771475209L;
-                
+
                 @Override
                 public void preCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
                 }
 
                 @Override
                 public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
-                    Item itemDataSource = commitEvent.getFieldBinder().
-                            getItemDataSource();
+                    Item itemDataSource = commitEvent.getFieldBinder().getItemDataSource();
                     if (itemDataSource instanceof ListContainer.DynaBeanItem) {
                         ListContainer<T>.DynaBeanItem<T> dynaBeanItem = (ListContainer<T>.DynaBeanItem<T>) itemDataSource;
                         T bean = dynaBeanItem.getBean();
@@ -330,8 +315,7 @@ public class MGrid<T> extends Grid {
                 }
 
             };
-            getEditorFieldGroup().addCommitHandler(
-                    reloadDataEfficientlyAfterEditor);
+            getEditorFieldGroup().addCommitHandler(reloadDataEfficientlyAfterEditor);
         }
     }
 
@@ -351,16 +335,13 @@ public class MGrid<T> extends Grid {
         Collection<Extension> extensions = getExtensions();
         for (Extension extension : extensions) {
             // Calling with reflection for 7.6-7.5 compatibility
-            if (extension.getClass().getName().contains(
-                    "RpcDataProviderExtension")) {
+            if (extension.getClass().getName().contains("RpcDataProviderExtension")) {
                 try {
-                    Method method = extension.getClass().getMethod(
-                            "updateRowData", Object.class);
+                    Method method = extension.getClass().getMethod("updateRowData", Object.class);
                     method.invoke(extension, bean);
                     break;
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                    Logger.getLogger(MGrid.class.getName()).
-                            log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MGrid.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -391,16 +372,13 @@ public class MGrid<T> extends Grid {
         Collection<Extension> extensions = getExtensions();
         for (Extension extension : extensions) {
             // Calling with reflection for 7.6-7.5 compatibility
-            if (extension.getClass().getName().contains(
-                    "RpcDataProviderExtension")) {
+            if (extension.getClass().getName().contains("RpcDataProviderExtension")) {
                 try {
-                    Method method = extension.getClass().getMethod(
-                            "refreshCache");
+                    Method method = extension.getClass().getMethod("refreshCache");
                     method.invoke(extension);
                     break;
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                    Logger.getLogger(MGrid.class.getName()).
-                            log(Level.SEVERE, null, ex);
+                    Logger.getLogger(MGrid.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -413,8 +391,7 @@ public class MGrid<T> extends Grid {
      * @param countProvider the interface via the count of items is detected
      * @return this MTable object
      */
-    public MGrid<T> lazyLoadFrom(LazyList.PagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider) {
+    public MGrid<T> lazyLoadFrom(LazyList.PagingProvider<T> pageProvider, LazyList.CountProvider countProvider) {
         setRows(new LazyList<T>(pageProvider, countProvider, DEFAULT_PAGE_SIZE));
         return this;
     }
@@ -427,8 +404,7 @@ public class MGrid<T> extends Grid {
      * @param pageSize the page size (aka maxResults) that is used in paging.
      * @return this MTable object
      */
-    public MGrid<T> lazyLoadFrom(LazyList.PagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider, int pageSize) {
+    public MGrid<T> lazyLoadFrom(LazyList.PagingProvider<T> pageProvider, LazyList.CountProvider countProvider, int pageSize) {
         setRows(new LazyList<T>(pageProvider, countProvider, pageSize));
         return this;
     }
@@ -440,11 +416,8 @@ public class MGrid<T> extends Grid {
      * @param countProvider the interface via the count of items is detected
      * @return this MTable object
      */
-    public MGrid<T> lazyLoadFrom(
-            SortableLazyList.SortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider) {
-        setRows(new SortableLazyList<T>(pageProvider, countProvider,
-                DEFAULT_PAGE_SIZE));
+    public MGrid<T> lazyLoadFrom(SortableLazyList.SortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider) {
+        setRows(new SortableLazyList<T>(pageProvider, countProvider, DEFAULT_PAGE_SIZE));
         ensureSortListener();
         return this;
     }
@@ -456,11 +429,8 @@ public class MGrid<T> extends Grid {
      * @param countProvider the interface via the count of items is detected
      * @return this MTable object
      */
-    public MGrid<T> lazyLoadFrom(
-            SortableLazyList.MultiSortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider) {
-        setRows(new SortableLazyList(pageProvider, countProvider,
-                DEFAULT_PAGE_SIZE));
+    public MGrid<T> lazyLoadFrom(SortableLazyList.MultiSortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider) {
+        setRows(new SortableLazyList(pageProvider, countProvider, DEFAULT_PAGE_SIZE));
         ensureSortListener();
         return this;
     }
@@ -473,9 +443,7 @@ public class MGrid<T> extends Grid {
      * @param pageSize the page size (aka maxResults) that is used in paging.
      * @return this MTable object
      */
-    public MGrid<T> lazyLoadFrom(
-            SortableLazyList.SortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider, int pageSize) {
+    public MGrid<T> lazyLoadFrom(SortableLazyList.SortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider, int pageSize) {
         setRows(new SortableLazyList<T>(pageProvider, countProvider, pageSize));
         ensureSortListener();
         return this;
@@ -489,14 +457,12 @@ public class MGrid<T> extends Grid {
      * @param pageSize the page size (aka maxResults) that is used in paging.
      * @return this MTable object
      */
-    public MGrid<T> lazyLoadFrom(
-            SortableLazyList.MultiSortablePagingProvider<T> pageProvider,
-            LazyList.CountProvider countProvider, int pageSize) {
+    public MGrid<T> lazyLoadFrom(SortableLazyList.MultiSortablePagingProvider<T> pageProvider, LazyList.CountProvider countProvider, int pageSize) {
         setRows(new SortableLazyList(pageProvider, countProvider, pageSize));
         ensureSortListener();
         return this;
     }
-    
+
     public MGrid<T> withStyleName(String... styleNames) {
         for (String styleName : styleNames) {
             addStyleName(styleName);

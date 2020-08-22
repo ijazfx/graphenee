@@ -84,6 +84,7 @@ public abstract class AbstractDashboardPanel extends MVerticalLayout {
 	}
 
 	private MVerticalLayout buildComponentLayout() {
+		addStyleName("viewroot");
 		MVerticalLayout layout = new MVerticalLayout().withMargin(true).withSpacing(true);
 		layout.setSizeFull();
 		layout.addStyleName("viewlayout");
