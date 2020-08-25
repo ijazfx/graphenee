@@ -81,9 +81,6 @@ public class TRFileContentUtil {
 		if (ext.matches("(mpeg-4)")) {
 			return "video/mp4";
 		}
-		if (ext.matches("(mpeg-4)")) {
-			return "video/mp4";
-		}
 		if (ext.matches("(3gp)")) {
 			return "video/3gpp";
 		}
