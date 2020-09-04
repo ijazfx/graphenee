@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -29,7 +28,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
 
 import com.vaadin.server.FileDownloader;
@@ -45,12 +43,10 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
-import com.vaadin.ui.Upload.FailedEvent;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.Upload.FinishedListener;
 import com.vaadin.ui.Upload.ProgressListener;
 import com.vaadin.ui.Upload.Receiver;
-import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.FileTypeResolver;
 
@@ -174,12 +170,12 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withWidthUndefined();
 		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		imageLayout.setHeight(componentHeight);
-		//		progressBar = new MLabel("Progress");
+
 		progressBar = new ProgressBar();
 		progressBar.setIndeterminate(false);
 		progressBar.setWidth("100px");
+
 		previewImage = new Image();
-		// previewImage.setHeight("32px");
 		previewImage.setSource(GrapheneeTheme.UPLOAD_ICON);
 		previewImage.addClickListener(event -> {
 			String value = getValue();
@@ -187,24 +183,14 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 				preview(value);
 			}
 		});
-		// MVerticalLayout imageContainer1 = new
-		// MVerticalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER)
-		// .withWidth(componentHeight).withHeight(componentHeight);
-		// imageContainer.addComponent(previewImage);
-		// imageLayout.addComponent(imageContainer);
 		imageLayout.addComponent(previewImage);
 
 		progressBar.setVisible(false);
 		upload = new Upload();
-		// upload.setCaption("Choose a file");
 		upload.setWidth(componentWidth);
 		upload.setHeight(componentHeight);
 		upload.setStyleName("dropBoxLayout");
-
-		//		upload.setReceivedCallback(this::uploadReceived);
-		//		upload.setStartedCallback(this::uploadStarted);
-		//		upload.setProgressCallback(this::uploadProgress);
-		//		upload.setFailedCallback(this::uploadFailed);
+		upload.setImmediate(true);
 
 		upload.setReceiver(this);
 		upload.addFinishedListener(this);
@@ -227,7 +213,6 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		upload.setVisible(false);
 		imageLayout.setVisible(false);
 
-		// fireValueChange(true);
 		renderComponent();
 
 		return layout;
@@ -348,7 +333,6 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 			progressBar.setVisible(false);
 			UI.getCurrent().push();
 		});
-		String mimeType = event.getMIMEType();
 		String ext = TRFileContentUtil.getExtensionFromFilename(event.getFilename());
 		String storageFileName = UUID.randomUUID().toString() + "." + ext;
 
@@ -359,6 +343,8 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		receivedFile = newFile;
 		uploadedFilePath = receivedFile.getAbsolutePath();
 		uploadedFileName = desiredFileName;
+
+		String mimeType = TRFileContentUtil.getMimeType(uploadedFileName);
 
 		if (mimeType.startsWith("image/")) {
 			try {
@@ -391,7 +377,12 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 			if (!mimeType.startsWith("image/")) {
 				previewImage.setHeight("32px");
 				previewImage.setWidth("32px");
-				resource = GrapheneeTheme.fileExtensionIconResource(extension);
+				if (mimeType.startsWith("audio/"))
+					resource = GrapheneeTheme.fileExtensionIconResource("audio");
+				else if (mimeType.startsWith("video/"))
+					resource = GrapheneeTheme.fileExtensionIconResource("video");
+				else
+					resource = GrapheneeTheme.fileExtensionIconResource(extension);
 				if (resource == null)
 					resource = GrapheneeTheme.fileExtensionIconResource("bin");
 			} else {
