@@ -18,9 +18,7 @@ package io.graphenee.vaadin.component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.function.Function;
@@ -42,15 +40,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
-import com.vaadin.ui.Upload.FailedEvent;
-import com.vaadin.ui.Upload.FinishedEvent;
-import com.vaadin.ui.Upload.FinishedListener;
-import com.vaadin.ui.Upload.ProgressListener;
-import com.vaadin.ui.Upload.Receiver;
-import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.util.FileTypeResolver;
 
@@ -60,21 +50,21 @@ import io.graphenee.core.util.TRFileContentUtil;
 import io.graphenee.core.util.TRImageUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.ResourcePreviewPanel;
+import server.droporchoose.UploadComponent;
 
-public class FileChooser extends CustomField<String> implements Receiver, FinishedListener, ProgressListener {
+public class FileChooserDeprecated extends CustomField<String> {
 
-	public static final Logger L = LoggerFactory.getLogger(FileChooser.class);
+	public static final Logger L = LoggerFactory.getLogger(FileChooserDeprecated.class);
 
 	private static final long serialVersionUID = 1L;
 	private Image previewImage;
-	private Upload upload;
+	private UploadComponent uploadComponent;
 	private FileStorage storage;
 	private String componentHeight;
 	private String componentWidth;
-	private ProgressBar progressBar;
+	private MLabel progressBar;
 	private String uploadedFilePath;
 	private String uploadedFileName;
-	private String uploadedFileMimeType;
 	private Function<String, String> fileNameTranslator;
 	private String rootFolder;
 	private MButton deleteButton;
@@ -90,17 +80,17 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		return uploadedFileName;
 	}
 
-	public FileChooser() {
+	public FileChooserDeprecated() {
 		this(null);
 	}
 
-	public FileChooser(String caption) {
+	public FileChooserDeprecated(String caption) {
 		this(caption, (fileName) -> {
 			return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(fileName);
 		});
 	}
 
-	public FileChooser(String caption, Function<String, String> fileNameTranslator) {
+	public FileChooserDeprecated(String caption, Function<String, String> fileNameTranslator) {
 		setCaption(caption);
 		this.fileNameTranslator = fileNameTranslator;
 		componentHeight = "-1px";
@@ -159,14 +149,119 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		}
 	}
 
+	private void uploadReceived(String receivedFileName, Path receivedFilePath) {
+		UI.getCurrent().access(() -> {
+			// float value = (float) readBytes / contentLength;
+			progressBar.setValue("Processing file, please wait!");
+			UI.getCurrent().push();
+		});
+		// String desiredFileName = fileNameTranslator != null ? fileNameTranslator.apply(receivedFileName)
+		// 		: receivedFileName;
+
+		// determine type of received file to apply conversion.
+		String mimeType = TRFileContentUtil.getMimeType(receivedFileName);
+		String ext = TRFileContentUtil.getExtensionFromFilename(receivedFileName);
+		String storageFileName = UUID.randomUUID().toString() + "." + ext;
+
+		String desiredFileName = receivedFileName;
+		File receivedFile = receivedFilePath.toFile();
+		File newFile = new File(receivedFile.getParent(), storageFileName);
+		receivedFile.renameTo(newFile);
+		receivedFile = newFile;
+		uploadedFilePath = receivedFile.getAbsolutePath();
+		uploadedFileName = desiredFileName;
+
+		if (mimeType.startsWith("image/")) {
+			try {
+				File convertedFile = new File(receivedFile.getParent(), "resized-" + storageFileName);
+				if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
+					uploadedFilePath = receivedFile.getAbsolutePath();
+				} else {
+					uploadedFilePath = convertedFile.getAbsolutePath();
+				}
+			} catch (Exception ex) {
+				uploadedFilePath = receivedFilePath.toString();
+				L.warn("Conversion failed so using original file", ex);
+			}
+		}
+
+		uploadedFileName = new File(uploadedFilePath).getName();
+		String uploadedFileExtension = TRFileContentUtil.getExtensionFromFilename(uploadedFileName);
+		if (!desiredFileName.endsWith(uploadedFileExtension)) {
+			uploadedFileName = desiredFileName + "." + uploadedFileExtension;
+		} else {
+			uploadedFileName = desiredFileName;
+		}
+
+		setValue(uploadedFilePath);
+
+		UI.getCurrent().access(() -> {
+			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
+			if (extension != null)
+				extension = extension.toLowerCase();
+			Resource resource = null;
+			if (!mimeType.startsWith("image/")) {
+				previewImage.setHeight("32px");
+				previewImage.setWidth("32px");
+				resource = GrapheneeTheme.fileExtensionIconResource(extension);
+				if (resource == null)
+					resource = GrapheneeTheme.fileExtensionIconResource("bin");
+			} else {
+				previewImage.setWidth("100px");
+				previewImage.setHeightUndefined();
+				try {
+					InputStream inputStream = new FileInputStream(uploadedFilePath);
+					StreamSource source = new InputStreamSource(inputStream);
+					resource = new StreamResource(source, UUID.randomUUID().toString());
+				} catch (FileNotFoundException e) {
+					resource = null;
+				}
+			}
+			previewImage.setSource(resource);
+			previewImage.markAsDirty();
+			progressBar.setVisible(false);
+			previewImage.setVisible(true);
+			UI.getCurrent().push();
+		});
+	}
+
+	private void uploadStarted(String fileName) {
+		UI.getCurrent().access(() -> {
+			uploadComponent.setVisible(false);
+			imageLayout.setVisible(true);
+			previewImage.setVisible(false);
+			progressBar.setValue("N/A");
+			progressBar.setVisible(true);
+			UI.getCurrent().push();
+		});
+	}
+
+	private void uploadProgress(String fileName, long readBytes, long contentLength) {
+		UI.getCurrent().access(() -> {
+			// float value = (float) readBytes / contentLength;
+			progressBar.setValue(readBytes + " / " + contentLength + " bytes uploaded.");
+			UI.getCurrent().push();
+		});
+	}
+
+	private void uploadFailed(String fileName, Path file) {
+		UI.getCurrent().access(() -> {
+			uploadComponent.setVisible(true);
+			imageLayout.setVisible(false);
+			progressBar.setVisible(false);
+			previewImage.setVisible(true);
+			UI.getCurrent().push();
+		});
+	}
+
 	public void setComponentHeight(String height) {
 		componentHeight = height;
 	}
 
 	public void setComponentWidth(String width) {
 		componentWidth = width;
-		if (upload != null)
-			upload.setWidth(width);
+		if (uploadComponent != null)
+			uploadComponent.setWidth(width);
 	}
 
 	@Override
@@ -174,10 +269,8 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withWidthUndefined();
 		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 		imageLayout.setHeight(componentHeight);
-		//		progressBar = new MLabel("Progress");
-		progressBar = new ProgressBar();
-		progressBar.setIndeterminate(false);
-		progressBar.setWidth("100px");
+		progressBar = new MLabel("Progress");
+		// progressBar.setIndeterminate(false);
 		previewImage = new Image();
 		// previewImage.setHeight("32px");
 		previewImage.setSource(GrapheneeTheme.UPLOAD_ICON);
@@ -187,6 +280,7 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 				preview(value);
 			}
 		});
+		imageLayout.addComponent(progressBar);
 		// MVerticalLayout imageContainer1 = new
 		// MVerticalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER)
 		// .withWidth(componentHeight).withHeight(componentHeight);
@@ -195,20 +289,16 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		imageLayout.addComponent(previewImage);
 
 		progressBar.setVisible(false);
-		upload = new Upload();
-		// upload.setCaption("Choose a file");
-		upload.setWidth(componentWidth);
-		upload.setHeight(componentHeight);
-		upload.setStyleName("dropBoxLayout");
+		uploadComponent = new UploadComponent();
+		uploadComponent.getChoose().setButtonCaption("Choose a file");
+		uploadComponent.setWidth(componentWidth);
+		uploadComponent.setHeight(componentHeight);
+		uploadComponent.setStyleName("dropBoxLayout");
 
-		//		upload.setReceivedCallback(this::uploadReceived);
-		//		upload.setStartedCallback(this::uploadStarted);
-		//		upload.setProgressCallback(this::uploadProgress);
-		//		upload.setFailedCallback(this::uploadFailed);
-
-		upload.setReceiver(this);
-		upload.addFinishedListener(this);
-		upload.addProgressListener(this);
+		uploadComponent.setReceivedCallback(this::uploadReceived);
+		uploadComponent.setStartedCallback(this::uploadStarted);
+		uploadComponent.setProgressCallback(this::uploadProgress);
+		uploadComponent.setFailedCallback(this::uploadFailed);
 
 		deleteButton = new MButton(FontAwesome.CLOSE).withListener(event -> {
 			setValue(null);
@@ -222,9 +312,9 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 			renderComponent();
 		});
 
-		layout.addComponents(progressBar, upload, imageLayout);
+		layout.addComponents(uploadComponent, imageLayout);
 
-		upload.setVisible(false);
+		uploadComponent.setVisible(false);
 		imageLayout.setVisible(false);
 
 		// fireValueChange(true);
@@ -299,11 +389,11 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 					}
 				}
 
-				upload.setVisible(false);
+				uploadComponent.setVisible(false);
 				imageLayout.setVisible(true);
 			} else {
 				imageLayout.setVisible(false);
-				upload.setVisible(true);
+				uploadComponent.setVisible(true);
 			}
 		}
 	}
@@ -317,110 +407,6 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 	@Override
 	public Class<? extends String> getType() {
 		return String.class;
-	}
-
-	@Override
-	public OutputStream receiveUpload(String filename, String mimeType) {
-		UI.getCurrent().access(() -> {
-			upload.setVisible(false);
-			progressBar.setVisible(true);
-			UI.getCurrent().push();
-		});
-		String ext = TRFileContentUtil.getExtensionFromContentType(mimeType);
-		try {
-			File tempFile = File.createTempFile("uploaded", ext);
-			uploadedFilePath = tempFile.getAbsolutePath();
-			uploadedFileName = filename;
-			uploadedFileMimeType = mimeType;
-			return new FileOutputStream(tempFile);
-		} catch (Exception e) {
-			L.warn(e.getMessage());
-			return null;
-		}
-	}
-
-	@Override
-	public void uploadFinished(FinishedEvent event) {
-		if (event.getLength() <= 0) {
-
-		}
-		UI.getCurrent().access(() -> {
-			progressBar.setVisible(false);
-			UI.getCurrent().push();
-		});
-		String mimeType = event.getMIMEType();
-		String ext = TRFileContentUtil.getExtensionFromFilename(event.getFilename());
-		String storageFileName = UUID.randomUUID().toString() + "." + ext;
-
-		String desiredFileName = event.getFilename();
-		File receivedFile = new File(uploadedFilePath);
-		File newFile = new File(receivedFile.getParent(), storageFileName);
-		receivedFile.renameTo(newFile);
-		receivedFile = newFile;
-		uploadedFilePath = receivedFile.getAbsolutePath();
-		uploadedFileName = desiredFileName;
-
-		if (mimeType.startsWith("image/")) {
-			try {
-				File convertedFile = new File(receivedFile.getParent(), "resized-" + storageFileName);
-				if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
-					uploadedFilePath = receivedFile.getAbsolutePath();
-				} else {
-					uploadedFilePath = convertedFile.getAbsolutePath();
-				}
-			} catch (Exception ex) {
-				L.warn("Conversion failed so using original file", ex);
-			}
-		}
-
-		uploadedFileName = new File(uploadedFilePath).getName();
-		String uploadedFileExtension = TRFileContentUtil.getExtensionFromFilename(uploadedFileName);
-		if (!desiredFileName.endsWith(uploadedFileExtension)) {
-			uploadedFileName = desiredFileName + "." + uploadedFileExtension;
-		} else {
-			uploadedFileName = desiredFileName;
-		}
-
-		setValue(uploadedFilePath);
-
-		UI.getCurrent().access(() -> {
-			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
-			if (extension != null)
-				extension = extension.toLowerCase();
-			Resource resource = null;
-			if (!mimeType.startsWith("image/")) {
-				previewImage.setHeight("32px");
-				previewImage.setWidth("32px");
-				resource = GrapheneeTheme.fileExtensionIconResource(extension);
-				if (resource == null)
-					resource = GrapheneeTheme.fileExtensionIconResource("bin");
-			} else {
-				previewImage.setWidth("100px");
-				previewImage.setHeightUndefined();
-				try {
-					InputStream inputStream = new FileInputStream(uploadedFilePath);
-					StreamSource source = new InputStreamSource(inputStream);
-					resource = new StreamResource(source, UUID.randomUUID().toString());
-				} catch (FileNotFoundException e) {
-					resource = null;
-				}
-			}
-			previewImage.setSource(resource);
-			previewImage.markAsDirty();
-			progressBar.setVisible(false);
-			previewImage.setVisible(true);
-			UI.getCurrent().push();
-		});
-	}
-
-	@Override
-	public void updateProgress(long readBytes, long contentLength) {
-		UI.getCurrent().access(() -> {
-			upload.setVisible(false);
-			progressBar.setVisible(true);
-			progressBar.setValue(readBytes / (contentLength * 1.0F));
-			UI.getCurrent().push();
-		});
 	}
 
 }

@@ -69,8 +69,26 @@ public class TRFileContentUtil {
 		if (ext.matches("(webm|m4v|mp4)")) {
 			return "video/" + ext;
 		}
-		if (ext.matches("(mov)")) {
+		if (ext.matches("(mov|qt)")) {
 			return "video/quicktime";
+		}
+		if (ext.matches("(mkv)")) {
+			return "video/x-matroska";
+		}
+		if (ext.matches("(flv)")) {
+			return "video/x-flv";
+		}
+		if (ext.matches("(mpeg-4)")) {
+			return "video/mp4";
+		}
+		if (ext.matches("(3gp)")) {
+			return "video/3gpp";
+		}
+		if (ext.matches("(wmv)")) {
+			return "video/x-ms-wmv";
+		}
+		if (ext.matches("(ts)")) {
+			return "video/MP2T";
 		}
 		if (ext.matches("(doc|docx)")) {
 			return "application/msword";
