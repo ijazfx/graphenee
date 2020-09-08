@@ -5,19 +5,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.graphenee.core.callback.TRErrorCallback;
 import io.graphenee.core.callback.TRParamCallback;
 import io.graphenee.core.enums.GxAreaPatternCode;
-import io.graphenee.core.storage.FileStorage;
 
 @Service
 public class GxVideoAnalyserImpl implements GxVideoAnalyser {
-
-	@Autowired
-	FileStorage fileStorage;
 
 	@Override
 	public String analyse(GxAreaPatternCode areaCode, String mediaFilePath, String jsonFilePath) throws Exception {
