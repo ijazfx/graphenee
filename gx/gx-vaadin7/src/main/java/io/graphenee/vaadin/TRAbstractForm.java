@@ -138,7 +138,7 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
 	@Override
 	protected Component createContent() {
-		MVerticalLayout content = new MVerticalLayout().withMargin(true);
+		MVerticalLayout content = new MVerticalLayout().withMargin(false);
 		content.setSizeFull();
 		MVerticalLayout contentLayout = new MVerticalLayout().withStyleName("content-layout");
 		contentLayout.setSizeFull();

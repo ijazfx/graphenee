@@ -171,8 +171,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 										}
 									} catch (Exception e1) {
 										if (e1.getMessage().contains("ConstraintViolationException"))
-											MNotification.tray("Operation Denied",
-													"Record is in use therefore cannot be removed.");
+											MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
 										else
 											MNotification.tray("Operation Failed", e1.getMessage());
 									}
@@ -226,10 +225,9 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				}
 				return new ArrayList<>(mainGridContainer.getItemIds());
 			});
-			exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O)
-					.withListener(cl -> {
-						exportDataSpreadSheetComponent.prepareDownload();
-					});
+			exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O).withListener(cl -> {
+				exportDataSpreadSheetComponent.prepareDownload();
+			});
 			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
 
 			pageNumberFeild = new MIntegerRangeField(null, 1, 99999, 1);
@@ -275,7 +273,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout().withMargin(new MarginInfo(true, false)).withSpacing(true);
+			rootLayout = new MVerticalLayout().withMargin(true).withSpacing(true);
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
 			rootLayout.setExpandRatio(mainGrid, 1);
@@ -308,12 +306,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			gridCellFilter = new GridCellFilter(grid);
 			gridCellFilter.addCellFilterChangedListener(event -> {
 				if (entityGrid().getSelectedRows().size() > 0) {
-					statusBar.setText(String.format("%d out of %d records selected",
-							entityGrid().getSelectedRows().size(), mainGridContainer.size()));
+					statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
 				} else {
 					if (shouldShowPaging() && mainGridContainer.size() != 0)
-						statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
-								getPageNumber() * getPageSize() + mainGridContainer.size()));
+						statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
 					else
 						statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 				}
@@ -339,12 +335,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 						if (onItemClick != null) {
 							Boolean value = onItemClick.apply(item.getBean());
 							if (value != null && value == true) {
-								onGridItemClicked(item.getBean(),
-										event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 							}
 						} else {
-							onGridItemClicked(item.getBean(),
-									event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 						}
 					}
 				}
@@ -352,12 +346,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		});
 		grid.addSelectionListener(event -> {
 			if (event.getSelected() != null && !event.getSelected().isEmpty()) {
-				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(),
-						mainGridContainer.size()));
+				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(), mainGridContainer.size()));
 			} else {
 				if (shouldShowPaging() && mainGridContainer.size() != 0)
-					statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
-							getPageNumber() * getPageSize() + mainGridContainer.size()));
+					statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
 				else
 					statusBar.setText(String.format("showing %d records", mainGridContainer.size()));
 			}
@@ -440,12 +432,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 						onGridItemClicked((T) event.getItemId(), "");
 					}
 				}), BooleanRenderer.CHECK_BOX_CONVERTER);
-			} else if ((column.getPropertyId().toString().matches("(date|since)")
-					|| column.getPropertyId().toString().matches("(date|since)[A-Z].*")
+			} else if ((column.getPropertyId().toString().matches("(date|since)") || column.getPropertyId().toString().matches("(date|since)[A-Z].*")
 					|| column.getPropertyId().toString().matches(".*[a-z](Date|Since)"))) {
 				column.setRenderer(new DateRenderer(applyDateFormatForProperty(column.getPropertyId().toString())));
-			} else if ((column.getPropertyId().toString().equalsIgnoreCase("time")
-					|| column.getPropertyId().toString().matches("(time)[A-Z].*")
+			} else if ((column.getPropertyId().toString().equalsIgnoreCase("time") || column.getPropertyId().toString().matches("(time)[A-Z].*")
 					|| column.getPropertyId().toString().matches(".*[a-z](Time)"))) {
 				column.setRenderer(new DateRenderer(applyDateTimeFormatForProperty(column.getPropertyId().toString())));
 			}
@@ -495,8 +485,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar")
-				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 		pagingLayout = new CssLayout();
 		pagingLayout.setCaption("Paging");
 		pagingLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
@@ -538,8 +527,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar")
-				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -659,8 +647,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				}
 			}
 			if (shouldShowPaging() && mainGridContainer.size() != 0)
-				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
-						getPageNumber() * getPageSize() + mainGridContainer.size()));
+				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
 			else
 				statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 			UI.getCurrent().push();
@@ -682,8 +669,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 					nextPageButton.setEnabled(true);
 			}
 			if (shouldShowPaging() && mainGridContainer.size() != 0)
-				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
-						getPageNumber() * getPageSize() + mainGridContainer.size()));
+				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
 			else
 				statusBar.setText(String.format("%d records", mainGridContainer.size()));
 
