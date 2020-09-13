@@ -485,7 +485,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 		pagingLayout = new CssLayout();
 		pagingLayout.setCaption("Paging");
 		pagingLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
@@ -527,7 +527,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 

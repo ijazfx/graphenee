@@ -76,7 +76,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 	@Override
 	protected Component getFormComponent() {
 		// detail form
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+		MVerticalLayout form = new MVerticalLayout().withMargin(true).withSpacing(true);
 		// namespaceFault = new ComboBox("Namespace");
 		// namespaceFault.setConverter(new
 		// BeanFaultToBeanConverter(GxNamespaceBean.class));
@@ -166,7 +166,8 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		CssLayout documentLayout = new CssLayout(securityPolicyDocumentComboBox, createButton, cloneButton, makeDefaultButton, deleteButton);
 		documentLayout.setCaption("Policy Document");
 		documentLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-		jsonDocumentTextArea = new MTextArea("Statements").withRows(15);
+		jsonDocumentTextArea = new MTextArea("Statements");
+		jsonDocumentTextArea.setSizeFull();
 		jsonDocumentTextArea.addStyleName(GrapheneeTheme.STYLE_CODE);
 		jsonDocumentTextArea.setInputPrompt("e.g.\ngrant all on all\nrevoke write on accounts");
 		jsonDocumentTextArea.setEnabled(false);
@@ -180,6 +181,7 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		// form.addComponents(namespaceFault, securityPolicyName, priority,
 		// isActive, documentLayout, jsonDocumentTextArea);
 		form.addComponents(securityPolicyName, securityPolicyDescription, priority, isActive, documentLayout, jsonDocumentTextArea);
+		form.expand(jsonDocumentTextArea);
 
 		// users
 		userAccountCollectionFault = new TwinColSelect();
@@ -208,9 +210,9 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(new MVerticalLayout(userAccountCollectionFault).withFullHeight(), "Users");
-		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
-		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
+		mainTabSheet.addTab(new MVerticalLayout(userAccountCollectionFault).withMargin(true).withFullHeight(), "Users");
+		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withMargin(true).withFullHeight(), "Security Groups");
+		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withMargin(true).withFullHeight(), "Access Keys");
 
 		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();

@@ -68,7 +68,7 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 	@Override
 	protected Component getFormComponent() {
 		// detail form
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+		MVerticalLayout form = new MVerticalLayout().withMargin(true).withSpacing(true);
 		username = new MTextField("Username").withRequired(true);
 		username.setMaxLength(50);
 		firstName = new MTextField("First Name").withRequired(false);
@@ -113,9 +113,9 @@ public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withFullHeight(), "Security Groups");
-		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
-		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
+		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withMargin(true).withFullHeight(), "Security Groups");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withMargin(true).withFullHeight(), "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withMargin(true).withFullHeight(), "Access Keys");
 
 		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
