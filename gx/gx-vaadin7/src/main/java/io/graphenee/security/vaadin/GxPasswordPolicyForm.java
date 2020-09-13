@@ -3,9 +3,9 @@ package io.graphenee.security.vaadin;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.bean.GxPasswordPolicyBean;
 import io.graphenee.vaadin.TRAbstractForm;
@@ -32,7 +32,7 @@ public class GxPasswordPolicyForm extends TRAbstractForm<GxPasswordPolicyBean> {
 	}
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		passwordPolicyName = new MTextField("Policy Name").withRequired(true);
 		maxHistory = new MTextField("Max History");
 		maxAge = new MTextField("Max Days");

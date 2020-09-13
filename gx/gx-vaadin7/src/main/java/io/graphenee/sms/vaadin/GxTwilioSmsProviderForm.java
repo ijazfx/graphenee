@@ -22,9 +22,9 @@ import org.vaadin.viritin.fields.MPasswordField;
 import org.vaadin.viritin.fields.MTextArea;
 import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
@@ -47,7 +47,7 @@ public class GxTwilioSmsProviderForm extends TRAbstractForm<GxSmsProviderBean> {
 	private MPasswordField authToken;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		providerNameLabel = new MLabel().withCaption("Provider");
 		isPrimary = new MCheckBox("Is Primary?");
 		form.addComponents(providerNameLabel, isPrimary);

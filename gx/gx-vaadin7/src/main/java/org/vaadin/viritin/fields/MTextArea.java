@@ -61,6 +61,7 @@ public class MTextArea extends TextArea implements EagerValidateable {
 		autocomplete = AutoComplete.off;
 		autocorrect = AutoCorrect.off;
 		autocapitalize = AutoCapitalize.off;
+		setWidth("100%");
 	}
 
 	public MTextArea(String caption) {

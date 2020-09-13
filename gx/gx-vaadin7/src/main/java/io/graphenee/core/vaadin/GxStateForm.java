@@ -19,13 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TwinColSelect;
 
 import io.graphenee.core.model.api.GxDataService;
@@ -61,7 +61,7 @@ public class GxStateForm extends TRAbstractForm<GxStateBean> {
 	BeanFaultComboBox countryBeanFaultComboBox;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		stateName = new MTextField("State Name").withRequired(true);
 		stateCode = new MTextField("State Code").withRequired(true);
 		isActive = new MCheckBox("Is Active?");

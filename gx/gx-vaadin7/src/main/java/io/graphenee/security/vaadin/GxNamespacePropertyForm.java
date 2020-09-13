@@ -18,9 +18,9 @@ package io.graphenee.security.vaadin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespacePropertyBean;
@@ -40,7 +40,7 @@ public class GxNamespacePropertyForm extends TRAbstractForm<GxNamespacePropertyB
 	MTextField propertyDefaultValue;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		propertyKey = new MTextField("Key");
 		propertyValue = new MTextField("Value");
 		propertyDefaultValue = new MTextField("Default Value");

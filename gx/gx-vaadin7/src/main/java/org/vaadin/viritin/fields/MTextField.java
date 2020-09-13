@@ -62,6 +62,7 @@ public class MTextField extends TextField implements EagerValidateable {
 		autocomplete = AutoComplete.off;
 		autocorrect = AutoCorrect.off;
 		autocapitalize = AutoCapitalize.off;
+		setWidth("100%");
 	}
 
 	public MTextField(String caption) {

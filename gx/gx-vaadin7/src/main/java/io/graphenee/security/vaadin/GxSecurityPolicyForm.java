@@ -53,6 +53,8 @@ import io.graphenee.vaadin.converter.BeanCollectionFaultToSetConverter;
 @Scope("prototype")
 public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
+	private static final long serialVersionUID = 1L;
+
 	@Autowired
 	GxDataService dataService;
 
@@ -66,12 +68,6 @@ public class GxSecurityPolicyForm extends TRAbstractForm<GxSecurityPolicyBean> {
 
 	GxSecurityPolicyDocumentBean selectedDocumentBean;
 	TwinColSelect accessKeyCollectionFault;
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	protected void addFieldsToForm(FormLayout form) {
-
-	}
 
 	TwinColSelect userAccountCollectionFault;
 	TwinColSelect securityGroupCollectionFault;
