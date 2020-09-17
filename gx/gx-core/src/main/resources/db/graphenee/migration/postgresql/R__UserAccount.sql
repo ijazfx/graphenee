@@ -1,0 +1,1 @@
+update gx_user_account set is_password_change_required = false where username = 'admin';
