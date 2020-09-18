@@ -273,7 +273,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout().withMargin(true).withSpacing(true);
+			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin()).withSpacing(true);
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
 			rootLayout.setExpandRatio(mainGrid, 1);
@@ -284,6 +284,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		}
 		return this;
 
+	}
+
+	protected MarginInfo rootLayoutMargin() {
+		return new MarginInfo(true);
 	}
 
 	private MGrid<T> buildMainGrid() {
