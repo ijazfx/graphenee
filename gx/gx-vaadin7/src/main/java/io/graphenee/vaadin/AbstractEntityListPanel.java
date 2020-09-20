@@ -71,6 +71,7 @@ import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.renderer.BooleanRenderer;
 import io.graphenee.vaadin.util.VaadinUtils;
 
+@SuppressWarnings("serial")
 public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	private static final Logger L = LoggerFactory.getLogger(AbstractEntityListPanel.class);
@@ -139,7 +140,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 			addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("New"), event -> {
 				try {
-					onAddButtonClick(initializeEntity(entityClass.newInstance()));
+					onAddButtonClick(initializeEntity(entityClass.getDeclaredConstructor().newInstance()));
 				} catch (Exception e) {
 					L.warn(e.getMessage(), e);
 				}
