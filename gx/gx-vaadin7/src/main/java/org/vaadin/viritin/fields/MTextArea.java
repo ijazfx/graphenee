@@ -31,6 +31,7 @@ import com.vaadin.server.CompositeErrorMessage;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  *
@@ -130,6 +131,16 @@ public class MTextArea extends TextArea implements EagerValidateable {
 
 	public MTextArea withConverter(Converter<String, ?> converter) {
 		setConverter(converter);
+		return this;
+	}
+
+	public MTextArea alignRight() {
+		setStyleName(ValoTheme.TEXTAREA_ALIGN_RIGHT);
+		return this;
+	}
+
+	public MTextArea alignCenter() {
+		setStyleName(ValoTheme.TEXTAREA_ALIGN_RIGHT);
 		return this;
 	}
 
