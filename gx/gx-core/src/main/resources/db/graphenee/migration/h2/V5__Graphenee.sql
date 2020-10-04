@@ -1,0 +1,1 @@
+update gx_namespace set namespace = 'io.graphenee.system' where namespace = 'com.graphenee.system';
