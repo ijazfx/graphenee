@@ -53,8 +53,9 @@ import com.vaadin.util.FileTypeResolver;
 import io.graphenee.core.storage.FileStorage;
 import io.graphenee.core.storage.ResolveFailedException;
 import io.graphenee.core.util.TRFileContentUtil;
-import io.graphenee.core.util.TRImageUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
+import io.graphenee.media.GxFfmpegMediaConverterImpl;
+import io.graphenee.media.GxMediaConverter;
 import io.graphenee.vaadin.ResourcePreviewPanel;
 
 public class FileChooser extends CustomField<String> implements Receiver, FinishedListener, ProgressListener {
@@ -345,15 +346,13 @@ public class FileChooser extends CustomField<String> implements Receiver, Finish
 		uploadedFileName = desiredFileName;
 
 		String mimeType = TRFileContentUtil.getMimeType(uploadedFileName);
-
 		if (mimeType.startsWith("image/")) {
 			try {
 				File convertedFile = new File(receivedFile.getParent(), "resized-" + storageFileName);
-				if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
-					uploadedFilePath = receivedFile.getAbsolutePath();
-				} else {
-					uploadedFilePath = convertedFile.getAbsolutePath();
-				}
+				GxMediaConverter conv = new GxFfmpegMediaConverterImpl();
+				conv.compressImageMedia(uploadedFilePath, convertedFile.getAbsolutePath(), 16);
+				uploadedFilePath = convertedFile.getAbsolutePath();
+
 			} catch (Exception ex) {
 				L.warn("Conversion failed so using original file", ex);
 			}
