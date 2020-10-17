@@ -15,6 +15,10 @@
  *******************************************************************************/
 package io.graphenee.vaadin.view;
 
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
@@ -30,10 +34,6 @@ import com.vaadin.ui.LoginForm;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.vaadin.AbstractDashboardSetup;
 import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
