@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.dialogs.ConfirmDialog;
 import org.vaadin.gridutil.cell.GridCellFilter;
 import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.grid.MGrid;
 import org.vaadin.viritin.label.MLabel;
 import org.vaadin.viritin.layouts.MHorizontalLayout;
@@ -42,6 +43,7 @@ import com.vaadin.addon.contextmenu.ContextMenu;
 import com.vaadin.addon.contextmenu.GridContextMenu;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.converter.StringToIntegerConverter;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
@@ -66,7 +68,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
-import io.graphenee.vaadin.component.MIntegerRangeField;
 import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.renderer.BooleanRenderer;
 import io.graphenee.vaadin.util.VaadinUtils;
@@ -89,7 +90,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private GridCellFilter gridCellFilter;
 	private Object filter;
 	private Function<T, Boolean> onItemClick;
-	private MIntegerRangeField pageNumberFeild;
+	private MTextField pageNumberFeild;
 	private Integer pageNumber = 1;
 	private MButton nextPageButton;
 	private MButton previousPageButton;
@@ -172,7 +173,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 										}
 									} catch (Exception e1) {
 										if (e1.getMessage().contains("ConstraintViolationException"))
-											MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
+											MNotification.tray("Operation Denied",
+													"Record is in use therefore cannot be removed.");
 										else
 											MNotification.tray("Operation Failed", e1.getMessage());
 									}
@@ -226,18 +228,18 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				}
 				return new ArrayList<>(mainGridContainer.getItemIds());
 			});
-			exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O).withListener(cl -> {
-				exportDataSpreadSheetComponent.prepareDownload();
-			});
+			exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O)
+					.withListener(cl -> {
+						exportDataSpreadSheetComponent.prepareDownload();
+					});
 			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
 
-			pageNumberFeild = new MIntegerRangeField(null, 1, 99999, 1);
+			pageNumberFeild = new MTextField();
 			pageNumberFeild.setWidth("100px");
-			pageNumberFeild.setNullSelectionAllowed(false);
-			pageNumberFeild.setValue(pageNumber);
-
+			pageNumberFeild.setConverter(new StringToIntegerConverter());
+			pageNumberFeild.setValue(pageNumber.toString());
 			pageNumberFeild.addValueChangeListener(listener -> {
-				pageNumber = (Integer) listener.getProperty().getValue();
+				pageNumber = (Integer) pageNumberFeild.getConvertedValue();
 				if (filter != null) {
 					refresh(filter);
 				} else
@@ -249,22 +251,14 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			previousPageButton.setEnabled(false);
 			previousPageButton.addClickListener(listener -> {
 				pageNumber = pageNumber - 1;
-				pageNumberFeild.setValue(pageNumber);
-				if (filter != null) {
-					refresh(filter);
-				} else
-					refresh();
+				pageNumberFeild.setValue(pageNumber.toString());
 			});
 
 			nextPageButton = new MButton().withIcon(FontAwesome.ARROW_RIGHT);
 
 			nextPageButton.addClickListener(listener -> {
 				pageNumber = pageNumber + 1;
-				pageNumberFeild.setValue(pageNumber);
-				if (filter != null) {
-					refresh(filter);
-				} else
-					refresh();
+				pageNumberFeild.setValue(pageNumber.toString());
 			});
 			toolbar = buildToolbar();
 			if (toolbar.getComponentCount() == 0)
@@ -311,10 +305,12 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			gridCellFilter = new GridCellFilter(grid);
 			gridCellFilter.addCellFilterChangedListener(event -> {
 				if (entityGrid().getSelectedRows().size() > 0) {
-					statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
+					statusBar.setText(String.format("%d out of %d records selected",
+							entityGrid().getSelectedRows().size(), mainGridContainer.size()));
 				} else {
 					if (shouldShowPaging() && mainGridContainer.size() != 0)
-						statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
+						statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
+								getPageNumber() * getPageSize() + mainGridContainer.size()));
 					else
 						statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 				}
@@ -340,10 +336,12 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 						if (onItemClick != null) {
 							Boolean value = onItemClick.apply(item.getBean());
 							if (value != null && value == true) {
-								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+								onGridItemClicked(item.getBean(),
+										event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 							}
 						} else {
-							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							onGridItemClicked(item.getBean(),
+									event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 						}
 					}
 				}
@@ -351,10 +349,12 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		});
 		grid.addSelectionListener(event -> {
 			if (event.getSelected() != null && !event.getSelected().isEmpty()) {
-				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(), mainGridContainer.size()));
+				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(),
+						mainGridContainer.size()));
 			} else {
 				if (shouldShowPaging() && mainGridContainer.size() != 0)
-					statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
+					statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
+							getPageNumber() * getPageSize() + mainGridContainer.size()));
 				else
 					statusBar.setText(String.format("showing %d records", mainGridContainer.size()));
 			}
@@ -437,10 +437,12 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 						onGridItemClicked((T) event.getItemId(), "");
 					}
 				}), BooleanRenderer.CHECK_BOX_CONVERTER);
-			} else if ((column.getPropertyId().toString().matches("(date|since)") || column.getPropertyId().toString().matches("(date|since)[A-Z].*")
+			} else if ((column.getPropertyId().toString().matches("(date|since)")
+					|| column.getPropertyId().toString().matches("(date|since)[A-Z].*")
 					|| column.getPropertyId().toString().matches(".*[a-z](Date|Since)"))) {
 				column.setRenderer(new DateRenderer(applyDateFormatForProperty(column.getPropertyId().toString())));
-			} else if ((column.getPropertyId().toString().equalsIgnoreCase("time") || column.getPropertyId().toString().matches("(time)[A-Z].*")
+			} else if ((column.getPropertyId().toString().equalsIgnoreCase("time")
+					|| column.getPropertyId().toString().matches("(time)[A-Z].*")
 					|| column.getPropertyId().toString().matches(".*[a-z](Time)"))) {
 				column.setRenderer(new DateRenderer(applyDateTimeFormatForProperty(column.getPropertyId().toString())));
 			}
@@ -490,9 +492,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true)
+				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 		pagingLayout = new CssLayout();
-		pagingLayout.setCaption("Paging");
+		pagingLayout.setCaption("Page#");
 		pagingLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
 		layout.add(addButton);
@@ -532,7 +535,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true)
+				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -652,7 +656,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				}
 			}
 			if (shouldShowPaging() && mainGridContainer.size() != 0)
-				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
+				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
+						getPageNumber() * getPageSize() + mainGridContainer.size()));
 			else
 				statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 			UI.getCurrent().push();
@@ -672,9 +677,15 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 					nextPageButton.setEnabled(false);
 				else
 					nextPageButton.setEnabled(true);
+				if (pageNumber > 1)
+					previousPageButton.setEnabled(true);
+				else
+					previousPageButton.setEnabled(false);
+
 			}
 			if (shouldShowPaging() && mainGridContainer.size() != 0)
-				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
+				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(),
+						getPageNumber() * getPageSize() + mainGridContainer.size()));
 			else
 				statusBar.setText(String.format("%d records", mainGridContainer.size()));
 
