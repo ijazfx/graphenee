@@ -44,14 +44,14 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 				mimeMessage.setTo(toEmailList);
 			mimeMessage.setFrom(senderEmail);
 			mimeMessage.setSentDate(new Date());
-			if (!StringUtils.isEmpty(ccEmailList)) {
+			if (!StringUtils.hasText(ccEmailList)) {
 				if (ccEmailList.contains(";")) {
 					String[] emails = ccEmailList.split(";");
 					mimeMessage.setCc(emails);
 				} else
 					mimeMessage.setCc(ccEmailList);
 			}
-			if (!StringUtils.isEmpty(bccEmailList)) {
+			if (!StringUtils.hasText(bccEmailList)) {
 				if (bccEmailList.contains(";")) {
 					String[] emails = bccEmailList.split(";");
 					mimeMessage.setBcc(emails);
