@@ -44,6 +44,7 @@ import com.vaadin.addon.contextmenu.GridContextMenu;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.StringToIntegerConverter;
+import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
@@ -95,7 +96,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private MButton nextPageButton;
 	private MButton previousPageButton;
 	private CssLayout pagingLayout;
-	private Integer pageSize = 200;
 
 	private Function<Collection<T>, Boolean> onSelection;
 
@@ -233,11 +233,14 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
 
 			pageNumberField = new MTextField();
-			pageNumberField.setWidth("100px");
+			pageNumberField.setWidth("50px");
+			pageNumberField.setStyleName(ValoTheme.TEXTFIELD_ALIGN_CENTER);
 			pageNumberField.setConverter(new StringToIntegerConverter());
 			pageNumberField.setValue(pageNumber.toString());
 			pageNumberField.addValueChangeListener(listener -> {
 				pageNumber = (Integer) pageNumberField.getConvertedValue();
+				previousPageButton.setEnabled(pageNumber > 1);
+				nextPageButton.setEnabled(pageNumber < getPageCount());
 				if (filter != null) {
 					refresh(filter);
 				} else
@@ -245,18 +248,24 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 			});
 
-			previousPageButton = new MButton().withIcon(FontAwesome.ARROW_LEFT);
+			pageNumberField.addValidator(new IntegerRangeValidator("Must be between 1 and " + getPageCount(), 1, getPageCount()));
+
+			previousPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_LEFT);
 			previousPageButton.setEnabled(false);
 			previousPageButton.addClickListener(listener -> {
-				pageNumber = pageNumber - 1;
-				pageNumberField.setValue(pageNumber.toString());
+				if (pageNumber > 1) {
+					pageNumber = pageNumber - 1;
+					pageNumberField.setValue(pageNumber.toString());
+				}
 			});
 
-			nextPageButton = new MButton().withIcon(FontAwesome.ARROW_RIGHT);
+			nextPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_RIGHT);
 
 			nextPageButton.addClickListener(listener -> {
-				pageNumber = pageNumber + 1;
-				pageNumberField.setValue(pageNumber.toString());
+				if (pageNumber < getPageCount()) {
+					pageNumber = pageNumber + 1;
+					pageNumberField.setValue(pageNumber.toString());
+				}
 			});
 			toolbar = buildToolbar();
 			if (toolbar.getComponentCount() == 0)
@@ -305,10 +314,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				if (entityGrid().getSelectedRows().size() > 0) {
 					statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
 				} else {
-					if (shouldShowPaging() && mainGridContainer.size() != 0)
-						statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
-					else
-						statusBar.setText(String.format(" %d records", mainGridContainer.size()));
+					statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 				}
 			});
 			if (visibleProperties != null) {
@@ -496,7 +502,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			layout.add(pagingLayout);
 			layout.setComponentAlignment(pagingLayout, Alignment.TOP_CENTER);
 		}
-		
+
 		layout.add(exportDataDownloadButton);
 		addButtonsToToolbar(layout);
 
@@ -631,22 +637,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			mainGridContainer.removeAllItems();
 			if (entities != null) {
 				mainGridContainer.addAll(entities);
-				if (shouldShowPaging()) {
-					if (mainGridContainer.size() < getPageSize())
-						nextPageButton.setEnabled(false);
-					else
-						nextPageButton.setEnabled(true);
-					if (pageNumber > 1)
-						previousPageButton.setEnabled(true);
-					else
-						previousPageButton.setEnabled(false);
-
-				}
 			}
-			if (shouldShowPaging() && mainGridContainer.size() != 0)
-				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
-			else
-				statusBar.setText(String.format(" %d records", mainGridContainer.size()));
+			statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 			UI.getCurrent().push();
 		});
 		return this;
@@ -659,22 +651,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			List<T> entities = postFetch(fetchEntities(filter));
 			mainGridContainer.removeAllItems();
 			mainGridContainer.addAll(entities);
-			if (shouldShowPaging()) {
-				if (mainGridContainer.size() < getPageSize())
-					nextPageButton.setEnabled(false);
-				else
-					nextPageButton.setEnabled(true);
-				if (pageNumber > 1)
-					previousPageButton.setEnabled(true);
-				else
-					previousPageButton.setEnabled(false);
-
-			}
-			if (shouldShowPaging() && mainGridContainer.size() != 0)
-				statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
-			else
-				statusBar.setText(String.format("%d records", mainGridContainer.size()));
-
+			statusBar.setText(String.format("%d records", mainGridContainer.size()));
 			UI.getCurrent().push();
 		});
 		return this;
@@ -682,6 +659,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	protected List<T> postFetch(List<T> fetchedEntities) {
 		return fetchedEntities;
+	}
+
+	protected Integer fetchEntityCount() {
+		return 0;
 	}
 
 	protected abstract String panelCaption();
@@ -878,12 +859,15 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		return false;
 	}
 
-	public Integer getPageSize() {
-		return pageSize;
+	protected Integer getPageSize() {
+		return 200;
 	}
 
-	public void setPageSize(Integer pageSize) {
-		this.pageSize = pageSize;
+	private Integer getPageCount() {
+		int pageCount = fetchEntityCount() / getPageSize();
+		if (pageCount == 0)
+			return 1;
+		return pageCount;
 	}
 
 }
