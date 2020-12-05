@@ -23,6 +23,9 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
@@ -46,9 +49,6 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -218,8 +218,15 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 				userMenuItem.addItem("Sign Out", new Command() {
 					@Override
 					public void menuSelected(final MenuItem selectedItem) {
+						UI current = UI.getCurrent();
+						VaadinSession.getCurrent().getUIs().forEach(ui -> {
+							if (ui != current && ui.isAttached()) {
+								ui.getPage().setLocation("/");
+							}
+						});
+						VaadinSession.getCurrent().close();
+						Page.getCurrent().setLocation("/login");
 						VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, null);
-						Page.getCurrent().reload();
 					}
 				});
 			}
