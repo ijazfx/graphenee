@@ -6,7 +6,7 @@
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx</artifactId>
 	<packaging>pom</packaging>
-	<version>3.2.1-SNAPSHOT</version>
+	<version>3.2.1</version>
 	<name>Graphenee Parent</name>
 	<description>Graphenee Parent Project</description>
 	<url>https://github.com/ijazfx/graphenee</url>
