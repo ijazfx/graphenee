@@ -158,9 +158,7 @@ public class BeanCollectionFault<T> {
 
 	public void add(T bean) {
 		_initializeBeansCollection();
-		if (!beans.contains(bean)) {
-			beans.add(bean);
-		}
+		beans.add(bean);
 		_initializeBeansAddedCollection();
 		if (!beansAdded.contains(bean)) {
 			beansAdded.add(bean);
@@ -173,18 +171,23 @@ public class BeanCollectionFault<T> {
 	}
 
 	public void update(T bean) {
+		_initializeBeansCollection();
+		beans.remove(bean);
+		beans.add(bean);
 		_initializeBeansUpdatedCollection();
 		if (!beansUpdated.contains(bean)) {
 			beansUpdated.add(bean);
+		}
+		_initializeBeansRemovedCollection();
+		if (beansRemoved.contains(bean)) {
+			beansRemoved.remove(bean);
 		}
 		notificationModificationListeners();
 	}
 
 	public void remove(T bean) {
 		_initializeBeansCollection();
-		if (beans.contains(bean)) {
-			beans.remove(bean);
-		}
+		beans.remove(bean);
 		_initializeBeansRemovedCollection();
 		if (!beansRemoved.contains(bean)) {
 			beansRemoved.add(bean);

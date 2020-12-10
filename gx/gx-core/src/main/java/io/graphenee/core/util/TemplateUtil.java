@@ -82,7 +82,6 @@ public class TemplateUtil {
 		data.put("name", "Farrukh");
 		data.put("place", "Lahore");
 		data.put("date", LocalDate.now().toString());
-
 	}
 
 }

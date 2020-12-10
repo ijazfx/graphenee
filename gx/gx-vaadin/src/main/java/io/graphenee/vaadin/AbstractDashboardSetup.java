@@ -20,16 +20,11 @@ import java.util.List;
 
 import com.vaadin.navigator.Navigator;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.AbstractSingleComponentContainer;
 import com.vaadin.ui.Image;
 
-import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.i18n.api.LocalizerService;
-import io.graphenee.vaadin.domain.DashboardUser;
-import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.view.DashboardMenu;
-import io.graphenee.vaadin.view.LoginComponent;
 import io.graphenee.vaadin.view.MainComponent;
 
 public abstract class AbstractDashboardSetup implements Serializable {
@@ -37,6 +32,8 @@ public abstract class AbstractDashboardSetup implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public abstract String applicationTitle();
+
+	private BaseProfileForm profileForm = null;
 
 	public String dashboardTitle() {
 		return applicationTitle();
@@ -62,10 +59,6 @@ public abstract class AbstractDashboardSetup implements Serializable {
 
 	public abstract String dashboardViewName();
 
-	public AbstractSingleComponentContainer loginComponent() {
-		return new LoginComponent(this);
-	}
-
 	public AbstractMainComponent defaultComponent() {
 		return new MainComponent(this).build();
 	}
@@ -74,8 +67,14 @@ public abstract class AbstractDashboardSetup implements Serializable {
 		return new DashboardMenu(this).build();
 	}
 
-	public AbstractComponent profileComponent() {
-		return null;
+	public BaseProfileForm profileComponent() {
+		if (profileForm == null) {
+			profileForm = new BaseProfileForm();
+			profileForm.setSavedHandler(event -> {
+
+			});
+		}
+		return profileForm;
 	}
 
 	public AbstractComponent preferencesComponent() {
@@ -87,8 +86,6 @@ public abstract class AbstractDashboardSetup implements Serializable {
 	}
 
 	public abstract void registerViewProviders(Navigator navigator);
-
-	public abstract DashboardUser authenticate(UserLoginRequestedEvent event) throws AuthenticationFailedException;
 
 	public List<GxSupportedLocaleBean> supportedLocales() {
 		return null;

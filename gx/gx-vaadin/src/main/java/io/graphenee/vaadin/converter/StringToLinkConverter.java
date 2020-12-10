@@ -24,7 +24,10 @@ public class StringToLinkConverter implements Converter<String, String> {
 	private LinkType linkType;
 
 	public static enum LinkType {
-		EMAIL, HTTP, HTTPS, CALL
+		EMAIL,
+		HTTP,
+		HTTPS,
+		CALL
 	};
 
 	public StringToLinkConverter() {

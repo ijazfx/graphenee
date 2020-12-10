@@ -1,0 +1,1 @@
+alter table gx_email_template add sender_email_address nvarchar(200);

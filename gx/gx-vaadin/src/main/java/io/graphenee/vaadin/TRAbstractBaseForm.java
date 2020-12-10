@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.groups.Default;
-
 import org.vaadin.viritin.BeanBinder;
 import org.vaadin.viritin.MBeanFieldGroup;
 import org.vaadin.viritin.MBeanFieldGroup.FieldGroupListener;
@@ -110,7 +108,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 			@Override
 			public void attach(AttachEvent event) {
 				lazyInit();
-				adjustResetButtonState();
+				//				adjustResetButtonState();
 			}
 		});
 
@@ -130,8 +128,8 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	protected void lazyInit() {
 		if (getCompositionRoot() == null) {
 			setCompositionRoot(new VerticalLayout());
-			adjustSaveButtonState();
-			adjustResetButtonState();
+			//			adjustSaveButtonState();
+			//			adjustResetButtonState();
 		}
 	}
 
@@ -278,27 +276,9 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		this.eagerValidation = eagerValidation;
 	}
 
-	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T entity) {
-		T clone = entity;
-		// try {
-		// // clone = entityClass.newInstance();
-		// // BeanUtilsBean.getInstance().getConvertUtils().register(false,
-		// // true, 0);
-		// // BeanUtilsBean.getInstance().copyProperties(clone, entity);
-		// // BeanUtils.copyProperties(clone, entity);
-		// } catch (Exception e) {
-		// // failed to clone so fall back. This though does not harm the
-		// // data in the original container as only call to save method
-		// // persists new values.
-		// clone = entity;
-		// }
-		return this.setEntity(clone);
-	}
-
-	@Deprecated
-	public MBeanFieldGroup<T> setEntity(T entity) {
+	public MBeanFieldGroup<T> setEntity(Class<T> entityClass, T originalEntity) {
 		lazyInit();
-		this.entity = entity;
+		this.entity = originalEntity;
 		if (entity != null) {
 			setCompositionRoot(createContent());
 			if (isBound()) {
@@ -307,11 +287,6 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 			binding = true;
 			fieldGroup = bindEntity(entity);
 			binding = false;
-			try {
-				fieldGroup.setValidationGroups(getValidationGroups());
-			} catch (Throwable e) {
-				// Probably no Validation API available
-			}
 
 			for (Map.Entry<MBeanFieldGroup.MValidator<T>, Collection<AbstractComponent>> e : mValidators.entrySet()) {
 				fieldGroup.addValidator(e.getKey(), e.getValue().toArray(new AbstractComponent[e.getValue().size()]));
@@ -336,6 +311,13 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		}
 	}
 
+	@Deprecated
+	public MBeanFieldGroup<T> setEntity(T originalEntity) {
+		if (originalEntity != null)
+			return this.setEntity((Class<T>) originalEntity.getClass(), originalEntity);
+		return this.setEntity(null, null);
+	}
+
 	protected Component getBindingComponent() {
 		return this;
 	}
@@ -356,10 +338,14 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	}
 
 	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c, String... nestedProperties) {
+		preBinding(entity);
 		MBeanFieldGroup<T> beanFieldGroup = BeanBinder.bind(entity, c, nestedProperties);
 		beanFieldGroup.setValidateAllProperties(false);
 		postBinding(entity);
 		return beanFieldGroup;
+	}
+
+	protected void preBinding(T entity) {
 	}
 
 	protected void postBinding(T entity) {
@@ -615,6 +601,57 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		return false;
 	}
 
+	Set<Field> lockedFields = new HashSet<>();
+
+	public void lockFields() {
+		lockFields(getCompositionRoot());
+	}
+
+	private void lockFields(Component compositionRoot) {
+		if (compositionRoot instanceof AbstractComponentContainer) {
+			AbstractComponentContainer cc = (AbstractComponentContainer) compositionRoot;
+			Iterator<Component> iterator = cc.iterator();
+			while (iterator.hasNext()) {
+				Component component = iterator.next();
+				if (component.isReadOnly())
+					continue;
+				if (component instanceof AbstractTextField) {
+					AbstractTextField abstractTextField = (AbstractTextField) component;
+					if (abstractTextField.isEnabled()) {
+						lockedFields.add(abstractTextField);
+					}
+				}
+				if (component instanceof AbstractField) {
+					AbstractField abstractField = (AbstractField) component;
+					if (abstractField.isEnabled()) {
+						lockedFields.add(abstractField);
+					}
+				}
+				if (component instanceof AbstractSingleComponentContainer) {
+					AbstractSingleComponentContainer container = (AbstractSingleComponentContainer) component;
+					lockFields(container.getContent());
+
+				}
+				if (component instanceof AbstractComponentContainer) {
+					lockFields(component);
+				}
+			}
+		} else if (compositionRoot instanceof AbstractSingleComponentContainer) {
+			AbstractSingleComponentContainer container = (AbstractSingleComponentContainer) compositionRoot;
+			lockFields(container.getContent());
+		}
+		lockedFields.forEach(field -> {
+			field.setReadOnly(true);
+		});
+	}
+
+	public void unlockFields() {
+		lockedFields.forEach(field -> {
+			field.setReadOnly(false);
+		});
+		lockedFields.clear();
+	}
+
 	/**
 	 * This method should return the actual content of the form, including
 	 * possible toolbar. Use setEntity(T entity) to fill in the data. Am example
@@ -656,31 +693,6 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 	private final LinkedHashMap<MBeanFieldGroup.MValidator<T>, Collection<AbstractComponent>> mValidators = new LinkedHashMap<MBeanFieldGroup.MValidator<T>, Collection<AbstractComponent>>();
 
 	private final Map<Class, AbstractComponent> validatorToErrorTarget = new LinkedHashMap<Class, AbstractComponent>();
-
-	private Class<?>[] validationGroups;
-
-	/**
-	 * @return the JSR 303 bean validation groups that should be used to
-	 * validate the bean
-	 */
-	public Class<?>[] getValidationGroups() {
-		if (validationGroups == null) {
-			return new Class<?>[] { Default.class };
-		}
-		return validationGroups;
-	}
-
-	/**
-	 * @param validationGroups the JSR 303 bean validation groups that should be
-	 * used to validate the bean. Note, that groups currently only affect
-	 * cross-field/bean-level validation.
-	 */
-	public void setValidationGroups(Class<?>... validationGroups) {
-		this.validationGroups = validationGroups;
-		if (getFieldGroup() != null) {
-			getFieldGroup().setValidationGroups(validationGroups);
-		}
-	}
 
 	public void setValidationErrorTarget(Class aClass, AbstractComponent errorTarget) {
 		validatorToErrorTarget.put(aClass, errorTarget);

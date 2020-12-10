@@ -28,8 +28,8 @@ public class GxTermBean implements Serializable {
 	private String termPlural;
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
-	private BeanFault<Integer, GxSupportedLocaleBean> supportedLocaleFault ;
-	private BeanFault<Integer, GxNamespaceBean> namespaceFault ;
+	private BeanFault<Integer, GxSupportedLocaleBean> supportedLocaleFault;
+	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
 
 	public Integer getOid() {
 		return oid;
@@ -93,6 +93,49 @@ public class GxTermBean implements Serializable {
 
 	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
 		this.namespaceFault = namespaceFault;
+	}
+
+	public String getLanguage() {
+		if (getSupportedLocaleFault() != null)
+			return getSupportedLocaleFault().getBean().getLocaleName();
+		return null;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((namespaceFault == null) ? 0 : namespaceFault.hashCode());
+		result = prime * result + ((supportedLocaleFault == null) ? 0 : supportedLocaleFault.hashCode());
+		result = prime * result + ((termKey == null) ? 0 : termKey.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GxTermBean other = (GxTermBean) obj;
+		if (namespaceFault == null) {
+			if (other.namespaceFault != null)
+				return false;
+		} else if (!namespaceFault.equals(other.namespaceFault))
+			return false;
+		if (supportedLocaleFault == null) {
+			if (other.supportedLocaleFault != null)
+				return false;
+		} else if (!supportedLocaleFault.equals(other.supportedLocaleFault))
+			return false;
+		if (termKey == null) {
+			if (other.termKey != null)
+				return false;
+		} else if (!termKey.equals(other.termKey))
+			return false;
+		return true;
 	}
 
 }

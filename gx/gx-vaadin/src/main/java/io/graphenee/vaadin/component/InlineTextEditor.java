@@ -40,8 +40,7 @@ public class InlineTextEditor extends CustomComponent {
 	 * well as the data source for the RichTextArea in edit mode. From there on
 	 * synchronization between the two is automatic.
 	 */
-	private final Property<String> property = new ObjectProperty<>(
-			"Enter text here...");
+	private final Property<String> property = new ObjectProperty<>("Enter text here...");
 	private final Component editor;
 	private final Component readOnly;
 

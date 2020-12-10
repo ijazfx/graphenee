@@ -28,11 +28,28 @@ import io.graphenee.core.hash.TRHashProviderException;
  */
 public class CryptoUtil {
 
+	public static String encodeHex(byte[] input) {
+		return Hex.encodeHexString(input);
+	}
+
+	public static String decodeHex(String input) {
+		if (input == null)
+			return input;
+		try {
+			byte[] decodedHex = Hex.decodeHex(input.toCharArray());
+			return new String(decodedHex, "utf8");
+		} catch (Exception e) {
+			return input;
+		}
+	}
+
 	public static String encode(String input) {
 		return Hex.encodeHexString(java.util.Base64.getEncoder().encode(input.getBytes()));
 	}
 
 	public static String decode(String input) {
+		if (input == null)
+			return input;
 		try {
 			byte[] decodedHex = Hex.decodeHex(input.toCharArray());
 			byte[] decodedString = Base64.decodeBase64(decodedHex);
@@ -43,6 +60,8 @@ public class CryptoUtil {
 	}
 
 	public static String createPasswordHash(String password) {
+		if (password == null)
+			return password;
 		try {
 			String hash = TRHashFactory.getInstance().createPasswordHash(password);
 			return Hex.encodeHexString(hash.getBytes());

@@ -37,7 +37,9 @@ public class GxSupportedLocaleForm extends TRAbstractForm<GxSupportedLocaleBean>
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
 		localeName = new MTextField("Locale Name").withRequired(true);
+		localeName.setMaxLength(50);
 		localeCode = new MTextField("Locale Code").withRequired(true);
+		localeCode.setMaxLength(10);
 		isLeftToRight = new MCheckBox("Direction LTR?");
 		isActive = new MCheckBox("Is Active?");
 		form.addComponents(localeName, localeCode, isLeftToRight, isActive);

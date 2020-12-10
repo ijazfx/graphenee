@@ -21,98 +21,80 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.AbstractOrderedLayout;
-import com.vaadin.ui.ComboBox;
 
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.bean.GxSupportedLocaleBean;
-import io.graphenee.core.model.bean.GxTermBean;
+import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.vaadin.AbstractEntityListPanel;
 import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")
-public class GxResourceListPanel extends AbstractEntityListPanel<GxTermBean> {
+public class GxResourceListPanel extends AbstractEntityListPanel<GxResourceBean> {
 
+	private GxNamespaceBean namespace;
 	@Autowired
-	GxDataService dataService;
+	GxDataService gxDataService;
 
 	@Autowired
 	GxResourceForm editorForm;
 
-	private GxNamespaceBean selectedNamespace;
-	private GxSupportedLocaleBean selectedSupportedLocale;
-
 	public GxResourceListPanel() {
-		super(GxTermBean.class);
+		super(GxResourceBean.class);
 	}
 
 	@Override
-	protected boolean onSaveEntity(GxTermBean entity) {
-		dataService.save(entity);
+	protected boolean onSaveEntity(GxResourceBean entity) {
+		gxDataService.createOrUpdate(entity);
 		return true;
 	}
 
 	@Override
-	protected boolean onDeleteEntity(GxTermBean entity) {
-		dataService.delete(entity);
+	protected boolean onDeleteEntity(GxResourceBean entity) {
+		gxDataService.delete(entity);
 		return true;
 	}
 
 	@Override
 	protected String panelCaption() {
-		return "Terms";
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
-	protected List<GxTermBean> fetchEntities() {
-		return dataService.findTermByNamespaceAndSupportedLocale(0, 10, selectedNamespace, selectedSupportedLocale);
+	protected List<GxResourceBean> fetchEntities() {
+		return null;
+	}
+
+	@Override
+	protected <F> List<GxResourceBean> fetchEntities(F filter) {
+		namespace = (GxNamespaceBean) filter;
+		return gxDataService.findResourceByNamespace(namespace);
 	}
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "termKey", "termSingular", "termPlural" };
+		return new String[] { "resourceName", "resourceDescription", "isActive" };
 	}
 
 	@Override
-	protected TRAbstractForm<GxTermBean> editorForm() {
+	protected TRAbstractForm<GxResourceBean> editorForm() {
 		return editorForm;
 	}
 
 	@Override
-	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
-		ComboBox namespaceComboBox = new ComboBox("Namespace");
-		namespaceComboBox.addItems(dataService.findNamespace());
-		namespaceComboBox.addValueChangeListener(event -> {
-			selectedNamespace = (GxNamespaceBean) event.getProperty().getValue();
-			refresh();
-		});
-
-		ComboBox supportedLocaleComboBox = new ComboBox("Supported Locale");
-		supportedLocaleComboBox.addItems(dataService.findSupportedLocale());
-		supportedLocaleComboBox.addValueChangeListener(event -> {
-			selectedSupportedLocale = (GxSupportedLocaleBean) event.getProperty().getValue();
-			refresh();
-		});
-
-		toolbar.addComponents(namespaceComboBox, supportedLocaleComboBox);
+	protected void onAddButtonClick(GxResourceBean entity) {
+		if (namespace != null) {
+			entity.setGxNamespaceBeanFault(BeanFault.beanFault(namespace.getOid(), namespace));
+		}
+		super.onAddButtonClick(entity);
 	}
 
 	@Override
-	protected void onAddButtonClick(GxTermBean entity) {
-		if (selectedNamespace != null) {
-			entity.setNamespaceFault(BeanFault.beanFault(selectedNamespace.getOid(), selectedNamespace));
-		} else {
-			entity.setNamespaceFault(null);
-		}
-		if (selectedSupportedLocale != null) {
-			entity.setSupportedLocaleFault(BeanFault.beanFault(selectedSupportedLocale.getOid(), selectedSupportedLocale));
-		} else {
-			entity.setSupportedLocaleFault(null);
-		}
-		super.onAddButtonClick(entity);
+	protected boolean shouldShowDeleteConfirmation() {
+		// TODO Auto-generated method stub
+		return true;
 	}
 
 }

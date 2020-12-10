@@ -15,96 +15,156 @@
  *******************************************************************************/
 package io.graphenee.i18n.vaadin;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.vaadin.viritin.MBeanFieldGroup;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MFormLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
+import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
+import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.TRAbstractForm;
 
 @SpringComponent
 @Scope("prototype")
 public class GxTermForm extends TRAbstractForm<GxTermBean> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Autowired
 	GxDataService dataService;
 
+	@Autowired
+	GxSupportedLocaleRepository supportedLocaleRepo;
+
+	@Autowired
+	GxTermTablePanel gxTermTablePanel;
+
+	@Autowired
+	LocalizerService localizer;
+
 	MTextField termKey;
-	MTextField termSingular;
-	MTextField termPlural;
+
 	MCheckBox isActive;
 	ComboBox supportedLocaleComboBox;
 	ComboBox namespaceFaultComboBox;
 
-	@Override
-	protected void addFieldsToForm(FormLayout form) {
-		termKey = new MTextField("Term Key").withRequired(true);
-		termSingular = new MTextField("Singular").withRequired(true);
-		termPlural = new MTextField("Plural");
-		isActive = new MCheckBox("Is Active?", true);
+	private GxNamespaceBean namespaceBean;
 
-		supportedLocaleComboBox = new ComboBox("Supported Locale");
-		supportedLocaleComboBox.addItems(dataService.findSupportedLocale());
-		supportedLocaleComboBox.setRequired(true);
-		supportedLocaleComboBox.addValueChangeListener(event -> {
-			GxSupportedLocaleBean supportedLocaleBean = (GxSupportedLocaleBean) event.getProperty().getValue();
-			if (supportedLocaleBean != null) {
-				getEntity().setSupportedLocaleFault(new BeanFault<Integer, GxSupportedLocaleBean>(supportedLocaleBean.getOid(), supportedLocaleBean));
-			}
-		});
+	private Button saveButton;
+
+	private ProgressBar busyIndicator = new ProgressBar();
+
+	Map<GxSupportedLocaleBean, GxTermBean> terms;
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	protected Component getFormComponent() {
+		MFormLayout termKeyForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT).withMargin(false);
+		termKey = new MTextField("Term Key").withRequired(true);
+		isActive = new MCheckBox("Is Active?", true);
 
 		namespaceFaultComboBox = new ComboBox("Namespace");
 		namespaceFaultComboBox.addItems(dataService.findNamespace());
 		namespaceFaultComboBox.setRequired(true);
 		namespaceFaultComboBox.addValueChangeListener(event -> {
-			GxNamespaceBean namespaceBean = (GxNamespaceBean) event.getProperty().getValue();
+			namespaceBean = (GxNamespaceBean) event.getProperty().getValue();
 			if (namespaceBean != null) {
-				getEntity().setNamespaceFault(new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
+				if (!isBinding())
+					getEntity().setNamespaceFault(new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
 			}
 		});
 
-		form.addComponents(supportedLocaleComboBox, namespaceFaultComboBox, termKey, termSingular, termPlural, isActive);
+		gxTermTablePanel.initializeWithEntity(getEntity());
+		gxTermTablePanel.build().withMargin(true);
+
+		termKeyForm.addComponents(namespaceFaultComboBox, termKey, isActive);
+
+		MVerticalLayout layout = new MVerticalLayout();
+		layout.addComponents(termKeyForm, gxTermTablePanel);
+
+		return layout;
+	}
+
+	public void saveGxTermEntities() {
+		gxTermTablePanel.availableTerms.forEach(term -> {
+			term.setTermKey(termKey.getValue());
+			term.setNamespaceFault(new BeanFault<Integer, GxNamespaceBean>(namespaceBean.getOid(), namespaceBean));
+			term.setIsActive(isActive.getValue());
+			dataService.save(term);
+			localizer.invalidateTerm(term.getTermKey());
+		});
 	}
 
 	@Override
 	protected boolean eagerValidationEnabled() {
-		return false;
+		return true;
 	}
 
 	@Override
 	protected String formTitle() {
-		return "Term";
+		if (getEntity().getOid() == null) {
+			return "Term";
+		}
+		return getEntity().getTermKey();
 	}
 
 	@Override
-	protected MBeanFieldGroup<GxTermBean> bindEntity(GxTermBean entity) {
-		if (entity.getSupportedLocaleFault() != null) {
-			supportedLocaleComboBox.setValue(entity.getSupportedLocaleFault().getBean());
-		}
+	protected void postBinding(GxTermBean entity) {
 		if (entity.getNamespaceFault() != null) {
 			namespaceFaultComboBox.setValue(entity.getNamespaceFault().getBean());
 		}
-		return super.bindEntity(entity);
+		gxTermTablePanel.refresh();
 	}
 
 	@Override
 	protected String popupHeight() {
-		return "300px";
+		return "475px";
 	}
 
 	@Override
 	protected String popupWidth() {
-		return "500px";
+		return "700px";
 	}
 
+	@Override
+	public void setSaveButton(Button saveButton) {
+		this.saveButton = saveButton;
+		saveButton.addClickListener(new Button.ClickListener() {
+
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				try {
+					saveButton.setEnabled(false);
+					busyIndicator.setVisible(true);
+					saveGxTermEntities();
+					UI.getCurrent().push();
+				} finally {
+					saveButton.setEnabled(true);
+					busyIndicator.setVisible(false);
+					UI.getCurrent().push();
+				}
+			}
+		});
+		super.setSaveButton(saveButton);
+	}
 }

@@ -16,6 +16,7 @@
 package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -30,5 +31,9 @@ public interface GxUserAccountRepository extends JpaRepository<GxUserAccount, In
 	List<GxUserAccount> findAllByGxSecurityPoliciesOidEquals(Integer oidSecurityPolicy);
 
 	GxUserAccount findByUsername(String username);
+
+	GxUserAccount findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(UUID accessKey);
+
+	GxUserAccount findByUsernameAndPassword(String username, String password);
 
 }

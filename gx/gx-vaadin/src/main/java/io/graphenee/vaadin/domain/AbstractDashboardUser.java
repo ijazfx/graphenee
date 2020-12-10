@@ -15,7 +15,9 @@
  *******************************************************************************/
 package io.graphenee.vaadin.domain;
 
-public abstract class AbstractDashboardUser<T> implements DashboardUser {
+import io.graphenee.core.model.GxAuthenticatedUser;
+
+public abstract class AbstractDashboardUser<T> implements GxAuthenticatedUser {
 
 	private T user;
 

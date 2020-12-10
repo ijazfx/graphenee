@@ -15,44 +15,51 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
-import org.vaadin.viritin.button.MButton;
-
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.BrowserWindowResizeEvent;
 import com.vaadin.server.Page.BrowserWindowResizeListener;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.Position;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.core.exception.AuthenticationFailedException;
-import io.graphenee.core.model.bean.GxSupportedLocaleBean;
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.i18n.api.LocalizerService;
-import io.graphenee.vaadin.domain.DashboardUser;
 import io.graphenee.vaadin.event.DashboardEvent.BrowserResizeEvent;
-import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
-import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
-import io.graphenee.vaadin.event.DashboardEvent.UserLoginRequestedEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.util.VaadinUtils;
+import io.graphenee.vaadin.view.MainComponent;
 
 @SuppressWarnings("serial")
 public abstract class AbstractDashboardUI extends UI {
 
 	@Override
 	protected void init(final VaadinRequest request) {
+
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		Map<String, String[]> queryMap = new HashMap<>();
+		for (String key : parameterMap.keySet()) {
+			if (!key.startsWith("v-")) {
+				queryMap.put(key, parameterMap.get(key));
+			}
+		}
+
+		VaadinSession.getCurrent().setAttribute("gx-QueryMap", queryMap);
+
+		if (this.getClass().isAnnotationPresent(GxSecuredUI.class)) {
+			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+			if (user == null) {
+				Page.getCurrent().setLocation("/login");
+				return;
+			}
+		}
+
 		if (dashboardSetup().shouldLocalize()) {
 			LocalizerService localizer = VaadinSession.getCurrent().getAttribute(LocalizerService.class);
 			if (localizer == null) {
@@ -67,11 +74,13 @@ public abstract class AbstractDashboardUI extends UI {
 			setLocale(locale);
 		}
 
-		DashboardEventBus.sessionInstance().register(this);
+		DashboardEventBus.sessionInstance().register(AbstractDashboardUI.this);
+
 		Responsive.makeResponsive(this);
 		addStyleName(ValoTheme.UI_WITH_MENU);
 
-		updateContent();
+		Component contentComponent = createComponent();
+		setContent(contentComponent);
 
 		// Some views need to be aware of browser resize events so a
 		// BrowserResizeEvent gets fired to the event bus on every occasion.
@@ -82,105 +91,51 @@ public abstract class AbstractDashboardUI extends UI {
 			}
 		});
 
+		addDetachListener(event -> {
+			DashboardEventBus.sessionInstance().unregister(AbstractDashboardUI.this);
+		});
+
 		localizeRecursively(this);
+
+		if (UI.getCurrent().getNavigator() != null) {
+
+			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+
+			String currentState = UI.getCurrent().getNavigator().getState();
+			String navigableState = findNavigableState(user, currentState);
+
+			try {
+				if (currentState.startsWith(navigableState))
+					UI.getCurrent().getNavigator().navigateTo(currentState);
+				else
+					UI.getCurrent().getNavigator().navigateTo(navigableState);
+			} catch (Exception ex) {
+				String dashboardViewName = dashboardSetup().dashboardViewName();
+				if (dashboardViewName == null)
+					dashboardViewName = "";
+				UI.getCurrent().getNavigator().navigateTo(dashboardViewName);
+			}
+
+		}
+
+		Page.getCurrent().setTitle(dashboardSetup().applicationTitle());
+
 	}
 
-	/**
-	 * Updates the correct content for this UI based on the current user status.
-	 * If the user is logged in with appropriate privileges, main view is shown.
-	 * Otherwise login view is shown.
-	 */
-	protected void updateContent() {
-		DashboardUser user = (DashboardUser) VaadinSession.getCurrent().getSession().getAttribute(DashboardUser.class.getName());
-		if (user != null) {
-			// Authenticated user
-			VaadinSession.getCurrent().setAttribute(DashboardUser.class, user);
-			setContent(dashboardSetup().defaultComponent());
-			removeStyleName("loginview");
-			try {
-				UI.getCurrent().getNavigator().navigateTo(getNavigator().getState());
-			} catch (Exception ex) {
-				UI.getCurrent().getNavigator().navigateTo(dashboardSetup().dashboardViewName());
-				// getNavigator().navigateTo(dashboardSetup().dashboardViewName());
-			}
-		} else {
-			CssLayout rootLayout = new CssLayout();
-			rootLayout.setSizeFull();
-			rootLayout.addComponent(dashboardSetup().loginComponent());
-
-			Label poweredByLabel = new Label();
-			poweredByLabel.setWidthUndefined();
-			poweredByLabel.setStyleName("powered-by");
-			poweredByLabel.setContentMode(ContentMode.HTML);
-			poweredByLabel.setValue("Powered by <strong>Graphenee&trade;</strong>");
-			poweredByLabel.setVisible(dashboardSetup().shouldShowPoweredByGraphenee());
-
-			rootLayout.addComponent(poweredByLabel);
-
-			if (dashboardSetup().shouldLocalize() && dashboardSetup().supportedLocales() != null) {
-				CssLayout languageBar = new CssLayout();
-				languageBar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-				languageBar.addStyleName("language-bar");
-
-				for (GxSupportedLocaleBean supportedLocaleBean : dashboardSetup().supportedLocales()) {
-					MButton localeButton = new MButton(supportedLocaleBean.getLocaleName());
-					localeButton.addClickListener(event -> {
-						Locale locale = new Locale(supportedLocaleBean.getLocaleCode());
-						VaadinSession.getCurrent().setAttribute(Locale.class, locale);
-						UI.getCurrent().getPage().setLocation("/");
-					});
-					localeButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
-					languageBar.addComponent(localeButton);
-				}
-
-				rootLayout.addComponent(languageBar);
-			}
-
-			setContent(rootLayout);
-			// setContent(dashboardSetup().loginComponent());
-			addStyleName("loginview");
+	private String findNavigableState(GxAuthenticatedUser user, String currentState) {
+		if (user != null && user.canDoAction(currentState, "view"))
+			return currentState;
+		if (currentState.lastIndexOf("/") >= 0) {
+			return findNavigableState(user, currentState.substring(0, currentState.lastIndexOf("/")));
 		}
+		return dashboardSetup().dashboardViewName();
+	}
+
+	protected Component createComponent() {
+		return new MainComponent(dashboardSetup()).build();
 	}
 
 	protected abstract AbstractDashboardSetup dashboardSetup();
-
-	@Subscribe
-	public void userLoginRequested(final UserLoginRequestedEvent event) {
-		try {
-			DashboardUser user = dashboardSetup().authenticate(event);
-			VaadinSession.getCurrent().setAttribute(DashboardUser.class.getName(), user);
-			VaadinSession.getCurrent().getSession().setAttribute(DashboardUser.class.getName(), user);
-			updateContent();
-		} catch (AuthenticationFailedException e) {
-			Notification notification = new Notification("Access Denied", e.getMessage(), Type.ERROR_MESSAGE);
-			notification.setDelayMsec(3000);
-			notification.setPosition(Position.BOTTOM_CENTER);
-			notification.show(getPage());
-		}
-	}
-
-	@Subscribe
-	public void userLoggedOut(final UserLoggedOutEvent event) {
-		// When the user logs out, current VaadinSession gets closed and the
-		// page gets reloaded on the login screen. Do notice the this doesn't
-		// invalidate the current HttpSession.
-		try {
-			VaadinSession.getCurrent().getSession().invalidate();
-			VaadinSession.getCurrent().close();
-		} catch (Exception ex) {
-			// To avoid NPE, most likely user UI unattended for longer and
-			// session got terminated.
-		}
-		// Page.getCurrent().reload();
-		Page.getCurrent().setLocation("/");
-	}
-
-	@Subscribe
-	public void closeOpenWindows(final CloseOpenWindowsEvent event) {
-		for (Window window : getWindows()) {
-			window.close();
-		}
-	}
 
 	protected String localizedSingularValue(String key) {
 		return VaadinUtils.localizedSingularValue(key);

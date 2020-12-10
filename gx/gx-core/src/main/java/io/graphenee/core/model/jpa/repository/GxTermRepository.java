@@ -20,6 +20,9 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxTerm;
@@ -31,10 +34,22 @@ public interface GxTermRepository extends JpaRepository<GxTerm, Integer> {
 
 	GxTerm findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(String termKey, String localeCode);
 
+	List<GxTerm> findByTermKey(String termKey);
+
+	@Modifying
+	@Query("Delete from GxTerm t WHERE t.termKey = :termKey AND t.gxNamespace.oid = :oidNamespace")
+	void deleteByTermKeyAndOidNameSpace(@Param("termKey") String termKey, @Param("oidNamespace") Integer oidNamespace);
+
 	Page<GxTerm> findByGxNamespaceOid(Pageable pageable, Integer oidNamespace);
+
+	List<GxTerm> findByGxNamespaceOid(Integer oidNamespace);
 
 	Page<GxTerm> findByGxSupportedLocaleOid(Pageable pageable, Integer oidSupportedLocale);
 
+	List<GxTerm> findByGxSupportedLocaleOid(Integer oidSupportedLocale);
+
 	Page<GxTerm> findByGxNamespaceOidAndGxSupportedLocaleOid(Pageable pageable, Integer oidNamespace, Integer oidSupportedLocale);
+
+	List<GxTerm> findByGxNamespaceOidAndGxSupportedLocaleOid(Integer oidNamespace, Integer oidSupportedLocale);
 
 }

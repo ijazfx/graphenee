@@ -32,6 +32,7 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
@@ -55,6 +56,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 
 	TwinColSelect userAccountCollectionFault;
 	TwinColSelect securityPolicyCollectionFault;
+	TwinColSelect accessKeyCollectionFault;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -68,7 +70,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 
 		securityGroupName = new MTextField("Group Name").withRequired(true);
 		securityGroupName.setMaxLength(50);
-		securityGroupDescription = new MTextField("Group Description").withRequired(true);
+		securityGroupDescription = new MTextField("Group Description");
 		securityGroupDescription.setMaxLength(200);
 		priority = new MTextField("Priority").withRequired(true);
 		isActive = new MCheckBox("Is Active?");
@@ -90,16 +92,24 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 		securityPolicyCollectionFault.setLeftColumnCaption("Available");
 		securityPolicyCollectionFault.setRightColumnCaption("Applied");
 
+		// keys
+		accessKeyCollectionFault = new TwinColSelect();
+		accessKeyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxAccessKeyBean>());
+		accessKeyCollectionFault.setSizeFull();
+		accessKeyCollectionFault.setLeftColumnCaption("Available");
+		accessKeyCollectionFault.setRightColumnCaption("Included");
+
 		TabSheet mainTabSheet = new TabSheet();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_COMPACT_TABBAR);
+		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
 		mainTabSheet.setWidth("100%");
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(userAccountCollectionFault, "Users");
-		mainTabSheet.addTab(securityPolicyCollectionFault, "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(userAccountCollectionFault).withFullHeight(), "Users");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
+		MVerticalLayout layout = new MVerticalLayout(mainTabSheet).withMargin(false);
 		layout.setSizeFull();
 		return layout;
 	}
@@ -110,6 +120,8 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 		userAccountCollectionFault.addItems(userAccounts);
 		List<GxSecurityPolicyBean> securityPolicies = dataService.findSecurityPolicyByNamespace(entity.getNamespaceFault().getBean());
 		securityPolicyCollectionFault.addItems(securityPolicies);
+		List<GxAccessKeyBean> accessKeyBeans = dataService.findAccessKeyByIsActive(true);
+		accessKeyCollectionFault.addItems(accessKeyBeans);
 		// namespaceFault.addItems(dataService.findNamespace());
 	}
 
@@ -124,13 +136,8 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	}
 
 	@Override
-	protected String popupHeight() {
-		return "400px";
-	}
-
-	@Override
 	protected String popupWidth() {
-		return "550px";
+		return "700px";
 	}
 
 }

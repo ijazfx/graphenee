@@ -56,7 +56,7 @@ $view-padding: round($v-unit-size * 0.75) !default;
   }
   
   .v-formlayout-captioncell {
-  	min-width: 150px;
+  	min-width: 130px;
   }
   
   .v-margin-left {
@@ -95,10 +95,6 @@ $view-padding: round($v-unit-size * 0.75) !default;
 	right: 10px;
   }
   
-  * {
-    box-sizing: border-box;
-  }
-  
   .banner {
   		background-color: red;
   }
@@ -107,6 +103,12 @@ $view-padding: round($v-unit-size * 0.75) !default;
   		.v-button {
 			margin-right: 5px;
   		}
+  }
+  
+  .v-panel-content-center {
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
   }
   
   .dropBoxMessageLabel {

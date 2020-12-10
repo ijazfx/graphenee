@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package io.graphenee.jbpm.embedded;
 
 import java.io.IOException;
@@ -16,6 +31,8 @@ import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.api.task.model.User;
 
+import io.graphenee.core.model.Fault;
+import io.graphenee.core.util.KeyValueWrapper;
 import io.graphenee.jbpm.embedded.exception.GxAssignTaskException;
 import io.graphenee.jbpm.embedded.exception.GxCompleteTaskException;
 import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
@@ -26,6 +43,9 @@ public class GxUserTask implements TaskSummary {
 	WeakReference<TaskService> taskService;
 	private volatile Task internalTask;
 	private String taskOwner;
+
+	private Fault<Long, Object> taskObjectFault;
+	private KeyValueWrapper o;
 
 	public GxUserTask(TaskService taskService, TaskSummary task) {
 		this.taskService = new WeakReference<>(taskService);
@@ -238,6 +258,21 @@ public class GxUserTask implements TaskSummary {
 
 	public void setTaskOwner(String taskOwner) {
 		this.taskOwner = taskOwner;
+	}
+
+	public Fault<Long, Object> getTaskObjectFault() {
+		return taskObjectFault;
+	}
+
+	public void setTaskObjectFault(Fault<Long, Object> taskObjectFault) {
+		this.taskObjectFault = taskObjectFault;
+	}
+
+	public KeyValueWrapper getO() {
+		if (o == null && getTaskObjectFault() != null) {
+			o = new KeyValueWrapper(getTaskObjectFault().getValue());
+		}
+		return o;
 	}
 
 }

@@ -53,11 +53,17 @@ public class TRCalenderUtil {
 	public static SimpleDateFormat yyyyMMddFormatter = new SimpleDateFormat("yyyy-MM-dd");
 	public static SimpleDateFormat yyyyMMddHHmmssFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static SimpleDateFormat yyyyMMddHHmmssSSSFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	public static SimpleDateFormat dateWithTimeFormatter = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
+	public static SimpleDateFormat zuluTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	public static Date addDaysToDate(Date currentDate, int days) {
 		LocalDate now = toLocalDateFromDate(currentDate);
 		now = now.plusDays(days);
+		return toDateFromLocalDate(now);
+	}
+
+	public static Date minusDaysToDate(Date currentDate, int days) {
+		LocalDate now = toLocalDateFromDate(currentDate);
+		now = now.minusDays(days);
 		return toDateFromLocalDate(now);
 	}
 
@@ -67,10 +73,24 @@ public class TRCalenderUtil {
 		return toDateFromLocalDateTime(now);
 	}
 
+	public static Date addMonthsToDate(Date currentDate, int months) {
+		LocalDateTime now = toLocalDateTimeFromDate(currentDate);
+		now = now.plusMonths(months);
+		return toDateFromLocalDateTime(now);
+	}
+
 	public static int calendarFieldFromDate(int calendarField, Date date) {
 		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 		cal.setTime(date);
 		return cal.get(calendarField);
+	}
+
+	public static long monthsBetween(Date startDate, Date endDate) {
+		return monthsBetweenUsingChronoUnit(startDate, endDate);
+	}
+
+	public static long monthsBetweenUsingChronoUnit(Date startDate, Date endDate) {
+		return Math.abs(ChronoUnit.MONTHS.between(toLocalDateFromDate(startDate), toLocalDateFromDate(endDate)));
 	}
 
 	public static long daysBetween(Date startDate, Date endDate) {
@@ -128,6 +148,13 @@ public class TRCalenderUtil {
 		return value;
 	}
 
+	public static String age(Timestamp timestamp) {
+		long diff = monthsBetween(timestamp, getCurrentTimeStamp());
+		int years = (int) diff / 12;
+		int remainingMonths = (int) diff % 12;
+		return years + "y " + remainingMonths + "m";
+	}
+
 	public static Date endOfDay() {
 		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 		cal.setTime(new Date());
@@ -138,6 +165,10 @@ public class TRCalenderUtil {
 		return cal.getTime();
 	}
 
+	public static Timestamp endOfDayAsTimestamp() {
+		return new Timestamp(endOfDay().getTime());
+	}
+
 	public static Date endOfDay(Date currentDate) {
 		GregorianCalendar cal = (GregorianCalendar) Calendar.getInstance();
 		cal.setTime(currentDate);
@@ -146,6 +177,10 @@ public class TRCalenderUtil {
 		cal.set(Calendar.SECOND, 59);
 		cal.set(Calendar.MILLISECOND, 999);
 		return cal.getTime();
+	}
+
+	public static Timestamp endOfDayAsTimestamp(Date currentDate) {
+		return new Timestamp(endOfDay(currentDate).getTime());
 	}
 
 	public static Date endOfLastMonth() {
@@ -302,6 +337,15 @@ public class TRCalenderUtil {
 		return Timestamp.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
 	}
 
+	public static final Integer getDayOfMonth(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.DAY_OF_MONTH);
+	}
+
 	public static final Integer getDay(Date date) {
 		if (date == null) {
 			return null;
@@ -371,6 +415,42 @@ public class TRCalenderUtil {
 		return timeFormatter.format(date);
 	}
 
+	public static final Integer getHourOfDay(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.HOUR_OF_DAY);
+	}
+
+	public static final Integer getMinutes(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.MINUTE);
+	}
+
+	public static final Integer getSeconds(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.SECOND);
+	}
+
+	public static final Integer getYear(Date date) {
+		if (date == null) {
+			return null;
+		}
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		return cal.get(Calendar.YEAR);
+	}
+
 	public static final Integer getMonth(Date date) {
 		if (date == null) {
 			return null;
@@ -394,7 +474,6 @@ public class TRCalenderUtil {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		calendar.set(Calendar.YEAR, 1970);
-		calendar.set(Calendar.MONTH, 1);
 		calendar.set(Calendar.DATE, 1);
 		calendar.set(Calendar.MILLISECOND, 0);
 		calendar.set(Calendar.SECOND, 0);
@@ -462,7 +541,11 @@ public class TRCalenderUtil {
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return new Timestamp(calendar.getTime().getTime());
+		return calendar.getTime();
+	}
+
+	public static Timestamp startOfDayAsTimestamp() {
+		return new Timestamp(startOfDay().getTime());
 	}
 
 	public static Date startOfDay(Date currentDate) {
@@ -472,7 +555,11 @@ public class TRCalenderUtil {
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
-		return new Timestamp(calendar.getTime().getTime());
+		return calendar.getTime();
+	}
+
+	public static Timestamp startOfDayAsTimestamp(Date currentDate) {
+		return new Timestamp(startOfDay(currentDate).getTime());
 	}
 
 	public static Timestamp startOfDayFuture(Integer numberOfDaysFuture) {
@@ -656,4 +743,30 @@ public class TRCalenderUtil {
 		return ChronoUnit.YEARS.between(toLocalDateFromDate(startDate), toLocalDateFromDate(endDate));
 	}
 
+	public static Date justTimeAsDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.YEAR, 1970);
+		cal.set(Calendar.MONTH, 1);
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		return cal.getTime();
+	}
+
+	public static Timestamp justTimeFromTimestamp(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.YEAR, 1970);
+		cal.set(Calendar.MONTH, 1);
+		cal.set(Calendar.DAY_OF_YEAR, 1);
+		return new Timestamp(cal.getTime().getTime());
+	}
+
+	public static Timestamp setTimeForDate(Timestamp time, Timestamp date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(time);
+		cal.set(Calendar.YEAR, getYear(date));
+		cal.set(Calendar.MONTH, getMonth(date));
+		cal.set(Calendar.DAY_OF_MONTH, getDayOfMonth(date));
+		return new Timestamp(cal.getTime().getTime());
+	}
 }

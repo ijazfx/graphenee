@@ -57,14 +57,12 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 
 	@Override
 	protected boolean onSaveEntity(GxTermBean entity) {
-		dataService.save(entity);
-		localizer.invalidateTerm(entity.getTermKey());
 		return true;
 	}
 
 	@Override
 	protected boolean onDeleteEntity(GxTermBean entity) {
-		dataService.delete(entity);
+		dataService.deleteTermByTermKeyAndOidNameSpace(entity.getTermKey(), entity.getNamespaceFault().getOid());
 		return true;
 	}
 
@@ -75,7 +73,7 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 
 	@Override
 	protected List<GxTermBean> fetchEntities() {
-		return dataService.findTermByNamespaceAndSupportedLocale(0, Integer.MAX_VALUE, selectedNamespace, selectedSupportedLocale);
+		return dataService.findDistinctTermByNamespaceAndSupportedLocale(selectedNamespace, selectedSupportedLocale);
 	}
 
 	@Override
@@ -89,9 +87,12 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 	}
 
 	@Override
-	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
+	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
 		namespaceComboBox = new ComboBox("Namespace");
-		namespaceComboBox.addItems(dataService.findNamespace());
+		List<GxNamespaceBean> gxNamespaceBeans = dataService.findNamespace();
+		namespaceComboBox.addItems(gxNamespaceBeans);
+		namespaceComboBox.setValue(gxNamespaceBeans.get(0));
+		selectedNamespace = (GxNamespaceBean) namespaceComboBox.getValue();
 		namespaceComboBox.addValueChangeListener(event -> {
 			selectedNamespace = (GxNamespaceBean) event.getProperty().getValue();
 			refresh();
@@ -105,6 +106,7 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 		});
 
 		toolbar.addComponents(namespaceComboBox, supportedLocaleComboBox);
+		super.addButtonsToToolbar(toolbar);
 	}
 
 	@Override
@@ -125,6 +127,11 @@ public class GxTermListPanel extends AbstractEntityListPanel<GxTermBean> {
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.selectedNamespace = namespaceBean;
 		namespaceComboBox.setVisible(namespaceBean == null);
+	}
+
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
 	}
 
 }

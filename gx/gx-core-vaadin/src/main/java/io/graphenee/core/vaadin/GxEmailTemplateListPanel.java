@@ -77,6 +77,7 @@ public class GxEmailTemplateListPanel extends AbstractEntityListPanel<GxEmailTem
 
 		CssLayout activeInactiveLayout = new CssLayout(activeButton, inactiveButton);
 		activeInactiveLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+		activeInactiveLayout.setCaption("Template Status");
 		toolbar.addComponent(activeInactiveLayout);
 		toolbar.setExpandRatio(activeInactiveLayout, 1);
 	}
@@ -125,7 +126,7 @@ public class GxEmailTemplateListPanel extends AbstractEntityListPanel<GxEmailTem
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "templateName", "subject" };
+		return new String[] { "templateCode", "templateName", "subject" };
 	}
 
 	@Override

@@ -24,8 +24,7 @@ import com.vaadin.data.util.converter.Converter;
 public class DateToTimestampConverter implements Converter<Date, Timestamp> {
 
 	@Override
-	public Timestamp convertToModel(Date value, Class<? extends Timestamp> targetType, Locale locale)
-			throws com.vaadin.data.util.converter.Converter.ConversionException {
+	public Timestamp convertToModel(Date value, Class<? extends Timestamp> targetType, Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
 		if (value == null) {
 			return null;
 		}
@@ -33,8 +32,7 @@ public class DateToTimestampConverter implements Converter<Date, Timestamp> {
 	}
 
 	@Override
-	public Date convertToPresentation(Timestamp value, Class<? extends Date> targetType, Locale locale)
-			throws com.vaadin.data.util.converter.Converter.ConversionException {
+	public Date convertToPresentation(Timestamp value, Class<? extends Date> targetType, Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
 		if (value == null) {
 			return null;
 		}

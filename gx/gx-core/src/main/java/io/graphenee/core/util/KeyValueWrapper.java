@@ -86,6 +86,8 @@ public class KeyValueWrapper {
 					return null;
 				}
 			} else {
+				if (currentObject == null)
+					return null;
 				String methodName = "get" + part.toUpperCase().charAt(0) + part.substring(1);
 				try {
 					Method method = currentObject.getClass().getMethod(methodName, new Class[] {});
@@ -197,7 +199,7 @@ public class KeyValueWrapper {
 		}
 	}
 
-	public Short shortForKeyPaht(String keyPath) {
+	public Short shortForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
 			if (value instanceof Number) {

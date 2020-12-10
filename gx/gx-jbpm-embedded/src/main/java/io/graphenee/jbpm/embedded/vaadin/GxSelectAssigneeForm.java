@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2018 Farrukh Ijaz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 package io.graphenee.jbpm.embedded.vaadin;
 
 import java.util.Collection;
@@ -5,7 +20,6 @@ import java.util.Collection;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.Window;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
 import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm.GxAssigneeHolder;
@@ -14,27 +28,27 @@ import io.graphenee.vaadin.TRAbstractForm;
 @SuppressWarnings("serial")
 public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 
-	ComboBox assignees;
+	ComboBox assignee;
 	private BeanItemContainer<GxAssignee> assigneeDataSource;
 
 	@Override
 	protected void addFieldsToForm(FormLayout form) {
-		assignees = new ComboBox("Assignee");
+		assignee = new ComboBox("Assign to");
 		assigneeDataSource = new BeanItemContainer<>(GxAssignee.class);
-		assignees.setContainerDataSource(assigneeDataSource);
-		assignees.setItemCaptionPropertyId("fullName");
-		assignees.addValueChangeListener(event -> {
+		assignee.setContainerDataSource(assigneeDataSource);
+		assignee.setItemCaptionPropertyId("fullName");
+		assignee.addValueChangeListener(event -> {
 			if (!isBinding())
 				getEntity().setAssignee((GxAssignee) event.getProperty().getValue());
 		});
-		assignees.setRequired(true);
-		form.addComponent(assignees);
+		assignee.setRequired(true);
+		form.addComponent(assignee);
 	}
 
 	@Override
-	public Window openInModalPopup() {
-		setSaveCaption("Select");
-		return super.openInModalPopup();
+	protected void postBinding(GxAssigneeHolder entity) {
+		super.postBinding(entity);
+		getSaveButton().setCaption("Assign");
 	}
 
 	public void initializeWithAssignees(Collection<GxAssignee> assignees) {
@@ -49,12 +63,12 @@ public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 
 	@Override
 	protected String formTitle() {
-		return "Select Assignee...";
+		return "Assign Task";
 	}
 
 	@Override
 	protected String popupHeight() {
-		return "150px";
+		return "180px";
 	}
 
 	@Override

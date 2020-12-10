@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="gx-aws" />
+        <module name="gx-core" />
+        <module name="gx-core-vaadin" />
+        <module name="gx-i18n" />
+        <module name="gx-i18n-vaadin" />
+        <module name="gx-jbpm-embedded" />
+        <module name="gx-security" />
+        <module name="gx-security-vaadin" />
+        <module name="gx-vaadin" />
+        <module name="gx-vaadin-theme" />
+        <module name="gx-workshop (1)" />
+        <module name="gx-workshop (2)" />
+        <module name="gx-workshop (3)" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>

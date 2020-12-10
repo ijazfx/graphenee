@@ -49,6 +49,7 @@ public class GxSecurityGroupBean implements Serializable {
 	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private Map<String, Set<String>> grantMap;
 	private Map<String, Set<String>> revokeMap;
+	private BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 
 	public Integer getOid() {
 		return oid;
@@ -227,7 +228,7 @@ public class GxSecurityGroupBean implements Serializable {
 
 		documents.forEach(document -> {
 			String documentJson = document.getDocumentJson();
-			String[] statements = documentJson.split(";");
+			String[] statements = documentJson.split("(;|\n)");
 			for (String statement : statements) {
 				String[] parts = statement.trim().toLowerCase().split("\\s");
 				if (parts.length == 4) {
@@ -267,6 +268,18 @@ public class GxSecurityGroupBean implements Serializable {
 				}
 			}
 		});
+	}
+
+	public BeanCollectionFault<GxAccessKeyBean> getAccessKeyCollectionFault() {
+		return accessKeyCollectionFault;
+	}
+
+	public void setAccessKeyCollectionFault(BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault) {
+		this.accessKeyCollectionFault = accessKeyCollectionFault;
+	}
+
+	public boolean hasMember(GxUserAccountBean userAccountBean) {
+		return getUserAccountCollectionFault().getBeans().contains(userAccountBean);
 	}
 
 }

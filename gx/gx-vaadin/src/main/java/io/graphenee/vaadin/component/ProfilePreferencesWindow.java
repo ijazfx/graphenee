@@ -47,7 +47,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.graphenee.vaadin.domain.DashboardUser;
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.event.DashboardEvent.CloseOpenWindowsEvent;
 import io.graphenee.vaadin.event.DashboardEvent.ProfileUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
@@ -57,7 +57,7 @@ public class ProfilePreferencesWindow extends Window {
 
 	public static final String ID = "profilepreferenceswindow";
 
-	private final BeanFieldGroup<DashboardUser> fieldGroup;
+	private final BeanFieldGroup<GxAuthenticatedUser> fieldGroup;
 	/*
 	 * Fields for editing the User object are defined here as class members.
 	 * They are later bound to a FieldGroup by calling
@@ -86,7 +86,7 @@ public class ProfilePreferencesWindow extends Window {
 	@PropertyId("bio")
 	private TextArea bioField;
 
-	public ProfilePreferencesWindow(final DashboardUser user, final boolean preferencesTabOpen) {
+	public ProfilePreferencesWindow(final GxAuthenticatedUser user, final boolean preferencesTabOpen) {
 		addStyleName("profile-window");
 		setId(ID);
 		Responsive.makeResponsive(this);
@@ -119,7 +119,7 @@ public class ProfilePreferencesWindow extends Window {
 
 		content.addComponent(buildFooter());
 
-		fieldGroup = new BeanFieldGroup<>(DashboardUser.class);
+		fieldGroup = new BeanFieldGroup<>(GxAuthenticatedUser.class);
 		fieldGroup.bindMemberFields(this);
 		fieldGroup.setItemDataSource(user);
 	}
@@ -283,7 +283,7 @@ public class ProfilePreferencesWindow extends Window {
 		return footer;
 	}
 
-	public static void open(final DashboardUser user, final boolean preferencesTabActive) {
+	public static void open(final GxAuthenticatedUser user, final boolean preferencesTabActive) {
 		DashboardEventBus.sessionInstance().post(new CloseOpenWindowsEvent());
 		Window w = new ProfilePreferencesWindow(user, preferencesTabActive);
 		UI.getCurrent().addWindow(w);

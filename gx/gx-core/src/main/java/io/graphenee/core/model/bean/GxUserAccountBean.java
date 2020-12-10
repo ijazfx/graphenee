@@ -57,7 +57,7 @@ public class GxUserAccountBean implements Serializable {
 	private BeanCollectionFault<GxAuditLogBean> auditLogCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxSecurityGroupBean> securityGroupCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
-
+	private BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
 
 	private Map<String, Set<String>> grantMap;
@@ -409,6 +409,14 @@ public class GxUserAccountBean implements Serializable {
 
 	public String getLastNameFirstName() {
 		return String.format("%s %s", getLastName() != null ? getLastName().trim() : "", getFirstName() != null ? getFirstName().trim() : "").trim();
+	}
+
+	public BeanCollectionFault<GxAccessKeyBean> getAccessKeyCollectionFault() {
+		return accessKeyCollectionFault;
+	}
+
+	public void setAccessKeyCollectionFault(BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault) {
+		this.accessKeyCollectionFault = accessKeyCollectionFault;
 	}
 
 }

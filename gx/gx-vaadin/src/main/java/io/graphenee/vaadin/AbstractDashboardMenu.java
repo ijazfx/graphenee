@@ -15,24 +15,26 @@
  *******************************************************************************/
 package io.graphenee.vaadin;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Stack;
 
 import javax.annotation.PostConstruct;
 
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomComponent;
@@ -44,17 +46,17 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.core.callback.TRVoidCallback;
+import io.graphenee.core.enums.GenderEnum;
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
-import io.graphenee.vaadin.domain.DashboardUser;
-import io.graphenee.vaadin.event.DashboardEvent.NotificationsCountUpdatedEvent;
 import io.graphenee.vaadin.event.DashboardEvent.PostViewChangeEvent;
-import io.graphenee.vaadin.event.DashboardEvent.ProfileUpdatedEvent;
-import io.graphenee.vaadin.event.DashboardEvent.ReportsCountUpdatedEvent;
-import io.graphenee.vaadin.event.DashboardEvent.UserLoggedOutEvent;
+import io.graphenee.vaadin.event.DashboardEvent.UserProfileRenderEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
+import io.graphenee.vaadin.event.TRButtonClickListener;
+import io.graphenee.vaadin.util.DashboardUtils;
 
 /**
  * A responsive menu component providing user information and the controls for
@@ -71,7 +73,6 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 	private Label reportsBadge;
 	private MenuItem userMenuItem;
 	private List<Component> menuItems;
-	private Map<TRMenuItem, ValoMenuItemButton> menuItemValoMenuItemButtonMap = new HashMap<>();
 	private boolean isBuilt;
 
 	public AbstractDashboardMenu() {
@@ -150,74 +151,83 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 
 	protected abstract AbstractDashboardSetup dashboardSetup();
 
-	private DashboardUser getCurrentUser() {
-		return (DashboardUser) VaadinSession.getCurrent().getAttribute(DashboardUser.class.getName());
+	private GxAuthenticatedUser getCurrentUser() {
+		return (GxAuthenticatedUser) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class.getName());
 	}
 
 	private Component buildUserMenu() {
-		final MenuBar userMenu = new MenuBar();
+		if (userMenu == null) {
+			userMenu = new MenuBar();
+		}
+		userMenu.removeItems();
 		userMenu.addStyleName("user-menu");
-		final DashboardUser user = getCurrentUser();
-		userMenuItem = userMenu.addItem("", user.getProfilePhoto(), null);
-		updateUserName(null);
-		boolean shouldAddSeparator = false;
-		if (dashboardSetup().profileComponent() != null) {
-			shouldAddSeparator = true;
-			userMenuItem.addItem("Edit Profile", new Command() {
+		final GxAuthenticatedUser user = getCurrentUser();
+		if (user != null) {
+			byte[] photoBytes = user.getProfilePhoto();
+			Resource photo = null;
+			if (photoBytes != null) {
+				photo = new StreamResource(new StreamResource.StreamSource() {
+
+					@Override
+					public InputStream getStream() {
+						ByteArrayInputStream bais = new ByteArrayInputStream(photoBytes);
+						return bais;
+					}
+				}, user.getUsername() + "_photo");
+			} else {
+				if (user.getGender() == GenderEnum.Female) {
+					photo = GrapheneeTheme.AVATAR_FEMALE;
+				} else {
+					photo = GrapheneeTheme.AVATAR_MALE;
+				}
+			}
+			boolean shouldAddSeparator = false;
+			userMenuItem = userMenu.addItem("", photo, null);
+			userMenuItem.setText(user.getFirstNameLastName());
+			if (dashboardSetup().profileComponent() != null) {
+				shouldAddSeparator = true;
+				userMenuItem.addItem("Profile", new Command() {
+					@Override
+					public void menuSelected(final MenuItem selectedItem) {
+						BaseProfileForm profileForm = dashboardSetup().profileComponent();
+						GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
+						profileForm.setEntity(GxAuthenticatedUser.class, user);
+						profileForm.openInModalPopup();
+					}
+				});
+			}
+			userMenuItem.addItem("Change Password", new Command() {
 				@Override
 				public void menuSelected(final MenuItem selectedItem) {
-					AbstractComponent profileComponent = dashboardSetup().profileComponent();
-					if (profileComponent instanceof TRAbstractForm<?>) {
-						TRAbstractForm<?> form = (TRAbstractForm<?>) profileComponent;
-						form.openInModalPopup();
-					} else {
-						Window window = new Window("Profile", profileComponent);
-						window.setModal(true);
-						UI.getCurrent().addWindow(window);
-						window.focus();
-					}
+					Page.getCurrent().setLocation("/reset-password");
 				}
 			});
-		}
-		if (dashboardSetup().preferencesComponent() != null) {
-			shouldAddSeparator = true;
-			userMenuItem.addItem("Preferences", new Command() {
-				@Override
-				public void menuSelected(final MenuItem selectedItem) {
-					AbstractComponent preferencesComponent = dashboardSetup().preferencesComponent();
-					if (preferencesComponent instanceof TRAbstractForm<?>) {
-						TRAbstractForm<?> form = (TRAbstractForm<?>) preferencesComponent;
-						form.openInModalPopup();
-					} else {
-						Window window = new Window("Preferences", preferencesComponent);
-						window.setModal(true);
-						UI.getCurrent().addWindow(window);
-						window.focus();
-					}
+			if (shouldAddSeparator) {
+				userMenuItem.addSeparator();
+			}
+			if (userMenuItems() != null && !userMenuItems().isEmpty()) {
+				for (TRMenuItem menuItem : userMenuItems()) {
+					userMenuItem.addItem(menuItem.caption(), menuItem.icon(), menuItem.command());
 				}
-			});
-		}
-		if (shouldAddSeparator) {
-			userMenuItem.addSeparator();
-		}
-		if (userMenuItems() != null && !userMenuItems().isEmpty()) {
-			for (TRMenuItem menuItem : userMenuItems()) {
-				userMenuItem.addItem(menuItem.caption(), menuItem.icon(), menuItem.command());
+			}
+			if (user != null) {
+				userMenuItem.addItem("Sign Out", new Command() {
+					@Override
+					public void menuSelected(final MenuItem selectedItem) {
+						VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, null);
+						Page.getCurrent().reload();
+					}
+				});
 			}
 		}
-		userMenuItem.addItem("Sign Out", new Command() {
-			@Override
-			public void menuSelected(final MenuItem selectedItem) {
-				DashboardEventBus.sessionInstance().post(new UserLoggedOutEvent());
-			}
-		});
 		return userMenu;
 	}
 
 	private Component buildToggleButton() {
-		Button valoMenuToggleButton = new Button("Menu", new ClickListener() {
+		Button valoMenuToggleButton = new Button("Menu", new TRButtonClickListener() {
+
 			@Override
-			public void buttonClick(final ClickEvent event) {
+			public void onButtonClick(ClickEvent event) {
 				if (getCompositionRoot().getStyleName().contains(STYLE_VISIBLE)) {
 					getCompositionRoot().removeStyleName(STYLE_VISIBLE);
 				} else {
@@ -236,61 +246,70 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		CssLayout menuItemsLayout = new CssLayout();
 		menuItemsLayout.addStyleName("valo-menuitems");
 		Collection<TRMenuItem> items = menuItems();
-		generateValoMenuItemButtons(menuItemsLayout, items);
-		items.forEach(item -> {
-			ValoMenuItemButton valoMenuItemButton = menuItemValoMenuItemButtonMap.get(item);
-			valoMenuItemButton.addStyleName("show");
+		backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON);
+		backButton.setVisible(false);
+		backButton.addClickListener(new TRButtonClickListener() {
+
+			@Override
+			public void onButtonClick(ClickEvent event) {
+				if (!backStack.isEmpty())
+					backStack.pop().execute();
+			}
 		});
+		generateValoMenuItemButtons(menuItemsLayout, items);
+		menuItemsLayout.addComponent(backButton, 0);
 		return menuItemsLayout;
 
 	}
 
+	HashMap<TRMenuItem, ValoMenuItemButton> buttonsMap = new HashMap<>();
+	private ValoMenuItemButton backButton;
+	private Stack<TRVoidCallback> backStack = new Stack<>();
+	private MenuBar userMenu;
+
 	private void generateValoMenuItemButtons(CssLayout menuItemsLayout, Collection<TRMenuItem> items) {
+		buttonsMap.values().forEach(button -> {
+			button.setVisible(false);
+		});
 		if (items != null && !items.isEmpty()) {
 			for (TRMenuItem menuItem : items) {
+				if (buttonsMap.containsKey(menuItem))
+					continue;
+				ValoMenuItemButton valoMenuItemButton = null;
+
 				if (menuItem.hasChildren()) {
-					ValoMenuItemButton valoMenuItemButton = new ValoMenuItemButton(menuItem.caption(), menuItem.icon()).withListener(event -> {
-						ValoMenuItemButton backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON).withListener(event2 -> {
-							menuItemsLayout.removeComponent(menuItemsLayout.getComponent(0));
-							menuItemValoMenuItemButtonMap.values().forEach(item -> {
-								item.removeStyleName("show");
-							});
+					valoMenuItemButton = new ValoMenuItemButton(menuItem.caption(), menuItem.icon()).withListener(event -> {
+						backStack.push(() -> {
 							if (menuItem.getParent() != null) {
-								menuItem.getParent().getChildren().forEach(item -> {
-									ValoMenuItemButton valoMenuItemButton2 = menuItemValoMenuItemButtonMap.get(item);
-									if (valoMenuItemButton2 != null)
-										valoMenuItemButton2.addStyleName("show");
+								generateValoMenuItemButtons(menuItemsLayout, menuItem.getParent().getChildren());
+								menuItem.getParent().getChildren().forEach(child -> {
+									buttonsMap.get(child).setVisible(true);
 								});
+								backButton.setVisible(true);
 							} else {
-								menuItems().forEach(item -> {
-									ValoMenuItemButton valoMenuItemButton2 = menuItemValoMenuItemButtonMap.get(item);
-									if (valoMenuItemButton2 != null)
-										valoMenuItemButton2.addStyleName("show");
+								generateValoMenuItemButtons(menuItemsLayout, menuItems());
+								menuItems().forEach(child -> {
+									buttonsMap.get(child).setVisible(true);
 								});
+								backButton.setVisible(false);
 							}
 						});
-						menuItemsLayout.addComponent(backButton, 0);
-						menuItemValoMenuItemButtonMap.values().forEach(item -> {
-							item.removeStyleName("show");
+						generateValoMenuItemButtons(menuItemsLayout, menuItem.getChildren());
+						menuItem.getChildren().forEach(child -> {
+							buttonsMap.get(child).setVisible(true);
 						});
-						menuItem.getChildren().forEach(item -> {
-							ValoMenuItemButton valoMenuItemButton2 = menuItemValoMenuItemButtonMap.get(item);
-							if (valoMenuItemButton2 != null)
-								valoMenuItemButton2.addStyleName("show");
-						});
+						backButton.setVisible(true);
 					});
-					valoMenuItemButton.addStyleName("hide");
-					menuItemValoMenuItemButtonMap.put(menuItem, valoMenuItemButton);
 					menuItemsLayout.addComponent(valoMenuItemButton);
-					generateValoMenuItemButtons(menuItemsLayout, menuItem.getChildren());
+					buttonsMap.put(menuItem, valoMenuItemButton);
 				} else {
-					ValoMenuItemButton valoMenuItemButton = new ValoMenuItemButton(menuItem.viewName(), menuItem.caption(), menuItem.icon()).withListener(event -> {
+					valoMenuItemButton = new ValoMenuItemButton(menuItem.viewName(), menuItem.caption(), menuItem.icon()).withListener(event -> {
 						UI.getCurrent().getNavigator().navigateTo(menuItem.viewName());
 					});
 					menuItemsLayout.addComponent(valoMenuItemButton);
-					valoMenuItemButton.addStyleName("hide");
-					menuItemValoMenuItemButtonMap.put(menuItem, valoMenuItemButton);
 				}
+
+				buttonsMap.put(menuItem, valoMenuItemButton);
 			}
 		}
 	}
@@ -303,53 +322,13 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		return dashboardSetup().profileMenuItems();
 	}
 
-	private Component buildBadgeWrapper(final Component menuItemButton, final Component badgeLabel) {
-		CssLayout dashboardWrapper = new CssLayout(menuItemButton);
-		dashboardWrapper.addStyleName("badgewrapper");
-		dashboardWrapper.addStyleName(ValoTheme.MENU_ITEM);
-		badgeLabel.addStyleName(ValoTheme.MENU_BADGE);
-		badgeLabel.setWidthUndefined();
-		badgeLabel.setVisible(false);
-		dashboardWrapper.addComponent(badgeLabel);
-		return dashboardWrapper;
-	}
-
 	protected void postInitialize() {
-	}
-
-	@Override
-	public void attach() {
-		super.attach();
-		updateNotificationsCount(null);
 	}
 
 	@Subscribe
 	public void postViewChange(final PostViewChangeEvent event) {
 		// After a successful view change the menu can be hidden in mobile view.
 		getCompositionRoot().removeStyleName(STYLE_VISIBLE);
-	}
-
-	@Subscribe
-	public void updateNotificationsCount(final NotificationsCountUpdatedEvent event) {
-		if (notificationsBadge != null) {
-			int unreadNotificationsCount = 0; // AbstractDashboardUI.getDataProvider().getUnreadNotificationsCount();
-			notificationsBadge.setValue(String.valueOf(unreadNotificationsCount));
-			notificationsBadge.setVisible(unreadNotificationsCount > 0);
-		}
-	}
-
-	@Subscribe
-	public void updateReportsCount(final ReportsCountUpdatedEvent event) {
-		reportsBadge.setValue(String.valueOf(event.getCount()));
-		reportsBadge.setVisible(event.getCount() > 0);
-	}
-
-	@Subscribe
-	public void updateUserName(final ProfileUpdatedEvent event) {
-		DashboardUser user = getCurrentUser();
-		String userFullName = user.getFirstNameLastName();
-		userMenuItem.setText(userFullName);
-		userMenuItem.setIcon(user.getProfilePhoto());
 	}
 
 	public static class ValoMenuItemButton extends Button {
@@ -399,6 +378,24 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 					addStyleName(STYLE_SELECTED);
 			}
 		}
+
+		@Override
+		public void setVisible(boolean visible) {
+			super.setVisible(visible);
+			if (visible) {
+				addStyleName("show");
+				removeStyleName("hide");
+			} else {
+				removeStyleName("show");
+				addStyleName("hide");
+			}
+		}
+
+	}
+
+	@Subscribe
+	public void onUserProfileRenderEvent(UserProfileRenderEvent event) {
+		buildUserMenu();
 	}
 
 }

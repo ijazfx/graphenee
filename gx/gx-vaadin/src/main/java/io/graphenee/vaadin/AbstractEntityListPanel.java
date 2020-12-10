@@ -17,7 +17,6 @@ package io.graphenee.vaadin;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,8 +39,11 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
 import org.vaadin.viritin.ui.MNotification;
 
 import com.google.common.base.Strings;
+import com.vaadin.addon.contextmenu.ContextMenu;
+import com.vaadin.addon.contextmenu.GridContextMenu;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -60,6 +62,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.graphenee.core.util.TRCalenderUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
+import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.renderer.BooleanRenderer;
 import io.graphenee.vaadin.util.VaadinUtils;
 
@@ -73,7 +76,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private BeanItemContainer<T> mainGridContainer;
 	private AbstractLayout toolbar;
 	private AbstractLayout secondaryToolbar;
-	private TRAbstractForm<T> cachedForm;
 	private MButton addButton;
 	private MButton editButton;
 	private MButton deleteButton;
@@ -131,6 +133,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 					L.warn(e.getMessage(), e);
 				}
 			}).withStyleName(ValoTheme.BUTTON_PRIMARY);
+
 			editButton = new MButton(FontAwesome.EDIT, localizedSingularValue("Modify"), event -> {
 				Collection<T> items = mainGrid.getSelectedRowsWithType();
 				if (items.size() == 1) {
@@ -197,7 +200,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				return getGridHeaderCaptionList();
 			});
 			exportDataSpreadSheetComponent.withDataColumns(() -> {
-				return Arrays.asList(visibleProperties());
+				List<String> columnList = new ArrayList<>();
+				entityGrid().getColumns().forEach(column -> {
+					if (!column.isHidden()) {
+						columnList.add(column.getPropertyId().toString());
+					}
+				});
+				return columnList;
 			}).withDataItems(() -> {
 				Collection<Object> selectedRows = entityGrid().getSelectedRows();
 				if (selectedRows.size() > 0) {
@@ -250,20 +259,27 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 		}
 
 		grid.getColumns().forEach(column -> {
+			column.setHidable(true);
 			applyRendererForColumn(column);
 		});
 
 		grid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
-		grid.addItemClickListener(event -> {
-			if (event.getPropertyId() != null) {
-				BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
-				if (onItemClick != null) {
-					Boolean value = onItemClick.apply(item.getBean());
-					if (value != null && value == true) {
-						onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+		grid.addItemClickListener(new TRItemClickListener() {
+
+			@Override
+			public void onItemClick(ItemClickEvent event) {
+				if (event.getPropertyId() != null) {
+					BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
+					if (item != null) {
+						if (onItemClick != null) {
+							Boolean value = onItemClick.apply(item.getBean());
+							if (value != null && value == true) {
+								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							}
+						} else {
+							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+						}
 					}
-				} else {
-					onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 				}
 			}
 		});
@@ -314,7 +330,16 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			}
 		});
 
+		GridContextMenu contextMenu = new GridContextMenu(grid);
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			event.getContextMenu().removeItems();
+			addMenuItemsToContextMenu(contextMenu, (T) event.getItemId(), grid.getSelectedRowsWithType());
+		});
+
 		return grid;
+	}
+
+	protected void addMenuItemsToContextMenu(ContextMenu contextMenu, T item, Collection<T> selectedItems) {
 	}
 
 	protected String generateCellStyle(CellReference cell) {
@@ -452,13 +477,13 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private List<String> getGridHeaderCaptionList() {
-		List<String> headerCaptionList = new ArrayList<>();
-		mainGrid.getColumns().forEach(column -> {
-			if (column.getPropertyId() != null) {
-				headerCaptionList.add(column.getHeaderCaption());
+		List<String> columnList = new ArrayList<>();
+		entityGrid().getColumns().forEach(column -> {
+			if (!column.isHidden()) {
+				columnList.add(column.getHeaderCaption());
 			}
 		});
-		return headerCaptionList;
+		return columnList;
 	}
 
 	protected DownloadButton getDownloadButton() {
@@ -485,21 +510,21 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private void openEditorForm(T item) {
-		if (cachedForm() != null) {
+		if (editorForm() != null) {
 			// BeanItem<T> beanItem = mainGridContainer.getItem(item);
 			// if (beanItem == null) {
 			// cachedForm().setEntity(entityClass, item);
 			// } else {
 			// cachedForm().setEntity(entityClass, beanItem.getBean());
 			// }
-			cachedForm().setEntity(entityClass, item);
-			cachedForm().setSavedHandler(entity -> {
+			editorForm().setEntity(entityClass, item);
+			editorForm().setSavedHandler(entity -> {
 				try {
 					if (onSaveEntity(entity)) {
 						if (delegate != null) {
 							delegate.onSave(entity);
 						}
-						cachedForm().closePopup();
+						editorForm().closePopup();
 						// UI.getCurrent().access(() -> {
 						// if (!mainGridContainer.containsId(entity)) {
 						// mainGridContainer.addBean(entity);
@@ -513,7 +538,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 					L.warn(e.getMessage(), e);
 				}
 			});
-			cachedForm().openInModalPopup();
+			editorForm().openInModalPopup();
 		}
 	}
 
@@ -566,14 +591,6 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	protected abstract String[] visibleProperties();
 
 	protected abstract TRAbstractForm<T> editorForm();
-
-	private TRAbstractForm<T> cachedForm() {
-		// if (cachedForm == null) {
-		// cachedForm = editorForm();
-		// }
-		// return cachedForm;
-		return editorForm();
-	}
 
 	protected void postBuild() {
 	}
@@ -749,6 +766,18 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	public void hideMargin() {
 		rootLayoutMargin = false;
 		rootLayout.setMargin(false);
+	}
+
+	public MButton getAddButton() {
+		return addButton;
+	}
+
+	public MButton getEditButton() {
+		return editButton;
+	}
+
+	public MButton getDeleteButton() {
+		return deleteButton;
 	}
 
 }

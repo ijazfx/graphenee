@@ -15,66 +15,109 @@
  *******************************************************************************/
 package io.graphenee.core.model.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import com.google.common.base.Strings;
+
+import io.graphenee.core.enums.AccessKeyType;
+import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.core.exception.RegisterDeviceFailedException;
+import io.graphenee.core.exception.UnregisterDeviceFailedException;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.bean.GxAccessKeyBean;
+import io.graphenee.core.model.bean.GxAuditLogBean;
 import io.graphenee.core.model.bean.GxCityBean;
 import io.graphenee.core.model.bean.GxCountryBean;
+import io.graphenee.core.model.bean.GxCurrencyBean;
 import io.graphenee.core.model.bean.GxEmailTemplateBean;
 import io.graphenee.core.model.bean.GxGenderBean;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.bean.GxNamespacePropertyBean;
+import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
+import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
+import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxAccessKey;
+import io.graphenee.core.model.entity.GxAccessLog;
+import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxCity;
 import io.graphenee.core.model.entity.GxCountry;
+import io.graphenee.core.model.entity.GxCurrency;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxNamespaceProperty;
+import io.graphenee.core.model.entity.GxPasswordHistory;
+import io.graphenee.core.model.entity.GxRegisteredDevice;
+import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.entity.GxUserAccount;
+import io.graphenee.core.model.jpa.repository.GxAccessKeyRepository;
+import io.graphenee.core.model.jpa.repository.GxAccessLogRepository;
+import io.graphenee.core.model.jpa.repository.GxAuditLogRepository;
 import io.graphenee.core.model.jpa.repository.GxCityRepository;
 import io.graphenee.core.model.jpa.repository.GxCountryRepository;
+import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
+import io.graphenee.core.model.jpa.repository.GxNamespacePropertyRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
+import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
+import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
+import io.graphenee.core.model.jpa.repository.GxResourceRepository;
 import io.graphenee.core.model.jpa.repository.GxSavedQueryRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityGroupRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxSecurityPolicyRepository;
+import io.graphenee.core.model.jpa.repository.GxSmsProviderRepository;
 import io.graphenee.core.model.jpa.repository.GxStateRepository;
 import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.core.util.CryptoUtil;
+import io.graphenee.core.util.TRCalenderUtil;
 
 @Service
+@DependsOn({ "flyway", "flywayInitializer" })
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
 
@@ -89,6 +132,9 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxNamespaceRepository namespaceRepo;
+
+	@Autowired
+	GxNamespacePropertyRepository namespacePropertyRepo;
 
 	@Autowired
 	GxSecurityGroupRepository securityGroupRepo;
@@ -106,6 +152,9 @@ public class GxDataServiceImpl implements GxDataService {
 	GxCountryRepository countryRepository;
 
 	@Autowired
+	GxCurrencyRepository currencyRepository;
+
+	@Autowired
 	GxStateRepository stateRepository;
 
 	@Autowired
@@ -116,6 +165,78 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Autowired
 	GxEmailTemplateRepository emailTemplateRepository;
+
+	@Autowired
+	GxAuditLogRepository auditLogRepository;
+
+	@Autowired
+	PlatformTransactionManager transactionManager;
+
+	@Autowired
+	GxAccessKeyRepository gxAccessKeyRepository;
+
+	@Autowired
+	GxAccessLogRepository accessLogRepo;
+
+	@Autowired
+	GxResourceRepository resourceRepo;
+
+	@Autowired
+	GxAccessKeyRepository accessKeyRepo;
+
+	@Autowired
+	GxSmsProviderRepository smsProviderRepo;
+
+	@Autowired
+	GxRegisteredDeviceRepository gxRegisteredDeviceRepository;
+
+	@PostConstruct
+	public void initialize() {
+		TransactionTemplate tran = new TransactionTemplate(transactionManager);
+		tran.execute(status -> {
+			// create default namespace
+			GxNamespaceBean namespace = findOrCreateNamespace("io.graphenee.core");
+			// create admin security group
+			GxSecurityGroupBean adminGroup = findOrCreateSecurityGroup("Admin", namespace);
+			// create admin security policy
+			GxSecurityPolicyBean adminPolicy = findOrCreateSecurityPolicy("Admin Policy", namespace);
+			// create admin security policy document
+			GxSecurityPolicyDocumentBean document = adminPolicy.getDefaultSecurityPolicyDocumentBean();
+			if (document == null) {
+				document = new GxSecurityPolicyDocumentBean();
+				document.setIsDefault(true);
+				document.setDocumentJson("grant all on all;");
+				document.setTag(TRCalenderUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
+				adminPolicy.getSecurityPolicyDocumentCollectionFault().add(document);
+				// save policy with document
+				save(adminPolicy);
+			}
+			// assign admin security policy to admin group
+			if (!adminGroup.getSecurityPolicyCollectionFault().getBeans().contains(adminPolicy)) {
+				adminGroup.getSecurityPolicyCollectionFault().add(adminPolicy);
+				// save admin group with policy
+				save(adminGroup);
+			}
+			// create admin user
+			GxUserAccountBean admin = findUserAccountByUsername("admin");
+			if (admin == null) {
+				admin = new GxUserAccountBean();
+				admin.setUsername("admin");
+				admin.setPassword("change_on_install");
+				admin.setIsActive(true);
+				admin.setIsProtected(true);
+				// save admin user
+				save(admin);
+			}
+			// assign admin group to admin
+			if (!admin.getSecurityGroupCollectionFault().getBeans().contains(adminGroup)) {
+				admin.getSecurityGroupCollectionFault().add(adminGroup);
+				save(admin);
+			}
+
+			return null;
+		});
+	}
 
 	@Override
 	public List<GxGenderBean> findGender() {
@@ -167,6 +288,20 @@ public class GxDataServiceImpl implements GxDataService {
 			return supportedLocale.getGxTerms().stream().map(this::makeTermBean).collect(Collectors.toList());
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public List<GxTermBean> findTermByTermKey(String termKey) {
+
+		if (termKey != null && !termKey.isEmpty()) {
+			return termRepo.findByTermKey(termKey).stream().map(this::makeTermBean).collect(Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public void deleteTermByTermKeyAndOidNameSpace(String termKey, Integer oidNamespace) {
+		termRepo.deleteByTermKeyAndOidNameSpace(termKey, oidNamespace);
 	}
 
 	private GxTermBean makeTermBean(GxTerm entity) {
@@ -250,6 +385,14 @@ public class GxDataServiceImpl implements GxDataService {
 		return namespaceRepo.findAll().stream().map(this::makeNamespaceBean).collect(Collectors.toList());
 	}
 
+	@Override
+	public GxNamespaceBean findNamespace(Integer oidNamespace) {
+		GxNamespace namespace = namespaceRepo.findOne(oidNamespace);
+		if (namespace != null)
+			return makeNamespaceBean(namespace);
+		return null;
+	}
+
 	private GxNamespaceBean makeNamespaceBean(GxNamespace entity) {
 		GxNamespaceBean bean = new GxNamespaceBean();
 		bean.setOid(entity.getOid());
@@ -257,6 +400,11 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setNamespaceDescription(entity.getNamespaceDescription());
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsProtected(entity.getIsProtected());
+
+		bean.setNamespacePropertyBeanCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return findNamespacePropertyByNamespace(bean);
+		}));
+
 		return bean;
 	}
 
@@ -274,6 +422,29 @@ public class GxDataServiceImpl implements GxDataService {
 			result = termRepo.findAll(pageRequest);
 		}
 		return result.getContent().stream().map(this::makeTermBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxTermBean> findDistinctTermByNamespaceAndSupportedLocale(GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale) {
+		List<GxTermBean> distinctTerms = new ArrayList<>();
+		Collection<GxTerm> entities = null;
+		if (namespace != null && supportedLocale != null) {
+			entities = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(namespace.getOid(), supportedLocale.getOid());
+		} else if (namespace != null) {
+			entities = termRepo.findByGxNamespaceOid(namespace.getOid());
+		} else if (supportedLocale != null) {
+			entities = termRepo.findByGxSupportedLocaleOid(supportedLocale.getOid());
+		}
+		if (entities != null) {
+			Set<String> termKeySet = new HashSet<>();
+			entities.forEach(term -> {
+				if (!termKeySet.contains(term.getTermKey())) {
+					distinctTerms.add(makeTermBean(term));
+					termKeySet.add(term.getTermKey());
+				}
+			});
+		}
+		return distinctTerms;
 	}
 
 	private GxSupportedLocale toEntity(GxSupportedLocaleBean bean) {
@@ -394,6 +565,9 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setUserAccountCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return userAccountRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
 		}));
+		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return accessKeyRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		}));
 		return bean;
 	}
 
@@ -423,6 +597,13 @@ public class GxDataServiceImpl implements GxDataService {
 			bean.getUserAccountCollectionFault().getBeans().forEach(added -> {
 				System.err.println(added.getOid());
 				entity.getGxUserAccounts().add(userAccountRepo.findOne(added.getOid()));
+			});
+		}
+
+		if (bean.getAccessKeyCollectionFault().isModified()) {
+			entity.getGxAccessKeys().clear();
+			bean.getAccessKeyCollectionFault().getBeans().forEach(added -> {
+				entity.getGxAccessKeys().add(accessKeyRepo.findOne(added.getOid()));
 			});
 		}
 
@@ -506,11 +687,16 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsPasswordChangeRequired(entity.getIsPasswordChangeRequired());
 		bean.setIsProtected(entity.getIsProtected());
+		bean.setAccountActivationDate(entity.getAccountActivationDate());
+		bean.setProfileImage(entity.getProfileImage());
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
 		bean.setSecurityPolicyCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityPolicyRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+		}));
+		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return accessKeyRepo.findAllByGxUserAccountOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 		}));
 		return bean;
 	}
@@ -528,10 +714,21 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setLastName(bean.getLastName());
 		entity.setFullNameNative(bean.getFullNameNative());
 		entity.setIsLocked(bean.getIsLocked());
-		entity.setIsActive(bean.getIsActive());
 		entity.setIsProtected(false);
-		entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
+
+		if (bean.getProfileImage() != null) {
+			entity.setProfileImage(bean.getProfileImage());
+		}
+
+		if (entity.getIsActive() != bean.getIsActive()) {
+			if (bean.getIsActive()) {
+				bean.setAccountActivationDate(TRCalenderUtil.getCurrentTimeStamp());
+			}
+		}
+
+		entity.setIsActive(bean.getIsActive());
+		entity.setAccountActivationDate(bean.getAccountActivationDate());
 
 		if (bean.getSecurityGroupCollectionFault().isModified()) {
 			entity.getGxSecurityGroups().clear();
@@ -547,8 +744,21 @@ public class GxDataServiceImpl implements GxDataService {
 			});
 		}
 
-		if (bean.getPassword() != null) {
-			entity.setPassword(bean.getPassword());
+		if (!Strings.isNullOrEmpty(bean.getPassword())) {
+			entity.setPassword(CryptoUtil.createPasswordHash(bean.getPassword()));
+			entity.setIsPasswordChangeRequired(false);
+		} else {
+			if (entity.getOid() == null) {
+				entity.setPassword(CryptoUtil.createPasswordHash("123456789"));
+			}
+			entity.setIsPasswordChangeRequired(bean.getIsPasswordChangeRequired());
+		}
+
+		if (bean.getAccessKeyCollectionFault().isModified()) {
+			entity.getGxAccessKeys().clear();
+			bean.getAccessKeyCollectionFault().getBeans().forEach(added -> {
+				entity.getGxAccessKeys().add(accessKeyRepo.findOne(added.getOid()));
+			});
 		}
 
 		return entity;
@@ -558,6 +768,15 @@ public class GxDataServiceImpl implements GxDataService {
 	public GxUserAccountBean save(GxUserAccountBean bean) {
 		GxUserAccount saved = userAccountRepo.save(toEntity(bean));
 		bean.setOid(saved.getOid());
+
+		if (bean.getPassword() != null) {
+			GxPasswordHistory history = new GxPasswordHistory();
+			history.setGxUserAccount(saved);
+			history.setHashedPassword(CryptoUtil.createPasswordHash(bean.getPassword()));
+			history.setPasswordDate(TRCalenderUtil.getCurrentTimeStamp());
+			gxPasswordHistoryRepo.save(history);
+		}
+
 		return bean;
 	}
 
@@ -601,7 +820,6 @@ public class GxDataServiceImpl implements GxDataService {
 		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
-	@Transactional
 	private GxSecurityPolicyBean makeSecurityPolicyBean(GxSecurityPolicy entity) {
 		GxSecurityPolicyBean bean = new GxSecurityPolicyBean();
 		bean.setOid(entity.getOid());
@@ -621,6 +839,9 @@ public class GxDataServiceImpl implements GxDataService {
 		}));
 		bean.setSecurityPolicyDocumentCollectionFault(BeanCollectionFault.collectionFault(() -> {
 			return securityPolicyDocumentRepo.findAllByGxSecurityPolicyOidEquals(entity.getOid()).stream().map(this::makeSecurityPolicyDocumentBean).collect(Collectors.toList());
+		}));
+		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return accessKeyRepo.findAllByGxSecurityPolicysOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
 		}));
 		return bean;
 	}
@@ -680,7 +901,12 @@ public class GxDataServiceImpl implements GxDataService {
 				}
 			});
 		}
-
+		if (bean.getAccessKeyCollectionFault().isModified()) {
+			entity.getGxAccessKeys().clear();
+			bean.getAccessKeyCollectionFault().getBeans().forEach(added -> {
+				entity.getGxAccessKeys().add(accessKeyRepo.findOne(added.getOid()));
+			});
+		}
 		return entity;
 	}
 
@@ -1154,6 +1380,30 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxEmailTemplateBean findEmailTemplateByTemplateCodeActive(String templateCode) {
+		GxNamespaceBean namespace = findNamespace(GxNamespaceBean.SYSTEM);
+		GxEmailTemplate emailTemplate = null;
+		if (namespace != null) {
+			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
+		} else {
+			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndIsActive(templateCode, true);
+		}
+		if (emailTemplate != null) {
+			return makeEmailTemplateBean(emailTemplate, namespace);
+		}
+		return null;
+	}
+
+	@Override
+	public GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace) {
+		GxEmailTemplate emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
+		if (emailTemplate != null) {
+			return makeEmailTemplateBean(emailTemplate, namespace);
+		}
+		return null;
+	}
+
+	@Override
 	public List<GxEmailTemplateBean> findEmailTemplate() {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
 		beans.addAll(emailTemplateRepository.findAll(new Sort("templateName")).stream().map(template -> {
@@ -1185,11 +1435,14 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setOid(entity.getOid());
 		bean.setBccList(entity.getBccList());
 		bean.setBody(entity.getBody());
+		bean.setSmsBody(entity.getSmsBody());
 		bean.setCcList(entity.getCcList());
 		bean.setIsActive(entity.getIsActive());
 		bean.setIsProtected(entity.getIsProtected());
 		bean.setSubject(entity.getSubject());
 		bean.setTemplateName(entity.getTemplateName());
+		bean.setTemplateCode(entity.getTemplateCode());
+		bean.setSenderEmailAddress(entity.getSenderEmailAddress());
 
 		if (entity.getGxNamespace() != null) {
 			if (namespace != null) {
@@ -1214,11 +1467,14 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceBeanFault().getOid()));
 		entity.setBccList(bean.getBccList());
 		entity.setBody(bean.getBody());
+		entity.setSmsBody(bean.getSmsBody());
 		entity.setCcList(bean.getCcList());
 		entity.setIsActive(bean.getIsActive());
 		entity.setIsProtected(bean.getIsProtected());
 		entity.setSubject(bean.getSubject());
 		entity.setTemplateName(bean.getTemplateName());
+		entity.setTemplateCode(bean.getTemplateCode());
+		entity.setSenderEmailAddress(bean.getSenderEmailAddress());
 		return entity;
 	}
 
@@ -1261,6 +1517,9 @@ public class GxDataServiceImpl implements GxDataService {
 		return makeUserAccountBean(userAccount);
 	}
 
+	@Autowired
+	GxPasswordHistoryRepository gxPasswordHistoryRepo;
+
 	@Override
 	public GxUserAccountBean findUserAccountByUsernameAndPassword(String username, String password) {
 		GxUserAccount userAccount = userAccountRepo.findByUsername(username);
@@ -1282,7 +1541,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean) {
-		GxSecurityGroup entity = securityGroupRepo.findAllBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
+		GxSecurityGroup entity = securityGroupRepo.findOneBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
 		if (entity != null) {
 			return makeSecurityGroupBean(entity);
 		}
@@ -1327,6 +1586,571 @@ public class GxDataServiceImpl implements GxDataService {
 		entity = securityPolicyRepo.save(entity);
 		bean.setOid(entity.getOid());
 		return bean;
+	}
+
+	@Override
+	public GxAuditLogBean createOrUpdate(GxAuditLogBean bean) {
+		GxAuditLog entity = null;
+		if (bean.getOid() == null) {
+			entity = new GxAuditLog();
+		} else {
+			entity = auditLogRepository.findOne(bean.getOid());
+		}
+		entity.setAuditDate(bean.getAuditDate());
+		entity.setAuditEntity(bean.getAuditEntity());
+		entity.setAuditEvent(bean.getAuditEvent());
+		entity.setOidAuditEntity(bean.getOidAuditEntity());
+		if (bean.getGxUserAccountBeanFault() != null) {
+			entity.setGxUserAccount(userAccountRepo.findOne(bean.getGxUserAccountBeanFault().getOid()));
+		} else {
+			entity.setGxUserAccount(null);
+		}
+		GxAuditLog savedEntity = auditLogRepository.save(entity);
+		bean.setOid(savedEntity.getOid());
+		return bean;
+	}
+
+	public GxAuditLogBean auditEvent(String auditEvent) {
+		return auditEntityEventByUser(null, null, auditEvent, null);
+	}
+
+	public GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean) {
+		return auditEntityEventByUser(null, null, auditEvent, userAccountBean);
+	}
+
+	public GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean) {
+		GxAuditLogBean bean = new GxAuditLogBean();
+		bean.setAuditDate(new Timestamp(System.currentTimeMillis()));
+		bean.setAuditEntity(auditEntity);
+		bean.setAuditEvent(auditEvent);
+		bean.setOidAuditEntity(oidAuditEntity);
+		if (userAccountBean != null) {
+			bean.setGxUserAccountBeanFault(BeanFault.beanFault(userAccountBean.getOid(), userAccountBean));
+		}
+		createOrUpdate(bean);
+		return bean;
+	}
+
+	public List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean) {
+		List<GxAuditLog> entities = auditLogRepository.findAllByGxUserAccountOidOrderByAuditDateDesc(userAccountBean.getOid());
+		return makeAuditLogBean(entities);
+	}
+
+	public List<GxAuditLogBean> findAuditLogByAuditEntity(String auditEntity) {
+		List<GxAuditLog> entities = auditLogRepository.findAllByAuditEntityOrderByAuditDateDesc(auditEntity);
+		return makeAuditLogBean(entities);
+	}
+
+	public List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity) {
+		List<GxAuditLog> entities = auditLogRepository.findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(auditEntity, oidAuditEntity);
+		return makeAuditLogBean(entities);
+	}
+
+	@Override
+	public List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity) {
+		List<GxAuditLog> entities = auditLogRepository.findAllByOidAuditEntity(oidAuditEntity);
+		return makeAuditLogBean(entities);
+	}
+
+	private List<GxAuditLogBean> makeAuditLogBean(List<GxAuditLog> entities) {
+		List<GxAuditLogBean> beans = new ArrayList<>();
+		entities.forEach(entity -> {
+			beans.add(makeAuditLogBean(entity));
+		});
+		return beans;
+	}
+
+	private GxAuditLogBean makeAuditLogBean(GxAuditLog entity) {
+		GxAuditLogBean bean = new GxAuditLogBean();
+		bean.setOid(entity.getOid());
+		bean.setAuditDate(entity.getAuditDate());
+		bean.setAuditEntity(entity.getAuditEntity());
+		bean.setOidAuditEntity(entity.getOidAuditEntity());
+		bean.setAuditEvent(entity.getAuditEvent());
+		if (entity.getGxUserAccount() != null) {
+			bean.setGxUserAccountBeanFault(BeanFault.beanFault(entity.getGxUserAccount().getOid(), oid -> {
+				return makeUserAccountBean(userAccountRepo.findOne(oid));
+			}));
+		}
+		return bean;
+	}
+
+	@Override
+	public GxNamespaceBean findSystemNamespace() {
+		return findOrCreateNamespace(SYSTEM_NAMESPACE);
+	}
+
+	@Override
+	public void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess) {
+		GxAccessLog accessLog = new GxAccessLog();
+		accessLog.setIsSuccess(isSuccess);
+		accessLog.setAccessTime(timeStamp);
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		accessLog.setGxAccessKey(gxAccessKeyRepository.findByAccessKey(accessKeyUuid));
+		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName, gxNamespaceBean.getNamespace()));
+		accessLog.setAccessType(accessType);
+		accessLogRepo.save(accessLog);
+	}
+
+	@Override
+	public List<GxAccessKeyBean> findAccessKey() {
+		return accessKeyRepo.findAll(new Sort("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+	}
+
+	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {
+		GxAccessKeyBean bean = new GxAccessKeyBean();
+		bean.setOid(gxAccessKey.getOid());
+		bean.setAccessKey(gxAccessKey.getAccessKey());
+		bean.setSecret(gxAccessKey.getSecret());
+		bean.setIsActive(gxAccessKey.getIsActive());
+		if (gxAccessKey.getAccessKeyType() != null)
+			bean.setAccessKeyType(AccessKeyType.accessKeyType(gxAccessKey.getAccessKeyType()));
+		else
+			bean.setAccessKeyType(null);
+
+		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return securityGroupRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		}));
+
+		bean.setSecurityPolicyCollectionFault(BeanCollectionFault.collectionFault(() -> {
+			return securityPolicyRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+		}));
+		return bean;
+	}
+
+	@Override
+	public GxAccessKeyBean save(GxAccessKeyBean bean) {
+		GxAccessKey saved = accessKeyRepo.save(toEntity(bean));
+		bean.setOid(saved.getOid());
+		return bean;
+	}
+
+	private GxAccessKey toEntity(GxAccessKeyBean bean) {
+		final GxAccessKey entity;
+		if (bean.getOid() != null) {
+			entity = accessKeyRepo.findOne(bean.getOid());
+		} else {
+			entity = new GxAccessKey();
+		}
+		entity.setAccessKey(bean.getAccessKey());
+		entity.setSecret(bean.getSecret());
+		entity.setIsActive(bean.getIsActive());
+		if (bean.getAccessKeyType() != null)
+			entity.setAccessKeyType(bean.getAccessKeyType().typeCode());
+		else
+			entity.setAccessKeyType(null);
+
+		if (bean.getSecurityGroupCollectionFault().isModified()) {
+			entity.getGxSecurityGroups().clear();
+			bean.getSecurityGroupCollectionFault().getBeans().forEach(added -> {
+				entity.getGxSecurityGroups().add(securityGroupRepo.findOne(added.getOid()));
+			});
+		}
+
+		if (bean.getSecurityPolicyCollectionFault().isModified()) {
+			entity.getGxSecurityPolicys().clear();
+			bean.getSecurityPolicyCollectionFault().getBeans().forEach(added -> {
+				entity.getGxSecurityPolicys().add(securityPolicyRepo.findOne(added.getOid()));
+			});
+		}
+
+		return entity;
+	}
+
+	@Override
+	public void delete(GxAccessKeyBean bean) {
+		accessKeyRepo.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxAccessKeyBean> findAccessKeyByIsActive(Boolean isActive) {
+		return accessKeyRepo.findAllByIsActive(isActive).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxAccessKeyBean> findAccessKeyByIsActiveAndGxUserAccountIsNull(Boolean isActive) {
+		return accessKeyRepo.findAllByIsActiveAndGxUserAccountIsNull(isActive).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxResourceBean createOrUpdate(GxResourceBean bean) {
+		GxResource gxResource;
+		if (bean.getOid() == null)
+			gxResource = new GxResource();
+		else
+			gxResource = resourceRepo.findOne(bean.getOid());
+		gxResource = resourceRepo.save(toEntity(bean, gxResource));
+		bean.setOid(gxResource.getOid());
+		return bean;
+	}
+
+	@Override
+	public List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean) {
+		return makeResourceBean(resourceRepo.findAllByGxNamespaceNamespace(gxNamespaceBean.getNamespace()));
+	}
+
+	@Override
+	public void delete(GxResourceBean bean) {
+		resourceRepo.delete(bean.getOid());
+	}
+
+	private List<GxResourceBean> makeResourceBean(List<GxResource> resources) {
+		List<GxResourceBean> beans = new ArrayList<>();
+		resources.forEach(resource -> {
+			beans.add(makeResourceBean(resource));
+		});
+		return beans;
+	}
+
+	private GxResourceBean makeResourceBean(GxResource gxResource) {
+		GxResourceBean bean = new GxResourceBean();
+		bean.setOid(gxResource.getOid());
+		bean.setResourceName(gxResource.getResourceName());
+		bean.setResourceDescription(gxResource.getResourceDescription());
+		bean.setIsActive(gxResource.getIsActive());
+		bean.setGxNamespaceBeanFault(BeanFault.beanFault(gxResource.getGxNamespace().getOid(), oid -> {
+			return makeNamespaceBean(namespaceRepo.findByNamespace(gxResource.getResourceName()));
+		}));
+		return bean;
+	}
+
+	private GxResource toEntity(GxResourceBean bean, GxResource entity) {
+		entity.setResourceName(bean.getResourceName());
+		entity.setResourceDescription(bean.getResourceDescription());
+		entity.setIsActive(bean.getIsActive());
+		if (bean.getGxNamespaceBeanFault() != null) {
+			entity.setGxNamespace(namespaceRepo.findOne(bean.getGxNamespaceBeanFault().getOid()));
+		}
+		return entity;
+	}
+
+	@Override
+	public GxCurrencyBean createOrUpdate(GxCurrencyBean bean) {
+		GxCurrency gxCurrency;
+		if (bean.getOid() == null)
+			gxCurrency = new GxCurrency();
+		else
+			gxCurrency = currencyRepository.findOne(bean.getOid());
+		gxCurrency = currencyRepository.save(toEntity(bean, gxCurrency));
+		bean.setOid(gxCurrency.getOid());
+		return bean;
+	}
+
+	private GxCurrency toEntity(GxCurrencyBean bean, GxCurrency entity) {
+		entity.setAlpha3Code(bean.getAlpha3Code());
+		entity.setCurrencyName(bean.getCurrencyName());
+		entity.setCurrencySymbol(bean.getCurrencySymbol());
+		entity.setIsActive(bean.getIsActive());
+		entity.setNumericCode(bean.getNumericCode());
+		return entity;
+	}
+
+	@Override
+	public void delete(GxCurrencyBean bean) {
+		currencyRepository.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxCurrencyBean> findCurrency() {
+		return makeCurrencyBean(currencyRepository.findAll());
+	}
+
+	@Override
+	public List<GxCurrencyBean> findCurrencyActive() {
+		return makeCurrencyBean(currencyRepository.findAllByIsActiveTrueOrderByCurrencyNameAsc());
+	}
+
+	private List<GxCurrencyBean> makeCurrencyBean(List<GxCurrency> entities) {
+		return entities.stream().map(this::makeCurrencyBean).collect(Collectors.toList());
+	}
+
+	private GxCurrencyBean makeCurrencyBean(GxCurrency entity) {
+		GxCurrencyBean bean = new GxCurrencyBean();
+		bean.setOid(entity.getOid());
+		bean.setAlpha3Code(entity.getAlpha3Code());
+		bean.setCurrencyName(entity.getCurrencyName());
+		bean.setCurrencySymbol(entity.getCurrencySymbol());
+		bean.setIsActive(entity.getIsActive());
+		bean.setNumericCode(entity.getNumericCode());
+		return bean;
+	}
+
+	@Override
+	public GxCurrencyBean findCurrency(Integer oid) {
+		GxCurrency entity = currencyRepository.findOne(oid);
+		if (entity != null)
+			return makeCurrencyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxCurrencyBean findCurrencyByCurrencyNumericCode(Integer numericCode) {
+		GxCurrency entity = currencyRepository.findOneByNumericCode(numericCode);
+		if (entity != null)
+			return makeCurrencyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxCurrencyBean findCurrencyByCurrencyAlpha3Code(String alpha3Code) {
+		GxCurrency entity = currencyRepository.findOneByAlpha3Code(alpha3Code);
+		if (entity != null)
+			return makeCurrencyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean createOrUpdate(GxSmsProviderBean bean) {
+		GxSmsProvider gxSmsProvider;
+		if (bean.getOid() == null)
+			gxSmsProvider = new GxSmsProvider();
+		else
+			gxSmsProvider = smsProviderRepo.findOne(bean.getOid());
+		gxSmsProvider = smsProviderRepo.save(toEntity(bean, gxSmsProvider));
+		bean.setOid(gxSmsProvider.getOid());
+		if (bean.getIsPrimary())
+			markAsPrimary(bean);
+		return bean;
+	}
+
+	private GxSmsProvider toEntity(GxSmsProviderBean bean, GxSmsProvider entity) {
+		entity.setConfigData(bean.getConfigData());
+		entity.setImplementationClass(bean.getImplementationClass());
+		entity.setIsActive(bean.getIsActive());
+		entity.setIsPrimary(bean.getIsPrimary());
+		entity.setProviderName(bean.getProviderName());
+		return entity;
+	}
+
+	@Override
+	public void delete(GxSmsProvider bean) {
+		smsProviderRepo.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxSmsProviderBean> findSmsProvider() {
+		return makeSmsProviderBean(smsProviderRepo.findAll(new Sort("providerName")));
+	}
+
+	@Override
+	public List<GxSmsProviderBean> findSmsProviderActive() {
+		return makeSmsProviderBean(smsProviderRepo.findAllByIsActiveTrueOrderByProviderNameAsc());
+	}
+
+	private List<GxSmsProviderBean> makeSmsProviderBean(List<GxSmsProvider> entities) {
+		return entities.stream().map(this::makeSmsProviderBean).collect(Collectors.toList());
+	}
+
+	private GxSmsProviderBean makeSmsProviderBean(GxSmsProvider entity) {
+		GxSmsProviderBean bean = new GxSmsProviderBean();
+		bean.setOid(entity.getOid());
+		bean.setConfigData(entity.getConfigData());
+		bean.setImplementationClass(entity.getImplementationClass());
+		bean.setIsActive(entity.getIsActive());
+		bean.setIsPrimary(entity.getIsPrimary());
+		bean.setProviderName(entity.getProviderName());
+		return bean;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProvider(Integer oid) {
+		GxSmsProvider entity = smsProviderRepo.findOne(oid);
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderByProvider(SmsProvider smsProvider) {
+		GxSmsProvider entity = smsProviderRepo.findOneByProviderName(smsProvider.getProviderName());
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderByProviderName(String providerName) {
+		GxSmsProvider entity = smsProviderRepo.findOneByProviderName(providerName);
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxSmsProviderBean findSmsProviderPrimary() {
+		GxSmsProvider entity = smsProviderRepo.findOneByIsActiveTrueAndIsPrimaryTrue();
+		if (entity != null)
+			return makeSmsProviderBean(entity);
+		return null;
+	}
+
+	@Override
+	public void markAsPrimary(GxSmsProviderBean bean) {
+		List<GxSmsProvider> allProviders = smsProviderRepo.findAll();
+		allProviders.forEach(provider -> {
+			if (bean.getOid().equals(provider.getOid()))
+				provider.setIsPrimary(true);
+			else
+				provider.setIsPrimary(false);
+
+		});
+		smsProviderRepo.save(allProviders);
+	}
+
+	@Override
+	public GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean) {
+		GxRegisteredDevice entity = toEntity(bean);
+		gxRegisteredDeviceRepository.save(entity);
+		bean.setOid(entity.getOid());
+		return bean;
+	}
+
+	@Override
+	public GxRegisteredDeviceBean registerDevice(String namespace, String deviceToken, String systemName, String brand, boolean isTablet, String ownerId)
+			throws RegisterDeviceFailedException {
+		GxNamespaceBean namespaceBean = findNamespace(namespace);
+		if (namespaceBean == null)
+			throw new RegisterDeviceFailedException("Namespace " + namespace + " does not exist.");
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
+		if (device != null)
+			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " already registered");
+		GxRegisteredDevice entity = new GxRegisteredDevice();
+		entity.setBrand(brand);
+		entity.setIsActive(true);
+		entity.setIsTablet(isTablet);
+		entity.setOwnerId(ownerId);
+		entity.setSystemName(systemName);
+		entity.setDeviceToken(deviceToken);
+		entity.setGxNamespace(namespaceRepo.findOne(namespaceBean.getOid()));
+		entity = gxRegisteredDeviceRepository.save(entity);
+		return makeGxRegisteredDeviceBean(entity);
+	}
+
+	@Override
+	public void unregisterDevice(String namespace, String deviceToken) throws UnregisterDeviceFailedException {
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
+		if (device == null)
+			throw new UnregisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " does not exist.");
+		gxRegisteredDeviceRepository.delete(device.getOid());
+	}
+
+	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceToken(String namespace, String deviceToken) {
+		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceToken(namespace, deviceToken);
+		if (device == null)
+			return null;
+		return makeGxRegisteredDeviceBean(device);
+	}
+
+	private GxRegisteredDeviceBean makeGxRegisteredDeviceBean(GxRegisteredDevice entity) {
+		GxRegisteredDeviceBean bean = new GxRegisteredDeviceBean();
+		bean.setOid(entity.getOid());
+		bean.setSystemName(entity.getSystemName());
+		bean.setDeviceToken(entity.getDeviceToken());
+		bean.setIsTablet(entity.getIsTablet());
+		bean.setBrand(entity.getBrand());
+		bean.setIsActive(entity.getIsActive());
+		bean.setOwnerId(entity.getOwnerId());
+		bean.setNamespaceFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
+			return makeNamespaceBean(namespaceRepo.findOne(oid));
+		}));
+		return bean;
+	}
+
+	private GxRegisteredDevice toEntity(GxRegisteredDeviceBean bean) {
+		GxRegisteredDevice entity = null;
+		if (bean.getOid() != null) {
+			entity = gxRegisteredDeviceRepository.findOne(bean.getOid());
+		} else {
+			entity = new GxRegisteredDevice();
+		}
+		entity.setSystemName(bean.getSystemName());
+		entity.setDeviceToken(bean.getDeviceToken());
+		entity.setIsTablet(bean.getIsTablet());
+		entity.setBrand(bean.getBrand());
+		entity.setIsActive(bean.getIsActive());
+		entity.setOwnerId(bean.getOwnerId());
+		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceFault().getOid()));
+		return entity;
+	}
+
+	@Override
+	public List<GxRegisteredDeviceBean> findRegisteredDevice() {
+		return gxRegisteredDeviceRepository.findAll().stream().map(this::makeGxRegisteredDeviceBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GxRegisteredDeviceBean> findRegisteredDeviceByNamespace(GxNamespaceBean bean) {
+		return gxRegisteredDeviceRepository.findByGxNamespaceNamespace(bean.getNamespace()).stream().map(this::makeGxRegisteredDeviceBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public void delete(GxRegisteredDeviceBean bean) {
+		gxRegisteredDeviceRepository.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxNamespacePropertyBean> findNamespaceProperty() {
+		return namespacePropertyRepo.findAll().stream().map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxNamespacePropertyBean findNamespaceProperty(Integer oidNamespaceProperty) {
+		GxNamespaceProperty entity = namespacePropertyRepo.findOne(oidNamespaceProperty);
+		if (entity != null)
+			return makeGxNamespacePropertyBean(entity);
+		return null;
+	}
+
+	@Override
+	public GxNamespacePropertyBean save(GxNamespacePropertyBean bean) {
+		GxNamespaceProperty savedEntity = namespacePropertyRepo.save(toEntity(bean));
+		bean.setOid(savedEntity.getOid());
+		return bean;
+	}
+
+	@Override
+	public void delete(GxNamespacePropertyBean bean) {
+		if (bean.getOid() != null)
+			namespacePropertyRepo.delete(bean.getOid());
+	}
+
+	@Override
+	public List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace) {
+		return namespacePropertyRepo.findAllByGxNamespaceOidOrderByPropertyKey(namespace.getOid()).stream().map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey) {
+		GxNamespaceProperty entity = namespacePropertyRepo.findOneByGxNamespaceOidAndPropertyKey(namespace.getOid(), propertyKey);
+		if (entity != null)
+			return makeGxNamespacePropertyBean(entity);
+		return null;
+	}
+
+	private GxNamespacePropertyBean makeGxNamespacePropertyBean(GxNamespaceProperty entity) {
+		GxNamespacePropertyBean bean = new GxNamespacePropertyBean();
+		bean.setOid(entity.getOid());
+		bean.setPropertyDefaultValue(entity.getPropertyDefaultValue());
+		bean.setPropertyKey(entity.getPropertyKey());
+		bean.setPropertyValue(entity.getPropertyValue());
+		bean.setNamespaceFault(BeanFault.beanFault(entity.getGxNamespace().getOid(), oid -> {
+			return makeNamespaceBean(namespaceRepo.findOne(oid));
+		}));
+		return bean;
+	}
+
+	private GxNamespaceProperty toEntity(GxNamespacePropertyBean bean) {
+		GxNamespaceProperty entity = null;
+		if (bean.getOid() != null) {
+			entity = namespacePropertyRepo.findOne(bean.getOid());
+		} else {
+			entity = new GxNamespaceProperty();
+		}
+		entity.setPropertyDefaultValue(bean.getPropertyDefaultValue());
+		entity.setPropertyKey(bean.getPropertyKey());
+		entity.setPropertyValue(bean.getPropertyValue());
+		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceFault().getOid()));
+		return entity;
 	}
 
 }

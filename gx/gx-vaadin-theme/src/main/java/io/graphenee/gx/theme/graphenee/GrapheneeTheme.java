@@ -51,11 +51,13 @@ public class GrapheneeTheme extends BaseTheme {
 		return new ThemeResource("./../" + THEME_NAME + "/" + fileName);
 	}
 
+	public static String STYLE_CARD_ITEM = "card-item";
 	public static String STYLE_HOVER_ELEVATED = "hover-elevated";
 	public static String STYLE_ELEVATED = "elevated";
 	public static String STYLE_CODE = "code";
 	public static String STYLE_V_ALIGN_RIGHT = "v-align-right";
 	public static String STYLE_V_ALIGN_LEFT = "v-align-left";
 	public static String STYLE_V_ALIGN_CENTER = "v-align-center";
+	public static String STYLE_CENTER = "center";
 
 }

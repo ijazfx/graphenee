@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.security.vaadin;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,8 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Override
 	protected boolean onSaveEntity(GxUserAccountBean entity) {
+		if (entity.getOid() == null)
+			entity.setAccountActivationDate(new Timestamp(System.currentTimeMillis()));
 		dataService.save(entity);
 		return true;
 	}
@@ -129,6 +132,11 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
+	}
+
+	@Override
+	protected boolean isGridCellFilterEnabled() {
+		return true;
 	}
 
 }

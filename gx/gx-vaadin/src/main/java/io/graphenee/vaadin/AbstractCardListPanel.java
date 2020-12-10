@@ -41,6 +41,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.util.VaadinUtils;
 
 public abstract class AbstractCardListPanel<T> extends MPanel {
@@ -229,45 +230,50 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 	}
 
 	private void buildCardList(List<T> entities) {
-		contentLayout.removeAllComponents();
-		if (entities != null) {
-			entities.forEach(entity -> {
-				MPanel cardPanel = new MPanel();
-				MButton editButton = new MButton(FontAwesome.PENCIL, localizedSingularValue("Edit"), event -> {
-					preEdit(entity);
-					openEditorForm(entity);
-				});
-				MButton deleteButton = new MButton(FontAwesome.TRASH, localizedSingularValue("Delete"), event -> {
-					if (shouldShowDeleteConfirmation()) {
-						ConfirmDialog.show(UI.getCurrent(), "Are you sure to delete selected records", e -> {
-							if (e.isConfirmed()) {
-								if (onDeleteEntity(entity)) {
-									contentLayout.removeComponent(cardPanel);
-									if (delegate != null) {
-										delegate.onDelete(entity);
+		if (entities.isEmpty()) {
+			contentLayout.removeAllComponents();
+			MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
+			cardPanel.setContent(new MVerticalLayout(new MLabel("No data available").withStyleName(ValoTheme.LABEL_NO_MARGIN)));
+			contentLayout.addComponent(cardPanel);
+		} else {
+			contentLayout.removeAllComponents();
+			if (entities != null) {
+				entities.forEach(entity -> {
+					MPanel cardPanel = new MPanel().withStyleName(cardStyleName());
+					MButton editButton = new MButton(FontAwesome.PENCIL, localizedSingularValue("Edit"), event -> {
+						preEdit(entity);
+						openEditorForm(entity);
+					});
+					MButton deleteButton = new MButton(FontAwesome.TRASH, localizedSingularValue("Delete"), event -> {
+						if (shouldShowDeleteConfirmation()) {
+							ConfirmDialog.show(UI.getCurrent(), "Are you sure to delete selected records", e -> {
+								if (e.isConfirmed()) {
+									if (onDeleteEntity(entity)) {
+										contentLayout.removeComponent(cardPanel);
+										if (delegate != null) {
+											delegate.onDelete(entity);
+										}
 									}
 								}
-							}
-						});
-					} else {
-						if (onDeleteEntity(entity)) {
-							contentLayout.removeComponent(cardPanel);
-							if (delegate != null) {
-								delegate.onDelete(entity);
+							});
+						} else {
+							if (onDeleteEntity(entity)) {
+								contentLayout.removeComponent(cardPanel);
+								if (delegate != null) {
+									delegate.onDelete(entity);
+								}
 							}
 						}
-					}
+
+					});
+					AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
+					cardPanel.setContent(cardLayout);
+					contentLayout.addComponent(cardPanel);
 
 				});
-				AbstractCardComponent<T> cardLayout = getCardComponent(entity).withEditButton(editButton).withDeleteButton(deleteButton);
-
-				cardPanel.addStyleName("card-item");
-				cardPanel.setContent(cardLayout);
-				contentLayout.addComponent(cardPanel);
-
-			});
-			MLabel dummyLabel = new MLabel().withHeight("-1px");
-			contentLayout.addComponent(dummyLabel);
+				MLabel dummyLabel = new MLabel().withHeight("-1px");
+				contentLayout.addComponent(dummyLabel);
+			}
 		}
 	}
 
@@ -386,6 +392,10 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 
 	public void hideToolbar() {
 		toolbar.setVisible(false);
+	}
+
+	protected String cardStyleName() {
+		return GrapheneeTheme.STYLE_CARD_ITEM;
 	}
 
 }

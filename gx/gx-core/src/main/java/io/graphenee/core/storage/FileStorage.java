@@ -34,7 +34,7 @@ public interface FileStorage {
 	 * path.
 	 */
 	default String resourcePath(String folder, String filePath) {
-		if (folder == null) {
+		if (folder == null || filePath == null) {
 			return filePath;
 		}
 		File file = new File(filePath);
@@ -48,6 +48,12 @@ public interface FileStorage {
 		} catch (FileNotFoundException e) {
 			throw new ResolveFailedException("Failed to resolve resource " + resourcePath);
 		}
+	}
+
+	boolean exists(String resourcePath);
+
+	default boolean exists(String folder, String filePath) {
+		return exists(resourcePath(folder, filePath));
 	}
 
 	default URI resolveToURI(String resourcePath) throws ResolveFailedException {

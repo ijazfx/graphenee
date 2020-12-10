@@ -15,24 +15,27 @@
  *******************************************************************************/
 package io.graphenee.vaadin.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.vaadin.server.VaadinSession;
 
-import io.graphenee.vaadin.domain.DashboardUser;
+import io.graphenee.core.model.GxAuthenticatedUser;
 
 public class DashboardUtils {
 
 	@SuppressWarnings("unchecked")
-	public static <T extends DashboardUser> T getLoggedInUser() {
-		return (T) VaadinSession.getCurrent().getAttribute(DashboardUser.class.getName());
+	public static <T extends GxAuthenticatedUser> T getLoggedInUser() {
+		return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class.getName());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends DashboardUser> T getLoggedInUser(VaadinSession vaadinSession) {
-		return (T) vaadinSession.getAttribute(DashboardUser.class.getName());
+	public static <T extends GxAuthenticatedUser> T getLoggedInUser(VaadinSession vaadinSession) {
+		return (T) vaadinSession.getAttribute(GxAuthenticatedUser.class.getName());
 	}
 
 	public static String getLoggedInUsername() {
-		DashboardUser loggedInUser = DashboardUtils.getLoggedInUser();
+		GxAuthenticatedUser loggedInUser = DashboardUtils.getLoggedInUser();
 		final String targetUser;
 		if (loggedInUser != null) {
 			targetUser = loggedInUser.getUsername();
@@ -40,6 +43,24 @@ public class DashboardUtils {
 			targetUser = "system";
 		}
 		return targetUser;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, String[]> getQueryMap() {
+		Map<String, String[]> map = (Map<String, String[]>) VaadinSession.getCurrent().getAttribute("gx-QueryMap");
+		if (map == null) {
+			map = new HashMap<>();
+		}
+		return map;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, String[]> getQueryMap(VaadinSession vaadinSession) {
+		Map<String, String[]> map = (Map<String, String[]>) vaadinSession.getAttribute("gx-QueryMap");
+		if (map == null) {
+			map = new HashMap<>();
+		}
+		return map;
 	}
 
 }
