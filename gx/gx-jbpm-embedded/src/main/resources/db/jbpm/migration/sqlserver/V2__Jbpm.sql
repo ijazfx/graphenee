@@ -24,8 +24,8 @@
 --# JTDS driver
 --#
 
-USE [enter_db_name_here]
-GO
+--USE [enter_db_name_here]
+--GO
 
 CREATE TABLE [dbo].[QRTZ_CALENDARS] (
   [CALENDAR_NAME] [VARCHAR] (200)  NOT NULL ,
