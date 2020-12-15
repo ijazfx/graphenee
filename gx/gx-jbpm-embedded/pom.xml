@@ -10,7 +10,7 @@
 	<!-- Parent -->
 	<parent>
 		<groupId>io.graphenee</groupId>
-		<version>3.2.1</version>
+		<version>3.2.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 		<artifactId>gx</artifactId>
 	</parent>
