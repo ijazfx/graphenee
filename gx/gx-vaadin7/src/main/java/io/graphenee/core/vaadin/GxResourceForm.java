@@ -18,9 +18,9 @@ package io.graphenee.core.vaadin;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.bean.GxResourceBean;
 import io.graphenee.vaadin.TRAbstractForm;
@@ -29,11 +29,13 @@ import io.graphenee.vaadin.TRAbstractForm;
 @Scope("prototype")
 public class GxResourceForm extends TRAbstractForm<GxResourceBean> {
 
+	private static final long serialVersionUID = 1L;
+
 	MTextField resourceName, resourceDescription;
 	MCheckBox isActive;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		resourceName = new MTextField("Resource Name");
 		resourceName.setRequired(true);
 		resourceDescription = new MTextField("Resource Description");

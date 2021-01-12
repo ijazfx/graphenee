@@ -15,13 +15,13 @@
  *******************************************************************************/
 package io.graphenee.core.vaadin;
 
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
-
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextArea;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
+import com.vaadin.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.vaadin.TRAbstractForm;
@@ -30,12 +30,14 @@ import io.graphenee.vaadin.TRAbstractForm;
 @Scope("prototype")
 public class GxNamespaceForm extends TRAbstractForm<GxNamespaceBean> {
 
+	private static final long serialVersionUID = 1L;
+
 	MTextField namespace;
 	MTextArea namespaceDescription;
 	MCheckBox isActive;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		namespace = new MTextField("Namespace").withRequired(true);
 		namespaceDescription = new MTextArea("Description");
 		isActive = new MCheckBox("Is Active?");

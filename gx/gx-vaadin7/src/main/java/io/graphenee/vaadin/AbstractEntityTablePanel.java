@@ -50,6 +50,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractLayout;
@@ -71,6 +72,7 @@ import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
 import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.util.VaadinUtils;
 
+@SuppressWarnings("serial")
 public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	private static final String SELECTED_CHECKBOX = "selected";
@@ -83,12 +85,10 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	private BeanItemContainer<T> mainTableContainer;
 	private AbstractLayout toolbar;
 	private AbstractLayout secondaryToolbar;
-	private TRAbstractForm<T> cachedForm;
 	private MButton addButton;
 	private MButton editButton;
 	private MButton deleteButton;
 	private MButton searchButton;
-	private GridCellFilter gridCellFilter;
 	private Object filter;
 	private Function<T, Boolean> onItemClick;
 
@@ -136,7 +136,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 			addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("New"), event -> {
 				try {
-					onAddButtonClick(initializeEntity(entityClass.newInstance()));
+					onAddButtonClick(initializeEntity(entityClass.getDeclaredConstructor().newInstance()));
 				} catch (Exception e) {
 					L.warn(e.getMessage(), e);
 				}
@@ -168,8 +168,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 										}
 									} catch (Exception e1) {
 										if (e1.getMessage().contains("ConstraintViolationException"))
-											MNotification.tray("Operation Denied",
-													"Record is in use therefore cannot be removed.");
+											MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
 										else
 											MNotification.tray("Operation Failed", e1.getMessage());
 									}
@@ -231,7 +230,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout();
+			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin()).withSpacing(true);
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainTable);
 			rootLayout.setExpandRatio(mainTable, 1);
@@ -254,6 +253,10 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			isBuilt = true;
 		}
 		return this;
+	}
+
+	protected MarginInfo rootLayoutMargin() {
+		return new MarginInfo(true);
 	}
 
 	private MTable<T> buildMainTable() {
@@ -291,7 +294,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 			propertiesList.add(0, SELECTED_CHECKBOX);
 			table.withProperties(propertiesList);
 		}
-		
+
 		if (isGridCellFilterEnabled()) {
 			//TODO: Add table column filter
 		}
@@ -314,12 +317,10 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 						if (onItemClick != null) {
 							Boolean value = onItemClick.apply(item.getBean());
 							if (value != null && value == true) {
-								onGridItemClicked(item.getBean(),
-										event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+								onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 							}
 						} else {
-							onGridItemClicked(item.getBean(),
-									event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
 						}
 					}
 				}
@@ -465,9 +466,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar")
-				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth()
-				;
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth();
 
 		layout.add(addButton);
 		layout.add(editButton);
@@ -501,9 +500,7 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar")
-				.withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth()
-				;
+		MHorizontalLayout layout = new MHorizontalLayout().withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT).withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -707,15 +704,15 @@ public abstract class AbstractEntityTablePanel<T> extends MPanel {
 
 	public AbstractEntityTablePanel<T> withSelectionEnabled(boolean isSelectionEnabled) {
 		//TODO: Temporary commented will do some refactoring.
-//		this.isSelectionEnabled = isSelectionEnabled;
-//		if (isSelectionEnabled) {
-//			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
-//			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
-//			mainTable.setMultiSelect(true);
-//			mainTable.setSelectable(true);
-//		} else {
-//			mainTable.setSelectable(false);
-//		}
+		//		this.isSelectionEnabled = isSelectionEnabled;
+		//		if (isSelectionEnabled) {
+		//			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
+		//			mainTable.setMultiSelectMode(MultiSelectMode.DEFAULT);
+		//			mainTable.setMultiSelect(true);
+		//			mainTable.setSelectable(true);
+		//		} else {
+		//			mainTable.setSelectable(false);
+		//		}
 		return this;
 	}
 

@@ -19,9 +19,9 @@ import java.util.Arrays;
 
 import org.vaadin.viritin.fields.MPasswordField;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -46,7 +46,7 @@ public class DashboardUserProfileForm extends TRAbstractForm<GxAuthenticatedUser
 	}
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		firstName = new MTextField("First Name");
 		firstName.setEnabled(false);
 		lastName = new MTextField("Last Name");

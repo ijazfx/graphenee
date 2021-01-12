@@ -15,18 +15,18 @@
  *******************************************************************************/
 package io.graphenee.vaadin.view.dashboard;
 
+import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 /**
  * Simple name editor Window.
@@ -34,7 +34,7 @@ import org.vaadin.viritin.layouts.MVerticalLayout;
 @SuppressWarnings("serial")
 public class DashboardEdit extends Window {
 
-	private final TextField nameField = new TextField("Name");
+	private final MTextField nameField = new MTextField("Name");
 	private final DashboardEditListener listener;
 
 	public DashboardEdit(final DashboardEditListener listener, final String currentName) {

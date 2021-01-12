@@ -20,9 +20,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
-import com.google.common.base.Strings;
-
 import org.springframework.stereotype.Service;
+
+import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.GxAudioType;
 import io.graphenee.core.enums.GxImageType;
@@ -38,56 +38,46 @@ import io.graphenee.core.util.TRFileContentUtil;
 @Service
 public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 	@Override
-	public void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType)
-			throws GxMediaConversionException {
+	public void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType) throws GxMediaConversionException {
 		if (sourceType.equals(targetType))
-			throw new GxMediaConversionException(
-					"Both source and target types are same thus conversion is not required.");
+			throw new GxMediaConversionException("Both source and target types are same thus conversion is not required.");
 		convertAudioMedia(sourceFile, targetFile, targetType);
 	}
 
 	@Override
-	public void convertVideoMedia(String sourceFile, GxVideoType sourceType, String targetFile, GxVideoType targetType)
-			throws GxMediaConversionException {
+	public void convertVideoMedia(String sourceFile, GxVideoType sourceType, String targetFile, GxVideoType targetType) throws GxMediaConversionException {
 		if (sourceType.equals(targetType))
-			throw new GxMediaConversionException(
-					"Both source and target types are same thus conversion is not required.");
+			throw new GxMediaConversionException("Both source and target types are same thus conversion is not required.");
 		convertVideoMedia(sourceFile, targetFile, targetType);
 	}
 
 	@Override
-	public void convertImageMedia(String sourceFile, GxImageType sourceType, String targetFile, GxImageType targetType)
-			throws GxMediaConversionException {
+	public void convertImageMedia(String sourceFile, GxImageType sourceType, String targetFile, GxImageType targetType) throws GxMediaConversionException {
 		if (sourceType.equals(targetType))
-			throw new GxMediaConversionException(
-					"Both source and target types are same thus conversion is not required.");
+			throw new GxMediaConversionException("Both source and target types are same thus conversion is not required.");
 		convertImageMedia(sourceFile, targetFile, targetType);
 	}
 
 	@Override
-	public void convertAudioMedia(String sourceFile, String targetFile, GxAudioType targetType)
-			throws GxMediaConversionException {
+	public void convertAudioMedia(String sourceFile, String targetFile, GxAudioType targetType) throws GxMediaConversionException {
 		File source = new File(sourceFile);
 		if (!source.exists())
 			throw new GxMediaConversionException(sourceFile + " does not exist.");
 		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
 		if (!targetExtension.equals(targetType.getExtension()))
-			throw new GxMediaConversionException(
-					targetFile + " file extension does not match with target type " + targetType.getExtension());
+			throw new GxMediaConversionException(targetFile + " file extension does not match with target type " + targetType.getExtension());
 		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " -vn " + sanitize(targetFile);
 		convertMedia(cmd);
 	}
 
 	@Override
-	public void convertVideoMedia(String sourceFile, String targetFile, GxVideoType targetType)
-			throws GxMediaConversionException {
+	public void convertVideoMedia(String sourceFile, String targetFile, GxVideoType targetType) throws GxMediaConversionException {
 		File source = new File(sourceFile);
 		if (!source.exists())
 			throw new GxMediaConversionException(sourceFile + " does not exist.");
 		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
 		if (!targetExtension.equals(targetType.getExtension()))
-			throw new GxMediaConversionException(
-					targetFile + " file extension does not match with target type " + targetType.getExtension());
+			throw new GxMediaConversionException(targetFile + " file extension does not match with target type " + targetType.getExtension());
 		String mpegFlag = "";
 		if (targetType.equals(GxVideoType.MPEG)) {
 			mpegFlag = mpegFlag + " -c:v mpeg2video";
@@ -99,16 +89,32 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		convertMedia(cmd);
 	}
 
+	//Image compression Quality (1-31) 1 for
 	@Override
-	public void convertImageMedia(String sourceFile, String targetFile, GxImageType targetType)
-			throws GxMediaConversionException {
+	public void compressImageMedia(String sourceFile, String targetFile, Integer quality) throws GxMediaConversionException {
+		File source = new File(sourceFile);
+		if (!source.exists())
+			throw new GxMediaConversionException(sourceFile + " does not exist.");
+		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
+		String sourceExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
+		if (targetExtension == null || sourceExtension == null) {
+			throw new GxMediaConversionException("Source extension or target extension is not suitable");
+		}
+		if (!sourceExtension.equals(targetExtension))
+			throw new GxMediaConversionException("Target extension does not match the source extension");
+
+		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " " + "-q:v" + " " + quality.toString() + " " + sanitize(targetFile);
+		convertMedia(cmd);
+	}
+
+	@Override
+	public void convertImageMedia(String sourceFile, String targetFile, GxImageType targetType) throws GxMediaConversionException {
 		File source = new File(sourceFile);
 		if (!source.exists())
 			throw new GxMediaConversionException(sourceFile + " does not exist.");
 		String targetExtension = TRFileContentUtil.getExtensionFromFilename(targetFile);
 		if (!targetExtension.equals(targetType.getExtension()))
-			throw new GxMediaConversionException(
-					targetFile + " file extension does not match with target type " + targetType.getExtension());
+			throw new GxMediaConversionException(targetFile + " file extension does not match with target type " + targetType.getExtension());
 		String cmd = "ffmpeg -y -i " + sanitize(sourceFile) + " " + sanitize(targetFile);
 		convertMedia(cmd);
 	}

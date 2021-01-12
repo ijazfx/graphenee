@@ -1,9 +1,9 @@
 package io.graphenee.vaadin;
 
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -37,7 +37,7 @@ public class BaseProfileForm<T extends GxAuthenticatedUser> extends TRAbstractFo
 	}
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		firstName = new MTextField("First Name");
 		lastName = new MTextField("Last Name");
 		username = new MTextField("Username");

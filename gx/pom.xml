@@ -6,7 +6,7 @@
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx</artifactId>
 	<packaging>pom</packaging>
-	<version>2.1.0-SNAPSHOT</version>
+	<version>3.2.2-SNAPSHOT</version>
 	<name>Graphenee Parent</name>
 	<description>Graphenee Parent Project</description>
 	<url>https://github.com/ijazfx/graphenee</url>
@@ -39,7 +39,7 @@
 		<version.maven.javadoc.plugin>3.2.0</version.maven.javadoc.plugin>
 		<version.maven.sonatype.plugin>1.6.7</version.maven.sonatype.plugin>
 		<version.maven.vaadin.plugin>7.7.17</version.maven.vaadin.plugin>
-		<version.springboot>2.2.0.RELEASE</version.springboot>
+		<version.springboot>2.3.6.RELEASE</version.springboot>
 		<version.jpa>2.1.1</version.jpa>
 		<version.twilio>7.49.1</version.twilio>
 		<version.aws>1.11.659</version.aws>

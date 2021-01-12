@@ -62,7 +62,7 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	@Override
 	protected Component getFormComponent() {
 		// detail form
-		MFormLayout form = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+		MVerticalLayout form = new MVerticalLayout().withMargin(true).withSpacing(true);
 		// namespaceFault = new ComboBox("Namespace");
 		// namespaceFault.setConverter(new
 		// BeanFaultToBeanConverter(GxNamespaceBean.class));
@@ -105,9 +105,9 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 		mainTabSheet.setHeight("100%");
 
 		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(new MVerticalLayout(userAccountCollectionFault).withFullHeight(), "Users");
-		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withFullHeight(), "Security Policies");
-		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withFullHeight(), "Access Keys");
+		mainTabSheet.addTab(new MVerticalLayout(userAccountCollectionFault).withMargin(true).withFullHeight(), "Users");
+		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withMargin(true).withFullHeight(), "Security Policies");
+		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withMargin(true).withFullHeight(), "Access Keys");
 
 		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
 		layout.setSizeFull();
@@ -134,5 +134,5 @@ public class GxSecurityGroupForm extends TRAbstractForm<GxSecurityGroupBean> {
 	protected String formTitle() {
 		return "Security Group";
 	}
-	
+
 }

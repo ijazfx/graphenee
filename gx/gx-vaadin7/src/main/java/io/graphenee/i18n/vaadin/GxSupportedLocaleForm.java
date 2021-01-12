@@ -18,9 +18,9 @@ package io.graphenee.i18n.vaadin;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.vaadin.TRAbstractForm;
@@ -35,7 +35,7 @@ public class GxSupportedLocaleForm extends TRAbstractForm<GxSupportedLocaleBean>
 	MCheckBox isActive;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		localeName = new MTextField("Locale Name").withRequired(true);
 		localeName.setMaxLength(50);
 		localeCode = new MTextField("Locale Code").withRequired(true);

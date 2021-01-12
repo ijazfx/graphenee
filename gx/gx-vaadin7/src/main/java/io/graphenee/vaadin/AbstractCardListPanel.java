@@ -103,7 +103,7 @@ public abstract class AbstractCardListPanel<T> extends MPanel {
 			setStyleName(ValoTheme.PANEL_BORDERLESS);
 			setCaption(panelCaption());
 
-			rootLayout = new MVerticalLayout().withMargin(true).withSpacing(true);
+			rootLayout = new MVerticalLayout().withMargin(false).withSpacing(true);
 			if (shouldShowToolbar()) {
 				toolbar = buildToolbar();
 				rootLayout.addComponent(toolbar);

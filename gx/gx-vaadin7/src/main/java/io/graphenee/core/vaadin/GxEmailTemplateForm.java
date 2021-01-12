@@ -82,8 +82,8 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 
 	}
 
-	private FormLayout constructTemplateInfoForm() {
-		FormLayout templateInfoForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+	private MVerticalLayout constructTemplateInfoForm() {
+		MVerticalLayout templateInfoForm = new MVerticalLayout().withMargin(true).withSpacing(true);
 
 		templateName = new MTextField("Name").withRequired(true);
 		templateName.setMaxLength(50);
@@ -96,9 +96,8 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 		return templateInfoForm;
 	}
 
-	private FormLayout emailTab() {
-		FormLayout emailForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
-		emailForm.setSizeFull();
+	private MVerticalLayout emailTab() {
+		MVerticalLayout emailForm = new MVerticalLayout().withMargin(true).withSpacing(true);
 		emailForm.setCaption("Email Message");
 
 		subject = new MTextField("Subject").withRequired(true);
@@ -128,8 +127,8 @@ public class GxEmailTemplateForm extends TRAbstractForm<GxEmailTemplateBean> {
 		return emailForm;
 	}
 
-	private FormLayout smsTab() {
-		FormLayout smsForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+	private MVerticalLayout smsTab() {
+		MVerticalLayout smsForm = new MVerticalLayout().withMargin(true).withSpacing(true);
 		smsForm.setSizeFull();
 		smsForm.setCaption("SMS Message");
 

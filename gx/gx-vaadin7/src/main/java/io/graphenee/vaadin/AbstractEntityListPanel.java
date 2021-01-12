@@ -25,11 +25,26 @@ import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.gridutil.cell.GridCellFilter;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.grid.MGrid;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.viritin.ui.MNotification;
+
 import com.google.common.base.Strings;
 import com.vaadin.addon.contextmenu.ContextMenu;
 import com.vaadin.addon.contextmenu.GridContextMenu;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.converter.StringToIntegerConverter;
+import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.FontAwesome;
@@ -40,6 +55,7 @@ import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid.CellReference;
 import com.vaadin.ui.Grid.CellStyleGenerator;
 import com.vaadin.ui.Grid.Column;
@@ -50,18 +66,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.gridutil.cell.GridCellFilter;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.grid.MGrid;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-import org.vaadin.viritin.ui.MNotification;
-
 import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
@@ -69,6 +73,7 @@ import io.graphenee.vaadin.event.TRItemClickListener;
 import io.graphenee.vaadin.renderer.BooleanRenderer;
 import io.graphenee.vaadin.util.VaadinUtils;
 
+@SuppressWarnings("serial")
 public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	private static final Logger L = LoggerFactory.getLogger(AbstractEntityListPanel.class);
@@ -86,6 +91,11 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	private GridCellFilter gridCellFilter;
 	private Object filter;
 	private Function<T, Boolean> onItemClick;
+	private MTextField pageNumberField;
+	private Integer pageNumber = 1;
+	private MButton nextPageButton;
+	private MButton previousPageButton;
+	private CssLayout pagingLayout;
 
 	private Function<Collection<T>, Boolean> onSelection;
 
@@ -131,7 +141,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 			addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("New"), event -> {
 				try {
-					onAddButtonClick(initializeEntity(entityClass.newInstance()));
+					onAddButtonClick(initializeEntity(entityClass.getDeclaredConstructor().newInstance()));
 				} catch (Exception e) {
 					L.warn(e.getMessage(), e);
 				}
@@ -222,6 +232,41 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			});
 			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
 
+			pageNumberField = new MTextField();
+			pageNumberField.setWidth("50px");
+			pageNumberField.setStyleName(ValoTheme.TEXTFIELD_ALIGN_CENTER);
+			pageNumberField.setConverter(new StringToIntegerConverter());
+			pageNumberField.setValue(pageNumber.toString());
+			pageNumberField.addValueChangeListener(listener -> {
+				pageNumber = (Integer) pageNumberField.getConvertedValue();
+				previousPageButton.setEnabled(pageNumber > 1);
+				nextPageButton.setEnabled(pageNumber < getPageCount());
+				if (filter != null) {
+					refresh(filter);
+				} else
+					refresh();
+
+			});
+
+			pageNumberField.addValidator(new IntegerRangeValidator("Must be between 1 and " + getPageCount(), 1, getPageCount()));
+
+			previousPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_LEFT);
+			previousPageButton.setEnabled(false);
+			previousPageButton.addClickListener(listener -> {
+				if (pageNumber > 1) {
+					pageNumber = pageNumber - 1;
+					pageNumberField.setValue(pageNumber.toString());
+				}
+			});
+
+			nextPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_RIGHT);
+
+			nextPageButton.addClickListener(listener -> {
+				if (pageNumber < getPageCount()) {
+					pageNumber = pageNumber + 1;
+					pageNumberField.setValue(pageNumber.toString());
+				}
+			});
 			toolbar = buildToolbar();
 			if (toolbar.getComponentCount() == 0)
 				toolbar.setVisible(false);
@@ -230,7 +275,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (secondaryToolbar.getComponentCount() == 0)
 				secondaryToolbar.setVisible(false);
 
-			rootLayout = new MVerticalLayout().withMargin(new MarginInfo(true, false)).withSpacing(true);
+			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin()).withSpacing(true);
 			rootLayout.setSizeFull();
 			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
 			rootLayout.setExpandRatio(mainGrid, 1);
@@ -240,6 +285,11 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			isBuilt = true;
 		}
 		return this;
+
+	}
+
+	protected MarginInfo rootLayoutMargin() {
+		return new MarginInfo(true);
 	}
 
 	private MGrid<T> buildMainGrid() {
@@ -264,7 +314,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 				if (entityGrid().getSelectedRows().size() > 0) {
 					statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
 				} else {
-					statusBar.setText(String.format("%d records", mainGridContainer.size()));
+					statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 				}
 			});
 			if (visibleProperties != null) {
@@ -301,7 +351,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (event.getSelected() != null && !event.getSelected().isEmpty()) {
 				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(), mainGridContainer.size()));
 			} else {
-				statusBar.setText(String.format("%d records", mainGridContainer.size()));
+				if (shouldShowPaging() && mainGridContainer.size() != 0)
+					statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
+				else
+					statusBar.setText(String.format("showing %d records", mainGridContainer.size()));
 			}
 			if (onSelection != null) {
 				Boolean value = onSelection.apply((Collection<T>) event.getSelected());
@@ -435,13 +488,21 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
-
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 		layout.add(addButton);
 		layout.add(editButton);
 		layout.add(deleteButton);
 		layout.add(searchButton);
 		searchButton.setVisible(false);
+
+		if (shouldShowPaging()) {
+			pagingLayout = new CssLayout();
+			pagingLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+			pagingLayout.addComponents(previousPageButton, pageNumberField, nextPageButton);
+			layout.add(pagingLayout);
+			layout.setComponentAlignment(pagingLayout, Alignment.TOP_CENTER);
+		}
+
 		layout.add(exportDataDownloadButton);
 		addButtonsToToolbar(layout);
 
@@ -469,7 +530,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 	}
 
 	private AbstractLayout buildSecondaryToolbar() {
-		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withStyleName("toolbar").withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
 
 		addButtonsToSecondaryToolbar(layout);
 
@@ -577,7 +638,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 			if (entities != null) {
 				mainGridContainer.addAll(entities);
 			}
-			statusBar.setText(String.format("%d records", mainGridContainer.size()));
+			statusBar.setText(String.format(" %d records", mainGridContainer.size()));
 			UI.getCurrent().push();
 		});
 		return this;
@@ -598,6 +659,10 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	protected List<T> postFetch(List<T> fetchedEntities) {
 		return fetchedEntities;
+	}
+
+	protected Integer fetchEntityCount() {
+		return 0;
 	}
 
 	protected abstract String panelCaption();
@@ -784,6 +849,25 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
 
 	public MButton getDeleteButton() {
 		return deleteButton;
+	}
+
+	public Integer getPageNumber() {
+		return pageNumber - 1;
+	}
+
+	public Boolean shouldShowPaging() {
+		return false;
+	}
+
+	protected Integer getPageSize() {
+		return 200;
+	}
+
+	private Integer getPageCount() {
+		int pageCount = fetchEntityCount() / getPageSize();
+		if (pageCount == 0)
+			return 1;
+		return pageCount;
 	}
 
 }

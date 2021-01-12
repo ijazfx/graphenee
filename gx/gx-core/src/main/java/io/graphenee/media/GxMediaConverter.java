@@ -23,7 +23,7 @@ import io.graphenee.core.exception.GxMediaConversionException;
 public interface GxMediaConverter {
 
 	void convertAudioMedia(String sourceFile, String targetFile, GxAudioType targetType) throws GxMediaConversionException;
-	
+
 	void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType) throws GxMediaConversionException;
 
 	void convertVideoMedia(String sourceFile, String targetFile, GxVideoType targetType) throws GxMediaConversionException;
@@ -33,5 +33,7 @@ public interface GxMediaConverter {
 	void convertImageMedia(String sourceFile, String targetFile, GxImageType targetType) throws GxMediaConversionException;
 
 	void convertImageMedia(String sourceFile, GxImageType sourceType, String targetFile, GxImageType targetType) throws GxMediaConversionException;
+
+	void compressImageMedia(String sourceFile, String targetFile, Integer quality) throws GxMediaConversionException;
 
 }

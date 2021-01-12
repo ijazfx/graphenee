@@ -18,10 +18,12 @@ package io.graphenee.security.vaadin;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.AbstractOrderedLayout;
+import com.vaadin.ui.ComboBox;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-
-import com.vaadin.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.api.GxDataService;
@@ -42,6 +44,8 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Autowired
 	GxUserAccountForm editorForm;
+
+	private ComboBox namespaceComboBox;
 
 	private GxNamespaceBean namespaceBean;
 
@@ -76,6 +80,14 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 	}
 
 	@Override
+	protected <F> List<GxUserAccountBean> fetchEntities(F filter) {
+		if (filter instanceof GxNamespaceBean) {
+			return dataService.findUserAccountByNamespace((GxNamespaceBean) filter);
+		}
+		return super.fetchEntities(filter);
+	}
+
+	@Override
 	protected String[] visibleProperties() {
 		return new String[] { "username", "firstName", "lastName", "isActive", "isLocked", "isPasswordChangeRequired" };
 	}
@@ -86,8 +98,15 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 	}
 
 	@Override
-	protected void onAddButtonClick(GxUserAccountBean entity) {
-		super.onAddButtonClick(entity);
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
+		namespaceComboBox = new ComboBox("Namespace");
+		namespaceComboBox.setTextInputAllowed(false);
+		namespaceComboBox.addItems(dataService.findNamespace());
+		namespaceComboBox.addValueChangeListener(event -> {
+			refresh(event.getProperty().getValue());
+		});
+		toolbar.addComponent(namespaceComboBox);
+
 	}
 
 	@Override
@@ -127,13 +146,17 @@ public class GxUserAccountListPanel extends AbstractEntityListPanel<GxUserAccoun
 
 	@Override
 	protected void preEdit(GxUserAccountBean item) {
-		if (namespaceBean != null) {
-			item.setNamespaceFault(new BeanFault<>(namespaceBean.getOid(), namespaceBean));
+		if (item.getOid() == null) {
+			GxNamespaceBean selectedNamespaceBean = namespaceBean != null ? namespaceBean : (GxNamespaceBean) namespaceComboBox.getValue();
+			if (selectedNamespaceBean != null) {
+				item.setNamespaceFault(BeanFault.beanFault(selectedNamespaceBean.getOid(), selectedNamespaceBean));
+			}
 		}
 	}
 
 	public void initializeWithNamespace(GxNamespaceBean namespaceBean) {
 		this.namespaceBean = namespaceBean;
+		namespaceComboBox.setVisible(namespaceBean == null);
 	}
 
 	@Override

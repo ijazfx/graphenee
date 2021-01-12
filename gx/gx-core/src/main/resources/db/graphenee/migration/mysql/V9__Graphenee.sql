@@ -1,0 +1,1 @@
+alter table gx_audit_log modify audit_event varchar(500);

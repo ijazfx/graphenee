@@ -16,8 +16,7 @@
 package io.graphenee.core.vaadin;
 
 import org.vaadin.viritin.fields.MTextField;
-
-import com.vaadin.ui.FormLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.model.bean.GxSavedQueryBean;
 import io.graphenee.vaadin.TRAbstractForm;
@@ -38,7 +37,7 @@ public class GxSaveQueryForm extends TRAbstractForm<GxSavedQueryBean> {
 	}
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		queryName = new MTextField("Query Name").withRequired(true);
 		form.addComponent(queryName);
 	}

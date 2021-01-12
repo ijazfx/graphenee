@@ -79,7 +79,7 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	protected Component getFormComponent() {
-		MFormLayout termKeyForm = new MFormLayout().withStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+		MVerticalLayout termKeyForm = new MVerticalLayout().withSpacing(true);
 		termKey = new MTextField("Term Key").withRequired(true);
 		isActive = new MCheckBox("Is Active?", true);
 
@@ -96,11 +96,14 @@ public class GxTermForm extends TRAbstractForm<GxTermBean> {
 
 		gxTermTablePanel.initializeWithEntity(getEntity());
 		gxTermTablePanel.build();
+		gxTermTablePanel.setSizeFull();
 
 		termKeyForm.addComponents(namespaceFaultComboBox, termKey, isActive);
 
-		MVerticalLayout layout = new MVerticalLayout();
+		MVerticalLayout layout = new MVerticalLayout().withMargin(true).withSpacing(true);
+		layout.setSizeFull();
 		layout.addComponents(termKeyForm, gxTermTablePanel);
+		layout.expand(gxTermTablePanel);
 
 		return layout;
 	}

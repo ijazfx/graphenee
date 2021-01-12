@@ -17,9 +17,10 @@ package io.graphenee.jbpm.embedded.vaadin;
 
 import java.util.Collection;
 
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
 import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm.GxAssigneeHolder;
@@ -32,7 +33,7 @@ public class GxSelectAssigneeForm extends TRAbstractForm<GxAssigneeHolder> {
 	private BeanItemContainer<GxAssignee> assigneeDataSource;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		assignee = new ComboBox("Assign to");
 		assigneeDataSource = new BeanItemContainer<>(GxAssignee.class);
 		assignee.setContainerDataSource(assigneeDataSource);
