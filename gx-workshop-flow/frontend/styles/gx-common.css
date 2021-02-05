@@ -1,0 +1,24 @@
+.gx-button {
+}
+
+.gx-grid {
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+}
+
+.gx-info-color {
+  color: #17a2b8;
+}
+
+.gx-warning-color {
+  color: #ffc107;
+}
+
+.gx-danger-color {
+  color: #dc3545;
+}
+
+.gx-success-color {
+  color: #28a745;
+}
