@@ -12,11 +12,11 @@ import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
 
 @Component
 @Scope("prototype")
-public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBean> {
+public class GxSecurityGroupList extends GxAbstractEntityLazyList<GxSecurityGroupBean> {
     private static final long serialVersionUID = 1L;
 
 
@@ -26,18 +26,24 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBea
     @Autowired
     GxSecurityGroupForm entityForm;
 
+    private GxNamespaceBean namespace;
+
     public GxSecurityGroupList() {
         super(GxSecurityGroupBean.class);
     }
 
     @Override
     protected int getTotalCount() {
-        return dataService.findSecurityGroup().size();
+        if(namespace == null)
+            return dataService.findSecurityGroup().size();
+        return dataService.findSecurityGroupByNamespace(namespace).size();
     }
 
     @Override
     protected Stream<GxSecurityGroupBean> getData(int pageNumber, int pageSize) {
-        return dataService.findSecurityGroup().stream();
+        if(namespace == null)
+            return dataService.findSecurityGroup().stream();
+        return dataService.findSecurityGroupByNamespace(namespace).stream();
     }
 
     @Override
@@ -65,14 +71,16 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBea
     @Override
     protected void preEdit(GxSecurityGroupBean entity) {
         if (entity.getOid() == null) {
-            GxNamespaceBean namespaceBean = dataService.findSystemNamespace();
-            entity.setNamespaceFault(new BeanFault<>(namespaceBean.getOid(), namespaceBean));
+            if(namespace == null) {
+                namespace = dataService.findSystemNamespace();
+            }
+            entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
         }
     }
 
-    @Override
-    protected boolean shouldShowFormInDialog() {
-        return true;
+    public void initializeWithNamespace(GxNamespaceBean namespace) {
+        this.namespace = namespace;
+        refresh();
     }
 
 }

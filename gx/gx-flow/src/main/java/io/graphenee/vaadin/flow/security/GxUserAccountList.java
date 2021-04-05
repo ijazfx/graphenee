@@ -12,11 +12,11 @@ import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
 
 @Component
 @Scope("prototype")
-public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
+public class GxUserAccountList extends GxAbstractEntityLazyList<GxUserAccountBean> {
 
     private static final long serialVersionUID = 1L;
 
@@ -25,6 +25,8 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 
     @Autowired
     GxUserAccountForm entityForm;
+
+    private GxNamespaceBean namespace;
 
     public GxUserAccountList() {
         super(GxUserAccountBean.class);
@@ -37,12 +39,16 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 
     @Override
     protected int getTotalCount() {
-        return dataService.findUserAccount().size();
+        if (namespace == null)
+            return dataService.findUserAccount().size();
+        return dataService.findUserAccountByNamespace(namespace).size();
     }
 
     @Override
     protected Stream<GxUserAccountBean> getData(int pageNumber, int pageSize) {
-        return dataService.findUserAccount().stream();
+        if (namespace == null)
+            return dataService.findUserAccount().stream();
+        return dataService.findUserAccountByNamespace(namespace).stream();
     }
 
     @Override
@@ -65,14 +71,16 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
     @Override
     protected void preEdit(GxUserAccountBean entity) {
         if (entity.getOid() == null) {
-            GxNamespaceBean namespaceBean = dataService.findSystemNamespace();
-            entity.setNamespaceFault(new BeanFault<>(namespaceBean.getOid(), namespaceBean));
+            if (namespace == null) {
+                namespace = dataService.findSystemNamespace();
+            }
+            entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
         }
     }
 
-    @Override
-    protected boolean shouldShowFormInDialog() {
-        return false;
+    public void initializeWithNamespace(GxNamespaceBean namespace) {
+        this.namespace = namespace;
+        refresh();
     }
 
 }

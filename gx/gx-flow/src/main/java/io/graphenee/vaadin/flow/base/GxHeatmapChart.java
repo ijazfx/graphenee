@@ -11,7 +11,7 @@ import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.html.Div;
 
-public class GxHeatChart extends Div {
+public class GxHeatmapChart extends Div {
 
         private static final long serialVersionUID = 1L;
         private ApexCharts heatChart;

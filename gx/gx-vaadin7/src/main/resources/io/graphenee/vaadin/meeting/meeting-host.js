@@ -1,15 +1,3 @@
-let configuration = {
-    "iceServers": [
-        {
-            "url": "stun:stun.l.google.com:19302",
-            "urls": [
-                "stun:stun.l.google.com:19302",
-                "stun:global.stun.twilio.com:3478?transport=udp"
-            ]
-        }
-    ]
-}
-
 let offerOptions = {
     offerToReceiveAudio: 1,
     offerToReceiveVideo: 1
@@ -19,10 +7,18 @@ let ws = null;
 let peers = new Map();
 let videos = new Map();
 let localUserId = null;
+let _stunUrl = null;
+let _turnUrl = null;
+let _turnUsername = null;
+let _turnCredentials = null;
 
 // initialize websockets...
-function initializeWebSocket(wsurl, userId) {
+function initializeWebSocket(wsurl, userId, stunUrl, turnUrl, turnUsername, turnCredentials) {
     localUserId = userId;
+    _stunUrl = stunUrl;
+    _turnUrl = turnUrl;
+    _turnUsername = turnUsername;
+    _turnCredentials = turnCredentials;
     if (ws)
         return;
     ws = new WebSocket(wsurl);
@@ -159,7 +155,18 @@ function createPeer(userId) {
 
 // creates a new peer connection for userId and videoId
 function initializePeerConnection(userId) {
-    let pc = new RTCPeerConnection(configuration);
+    let pc = new RTCPeerConnection({
+        'iceServers': [
+          {
+            'url': _stunUrl
+          },
+          {
+            'url': _turnUrl,
+            'credential': _turnCredentials,
+            'username': _turnUsername
+          }
+        ]
+    });
     let isNegotiating = false;
     // is called when new candidate is discovered
     pc.onicecandidate = function (event) {

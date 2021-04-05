@@ -2,13 +2,16 @@ package io.graphenee.vaadin.flow.base;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -18,6 +21,7 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridMultiSelectionModel;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -29,15 +33,21 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
-import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.InMemoryDataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 
@@ -47,8 +57,11 @@ import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxLongToDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxLongToDateTimeRenderer;
 import io.graphenee.vaadin.flow.renderer.GxTimestampRenderer;
+import lombok.extern.slf4j.Slf4j;
 
-@CssImport("./styles/gx-list.css")
+@Slf4j
+@CssImport("./styles/gx-common.css")
+@CssImport("./styles/gx-entity-list.css")
 public abstract class GxAbstractEntityList<T> extends Div {
 
     private static final long serialVersionUID = 1L;
@@ -58,8 +71,6 @@ public abstract class GxAbstractEntityList<T> extends Div {
     private Grid<T> dataGrid;
     private Class<T> entityClass;
     private Map<T, GxAbstractEntityForm<T>> formCache = new HashMap<>();
-    private GxAbstractSearchForm<?> searchForm = null;
-    private CallbackDataProvider<T, Void> dataProvider;
 
     private boolean isBuilt = false;
 
@@ -71,17 +82,19 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     private MenuItem deleteMenuItem;
 
-    private MenuItem searchMenuItem;
+    private MenuBar crudMenuBar;
 
-    private MenuItem clearSearchMenuItem;
-
-    private MenuBar menuBar;
+    private MenuBar customMenuBar;
 
     private Function<Collection<T>, Boolean> onSelection;
 
     private HorizontalLayout menuBarLayout;
 
     private VerticalLayout formLayout;
+
+    private HeaderRow headerRow;
+
+    private List<T> items;
 
     public GxAbstractEntityList(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -91,121 +104,83 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     synchronized private GxAbstractEntityList<T> build() {
         if (!isBuilt) {
-            dataGrid = new Grid<>(entityClass, false);
-            // dataGrid.setPageSize(20);
+            dataGrid = dataGrid(entityClass);
+
             dataGrid.setClassName("gx-grid");
             ((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI)).setSelectionColumnFrozen(true);
-            decorateGrid(dataGrid);
 
-            //    filterText.addValueChangeListener(e -> updateList());
-            dataProvider = DataProvider.fromCallbacks(query -> getPagedData(query.getOffset(), query.getLimit()), query -> getTotalCount());
-            dataGrid.setDataProvider(dataProvider);
-            dataGrid.getColumns().forEach(column -> {
-                column.setVisible(false);
-            });
+            DataProvider<T, ?> dataProvider = dataProvider(entityClass);
+            if (dataProvider != null) {
+                dataGrid.setDataProvider(dataProvider);
+            }
 
             dataGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-
+            
+            List<Column<T>> columns = new ArrayList<>();
             if (visibleProperties() != null && visibleProperties().length > 0) {
                 PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
                 for (int i = 0; i < visibleProperties().length; i++) {
                     String propertyName = visibleProperties()[i];
-                    Column<T> column;
-                    PropertyDefinition<T, ?> propertyDefinition = propertySet.getProperty(propertyName).get();
-                    Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
-                    if (renderer != null) {
-                        column = dataGrid.addColumn(renderer);
-                    } else {
-                        column = dataGrid.addColumn(propertyName);
+                    Column<T> column = dataGrid.getColumnByKey(propertyName);
+                    PropertyDefinition<T, ?> propertyDefinition;
+                    try {
+                        propertyDefinition = propertySet.getProperty(propertyName).get();
+                        Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
+                        if (renderer != null) {
+                            if (column != null)
+                                dataGrid.removeColumn(column);
+                            column = dataGrid.addColumn(renderer);
+                            column.setKey(propertyName);
+                        } else {
+                            if (column == null)
+                                column = dataGrid.addColumn(propertyName);
+                        }
+                        configureDefaults(propertyName, column, propertyDefinition);
+                        column.setAutoWidth(true);
+                        if (isGridFilterEnabled()) {
+                            addFilteredColumn(column, propertyDefinition);
+                        }
+                        decorateColumn(propertyName, column);
+                    } catch (Exception ex) {
+                        log.warn(propertyName + " error: " + ex.getMessage());
                     }
-                    configureDefaults(propertyName, column, propertyDefinition);
-                    if (i == 0) {
-                        column.setFrozen(true);
-                        column.setFlexGrow(0);
-                        column.setWidth("20em");
-                        column.setAutoWidth(false);
+                    if(column != null) {
+                        columns.add(column);
                     }
-                    decorateColumn(propertyName, column);
                 }
+                dataGrid.setColumnOrder(columns);
                 dataGrid.addComponentColumn(source -> new Span());
             }
 
             mainLayout = new SplitLayout();
             mainLayout.setSizeFull();
 
-            menuBar = new MenuBar();
-            menuBar.setWidthFull();
+            crudMenuBar = new MenuBar();
+            customMenuBar = new MenuBar();
+            customMenuBar.setWidthFull();
+
             menuBarLayout = new HorizontalLayout();
             menuBarLayout.setPadding(true);
-            menuBarLayout.add(menuBar);
-
+            menuBarLayout.add(crudMenuBar, customMenuBar);
             add(menuBarLayout);
-            menuBar.addThemeVariants(MenuBarVariant.MATERIAL_OUTLINED);
+            crudMenuBar.addThemeVariants(MenuBarVariant.LUMO_CONTRAST);
+            customMenuBar.addThemeVariants(MenuBarVariant.LUMO_CONTRAST);
 
-            addMenuItem = menuBar.addItem("Add");
-            editMenuItem = menuBar.addItem("Edit");
-            deleteMenuItem = menuBar.addItem("Delete");
-            searchMenuItem = menuBar.addItem("Search");
-            searchMenuItem.add(new Icon(VaadinIcon.SEARCH));
-            clearSearchMenuItem = menuBar.addItem("Clear");
-            clearSearchMenuItem.add(new Icon(VaadinIcon.CLOSE));
-            setClearSearchFilterEnable(false);
+            addMenuItem = crudMenuBar.addItem("Add");
+            customizeAddMenuItem(addMenuItem);
+
+            editMenuItem = crudMenuBar.addItem("Edit");
+            customizeEditMenuItem(editMenuItem);
+
+            deleteMenuItem = crudMenuBar.addItem("Delete");
+            customizeDeleteMenuItem(deleteMenuItem);
+
+            decorateMenuBar(customMenuBar);
 
             editMenuItem.setEnabled(false);
             deleteMenuItem.setEnabled(false);
 
-            searchMenuItem.setVisible(false);
-            clearSearchMenuItem.setVisible(false);
-
-            addMenuItem.addClickListener(cl -> {
-                try {
-                    openForm(entityClass.getDeclaredConstructor().newInstance());
-                } catch (Exception e) {
-                    Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-                }
-            });
-
-            editMenuItem.addClickListener(cl -> {
-                if (dataGrid.getSelectedItems().size() == 1) {
-                    T entity = dataGrid.getSelectedItems().iterator().next();
-                    openForm(entity);
-                }
-            });
-
-            deleteMenuItem.addClickListener(cl -> {
-                if (shouldShowDeleteConfirmation()) {
-                    ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
-                        onDelete(dataGrid.getSelectedItems());
-                        refresh();
-                        editMenuItem.setEnabled(false);
-                        deleteMenuItem.setEnabled(false);
-                        dataGrid.deselectAll();
-                    }, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
-                } else {
-                    onDelete(dataGrid.getSelectedItems());
-                    refresh();
-                }
-            });
-
-            searchMenuItem.addClickListener(cl -> {
-                try {
-                    searchForm.showInDialog();
-                } catch (Exception e) {
-                    Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-                }
-            });
-
-            clearSearchMenuItem.addClickListener(cl -> {
-                try {
-                    onClearSearchFilter();
-                    refresh();
-                } catch (Exception e) {
-                    Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-                }
-            });
-
             mainLayout.addToPrimary(dataGrid);
-            decorateMenuBar(menuBar);
 
             add(mainLayout);
 
@@ -220,6 +195,9 @@ public abstract class GxAbstractEntityList<T> extends Div {
             }
 
             dataGrid.addSelectionListener(sl -> {
+                int selected = sl.getAllSelectedItems().size();
+                editMenuItem.setEnabled(selected == 1);
+                deleteMenuItem.setEnabled(selected > 0);
                 if (onSelection != null) {
                     Boolean value = onSelection.apply(sl.getAllSelectedItems());
                     if (value != null && value) {
@@ -234,10 +212,100 @@ public abstract class GxAbstractEntityList<T> extends Div {
                 openForm(icl.getItem());
             });
 
+            decorateGrid(dataGrid);
+
             postBuild();
             isBuilt = true;
         }
         return this;
+    }
+
+    protected Grid<T> dataGrid(Class<T> entityClass) {
+        Grid<T> dataGrid = new Grid<>(entityClass, true);
+        List<Column<T>> removeList = new ArrayList<>(dataGrid.getColumns());
+        for (String key : visibleProperties()) {
+            Column<T> column = dataGrid.getColumnByKey(key);
+            if (column != null) {
+                column.setVisible(true);
+                removeList.remove(column);
+            }
+        }
+        removeList.forEach(c -> dataGrid.removeColumn(c));
+        return dataGrid;
+    }
+
+    protected DataProvider<T, ?> dataProvider(Class<T> entityClass) {
+        items = new ArrayList<>();
+        return DataProvider.ofCollection(items);
+    }
+
+    protected void customizeAddMenuItem(MenuItem addMenuItem) {
+        addMenuItem.addClickListener(cl -> {
+            try {
+                openForm(entityClass.getDeclaredConstructor().newInstance());
+            } catch (Exception e) {
+                Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+            }
+        });
+    }
+
+    protected void customizeEditMenuItem(MenuItem editMenuItem) {
+        editMenuItem.addClickListener(cl -> {
+            if (dataGrid.getSelectedItems().size() == 1) {
+                T entity = dataGrid.getSelectedItems().iterator().next();
+                openForm(entity);
+            }
+        });
+    }
+
+    protected void customizeDeleteMenuItem(MenuItem deleteMenuItem) {
+        deleteMenuItem.addClickListener(cl -> {
+            try {
+                if (shouldShowDeleteConfirmation()) {
+                    ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
+                        onDelete(dataGrid.getSelectedItems());
+                        refresh();
+                        editMenuItem.setEnabled(false);
+                        deleteMenuItem.setEnabled(false);
+                        dataGrid.deselectAll();
+                    }, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
+                } else {
+                    onDelete(dataGrid.getSelectedItems());
+                    refresh();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addFilteredColumn(Column<T> column, PropertyDefinition<T, ?> propertyDefinition) {
+        if (dataGrid.getDataProvider() instanceof ListDataProvider) {
+            ListDataProvider<T> dataProvider = (ListDataProvider<T>) dataGrid.getDataProvider();
+            TextField filterTF = new TextField();
+            filterTF.setClearButtonVisible(true);
+            filterTF.addValueChangeListener(event -> {
+                dataProvider.addFilter(fe -> {
+                    Object value = propertyDefinition.getGetter().apply(fe);
+                    if (value != null) {
+                        return StringUtils.containsIgnoreCase(value.toString(), filterTF.getValue());
+                    }
+                    return false;
+                });
+                dataProvider.refreshAll();
+            });
+
+            if (headerRow == null) {
+                headerRow = dataGrid.appendHeaderRow();
+            }
+
+            headerRow.getCell(column).setComponent(filterTF);
+            filterTF.setValueChangeMode(ValueChangeMode.EAGER);
+            filterTF.setSizeFull();
+            filterTF.setPlaceholder(propertyDefinition.getCaption());
+        }
     }
 
     protected void decorateMenuBar(MenuBar menuBar) {
@@ -250,26 +318,39 @@ public abstract class GxAbstractEntityList<T> extends Div {
     private Renderer<T> defaultRendererForProperty(String propertyName, PropertyDefinition<T, ?> propertyDefinition) {
         Renderer<T> renderer = rendererForProperty(propertyName, propertyDefinition);
         if (renderer == null) {
-            if (propertyDefinition.getType().equals(Timestamp.class)) {
-                renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.dateTimeFormatter.toLocalizedPattern());
-            }
-            if (propertyDefinition.getType().equals(Date.class)) {
-                renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
-            }
             if (propertyName.matches("date.*|.*Date")) {
                 if (propertyDefinition.getType().equals(Long.class)) {
                     renderer = new GxLongToDateRenderer<>((ValueProvider<T, Long>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
+                } else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
+                    renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
                 }
             }
-            if (propertyName.matches("dateTime.*|.*DateTime")) {
+            if (renderer == null && propertyName.matches("dateTime.*|.*DateTime")) {
                 if (propertyDefinition.getType().equals(Long.class)) {
                     renderer = new GxLongToDateTimeRenderer<>((ValueProvider<T, Long>) propertyDefinition.getGetter(), TRCalendarUtil.dateTimeFormatter.toLocalizedPattern());
                 }
             }
-            if (propertyName.matches("time.*|.*Time")) {
+            if (renderer == null && propertyName.matches("time.*|.*Time")) {
                 if (propertyDefinition.getType().equals(Long.class)) {
                     renderer = new GxLongToDateTimeRenderer<>((ValueProvider<T, Long>) propertyDefinition.getGetter(), TRCalendarUtil.timeFormatter.toLocalizedPattern());
+                } else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
+                    renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.timeFormatter.toLocalizedPattern());
                 }
+            }
+            if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
+                renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.dateTimeFormatter.toLocalizedPattern());
+            }
+            if (renderer == null && propertyDefinition.getType().equals(Date.class)) {
+                renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
+            }
+            if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
+                renderer = TemplateRenderer.<T> of("<vaadin-checkbox checked=[[item.value]] disabled=true />").withProperty("value", propertyDefinition.getGetter());
+            }
+            if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+                DecimalFormat numberFormat = new DecimalFormat("0.##");
+                numberFormat.setGroupingUsed(true);
+                numberFormat.setGroupingSize(3);
+                renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), numberFormat);
             }
         }
         return renderer;
@@ -283,11 +364,11 @@ public abstract class GxAbstractEntityList<T> extends Div {
         column.setId(propertyName);
         column.setHeader(propertyDefinition.getCaption());
         column.setResizable(true);
+        column.setFlexGrow(0);
+        column.setAutoWidth(true);
         if (propertyDefinition != null) {
             if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-                column.setFlexGrow(0);
                 column.setTextAlign(ColumnTextAlign.END);
-                column.setAutoWidth(true);
             }
             if (propertyDefinition.getType().equals(String.class)) {
                 column.setTextAlign(ColumnTextAlign.START);
@@ -303,42 +384,32 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
-        if (addMenuItem != null) {
-            addMenuItem.setEnabled(editable);
-        }
-        if (editMenuItem != null) {
-            editMenuItem.setEnabled(editable);
-        }
-        if (deleteMenuItem != null) {
-            deleteMenuItem.setEnabled(editable);
-        }
     }
 
     public boolean isEditable() {
         return editable;
     }
 
-    public void shouldShowToolbar(boolean toolbar) {
-        if (menuBar != null) {
-            menuBar.setVisible(toolbar);
+    public void shouldShowToolbar(boolean show) {
+        if (menuBarLayout != null) {
+            menuBarLayout.setVisible(show);
         }
     }
 
     /**
-     * Default value is 20.0 which is 20% for primary container and 60% for
+     * Default value is 0.0 which is 0% for primary container and 100% for
      * secondary container.
      * 
      * @return
      */
     protected double defaultSplitterPosition() {
-        return 20.0;
+        return 0.0;
     }
 
     private void openForm(T entity) {
         preEdit(entity);
         GxAbstractEntityForm<T> entityForm = cachedForm(entity);
         if (entityForm != null) {
-            entityForm.setEditable(isEditable());
             if (!shouldShowFormInDialog()) {
                 formLayout.removeAll();
                 formLayout.add(entityForm);
@@ -351,45 +422,25 @@ public abstract class GxAbstractEntityList<T> extends Div {
         }
     }
 
-    // public void updateList() {
-    //     filterText.addValueChangeListener(
-    //             event -> dataGrid.getDataProvider().addFilter(filterableEntity -> StringUtils.containsIgnoreCase(filterableValue.apply(filterableEntity), filterTF.getValue())));
-
-    //     Column<T> column = dataGrid.addColumn(new TextRenderer<>(itemLabelGenerator)).setHeader(header);
-    //     dataGrid.getCell(column).setComponent(filterText);
-    //     filterText.setValueChangeMode(ValueChangeMode.EAGER);
-    //     filterText.setSizeFull();
-    //     filterText.setPlaceholder(filterPlaceholder);
-    //     // grid.setItems(service.findAll(filterText.getValue()));
-    // }
-
     protected void preEdit(T entity) {
     }
 
-    protected abstract int getTotalCount();
-
-    private Stream<T> getPagedData(int offset, int limit) {
-        int pageNumber = offset / limit;
-        int remainder = offset % limit == 0 ? 0 : offset - (pageNumber * limit);
-        int pageSize = limit;
-        Stream<T> stream = getData(pageNumber, pageSize);
-        if (remainder != 0) {
-            Stream<T> nextStream = getData(pageNumber + 1, pageSize);
-            stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
-        }
-        return stream;
-    }
-
-    protected abstract Stream<T> getData(int pageNumber, int pageSize);
+    protected abstract Stream<T> getData();
 
     protected abstract String[] visibleProperties();
 
     public void refresh() {
         build();
+        crudMenuBar.setVisible(isEditable());
         if (!shouldShowFormInDialog()) {
             mainLayout.getSecondaryComponent().setVisible(false);
         }
-        if (dataProvider != null) {
+        DataProvider<T, ?> dataProvider = dataGrid.getDataProvider();
+        if (dataProvider instanceof InMemoryDataProvider) {
+            items.clear();
+            items.addAll(getData().collect(Collectors.toList()));
+            dataProvider.refreshAll();
+        } else {
             dataProvider.refreshAll();
         }
     }
@@ -410,6 +461,7 @@ public abstract class GxAbstractEntityList<T> extends Div {
             }
         }
         if (entityForm != null) {
+            entityForm.setEditable(isEditable());
             entityForm.setEntity(entity);
             entityForm.setDelegate(new EntityFormDelegate<T>() {
 
@@ -441,22 +493,11 @@ public abstract class GxAbstractEntityList<T> extends Div {
         return false;
     }
 
-    protected void setDefaultColumnAlignment(String propertyName, Column<T> column) {
-        if (propertyName.matches("(is|should|has)[A-Z].*")) {
-            column.setTextAlign(ColumnTextAlign.START);
-        }
-        if (propertyName.matches("(quantity|capacity|time|weight|code|ratio|days|cycle|cost|price|sum|amount|percent|day)")) {
-            column.setTextAlign(ColumnTextAlign.END);
-        }
-        if (propertyName.matches("(quantity|capacity|time|weight|code|ratio|days|cost|price|sum|amount|percent|day)[A-Z].*")) {
-            column.setTextAlign(ColumnTextAlign.END);
-        }
-        if (propertyName.matches(".*(Quantity|Capacity|Time|Weight|Ratio|Days|Cycle|Cost|Price|Sum|Amount|percent|Day)")) {
-            column.setTextAlign(ColumnTextAlign.END);
-        }
+    protected boolean shouldShowDeleteConfirmation() {
+        return true;
     }
 
-    protected boolean shouldShowDeleteConfirmation() {
+    protected boolean isGridFilterEnabled() {
         return true;
     }
 
@@ -464,49 +505,48 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     protected abstract void onDelete(Collection<T> entities);
 
-    protected Component getPrimaryToolbarComponent() {
-        HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.setPadding(false);
-        return toolbar;
-    }
-
-    protected Component getSecondaryToolbarComponent() {
-        HorizontalLayout toolbar = new HorizontalLayout();
-        return toolbar;
-    }
-
     public GxAbstractEntityList<T> withSearchForm(GxAbstractSearchForm<?> searchForm) {
         setSearchForm(searchForm);
         return this;
     }
 
     public void setSearchForm(GxAbstractSearchForm<?> searchForm) {
-        this.searchForm = searchForm;
-        if (searchMenuItem != null) {
-            searchMenuItem.setVisible(searchForm != null);
-        }
-        if (clearSearchMenuItem != null) {
-            clearSearchMenuItem.setVisible(searchForm != null);
-            clearSearchMenuItem.setEnabled(false);
-        }
+        MenuItem searchMenuItem = customMenuBar.addItem("Search");
+        searchMenuItem.add(new Icon(VaadinIcon.SEARCH));
+        MenuItem clearSearchMenuItem = customMenuBar.addItem("Clear");
+        clearSearchMenuItem.add(new Icon(VaadinIcon.CLOSE));
+        clearSearchMenuItem.setEnabled(false);
+
+        searchMenuItem.addClickListener(cl -> {
+            try {
+                searchForm.showInDialog();
+                clearSearchMenuItem.setEnabled(true);
+                searchForm.getDismissButton().addClickListener(l -> {
+                    clearSearchMenuItem.setEnabled(false);
+                });
+            } catch (Exception e) {
+                Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+            }
+        });
+
+        clearSearchMenuItem.addClickListener(cl -> {
+            try {
+                clearSearchMenuItem.setEnabled(false);
+                onClearSearchFilter();
+            } catch (Exception e) {
+                Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+            }
+        });
     }
 
     protected void onClearSearchFilter() {
-        setClearSearchFilterEnable(false);
     }
 
-    public void setClearSearchFilterEnable(Boolean value) {
-        clearSearchMenuItem.setEnabled(value);
-    }
-
-    protected Grid<T> entityGrid() {
+    public Grid<T> entityGrid() {
         return dataGrid;
     }
 
     protected void onGridItemSelect(SelectionEvent<Grid<T>, T> event) {
-        int selected = event.getAllSelectedItems().size();
-        editMenuItem.setEnabled(selected == 1);
-        deleteMenuItem.setEnabled(selected > 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -515,27 +555,12 @@ public abstract class GxAbstractEntityList<T> extends Div {
         return (R) this;
     }
 
-    protected void setAddMenuItemVisibility(boolean visibility) {
-        if (addMenuItem != null) {
-            addMenuItem.setVisible(visibility);
-        }
+    public void hideToolbar() {
+        menuBarLayout.setVisible(false);
     }
 
-    protected void setEditMenuItemVisibility(boolean visibility) {
-        if (editMenuItem != null) {
-            editMenuItem.setVisible(visibility);
-        }
+    public void showToolbar() {
+        menuBarLayout.setVisible(true);
     }
 
-    protected void setDeleteMenuItemVisibility(boolean visibility) {
-        if (deleteMenuItem != null) {
-            deleteMenuItem.setVisible(visibility);
-        }
-    }
-
-    protected void hideMenuBar() {
-        if (menuBarLayout != null) {
-            menuBarLayout.setVisible(false);
-        }
-    }
 }

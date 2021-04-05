@@ -18,11 +18,11 @@ package io.graphenee.workshop.vaadin;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.viritin.navigator.MView;
-
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.viritin.navigator.MView;
 
 import io.graphenee.core.api.GxMeetingService;
 import io.graphenee.core.model.GxAuthenticatedMeetingUserWrapper;
@@ -53,7 +53,11 @@ public class MeetingHostView extends AbstractDashboardPanel implements MView {
 		GxAuthenticatedMeetingUserWrapper meetingUser = new GxAuthenticatedMeetingUserWrapper(DashboardUtils.getLoggedInUser());
 		Collection<GxMeetingUser> users = dataService.findUserAccount().stream().map(u -> new GxUserAccountMeetingUserWrapper(u)).collect(Collectors.toList());
 		GxMeeting meeting = meetingService.createMeeting(meetingUser, "1", users);
-		meetingHost.initializeWithMeetingUserAndMeeting(meetingUser, meeting);
+		String stunUrl = "stun:stun.l.google.com:19302";
+		String turnUrl = "turn:127.0.0.1:3478?transport=tcp";
+		String turnUsername = "guest";
+		String turnCredentials = "guest";
+		meetingHost.initializeWithMeetingUserAndMeeting(meetingUser, meeting, stunUrl, turnUrl, turnUsername, turnCredentials);
 	}
 
 	@Override

@@ -19,7 +19,7 @@ import lombok.extern.log4j.Log4j;
 
 @Log4j
 @CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-form.css")
+@CssImport("./styles/gx-search-form.css")
 public abstract class GxAbstractSearchForm<T> extends Div {
 
     private static final long serialVersionUID = 1L;
@@ -47,25 +47,24 @@ public abstract class GxAbstractSearchForm<T> extends Div {
     }
 
     synchronized public GxAbstractSearchForm<T> build() {
-        if(!isBuilt) {
+        if (!isBuilt) {
             setSizeFull();
             entityForm = getFormComponent();
-    
+
             if (entityForm instanceof HasComponents) {
                 decorateForm((HasComponents) entityForm);
             }
-    
+
             add(entityForm);
-    
+
             toolbar = getToolbarComponent();
-    
+
             if (toolbar instanceof HasComponents) {
                 HasComponents c = (HasComponents) toolbar;
                 decorateToolbar(c);
                 searchButton = new Button("SEARCH");
                 searchButton.addClassName("gx-button");
                 searchButton.addClassName("gx-searchButton");
-                searchButton.addClickShortcut(Key.ENTER);
                 searchButton.addClickListener(cl -> {
                     try {
                         dataBinder.writeBean(entity);
@@ -75,24 +74,24 @@ public abstract class GxAbstractSearchForm<T> extends Div {
                         if (delegate != null)
                             delegate.onSearch(entity);
                     } catch (Exception e) {
-                        Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+                        if (e.getMessage() != null)
+                            Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+                        e.printStackTrace();
                     }
                 });
-    
+
                 resetButton = new Button("RESET");
                 searchButton.addClassName("gx-button");
                 searchButton.addClassName("gx-resetButton");
                 resetButton.addClickListener(cl -> {
                     try {
                         dataBinder.readBean(entity);
-                        if (delegate != null)
-                            delegate.onReset(entity);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
                     }
                 });
-    
+
                 dismissButton = new Button("DISMISS");
                 searchButton.addClassName("gx-button");
                 searchButton.addClassName("gx-dismissButton");
@@ -102,22 +101,20 @@ public abstract class GxAbstractSearchForm<T> extends Div {
                     if (dialog != null) {
                         dialog.close();
                     }
-                    if (delegate != null)
-                        delegate.onDismiss(entity);
                 });
-    
+
                 Span spacer = new Span();
-    
+
                 c.add(searchButton, spacer, resetButton, dismissButton);
                 if (c instanceof FlexComponent) {
                     FlexComponent<?> fc = (FlexComponent<?>) c;
                     fc.setFlexGrow(2.0, spacer);
                 }
-    
+
             }
-    
+
             add(toolbar);
-    
+
             dataBinder = new Binder<>(entityClass, true);
             bindFields(dataBinder);
             try {
@@ -125,8 +122,8 @@ public abstract class GxAbstractSearchForm<T> extends Div {
             } catch (Exception ex) {
                 log.warn(ex.getMessage());
             }
-    
-            postBuild();   
+
+            postBuild();
             isBuilt = true;
         }
         return this;
@@ -164,6 +161,10 @@ public abstract class GxAbstractSearchForm<T> extends Div {
         return editable;
     }
 
+    public Button getDismissButton() {
+        return dismissButton;
+    }
+
     public void setEntity(T entity) {
         build();
         this.entity = entity;
@@ -185,13 +186,6 @@ public abstract class GxAbstractSearchForm<T> extends Div {
 
     public interface SearchFormDelegate<T> {
         void onSearch(T entity);
-
-        default void onDismiss(T entity) {
-
-        }
-
-        default void onReset(T entity) {
-        }
     }
 
 }

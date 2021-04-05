@@ -2,6 +2,7 @@ package io.graphenee.vaadin.flow.base;
 
 import javax.annotation.PostConstruct;
 
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.login.AbstractLogin.ForgotPasswordEvent;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.component.login.LoginForm;
@@ -19,6 +20,8 @@ import io.graphenee.vaadin.flow.security.GxSecurityGroupListView;
 import io.graphenee.vaadin.flow.security.GxSecurityPolicyListView;
 import io.graphenee.vaadin.flow.security.GxUserAccountListView;
 
+@CssImport("./styles/gx-common.css")
+@CssImport("./styles/gx-login-view.css")
 public abstract class GxAbstractLoginView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +46,7 @@ public abstract class GxAbstractLoginView extends VerticalLayout {
                 VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
                 RouteConfiguration rc = RouteConfiguration.forSessionScope();
                 registerRoutesOnSuccessfulAuthentication(rc, user);
-                if (user.canDoAction("view", GxUserAccountListView.VIEW_NAME))
+                if (user.canDoAction(GxUserAccountListView.VIEW_NAME, "view"))
                     rc.setRoute(GxUserAccountListView.VIEW_NAME, GxUserAccountListView.class, flowSetup().routerLayout());
                 if (user.canDoAction(GxSecurityGroupListView.VIEW_NAME, "view"))
                     rc.setRoute(GxSecurityGroupListView.VIEW_NAME, GxSecurityGroupListView.class, flowSetup().routerLayout());

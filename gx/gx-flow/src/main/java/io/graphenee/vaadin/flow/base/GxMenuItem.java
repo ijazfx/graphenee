@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.icon.Icon;
 
 import lombok.Getter;
@@ -16,8 +17,10 @@ public class GxMenuItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String label;
+
     private Icon icon;
     private String route;
+    private Class<? extends Component> componentClass;
 
     private List<GxMenuItem> children;
 
@@ -25,6 +28,17 @@ public class GxMenuItem implements Serializable {
         this.label = label;
         this.icon = icon;
         this.route = route;
+    }
+
+    public GxMenuItem(String label, Icon icon, Class<? extends Component> componentClass) {
+        this.label = label;
+        this.icon = icon;
+        this.componentClass = componentClass;
+    }
+
+    public GxMenuItem(String label, Icon icon) {
+        this.label = label;
+        this.icon = icon;
     }
 
     public GxMenuItem(String label, String route) {
@@ -51,6 +65,16 @@ public class GxMenuItem implements Serializable {
 
     public static GxMenuItem create(String label, Icon icon, String route) {
         GxMenuItem mi = new GxMenuItem(label, icon, route);
+        return mi;
+    }
+
+    public static GxMenuItem create(String label, Icon icon, Class<? extends Component> componentClass) {
+        GxMenuItem mi = new GxMenuItem(label, icon, componentClass);
+        return mi;
+    }
+
+    public static GxMenuItem create(String label, Icon icon) {
+        GxMenuItem mi = new GxMenuItem(label, icon);
         return mi;
     }
 

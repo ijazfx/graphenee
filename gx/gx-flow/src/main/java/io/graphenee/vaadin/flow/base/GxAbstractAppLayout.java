@@ -4,25 +4,39 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import com.github.appreciated.app.layout.component.appbar.AppBarBuilder;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts;
-import com.github.appreciated.app.layout.component.applayout.LeftLayouts.LeftResponsiveHybrid;
+import com.github.appreciated.app.layout.component.applayout.LeftLayouts.LeftHybrid;
 import com.github.appreciated.app.layout.component.builder.AppLayoutBuilder;
 import com.github.appreciated.app.layout.component.menu.left.LeftSubmenu;
 import com.github.appreciated.app.layout.component.menu.left.builder.LeftAppMenuBuilder;
 import com.github.appreciated.app.layout.component.menu.left.builder.LeftSubMenuBuilder;
-import com.github.appreciated.app.layout.component.menu.left.items.LeftClickableItem;
+import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigationItem;
 import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.server.VaadinSession;
 
-public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsiveHybrid> {
+import io.graphenee.core.model.GxAuthenticatedUser;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@CssImport("./styles/gx-common.css")
+@CssImport("./styles/gx-app-layout.css")
+public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> {
 
     private static final long serialVersionUID = 1L;
 
     @PostConstruct
     private void postBuild() {
-        AppLayoutBuilder<LeftResponsiveHybrid> builder = AppLayoutBuilder.get(LeftLayouts.LeftResponsiveHybrid.class);
+        AppLayoutBuilder<LeftHybrid> builder = AppLayoutBuilder.get(LeftLayouts.LeftHybrid.class);
         builder = builder.withTitle(buildTitle());
         builder.withAppMenu(buildAppMenu());
+        if (flowSetup().loggedInUser() != null) {
+            builder.withAppBar(AppBarBuilder.get().add(buildProfileMenu()).build());
+        }
         init(builder.build());
     }
 
@@ -44,15 +58,14 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
                 addMenuItemToSubMenu(smi, smb);
             });
             LeftSubmenu sm = smb.build();
-            sm.setCloseMenuOnNavigation(false);
             builder.add(sm);
         } else {
-            LeftClickableItem item = new LeftClickableItem(mi.getLabel(), mi.getIcon(), cl -> {
-                getUI().ifPresent(ui -> {
-                    ui.navigate(mi.getRoute());
-                });
-            });
-            builder.add(item);
+            try {
+                LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+                builder.add(item);
+            } catch (Exception ex) {
+                log.warn(ex.getMessage());
+            }
         }
     }
 
@@ -64,17 +77,31 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
             });
             builder.add(smb.build());
         } else {
-            LeftClickableItem item = new LeftClickableItem(mi.getLabel(), mi.getIcon(), cl -> {
-                getUI().ifPresent(ui -> {
-                    ui.navigate(mi.getRoute());
-                });
-            });
-            builder.add(item);
+            try {
+                LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+                builder.add(item);
+            } catch (Exception ex) {
+                log.warn(ex.getMessage());
+            }
         }
     }
 
     private String buildTitle() {
         return flowSetup().appTitle() + " - v" + flowSetup().appVersion();
+    }
+
+    private Component buildProfileMenu() {
+        GxAuthenticatedUser user = flowSetup().loggedInUser();
+
+        MenuBar profileMenuBar = new MenuBar();
+        profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY, MenuBarVariant.LUMO_CONTRAST);
+        profileMenuBar.addItem(user.getUsername());
+        profileMenuBar.addItem(" | ");
+        profileMenuBar.addItem("Sign Out", event -> {
+            VaadinSession.getCurrent().close();
+        });
+
+        return profileMenuBar;
     }
 
     protected abstract GxAbstractFlowSetup flowSetup();

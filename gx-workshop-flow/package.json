@@ -48,7 +48,9 @@
       "@polymer/paper-ripple": "3.0.2",
       "multiselect-combo-box": "2.4.2",
       "apexcharts": "3.20.2",
-      "onecolor": "3.1.0"
+      "onecolor": "3.1.0",
+      "viz.js": "2.1.2",
+      "svg-pan-zoom": "3.6.1"
     },
     "devDependencies": {
       "webpack-babel-multi-target-plugin": "2.3.3",
@@ -69,7 +71,7 @@
       "html-webpack-plugin": "3.2.0",
       "typescript": "3.8.3"
     },
-    "hash": "f6f95e6b255061dc4069c49e1993a3dddc21041578270629a261f507de0f9061"
+    "hash": "101f2d0bc986ddf5827804f81f48d41390e28a2614b37870ac0482d7915182a0"
   },
   "dependencies": {
     "@polymer/app-layout": "3.1.0",
@@ -116,7 +118,9 @@
     "apexcharts": "^3.20.2",
     "lit-element": "^2.2.1",
     "multiselect-combo-box": "2.4.2",
-    "onecolor": "3.1.0"
+    "onecolor": "3.1.0",
+    "viz.js": "2.1.2",
+    "svg-pan-zoom": "3.6.1"
   },
   "devDependencies": {
     "webpack-babel-multi-target-plugin": "2.3.3",

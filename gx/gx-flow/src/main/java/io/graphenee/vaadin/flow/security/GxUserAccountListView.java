@@ -2,18 +2,26 @@ package io.graphenee.vaadin.flow.security;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
+@Route(value = GxUserAccountListView.VIEW_NAME)
+@GxSecuredView
 public class GxUserAccountListView extends GxVerticalLayoutView {
-    private static final long serialVersionUID = 1L;
-
     public static final String VIEW_NAME = "user-accounts";
+
+    private static final long serialVersionUID = 1L;
 
     @Autowired
     GxUserAccountList list;
+
+    @Autowired(required = false)
+    GxNamespaceBean namespace;
 
     @Override
     protected void decorateLayout(HasComponents rootLayout) {
@@ -22,7 +30,7 @@ public class GxUserAccountListView extends GxVerticalLayoutView {
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        list.refresh();
+        list.initializeWithNamespace(namespace);
     }
 
     @Override

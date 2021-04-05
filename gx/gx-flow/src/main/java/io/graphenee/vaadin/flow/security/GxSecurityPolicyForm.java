@@ -8,7 +8,6 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -31,9 +30,6 @@ import io.graphenee.vaadin.flow.converter.BeanCollectionFaultToSetConverter;
 
 @Component
 @Scope("prototype")
-@CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-form.css")
-
 public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyBean> {
     private static final long serialVersionUID = 1L;
 
@@ -161,11 +157,9 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 
         securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>().addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
                 .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-        securityGroupCollectionFault.setSizeFull();
 
         userAccountCollectionFault = new TwinColGrid<GxUserAccountBean>().addFilterableColumn(GxUserAccountBean::getUsername, "User Name", "User Name", true)
                 .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-        userAccountCollectionFault.setSizeFull();
     }
 
     @Override
@@ -173,6 +167,7 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
         dataBinder.forMemberField(priority).withConverter(new StringToIntegerConverter("value must be integer"));
         dataBinder.forMemberField(securityGroupCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityGroupBean>());
         dataBinder.forMemberField(userAccountCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxUserAccountBean>());
+        dataBinder.forMemberField(securityPolicyName).asRequired("Policy name is required.");
     }
 
     @Override
@@ -183,8 +178,9 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 
     @Override
     protected void preBinding(GxSecurityPolicyBean entity) {
-        securityGroupCollectionFault.setItems(gxDataService.findSecurityGroupActive());
-        userAccountCollectionFault.setItems(gxDataService.findUserAccountActive());
+        jsonDocumentTextArea.clear();
+        securityGroupCollectionFault.setItems(gxDataService.findSecurityGroupByNamespaceActive(entity.getNamespaceFault().getBean()));
+        userAccountCollectionFault.setItems(gxDataService.findUserAccountByNamespace(entity.getNamespaceFault().getBean()));
         securityPolicyDocumentComboBox.setItems(entity.getSecurityPolicyDocumentCollectionFault().getBeans());
         if (entity.getOid() != null && entity.getDefaultSecurityPolicyDocumentBean() != null) {
             securityPolicyDocumentComboBox.setValue(entity.getDefaultSecurityPolicyDocumentBean());

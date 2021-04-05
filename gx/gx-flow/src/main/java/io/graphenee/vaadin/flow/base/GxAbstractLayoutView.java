@@ -16,7 +16,8 @@ import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 
-@CssImport("./styles/gx-view.css")
+@CssImport("./styles/gx-common.css")
+@CssImport("./styles/gx-layout-view.css")
 public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {
 
     private static final long serialVersionUID = 1L;

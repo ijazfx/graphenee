@@ -18,3 +18,4 @@ target
 .vscode
 .classpath
 .project
+node_modules

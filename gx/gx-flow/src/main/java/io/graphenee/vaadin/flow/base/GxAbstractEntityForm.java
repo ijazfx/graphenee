@@ -23,11 +23,12 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.data.binder.Binder;
 
+import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 @Log4j
 @CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-form.css")
+@CssImport("./styles/gx-entity-form.css")
 public abstract class GxAbstractEntityForm<T> extends Div {
 
     private static final long serialVersionUID = 1L;
@@ -53,6 +54,9 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     private Dialog dialog = null;
 
+    @Setter
+    private Boolean dialogAutoClose = true;
+
     public GxAbstractEntityForm(Class<T> entityClass) {
         this.entityClass = entityClass;
         setClassName("gx-form");
@@ -70,26 +74,28 @@ public abstract class GxAbstractEntityForm<T> extends Div {
             if (toolbar instanceof HasComponents) {
                 HasComponents c = (HasComponents) toolbar;
                 decorateToolbar(c);
-                saveButton = new Button();
-                setSaveButtonCaption("SAVE");
+                saveButton = new Button("SAVE");
                 saveButton.addClassName("gx-button");
                 saveButton.addClassName("gx-saveButton");
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                saveButton.addClickShortcut(Key.ENTER);
                 saveButton.addClickListener(cl -> {
                     if (entity != null) {
                         try {
+                            dataBinder.validate();
                             dataBinder.writeBean(entity);
                             if (delegate != null)
                                 delegate.onSave(entity);
-                            if (dialog != null) {
+                            if (dialog != null && dialogAutoClose) {
                                 dialog.close();
                             }
                         } catch (Exception e) {
+                            e.printStackTrace();
                             Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
                         }
                     }
                 });
+
+                customizeSaveButton(saveButton);
 
                 resetButton = new Button("RESET");
                 resetButton.addClassName("gx-button");
@@ -124,7 +130,8 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
             }
 
-            Div formDetails = new Div();
+            VerticalLayout formDetails = new VerticalLayout();
+            formDetails.setPadding(false);
             formDetails.setSizeFull();
             formDetails.add(entityForm, toolbar);
 
@@ -140,11 +147,13 @@ public abstract class GxAbstractEntityForm<T> extends Div {
             } catch (Exception ex) {
                 log.warn(ex.getMessage());
             }
-
             postBuild();
             isBuilt = true;
         }
         return this;
+    }
+
+    protected void customizeSaveButton(Button saveButton) {
     }
 
     protected void preBinding(T entity) {
@@ -167,6 +176,7 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     protected Component getToolbarComponent() {
         HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.setWidthFull();
         toolbar.setClassName("gx-form-footer");
         toolbar.setPadding(false);
         return toolbar;
@@ -174,6 +184,7 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     protected Component getFormComponent() {
         FormLayout formLayout = new FormLayout();
+        formLayout.setSizeFull();
         return formLayout;
     }
 
@@ -187,9 +198,6 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     public void setEditable(boolean editable) {
         this.editable = editable;
-        if (saveButton != null) {
-            saveButton.setEnabled(editable);
-        }
     }
 
     public boolean isEditable() {
@@ -198,6 +206,8 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     public void setEntity(T entity) {
         build();
+        saveButton.setVisible(isEditable());
+        resetButton.setVisible(isEditable());
         entityBound = false;
         preBinding(entity);
         this.entity = entity;
@@ -218,12 +228,16 @@ public abstract class GxAbstractEntityForm<T> extends Div {
         dialog.setCloseOnEsc(true);
         dialog.setDraggable(true);
         dialog.setResizable(true);
-        if (setDialogSizeFull()) {
-            dialog.setWidth("80%");
-            dialog.setHeight("90%");
-        }
+        dialog.setWidth(getWidth());
+        dialog.setHeight(getHeight());
         dialog.open();
         return dialog;
+    }
+
+    public void closeDialog() {
+        if (dialog != null) {
+            dialog.close();
+        }
     }
 
     public void setDelegate(EntityFormDelegate<T> delegate) {
@@ -232,36 +246,38 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     private void addTab(List<GxTabItem> tabItems) {
         tabs = new Tabs();
-        tabs.setSizeFull();
-        Div pages = new Div();
-        pages.setSizeFull();
+        tabs.setWidthFull();
+
+        Div selectedTab = new Div();
+        selectedTab.setSizeFull();
+
+        Component[] tabComponents = new Component[tabItems.size()];
 
         tabItems.sort(Comparator.comparing(GxTabItem::getIndex));
-        tabItems.forEach(tabItem -> {
+        for (int i = 0; i < tabItems.size(); i++) {
+            GxTabItem tabItem = tabItems.get(i);
             Tab tab = new Tab(tabItem.getLabel());
-
-            pages.add(tabItem.getComponent());
-            tabItem.getComponent().setVisible(false);
-
-            if (tabItem.getIndex().equals(0)) {
-                tab.setSelected(true);
-                tabItem.getComponent().setVisible(true);
-            }
             tabs.add(tab);
-        });
+            tabComponents[i] = tabItem.getComponent();
+            if (i == 0) {
+                selectedTab.add(tabComponents[i]);
+            }
+        }
 
         VerticalLayout tabsLayout = new VerticalLayout(tabs);
+        tabsLayout.setPadding(false);
         tabsLayout.getStyle().set("alignItems", "start");
         tabs.getStyle().set("align", "start");
 
         tabs.addSelectedChangeListener(event -> {
             Integer selectedIndex = tabs.getSelectedIndex();
-            Component component = tabItems.get(selectedIndex).getComponent();
-            tabItems.forEach(tabItem -> tabItem.getComponent().setVisible(false));
-            tabItems.get(selectedIndex).getComponent().setVisible(true);
-            onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), component);
+            Component selectedComponent = tabComponents[selectedIndex];
+            selectedTab.removeAll();
+            selectedTab.add(selectedComponent);
+            onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), selectedComponent);
         });
-        add(tabsLayout, pages);
+
+        add(tabsLayout, selectedTab);
     }
 
     protected void addTabsToForm(List<GxTabItem> tabItems) {
@@ -290,16 +306,6 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     protected boolean isEntityBound() {
         return entityBound;
-    }
-
-    protected void setSaveButtonCaption(String caption) {
-        if (saveButton != null) {
-            saveButton.setText(caption);
-        }
-    }
-
-    protected boolean setDialogSizeFull() {
-        return false;
     }
 
 }
