@@ -59,6 +59,11 @@ public abstract class AbstractDashboardUI extends UI {
 				return;
 			}
 			DashboardUtils.setCurrentUI(user, getUI());
+		} else if (DashboardUtils.getLoggedInUser() != null) {
+			UI currentUI = DashboardUtils.getCurrentUI(DashboardUtils.getLoggedInUser());
+			if (currentUI != null && currentUI.isAttached()) {
+				Page.getCurrent().setLocation(currentUI.getPage().getLocation());
+			}
 		}
 
 		if (dashboardSetup().shouldLocalize()) {
