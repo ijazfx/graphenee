@@ -19,3 +19,4 @@ target
 .classpath
 .project
 node_modules
+graphenee.db*

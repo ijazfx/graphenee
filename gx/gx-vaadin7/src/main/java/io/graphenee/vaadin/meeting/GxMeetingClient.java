@@ -118,10 +118,10 @@ public class GxMeetingClient extends MVerticalLayout {
 
 		joinButton.setEnabled(!online);
 		leaveButton.setEnabled(online);
-		initializeWebSocket(user, stunUrl, turnUrl, turnUsername, turnCredentials);
+		initializeWebSocket(meeting, user, stunUrl, turnUrl, turnUsername, turnCredentials);
 	}
 
-	private void initializeWebSocket(GxMeetingUser user, String stunUrl, String turnUrl, String turnUsername, String turnCredentials) {
+	private void initializeWebSocket(GxMeeting meeting, GxMeetingUser user, String stunUrl, String turnUrl, String turnUsername, String turnCredentials) {
 		URI pageUri = Page.getCurrent().getLocation();
 		StringBuilder sb = new StringBuilder();
 		if (pageUri.getScheme().startsWith("https"))
@@ -132,8 +132,8 @@ public class GxMeetingClient extends MVerticalLayout {
 			sb.append(":").append(pageUri.getPort());
 		}
 		sb.append("/socket");
-		String statement = String.format("initializeWebSocket('%s?authToken=%s', '%s', '%s', '%s', '%s', '%s')", sb.toString(), user.getUserId(), user.getUserId(), stunUrl,
-				turnUrl, turnUsername, turnCredentials);
+		String statement = String.format("initializeWebSocket('%s?mid=%s', '%s', '%s', '%s', '%s', '%s', '%s')", sb.toString(), meeting.getMeetingId(), user.getUserId(),
+				meeting.getMeetingId(), stunUrl, turnUrl, turnUsername, turnCredentials);
 		com.vaadin.ui.JavaScript.getCurrent().execute(statement);
 	}
 

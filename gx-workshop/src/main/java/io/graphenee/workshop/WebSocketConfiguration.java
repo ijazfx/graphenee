@@ -1,8 +1,12 @@
 package io.graphenee.workshop;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.base.Strings;
+
+import org.json.JSONObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -14,8 +18,6 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-
-import com.google.common.base.Strings;
 
 @Configuration
 @EnableWebSocket
@@ -36,14 +38,20 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 
 	class SocketHandler extends TextWebSocketHandler {
 
-		List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+		Map<WebSocketSession, String> sessionMap = new ConcurrentHashMap<>(new HashMap<>());
 
 		@Override
 		protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+			JSONObject json = new JSONObject(message.getPayload());
+			String meetingId = json.getString("mid");
+			System.err.println(json);
 			// do whatever you want based on processing...
-			for (WebSocketSession webSocketSession : sessions) {
+			for (WebSocketSession webSocketSession : sessionMap.keySet()) {
 				if (webSocketSession.isOpen() && !session.getId().equals(webSocketSession.getId())) {
-					webSocketSession.sendMessage(message);
+					String sessionMeetingId = sessionMap.get(webSocketSession);
+					if(sessionMeetingId.equals(meetingId)) {
+						webSocketSession.sendMessage(message);
+					}
 				}
 			}
 		}
@@ -51,26 +59,26 @@ public class WebSocketConfiguration implements WebSocketConfigurer {
 		@Override
 		public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 			HttpHeaders headers = session.getHandshakeHeaders();
-			String authToken = headers.getFirst("X-AuthToken");
-			if (authToken == null) {
+			String meetingId = headers.getFirst("X-MeetingId");
+			if (meetingId == null) {
 				String query = session.getUri().getQuery().trim();
-				if (query.startsWith("authToken=")) {
-					authToken = query.substring("authToken=".length());
+				if (query.startsWith("mid=")) {
+					meetingId = query.substring("mid=".length());
 				}
 			}
-			// add session to sessions if token is valid...
-			if (!Strings.isNullOrEmpty(authToken)) {
-				sessions.add(session);
+			// add session to sessions if meetingId is valid...
+			if (!Strings.isNullOrEmpty(meetingId)) {
+				sessionMap.put(session, meetingId);
 			} else {
 				session.close();
-				throw new Exception("Invalid X-AuthToken");
+				throw new Exception("Invalid X-MeetingId");
 			}
 		}
 
 		@Override
 		public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 			System.err.println("WebSocket connection closed: " + session.getId() + ", Status: " + status.getReason());
-			sessions.remove(session);
+			sessionMap.remove(session);
 		}
 
 	}

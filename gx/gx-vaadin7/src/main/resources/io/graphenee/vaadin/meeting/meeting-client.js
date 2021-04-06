@@ -6,14 +6,16 @@ let offerOptions = {
 let ws = null;
 let pc = null;
 let localUserId = null;
+let _meetingId = null;
 let _stunUrl = null;
 let _turnUrl = null;
 let _turnUsername = null;
 let _turnCredentials = null;
 
 // initialize websockets...
-function initializeWebSocket(wsurl, userId, stunUrl, turnUrl, turnUsername, turnCredentials) {
+function initializeWebSocket(wsurl, userId, meetingId, stunUrl, turnUrl, turnUsername, turnCredentials) {
     localUserId = userId;
+    _meetingId = meetingId;
     _stunUrl = stunUrl;
     _turnUrl = turnUrl;
     _turnUsername = turnUsername;
@@ -77,7 +79,8 @@ async function handleOffer(offer) {
         await pc.setLocalDescription(answer);
         ws.send(JSON.stringify({
             event: "answer",
-            userId: localUserId,
+            uid: localUserId,
+            mid: _meetingId,
             data: answer
         }));
     } catch (error) {
@@ -116,7 +119,8 @@ async function createOffer() {
         await pc.setLocalDescription(offer);
         ws.send(JSON.stringify({
             event: "offer",
-            userId: localUserId,
+            uid: localUserId,
+            mid: _meetingId,
             data: offer
         }));
     } catch (error) {
@@ -129,7 +133,8 @@ function joinMeeting() {
     try {
         ws.send(JSON.stringify({
             event: "joining",
-            userId: localUserId,
+            uid: localUserId,
+            mid: _meetingId
         }));
     } catch (error) {
         console.log("Error", error);
@@ -141,7 +146,8 @@ function leaveMeeting() {
     try {
         ws.send(JSON.stringify({
             event: "leaving",
-            userId: localUserId,
+            uid: localUserId,
+            mid: _meetingId
         }));
         pc.close();
         pc = null;
@@ -170,7 +176,8 @@ function initializePeerConnection() {
         if (event.candidate) {
             ws.send(JSON.stringify({
                 event: "candidate",
-                userId: localUserId,
+                uid: localUserId,
+                mid: _meetingId,
                 data: event.candidate
             }));
         }

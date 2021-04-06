@@ -7,14 +7,16 @@ let ws = null;
 let peers = new Map();
 let videos = new Map();
 let localUserId = null;
+let _meetingId = null;
 let _stunUrl = null;
 let _turnUrl = null;
 let _turnUsername = null;
 let _turnCredentials = null;
 
 // initialize websockets...
-function initializeWebSocket(wsurl, userId, stunUrl, turnUrl, turnUsername, turnCredentials) {
+function initializeWebSocket(wsurl, userId, meetingId, stunUrl, turnUrl, turnUsername, turnCredentials) {
     localUserId = userId;
+    _meetingId = meetingId;
     _stunUrl = stunUrl;
     _turnUrl = turnUrl;
     _turnUsername = turnUsername;
@@ -26,15 +28,15 @@ function initializeWebSocket(wsurl, userId, stunUrl, turnUrl, turnUsername, turn
     ws.onmessage = function (m) {
         let message = JSON.parse(m.data);
         if (message.event == "joining") {
-            handleJoining(message.userId);
+            handleJoining(message.uid);
         } else if (message.event == "leaving") {
-            handleLeaving(message.userId);
+            handleLeaving(message.uid);
         } else if (message.event == "candidate") {
-            handleCandidate(message.data, message.userId);
+            handleCandidate(message.data, message.uid);
         } else if (message.event == "offer") {
-            handleOffer(message.data, message.userId);
+            handleOffer(message.data, message.uid);
         } else if (message.event == "answer") {
-            handleAnswer(message.data, message.userId);
+            handleAnswer(message.data, message.uid);
         } else {
             console.log("Invalid Message", message);
         }
@@ -96,7 +98,8 @@ async function createOffer(userId) {
         await pc.setLocalDescription(offer);
         ws.send(JSON.stringify({
             event: "offer",
-            userId: localUserId,
+            uid: localUserId,
+            mid: _meetingId,
             data: offer
         }));
     } catch (error) {
@@ -120,6 +123,8 @@ async function handleOffer(offer, userId) {
         await pc.setLocalDescription(answer);
         ws.send(JSON.stringify({
             event: "answer",
+            uid: localUserId,
+            mid: _meetingId,
             data: answer
         }));
     } catch (error) {
@@ -173,6 +178,8 @@ function initializePeerConnection(userId) {
         if (event.candidate) {
             ws.send(JSON.stringify({
                 event: "candidate",
+                uid: localUserId,
+                mid: _meetingId,
                 data: event.candidate
             }));
         }

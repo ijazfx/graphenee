@@ -47,7 +47,7 @@ public class MeetingClientView extends AbstractDashboardPanel implements MView {
 	public void enter(ViewChangeEvent event) {
 		GxAuthenticatedMeetingUserWrapper meetingUser = new GxAuthenticatedMeetingUserWrapper(DashboardUtils.getLoggedInUser());
 		GxMeeting meeting = meetingService.joinMeeting(meetingUser, "1");
-		String stunUrl = "stun:stun.l.google.com:19302";
+		String stunUrl = "stun:127.0.0.1:54321";
 		String turnUrl = "turn:127.0.0.1:3478?transport=tcp";
 		String turnUsername = "guest";
 		String turnCredentials = "guest";
