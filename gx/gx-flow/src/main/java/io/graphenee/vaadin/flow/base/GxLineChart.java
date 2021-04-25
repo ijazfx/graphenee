@@ -12,8 +12,9 @@ import com.github.appreciated.apexcharts.config.grid.builder.RowBuilder;
 import com.github.appreciated.apexcharts.config.stroke.Curve;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class GxLineChart extends Div {
+public class GxLineChart extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
     private ApexCharts lineChart;

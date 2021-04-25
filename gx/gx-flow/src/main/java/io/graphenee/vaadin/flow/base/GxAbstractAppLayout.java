@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-app-layout.css")
 public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +36,8 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
         if (flowSetup().loggedInUser() != null) {
             builder.withAppBar(AppBarBuilder.get().add(buildProfileMenu()).build());
         }
-        init(builder.build());
+        LeftHybrid layout = builder.build();
+        init(layout);
     }
 
     private Component buildAppMenu() {
@@ -94,9 +94,9 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
         GxAuthenticatedUser user = flowSetup().loggedInUser();
 
         MenuBar profileMenuBar = new MenuBar();
-        profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY, MenuBarVariant.LUMO_CONTRAST);
+        profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
         profileMenuBar.addItem(user.getUsername());
-        profileMenuBar.addItem(" | ");
+        profileMenuBar.addItem("|");
         profileMenuBar.addItem("Sign Out", event -> {
             VaadinSession.getCurrent().close();
         });

@@ -1,5 +1,6 @@
 package io.graphenee.vaadin.flow.base;
 
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
@@ -12,8 +13,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -22,7 +24,6 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridMultiSelectionModel;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -39,7 +40,6 @@ import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
@@ -60,9 +60,7 @@ import io.graphenee.vaadin.flow.renderer.GxTimestampRenderer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-entity-list.css")
-public abstract class GxAbstractEntityList<T> extends Div {
+public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
@@ -82,9 +80,13 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     private MenuItem deleteMenuItem;
 
+    private MenuItem columnsMenuItem;
+
     private MenuBar crudMenuBar;
 
     private MenuBar customMenuBar;
+
+    private MenuBar columnMenuBar;
 
     private Function<Collection<T>, Boolean> onSelection;
 
@@ -96,17 +98,22 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     private List<T> items;
 
+    private Column<T> columnByKey;
+
     public GxAbstractEntityList(Class<T> entityClass) {
         this.entityClass = entityClass;
-        setClassName("gx-list");
         setSizeFull();
+        setMargin(false);
+        setPadding(false);
+        setSpacing(false);
+        addClassName("gx-abstract-entity-list");
     }
 
     synchronized private GxAbstractEntityList<T> build() {
         if (!isBuilt) {
             dataGrid = dataGrid(entityClass);
-
-            dataGrid.setClassName("gx-grid");
+            dataGrid.setSizeFull();
+            dataGrid.addClassName("gx-grid");
             ((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI)).setSelectionColumnFrozen(true);
 
             DataProvider<T, ?> dataProvider = dataProvider(entityClass);
@@ -114,8 +121,44 @@ public abstract class GxAbstractEntityList<T> extends Div {
                 dataGrid.setDataProvider(dataProvider);
             }
 
-            dataGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-            
+            dataGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+
+            mainLayout = new SplitLayout();
+            mainLayout.setSizeFull();
+
+            crudMenuBar = new MenuBar();
+            columnMenuBar = new MenuBar();
+            customMenuBar = new MenuBar();
+
+            menuBarLayout = new HorizontalLayout();
+            menuBarLayout.setSpacing(false);
+            menuBarLayout.setPadding(true);
+            menuBarLayout.setWidthFull();
+
+            customMenuBar.getElement().getStyle().set("margin-right", "auto");
+            menuBarLayout.add(crudMenuBar, customMenuBar, columnMenuBar);
+
+            add(menuBarLayout);
+            crudMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
+            customMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
+            columnMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
+
+            addMenuItem = crudMenuBar.addItem("Add");
+            customizeAddMenuItem(addMenuItem);
+
+            editMenuItem = crudMenuBar.addItem("Edit");
+            customizeEditMenuItem(editMenuItem);
+
+            deleteMenuItem = crudMenuBar.addItem("Delete");
+            customizeDeleteMenuItem(deleteMenuItem);
+
+            decorateMenuBar(customMenuBar);
+
+            columnsMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
+
+            editMenuItem.setEnabled(false);
+            deleteMenuItem.setEnabled(false);
+
             List<Column<T>> columns = new ArrayList<>();
             if (visibleProperties() != null && visibleProperties().length > 0) {
                 PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
@@ -136,49 +179,34 @@ public abstract class GxAbstractEntityList<T> extends Div {
                                 column = dataGrid.addColumn(propertyName);
                         }
                         configureDefaults(propertyName, column, propertyDefinition);
-                        column.setAutoWidth(true);
+                        if (i == 0 || i == visibleProperties().length - 1) {
+                            column.setFlexGrow(1);
+                            column.setAutoWidth(true);
+                        }
                         if (isGridFilterEnabled()) {
                             addFilteredColumn(column, propertyDefinition);
                         }
                         decorateColumn(propertyName, column);
+                        SubMenu columnsSubMenu = columnsMenuItem.getSubMenu();
+                        MenuItem columnMenuItem = columnsSubMenu.addItem(propertyDefinition.getCaption(), cl -> {
+                            boolean checked = cl.getSource().isChecked();
+                            cl.getSource().setChecked(checked);
+                            columnByKey = dataGrid.getColumnByKey(propertyName);
+                            columnByKey.setVisible(checked);
+                        });
+                        columnMenuItem.setCheckable(true);
+                        columnMenuItem.setChecked(true);
                     } catch (Exception ex) {
                         log.warn(propertyName + " error: " + ex.getMessage());
                     }
-                    if(column != null) {
+                    if (column != null) {
                         columns.add(column);
                     }
                 }
                 dataGrid.setColumnOrder(columns);
-                dataGrid.addComponentColumn(source -> new Span());
+                Column<T> endColumn = dataGrid.addComponentColumn(source -> new Span());
+                endColumn.setResizable(false);
             }
-
-            mainLayout = new SplitLayout();
-            mainLayout.setSizeFull();
-
-            crudMenuBar = new MenuBar();
-            customMenuBar = new MenuBar();
-            customMenuBar.setWidthFull();
-
-            menuBarLayout = new HorizontalLayout();
-            menuBarLayout.setPadding(true);
-            menuBarLayout.add(crudMenuBar, customMenuBar);
-            add(menuBarLayout);
-            crudMenuBar.addThemeVariants(MenuBarVariant.LUMO_CONTRAST);
-            customMenuBar.addThemeVariants(MenuBarVariant.LUMO_CONTRAST);
-
-            addMenuItem = crudMenuBar.addItem("Add");
-            customizeAddMenuItem(addMenuItem);
-
-            editMenuItem = crudMenuBar.addItem("Edit");
-            customizeEditMenuItem(editMenuItem);
-
-            deleteMenuItem = crudMenuBar.addItem("Delete");
-            customizeDeleteMenuItem(deleteMenuItem);
-
-            decorateMenuBar(customMenuBar);
-
-            editMenuItem.setEnabled(false);
-            deleteMenuItem.setEnabled(false);
 
             mainLayout.addToPrimary(dataGrid);
 
@@ -186,7 +214,8 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
             if (!shouldShowFormInDialog()) {
                 formLayout = new VerticalLayout();
-                formLayout.setPadding(true);
+                formLayout.setMargin(false);
+                formLayout.setPadding(false);
                 mainLayout.addToSecondary(formLayout);
                 mainLayout.getSecondaryComponent().setVisible(false);
                 mainLayout.setSplitterPosition(defaultSplitterPosition());
@@ -282,8 +311,8 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     @SuppressWarnings("unchecked")
     private void addFilteredColumn(Column<T> column, PropertyDefinition<T, ?> propertyDefinition) {
-        if (dataGrid.getDataProvider() instanceof ListDataProvider) {
-            ListDataProvider<T> dataProvider = (ListDataProvider<T>) dataGrid.getDataProvider();
+        if (dataGrid.getDataProvider() instanceof InMemoryDataProvider) {
+            InMemoryDataProvider<T> dataProvider = (InMemoryDataProvider<T>) dataGrid.getDataProvider();
             TextField filterTF = new TextField();
             filterTF.setClearButtonVisible(true);
             filterTF.addValueChangeListener(event -> {
@@ -303,7 +332,6 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
             headerRow.getCell(column).setComponent(filterTF);
             filterTF.setValueChangeMode(ValueChangeMode.EAGER);
-            filterTF.setSizeFull();
             filterTF.setPlaceholder(propertyDefinition.getCaption());
         }
     }
@@ -347,7 +375,8 @@ public abstract class GxAbstractEntityList<T> extends Div {
                 renderer = TemplateRenderer.<T> of("<vaadin-checkbox checked=[[item.value]] disabled=true />").withProperty("value", propertyDefinition.getGetter());
             }
             if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-                DecimalFormat numberFormat = new DecimalFormat("0.##");
+                DecimalFormat numberFormat = new DecimalFormat();
+                numberFormat.setRoundingMode(RoundingMode.CEILING);
                 numberFormat.setGroupingUsed(true);
                 numberFormat.setGroupingSize(3);
                 renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), numberFormat);
@@ -364,8 +393,6 @@ public abstract class GxAbstractEntityList<T> extends Div {
         column.setId(propertyName);
         column.setHeader(propertyDefinition.getCaption());
         column.setResizable(true);
-        column.setFlexGrow(0);
-        column.setAutoWidth(true);
         if (propertyDefinition != null) {
             if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
                 column.setTextAlign(ColumnTextAlign.END);
@@ -418,7 +445,8 @@ public abstract class GxAbstractEntityList<T> extends Div {
                 dialog = entityForm.showInDialog(entity);
             }
         } else {
-            mainLayout.getSecondaryComponent().setVisible(false);
+            if (mainLayout.getSecondaryComponent() != null)
+                mainLayout.getSecondaryComponent().setVisible(false);
         }
     }
 
@@ -433,7 +461,8 @@ public abstract class GxAbstractEntityList<T> extends Div {
         build();
         crudMenuBar.setVisible(isEditable());
         if (!shouldShowFormInDialog()) {
-            mainLayout.getSecondaryComponent().setVisible(false);
+            if (mainLayout.getSecondaryComponent() != null)
+                mainLayout.getSecondaryComponent().setVisible(false);
         }
         DataProvider<T, ?> dataProvider = dataGrid.getDataProvider();
         if (dataProvider instanceof InMemoryDataProvider) {
@@ -463,7 +492,7 @@ public abstract class GxAbstractEntityList<T> extends Div {
         if (entityForm != null) {
             entityForm.setEditable(isEditable());
             entityForm.setEntity(entity);
-            entityForm.setDelegate(new EntityFormDelegate<T>() {
+            EntityFormDelegate<T> delegate = new EntityFormDelegate<T>() {
 
                 @Override
                 public void onSave(T entity) {
@@ -484,7 +513,8 @@ public abstract class GxAbstractEntityList<T> extends Div {
                         dialog.close();
                     }
                 }
-            });
+            };
+            entityForm.setDelegate(delegate);
         }
         return entityForm;
     }
@@ -561,6 +591,43 @@ public abstract class GxAbstractEntityList<T> extends Div {
 
     public void showToolbar() {
         menuBarLayout.setVisible(true);
+    }
+
+    public void showSecondaryComponent(Component component) {
+        if (formLayout == null) {
+            formLayout = new VerticalLayout();
+            mainLayout.addToSecondary(formLayout);
+        }
+        formLayout.removeAll();
+        formLayout.add(component);
+        mainLayout.setSplitterPosition(20.0);
+        mainLayout.getSecondaryComponent().setVisible(true);
+    }
+
+    public void hideSecondaryComponent() {
+        mainLayout.setSplitterPosition(0.0);
+        if (formLayout != null) {
+            formLayout.removeAll();
+        }
+    }
+
+    public Dialog showInDialog() {
+        dialog = new Dialog(GxAbstractEntityList.this);
+        dialog.setMaxHeight("90%");
+        dialog.setMaxWidth("90%");
+        dialog.setModal(true);
+        dialog.setCloseOnEsc(true);
+        dialog.setDraggable(true);
+        dialog.setResizable(true);
+        dialog.setSizeFull();
+        dialog.open();
+        return dialog;
+    }
+
+    public void dismissDialog() {
+        if (dialog != null) {
+            dialog.close();
+        }
     }
 
 }

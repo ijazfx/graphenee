@@ -4,23 +4,21 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 
 import lombok.extern.log4j.Log4j;
 
 @Log4j
-@CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-search-form.css")
-public abstract class GxAbstractSearchForm<T> extends Div {
+public abstract class GxAbstractSearchForm<T> extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,11 +42,14 @@ public abstract class GxAbstractSearchForm<T> extends Div {
 
     public GxAbstractSearchForm(Class<T> entityClass) {
         this.entityClass = entityClass;
+        setSizeFull();
+        setMargin(false);
+        setPadding(false);
+        addClassName("gx-abstract-search-form");
     }
 
     synchronized public GxAbstractSearchForm<T> build() {
         if (!isBuilt) {
-            setSizeFull();
             entityForm = getFormComponent();
 
             if (entityForm instanceof HasComponents) {
@@ -63,8 +64,7 @@ public abstract class GxAbstractSearchForm<T> extends Div {
                 HasComponents c = (HasComponents) toolbar;
                 decorateToolbar(c);
                 searchButton = new Button("SEARCH");
-                searchButton.addClassName("gx-button");
-                searchButton.addClassName("gx-searchButton");
+                searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 searchButton.addClickListener(cl -> {
                     try {
                         dataBinder.writeBean(entity);
@@ -81,8 +81,6 @@ public abstract class GxAbstractSearchForm<T> extends Div {
                 });
 
                 resetButton = new Button("RESET");
-                searchButton.addClassName("gx-button");
-                searchButton.addClassName("gx-resetButton");
                 resetButton.addClickListener(cl -> {
                     try {
                         dataBinder.readBean(entity);
@@ -93,8 +91,6 @@ public abstract class GxAbstractSearchForm<T> extends Div {
                 });
 
                 dismissButton = new Button("DISMISS");
-                searchButton.addClassName("gx-button");
-                searchButton.addClassName("gx-dismissButton");
                 dismissButton.addClickShortcut(Key.ESCAPE);
                 dismissButton.addClickListener(cl -> {
                     dataBinder.readBean(entity);
@@ -142,11 +138,16 @@ public abstract class GxAbstractSearchForm<T> extends Div {
 
     protected Component getToolbarComponent() {
         HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.setClassName("gx-footer");
+        toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
+        toolbar.setWidthFull();
+        toolbar.setPadding(false);
         return toolbar;
     }
 
     protected Component getFormComponent() {
         FormLayout formLayout = new FormLayout();
+        formLayout.setSizeFull();
         return formLayout;
     }
 
@@ -173,9 +174,12 @@ public abstract class GxAbstractSearchForm<T> extends Div {
 
     public Dialog showInDialog() {
         dialog = new Dialog(GxAbstractSearchForm.this);
+        dialog.setMaxHeight("90%");
+        dialog.setMaxWidth("90%");
         dialog.setModal(true);
         dialog.setCloseOnEsc(true);
         dialog.setDraggable(true);
+        dialog.setSizeFull();
         dialog.open();
         return dialog;
     }

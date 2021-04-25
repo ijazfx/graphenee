@@ -2,16 +2,15 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.DataProvider;
 
-@CssImport("./styles/gx-entity-lazy-list.css")
 public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T> {
 
     private static final long serialVersionUID = 1L;
 
     public GxAbstractEntityLazyList(Class<T> entityClass) {
         super(entityClass);
+        addClassName("gx-abstract-entity-lazy-list");
     }
 
     @Override

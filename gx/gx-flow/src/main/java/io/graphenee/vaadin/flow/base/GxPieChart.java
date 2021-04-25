@@ -8,9 +8,9 @@ import com.github.appreciated.apexcharts.config.builder.ResponsiveBuilder;
 import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.legend.Position;
 import com.github.appreciated.apexcharts.config.responsive.builder.OptionsBuilder;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class GxPieChart extends Div {
+public class GxPieChart extends VerticalLayout {
     private static final long serialVersionUID = 1L;
 
     private ApexCharts chart;

@@ -3,13 +3,16 @@ package io.graphenee.vaadin.flow.base;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.ShortcutRegistration;
+import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
@@ -27,9 +30,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 @Log4j
-@CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-entity-form.css")
-public abstract class GxAbstractEntityForm<T> extends Div {
+public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,9 +58,15 @@ public abstract class GxAbstractEntityForm<T> extends Div {
     @Setter
     private Boolean dialogAutoClose = true;
 
+    private ShortcutRegistration escapeKeyShortcut;
+
     public GxAbstractEntityForm(Class<T> entityClass) {
         this.entityClass = entityClass;
-        setClassName("gx-form");
+        setSizeFull();
+        setMargin(false);
+        setPadding(false);
+        setSpacing(false);
+        addClassName("gx-abstract-entity-form");
     }
 
     synchronized private GxAbstractEntityForm<T> build() {
@@ -75,8 +82,6 @@ public abstract class GxAbstractEntityForm<T> extends Div {
                 HasComponents c = (HasComponents) toolbar;
                 decorateToolbar(c);
                 saveButton = new Button("SAVE");
-                saveButton.addClassName("gx-button");
-                saveButton.addClassName("gx-saveButton");
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 saveButton.addClickListener(cl -> {
                     if (entity != null) {
@@ -98,9 +103,7 @@ public abstract class GxAbstractEntityForm<T> extends Div {
                 customizeSaveButton(saveButton);
 
                 resetButton = new Button("RESET");
-                resetButton.addClassName("gx-button");
-                resetButton.addClassName("gx-resetButton");
-                resetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+                resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
                 resetButton.addClickListener(cl -> {
                     dataBinder.readBean(entity);
                     if (delegate != null)
@@ -108,10 +111,7 @@ public abstract class GxAbstractEntityForm<T> extends Div {
                 });
 
                 dismissButton = new Button("DISMISS");
-                dismissButton.addClassName("gx-button");
-                dismissButton.addClassName("gx-dismissButton");
-                dismissButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                dismissButton.addClickShortcut(Key.ESCAPE);
+                dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
                 dismissButton.addClickListener(cl -> {
                     if (dialog != null) {
                         dialog.close();
@@ -131,8 +131,9 @@ public abstract class GxAbstractEntityForm<T> extends Div {
             }
 
             VerticalLayout formDetails = new VerticalLayout();
-            formDetails.setPadding(false);
             formDetails.setSizeFull();
+            formDetails.setMargin(false);
+            formDetails.setPadding(true);
             formDetails.add(entityForm, toolbar);
 
             List<GxTabItem> tabItems = new ArrayList<>();
@@ -148,6 +149,18 @@ public abstract class GxAbstractEntityForm<T> extends Div {
                 log.warn(ex.getMessage());
             }
             postBuild();
+
+            if (escapeKeyShortcut == null) {
+                escapeKeyShortcut = Shortcuts.addShortcutListener(GxAbstractEntityForm.this, () -> {
+                    if (dialog != null) {
+                        dialog.close();
+                    }
+                    if (delegate != null)
+                        delegate.onDismiss(entity);
+                }, Key.ESCAPE);
+                escapeKeyShortcut.listenOn(GxAbstractEntityForm.this);
+            }
+
             isBuilt = true;
         }
         return this;
@@ -176,8 +189,9 @@ public abstract class GxAbstractEntityForm<T> extends Div {
 
     protected Component getToolbarComponent() {
         HorizontalLayout toolbar = new HorizontalLayout();
+        toolbar.addClassName("gx-footer");
+        toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
         toolbar.setWidthFull();
-        toolbar.setClassName("gx-form-footer");
         toolbar.setPadding(false);
         return toolbar;
     }
@@ -215,6 +229,20 @@ public abstract class GxAbstractEntityForm<T> extends Div {
         entityBound = true;
         tabs.setSelectedTab((Tab) tabs.getComponentAt(0));
         postBinding(entity);
+        focusFirst(this);
+    }
+
+    private boolean focusFirst(Component c) {
+        if (c instanceof Focusable) {
+            ((Focusable) c).focus();
+            return true;
+        }
+        List<Component> children = c.getChildren().collect(Collectors.toList());
+        for (Component child : children) {
+            if (focusFirst(child))
+                return true;
+        }
+        return false;
     }
 
     public T getEntity() {
@@ -224,12 +252,13 @@ public abstract class GxAbstractEntityForm<T> extends Div {
     public Dialog showInDialog(T entity) {
         setEntity(entity);
         dialog = new Dialog(GxAbstractEntityForm.this);
+        dialog.setMaxHeight("90%");
+        dialog.setMaxWidth("90%");
         dialog.setModal(true);
         dialog.setCloseOnEsc(true);
         dialog.setDraggable(true);
         dialog.setResizable(true);
-        dialog.setWidth(getWidth());
-        dialog.setHeight(getHeight());
+        dialog.setSizeFull();
         dialog.open();
         return dialog;
     }
@@ -265,6 +294,7 @@ public abstract class GxAbstractEntityForm<T> extends Div {
         }
 
         VerticalLayout tabsLayout = new VerticalLayout(tabs);
+        tabsLayout.setMargin(false);
         tabsLayout.setPadding(false);
         tabsLayout.getStyle().set("alignItems", "start");
         tabs.getStyle().set("align", "start");

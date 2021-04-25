@@ -17,8 +17,9 @@ import com.github.appreciated.apexcharts.config.subtitle.Align;
 import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class GxAreaChart extends Div {
+public class GxAreaChart extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
     private ApexCharts areaChart;

@@ -4,20 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 
-@CssImport("./styles/gx-entity-tree-list.css")
 public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T> {
 
     private static final long serialVersionUID = 1L;
 
     public GxAbstractEntityTreeList(Class<T> entityClass) {
         super(entityClass);
+        addClassName("gx-abstract-entity-tree-list");
     }
 
     @Override

@@ -21,24 +21,35 @@ import io.graphenee.vaadin.flow.security.GxSecurityPolicyListView;
 import io.graphenee.vaadin.flow.security.GxUserAccountListView;
 
 @CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-login-view.css")
 public abstract class GxAbstractLoginView extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
 
     public GxAbstractLoginView() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        setSizeFull();
+        setClassName("gx-abstract-login-view");
+        getStyle().set("display", "flex");
+        getStyle().set("flex-flow", "initial");
+        getStyle().set("background", "var(--app-layout-bar-background-color)");
+        setJustifyContentMode(JustifyContentMode.CENTER);
     }
 
     @PostConstruct
     private void postBuild() {
         LoginForm loginForm = new LoginForm();
+        loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+        loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
+        loginForm.getElement().getStyle().set("background", "white");
         loginForm.setForgotPasswordButtonVisible(true);
         LoginI18n loginI18n = LoginI18n.createDefault();
         loginI18n.getForm().setTitle(flowSetup().appTitle());
+        loginI18n.getForm().setForgotPassword("Forgot Password? Click here to Reset!");
+        loginI18n.getForm().setUsername("Login ID");
+        loginI18n.getForm().setPassword("Password");
         loginForm.setI18n(loginI18n);
 
         add(loginForm);
+        setAlignSelf(Alignment.CENTER, loginForm);
 
         loginForm.addLoginListener(e -> {
             try {

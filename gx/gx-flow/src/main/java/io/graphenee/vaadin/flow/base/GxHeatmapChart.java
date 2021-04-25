@@ -9,9 +9,9 @@ import com.github.appreciated.apexcharts.config.builder.YAxisBuilder;
 import com.github.appreciated.apexcharts.config.chart.Type;
 import com.github.appreciated.apexcharts.config.xaxis.XAxisType;
 import com.github.appreciated.apexcharts.helper.Series;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class GxHeatmapChart extends Div {
+public class GxHeatmapChart extends VerticalLayout {
 
         private static final long serialVersionUID = 1L;
         private ApexCharts heatChart;

@@ -6,7 +6,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
@@ -17,13 +17,15 @@ import com.vaadin.flow.server.VaadinSession;
 import io.graphenee.core.model.GxAuthenticatedUser;
 
 @CssImport("./styles/gx-common.css")
-@CssImport("./styles/gx-layout-view.css")
 public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {
 
     private static final long serialVersionUID = 1L;
 
     public GxAbstractLayoutView() {
         setSizeFull();
+        getElement().getStyle().set("margin", "0");
+        getElement().getStyle().set("padding", "0");
+        addClassName("gx-abstract-layout-view");
     }
 
     @PostConstruct
@@ -48,7 +50,10 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
     }
 
     protected Component getCaptionComponent() {
-        VerticalLayout captionComponent = new VerticalLayout(new Span(getCaption()));
+        VerticalLayout captionComponent = new VerticalLayout(new H4(getCaption()));
+        captionComponent.setMargin(false);
+        captionComponent.setSpacing(false);
+        // captionComponent.setPadding(true);
         return captionComponent;
     }
 

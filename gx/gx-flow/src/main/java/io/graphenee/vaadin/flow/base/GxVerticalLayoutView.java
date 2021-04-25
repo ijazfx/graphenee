@@ -4,8 +4,9 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class GxVerticalLayoutView extends GxAbstractLayoutView {
+    
     public GxVerticalLayoutView() {
-        setClassName("gx-view");
+        addClassName("gx-vertical-layout-view");
     }
 
     private static final long serialVersionUID = 1L;
@@ -14,8 +15,9 @@ public class GxVerticalLayoutView extends GxAbstractLayoutView {
     protected Component getLayoutComponent() {
         VerticalLayout layoutComponent = new VerticalLayout();
         layoutComponent.setSizeFull();
+        layoutComponent.setMargin(false);
         layoutComponent.setPadding(false);
-        layoutComponent.setSpacing(true);
+        layoutComponent.setSpacing(false);
         return layoutComponent;
     }
 
