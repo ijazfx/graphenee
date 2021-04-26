@@ -55,7 +55,7 @@
 		<version.retrofit>2.5.0</version.retrofit>
 		<version.protobuf>3.8.0</version.protobuf>
 		<version.commons.beanutils>1.9.4</version.commons.beanutils>
-		<version.commons.io>2.4</version.commons.io>
+		<version.commons.io>2.7</version.commons.io>
 		<version.vaadin>7.7.17</version.vaadin>
 		<version.vaadin.spring>1.2.0</version.vaadin.spring>
 		<version.vaadin.grid.util>1.1.0</version.vaadin.grid.util>
