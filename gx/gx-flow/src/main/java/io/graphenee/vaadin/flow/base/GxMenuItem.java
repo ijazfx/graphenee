@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.router.Route;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,7 @@ public class GxMenuItem implements Serializable {
         this.label = label;
         this.icon = icon;
         this.componentClass = componentClass;
+        this.route = determineRoute(componentClass);
     }
 
     public GxMenuItem(String label, Component icon) {
@@ -75,6 +77,18 @@ public class GxMenuItem implements Serializable {
     public static GxMenuItem create(String label, Component icon) {
         GxMenuItem mi = new GxMenuItem(label, icon);
         return mi;
+    }
+
+    private String determineRoute(Class<? extends Component> navigationTarget) {
+        if (navigationTarget.isAnnotationPresent(Route.class)) {
+            Route annotation = navigationTarget.getAnnotation(Route.class);
+            return annotation.value();
+        }
+        if (navigationTarget.isAnnotationPresent(GxSecuredView.class)) {
+            GxSecuredView annotation = navigationTarget.getAnnotation(GxSecuredView.class);
+            return annotation.value();
+        }
+        return null;
     }
 
 }
