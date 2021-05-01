@@ -1,6 +1,7 @@
 package io.graphenee.vaadin.flow.base;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
@@ -20,6 +21,7 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -52,17 +54,26 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
     }
 
     private void addMenuItemToAppMenu(GxMenuItem mi, LeftAppMenuBuilder builder) {
+        GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
         if (mi.hasChildren()) {
             LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
+            AtomicBoolean anyMenu = new AtomicBoolean(false);
             mi.getChildren().forEach(smi -> {
-                addMenuItemToSubMenu(smi, smb);
+                if (smi.getRoute() == null || user != null && user.canDoAction(smi.getRoute(), "view")) {
+                    addMenuItemToSubMenu(smi, smb);
+                    anyMenu.set(true);
+                }
             });
-            LeftSubmenu sm = smb.build();
-            builder.add(sm);
+            if (anyMenu.get()) {
+                LeftSubmenu sm = smb.build();
+                builder.add(sm);
+            }
         } else {
             try {
-                LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
-                builder.add(item);
+                if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
+                    LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+                    builder.add(item);
+                }
             } catch (Exception ex) {
                 log.warn(ex.getMessage());
             }
@@ -70,6 +81,7 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
     }
 
     private void addMenuItemToSubMenu(GxMenuItem mi, LeftSubMenuBuilder builder) {
+        GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
         if (mi.hasChildren()) {
             LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
             mi.getChildren().forEach(smi -> {
@@ -78,8 +90,10 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
             builder.add(smb.build());
         } else {
             try {
-                LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
-                builder.add(item);
+                if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
+                    LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+                    builder.add(item);
+                }
             } catch (Exception ex) {
                 log.warn(ex.getMessage());
             }

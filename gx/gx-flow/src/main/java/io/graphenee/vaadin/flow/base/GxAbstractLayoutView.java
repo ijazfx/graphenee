@@ -12,6 +12,7 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -19,65 +20,73 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public GxAbstractLayoutView() {
-        setSizeFull();
-        getElement().getStyle().set("margin", "0");
-        getElement().getStyle().set("padding", "0");
-        addClassName("gx-abstract-layout-view");
-    }
+	public GxAbstractLayoutView() {
+		setSizeFull();
+		getElement().getStyle().set("margin", "0");
+		getElement().getStyle().set("padding", "0");
+		addClassName("gx-abstract-layout-view");
+	}
 
-    @PostConstruct
-    private void postBuild() {
-        add(getCaptionComponent());
-        Component rootLayout = getLayoutComponent();
-        if (rootLayout instanceof HasComponents) {
-            decorateLayout((HasComponents) rootLayout);
-        }
+	@PostConstruct
+	private void postBuild() {
+		add(getCaptionComponent());
+		Component rootLayout = getLayoutComponent();
+		if (rootLayout instanceof HasComponents) {
+			decorateLayout((HasComponents) rootLayout);
+		}
+		add(rootLayout);
+	}
 
-        add(rootLayout);
+	protected abstract Component getLayoutComponent();
 
-    }
+	protected void decorateLayout(HasComponents rootLayout) {
+	}
 
-    protected abstract Component getLayoutComponent();
+	protected String getCaption() {
+		return null;
+	}
 
-    protected void decorateLayout(HasComponents rootLayout) {
-    }
+	protected Component getCaptionComponent() {
+		VerticalLayout captionComponent = new VerticalLayout(new H4(getCaption()));
+		captionComponent.setMargin(false);
+		captionComponent.setSpacing(false);
+		// captionComponent.setPadding(true);
+		return captionComponent;
+	}
 
-    protected String getCaption() {
-        return null;
-    }
+	@Override
+	public void beforeEnter(BeforeEnterEvent event) {
+		if (this.getClass().isAnnotationPresent(GxSecuredView.class)) {
+			GxSecuredView annotation = this.getClass().getAnnotation(GxSecuredView.class);
+			String route = null;
+			if (annotation.value() != null) {
+				route = annotation.value();
+			} else if (this.getClass().isAnnotationPresent(Route.class)) {
+				Route routeAnnotation = this.getClass().getAnnotation(Route.class);
+				route = routeAnnotation.value();
+			}
+			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+			if (user == null) {
+				event.rerouteTo("login", "");
+			} else if (!user.canDoAction(route, "view")) {
+				event.rerouteToError(new ForbiddenView.ForbiddenException(), "You do not have permission to access this view.");
+			}
+		}
+	}
 
-    protected Component getCaptionComponent() {
-        VerticalLayout captionComponent = new VerticalLayout(new H4(getCaption()));
-        captionComponent.setMargin(false);
-        captionComponent.setSpacing(false);
-        // captionComponent.setPadding(true);
-        return captionComponent;
-    }
+	protected boolean isLoggedIn() {
+		return VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class) != null;
+	}
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        if (this.getClass().isAnnotationPresent(GxSecuredView.class)) {
-            GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
-            if (user == null) {
-                event.rerouteTo("login");
-            }
-        }
-    }
+	@SuppressWarnings("unchecked")
+	protected <T extends GxAuthenticatedUser> T loggedInUser() {
+		return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+	}
 
-    protected boolean isLoggedIn() {
-        return VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class) != null;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <T extends GxAuthenticatedUser> T loggedInUser() {
-        return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
-    }
-
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-    }
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+	}
 
 }

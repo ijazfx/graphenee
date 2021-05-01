@@ -2,7 +2,6 @@ package io.graphenee.vaadin.flow.security;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
-import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -10,8 +9,7 @@ import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
-@Route(value = GxUserAccountListView.VIEW_NAME)
-@GxSecuredView
+@GxSecuredView(GxUserAccountListView.VIEW_NAME)
 public class GxUserAccountListView extends GxVerticalLayoutView {
     public static final String VIEW_NAME = "user-accounts";
 

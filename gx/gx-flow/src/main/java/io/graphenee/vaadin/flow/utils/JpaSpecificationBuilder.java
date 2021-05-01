@@ -17,8 +17,8 @@ public class JpaSpecificationBuilder<T> {
         specsQueue = new LinkedList<>();
     }
 
-    public static <T> JpaSpecificationBuilder<T> get() {
-        return new JpaSpecificationBuilder<T>();
+    public static <I> JpaSpecificationBuilder<I> get() {
+        return new JpaSpecificationBuilder<I>();
     }
 
     public JpaSpecificationBuilder<T> and() {
@@ -32,11 +32,11 @@ public class JpaSpecificationBuilder<T> {
         return this;
     }
 
-    public Specification<T> build() {
+    public <T> Specification<T> build() {
         and();
         if (specsQueue.isEmpty())
             return null;
-        return specsQueue.removeFirst();
+        return (Specification<T>) specsQueue.removeFirst();
     }
 
     public JpaSpecificationBuilder<T> or() {
