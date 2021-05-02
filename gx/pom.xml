@@ -45,7 +45,7 @@
 		<version.aws>1.11.659</version.aws>
 		<version.scrypt>1.4.0</version.scrypt>
 		<version.zxing>3.3.0</version.zxing>
-		<version.guava>28.2-jre</version.guava>
+		<version.guava>29.0-jre</version.guava>
 		<version.json>20160810</version.json>
 		<version.itextpdf>5.5.12</version.itextpdf>
 		<version.lombok>1.18.12</version.lombok>
