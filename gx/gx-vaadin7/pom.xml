@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gx-vaadin7</artifactId>
 	<name>Graphenee UI (Vaadin 7)</name>
@@ -23,8 +21,15 @@
 		<version.vaadin.confirm.dialog>2.1.3</version.vaadin.confirm.dialog>
 		<version.vaadin.autocompletetextfield>1.0-alpha-4</version.vaadin.autocompletetextfield>
 		<version.vaadin.chartjs>0.4.0</version.vaadin.chartjs>
-		<version.maven.vaadin.plugin>7.7.17</version.maven.vaadin.plugin>
+		<version.vaadin.plugin>7.7.17</version.vaadin.plugin>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons/</url>
+		</repository>
+	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
@@ -172,5 +177,40 @@
 			<artifactId>poi-ooxml</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.vaadin</groupId>
+					<artifactId>vaadin-maven-plugin</artifactId>
+					<version>${version.vaadin.plugin}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<configuration>
+					<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
+					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
+					<draftCompile>false</draftCompile>
+					<compileReport>false</compileReport>
+					<style>OBF</style>
+					<strict>true</strict>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<!-- Comment out compile-theme goal to use on-the-fly theme compilation -->
+							<!-- <goal>update-theme</goal> <goal>update-widgetset</goal> <goal>compile</goal> 
+								<goal>compile-theme</goal> -->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
