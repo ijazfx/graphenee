@@ -20,3 +20,7 @@ target
 .project
 node_modules
 graphenee.db*
+package-lock.json
+package.json
+webpack.generated.js
+webpack.config.js
