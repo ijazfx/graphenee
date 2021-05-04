@@ -54,7 +54,7 @@
 		<version.retrofit>2.5.0</version.retrofit>
 		<version.protobuf>3.8.0</version.protobuf>
 		<version.commons.beanutils>1.9.4</version.commons.beanutils>
-		<version.commons.io>2.4</version.commons.io>
+		<version.commons.io>2.8.0</version.commons.io>
 		<version.markdown4j>2.2-cj-1.1</version.markdown4j>
 		<version.jasper>6.12.2</version.jasper>
 		<version.grpc>1.23.0</version.grpc>
