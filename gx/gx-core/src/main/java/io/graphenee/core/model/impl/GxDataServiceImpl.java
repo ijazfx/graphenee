@@ -49,6 +49,7 @@ import io.graphenee.core.exception.RegisterDeviceFailedException;
 import io.graphenee.core.exception.UnregisterDeviceFailedException;
 import io.graphenee.core.model.BeanCollectionFault;
 import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.model.CollectionFault;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxAccessKeyBean;
 import io.graphenee.core.model.bean.GxAuditLogBean;
@@ -1668,26 +1669,32 @@ public class GxDataServiceImpl implements GxDataService {
 		return bean;
 	}
 
+	@Override
 	public GxAuditLogBean auditEvent(String auditEvent) {
 		return auditEntityEventByUser(null, null, auditEvent, null);
 	}
 
+	@Override
 	public GxAuditLogBean auditEventWithAdditionalData(String auditEvent, byte[] additionalData) {
 		return auditEntityEventByUserWithAdditionalData(null, null, auditEvent, null, additionalData);
 	}
 
+	@Override
 	public GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean) {
 		return auditEntityEventByUser(null, null, auditEvent, userAccountBean);
 	}
 
+	@Override
 	public GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean, byte[] additionalData) {
 		return auditEntityEventByUserWithAdditionalData(null, null, auditEvent, userAccountBean, additionalData);
 	}
 
+	@Override
 	public GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean) {
 		return auditEntityEventByUserWithAdditionalData(auditEntity, oidAuditEntity, auditEvent, userAccountBean, null);
 	}
 
+	@Override
 	public GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean,
 			byte[] additionalData) {
 		GxAuditLogBean bean = new GxAuditLogBean();
@@ -1703,16 +1710,19 @@ public class GxDataServiceImpl implements GxDataService {
 		return bean;
 	}
 
+	@Override
 	public List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean) {
 		List<GxAuditLog> entities = auditLogRepository.findAllByGxUserAccountOidOrderByAuditDateDesc(userAccountBean.getOid());
 		return makeAuditLogBean(entities);
 	}
 
+	@Override
 	public List<GxAuditLogBean> findAuditLogByAuditEntity(String auditEntity) {
 		List<GxAuditLog> entities = auditLogRepository.findAllByAuditEntityOrderByAuditDateDesc(auditEntity);
 		return makeAuditLogBean(entities);
 	}
 
+	@Override
 	public List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity) {
 		List<GxAuditLog> entities = auditLogRepository.findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(auditEntity, oidAuditEntity);
 		return makeAuditLogBean(entities);
@@ -2113,7 +2123,7 @@ public class GxDataServiceImpl implements GxDataService {
 			return null;
 		return makeGxRegisteredDeviceBean(device);
 	}
-	
+
 	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace, String deviceToken, String ownerId) {
 		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(namespace, deviceToken, ownerId);
 		if (device == null)
@@ -2231,6 +2241,60 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setPropertyValue(bean.getPropertyValue());
 		entity.setGxNamespace(namespaceRepo.findOne(bean.getNamespaceFault().getOid()));
 		return entity;
+	}
+
+	@Override
+	public List<GxNamespace> findNamespaceEntity() {
+		return namespaceRepo.findAll().stream().map(this::makeNamespaceEntity).collect(Collectors.toList());
+	}
+
+	@Override
+	public GxNamespace findNamespaceEntity(Integer oidNamespace) {
+		GxNamespace namespace = namespaceRepo.findOne(oidNamespace);
+		if (namespace != null)
+			return makeNamespaceEntity(namespace);
+		return null;
+	}
+
+	@Override
+	public GxNamespace findSystemNamespaceEntity() {
+		return findOrCreateNamespaceEntity(SYSTEM_NAMESPACE);
+	}
+
+	@Override
+	public GxNamespace findOrCreateNamespaceEntity(String namespace) {
+		GxNamespace entity = namespaceRepo.findByNamespace(namespace);
+		if (entity != null) {
+			return makeNamespaceEntity(entity);
+		}
+		entity = new GxNamespace();
+		entity.setIsActive(true);
+		entity.setIsProtected(false);
+		entity.setNamespace(namespace);
+		entity.setNamespaceDescription("-- Auto Generated --");
+		namespaceRepo.save(entity);
+		return entity;
+	}
+
+	@Override
+	public GxNamespace findNamespaceEntity(String namespace) {
+		GxNamespace entity = namespaceRepo.findByNamespace(namespace);
+		if (entity != null) {
+			return makeNamespaceEntity(entity);
+		}
+		return null;
+	}
+
+	private GxNamespace makeNamespaceEntity(GxNamespace entity) {
+		entity.setNamespacePropertyCollectionFault(CollectionFault.collectionFault(() -> {
+			return findNamespacePropertyEntityByNamespace(entity);
+		}));
+		return entity;
+	}
+
+	@Override
+	public List<GxNamespaceProperty> findNamespacePropertyEntityByNamespace(GxNamespace namespace) {
+		return namespacePropertyRepo.findAllByGxNamespaceOidOrderByPropertyKey(namespace.getOid());
 	}
 
 }

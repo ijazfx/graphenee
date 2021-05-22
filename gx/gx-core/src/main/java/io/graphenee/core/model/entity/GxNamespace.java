@@ -27,10 +27,17 @@ import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import io.graphenee.core.model.CollectionFault;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * The persistent class for the gx_namespace database table.
  */
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "gx_namespace")
 @NamedQuery(name = "GxNamespace.findAll", query = "SELECT g FROM GxNamespace g")
@@ -72,56 +79,8 @@ public class GxNamespace implements Serializable {
 	@OneToMany(mappedBy = "gxNamespace")
 	private List<GxTerm> gxTerms = new ArrayList<>();
 
-	public GxNamespace() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public Boolean getIsActive() {
-		return this.isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Boolean getIsProtected() {
-		return this.isProtected;
-	}
-
-	public void setIsProtected(Boolean isProtected) {
-		this.isProtected = isProtected;
-	}
-
-	public String getNamespace() {
-		return this.namespace;
-	}
-
-	public void setNamespace(String namespace) {
-		this.namespace = namespace;
-	}
-
-	public String getNamespaceDescription() {
-		return this.namespaceDescription;
-	}
-
-	public void setNamespaceDescription(String namespaceDescription) {
-		this.namespaceDescription = namespaceDescription;
-	}
-
-	public List<GxEmailTemplate> getGxEmailTemplates() {
-		return this.gxEmailTemplates;
-	}
-
-	public void setGxEmailTemplates(List<GxEmailTemplate> gxEmailTemplates) {
-		this.gxEmailTemplates = gxEmailTemplates;
-	}
+	@Transient
+	private CollectionFault<GxNamespaceProperty> namespacePropertyCollectionFault = CollectionFault.emptyCollectionFault();
 
 	public GxEmailTemplate addGxEmailTemplate(GxEmailTemplate gxEmailTemplate) {
 		getGxEmailTemplates().add(gxEmailTemplate);
@@ -135,14 +94,6 @@ public class GxNamespace implements Serializable {
 		gxEmailTemplate.setGxNamespace(null);
 
 		return gxEmailTemplate;
-	}
-
-	public List<GxNamespaceProperty> getGxNamespaceProperties() {
-		return this.gxNamespaceProperties;
-	}
-
-	public void setGxNamespaceProperties(List<GxNamespaceProperty> gxNamespaceProperties) {
-		this.gxNamespaceProperties = gxNamespaceProperties;
 	}
 
 	public GxNamespaceProperty addGxNamespaceProperty(GxNamespaceProperty gxNamespaceProperty) {
@@ -159,14 +110,6 @@ public class GxNamespace implements Serializable {
 		return gxNamespaceProperty;
 	}
 
-	public List<GxSecurityGroup> getGxSecurityGroups() {
-		return this.gxSecurityGroups;
-	}
-
-	public void setGxSecurityGroups(List<GxSecurityGroup> gxSecurityGroups) {
-		this.gxSecurityGroups = gxSecurityGroups;
-	}
-
 	public GxSecurityGroup addGxSecurityGroup(GxSecurityGroup gxSecurityGroup) {
 		getGxSecurityGroups().add(gxSecurityGroup);
 		gxSecurityGroup.setGxNamespace(this);
@@ -181,14 +124,6 @@ public class GxNamespace implements Serializable {
 		return gxSecurityGroup;
 	}
 
-	public List<GxSecurityPolicy> getGxSecurityPolicies() {
-		return this.gxSecurityPolicies;
-	}
-
-	public void setGxSecurityPolicies(List<GxSecurityPolicy> gxSecurityPolicies) {
-		this.gxSecurityPolicies = gxSecurityPolicies;
-	}
-
 	public GxSecurityPolicy addGxSecurityPolicy(GxSecurityPolicy gxSecurityPolicy) {
 		getGxSecurityPolicies().add(gxSecurityPolicy);
 		gxSecurityPolicy.setGxNamespace(this);
@@ -201,14 +136,6 @@ public class GxNamespace implements Serializable {
 		gxSecurityPolicy.setGxNamespace(null);
 
 		return gxSecurityPolicy;
-	}
-
-	public List<GxTerm> getGxTerms() {
-		return this.gxTerms;
-	}
-
-	public void setGxTerms(List<GxTerm> gxTerms) {
-		this.gxTerms = gxTerms;
 	}
 
 	public GxTerm addGxTerm(GxTerm gxTerm) {

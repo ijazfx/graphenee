@@ -41,6 +41,8 @@ import io.graphenee.core.model.bean.GxStateBean;
 import io.graphenee.core.model.bean.GxSupportedLocaleBean;
 import io.graphenee.core.model.bean.GxTermBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxNamespaceProperty;
 import io.graphenee.core.model.entity.GxSmsProvider;
 
 public interface GxDataService {
@@ -51,11 +53,20 @@ public interface GxDataService {
 
 	List<GxGenderBean> findGender();
 
+	@Deprecated
 	List<GxNamespaceBean> findNamespace();
 
+	List<GxNamespace> findNamespaceEntity();
+
+	@Deprecated
 	GxNamespaceBean findNamespace(Integer oidNamespace);
 
+	GxNamespace findNamespaceEntity(Integer oidNamespace);
+
+	@Deprecated
 	GxNamespaceBean findSystemNamespace();
+
+	GxNamespace findSystemNamespaceEntity();
 
 	List<GxSupportedLocaleBean> findSupportedLocale();
 
@@ -81,7 +92,10 @@ public interface GxDataService {
 
 	void delete(GxSupportedLocaleBean entity);
 
+	@Deprecated
 	GxNamespaceBean findNamespace(String namespace);
+
+	GxNamespace findNamespaceEntity(String namespace);
 
 	GxNamespaceBean save(GxNamespaceBean entity);
 
@@ -95,7 +109,10 @@ public interface GxDataService {
 
 	void delete(GxNamespacePropertyBean bean);
 
+	@Deprecated
 	List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace);
+
+	List<GxNamespaceProperty> findNamespacePropertyEntityByNamespace(GxNamespace namespace);
 
 	GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey);
 
@@ -231,7 +248,10 @@ public interface GxDataService {
 
 	void delete(GxEmailTemplateBean bean);
 
+	@Deprecated
 	GxNamespaceBean findOrCreateNamespace(String namespace);
+
+	GxNamespace findOrCreateNamespaceEntity(String namespace);
 
 	GxEmailTemplateBean findEmailTemplate(Integer oid);
 
