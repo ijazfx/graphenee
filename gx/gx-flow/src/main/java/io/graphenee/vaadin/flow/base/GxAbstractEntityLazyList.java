@@ -2,7 +2,9 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.stream.Stream;
 
+import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.Query;
 
 public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T> {
 
@@ -14,19 +16,24 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
     }
 
     @Override
-    protected DataProvider<T, ?> dataProvider(Class<T> entityClass) {
-        return DataProvider.fromCallbacks(query -> getPagedData(query.getOffset(), query.getLimit()), query -> getTotalCount());
+    @SuppressWarnings("unchecked")
+    protected DataProvider<T, T> dataProvider(Class<T> entityClass) {
+        CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query),
+                query -> getTotalCount(query.getFilter().orElse(initializeSearchEntity())));
+        return (DataProvider<T, T>) fromFilteringCallbacks.withConfigurableFilter();
     }
 
-    protected abstract int getTotalCount();
+    protected abstract int getTotalCount(T probe);
 
-    private Stream<T> getPagedData(int offset, int limit) {
+    private Stream<T> getPagedData(Query<T, T> query) {
+        int offset = query.getOffset();
+        int limit = query.getLimit();
         int pageNumber = offset / limit;
         int remainder = offset % limit == 0 ? 0 : offset - (pageNumber * limit);
         int pageSize = limit;
-        Stream<T> stream = getData(pageNumber, pageSize);
+        Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(initializeSearchEntity()));
         if (remainder != 0) {
-            Stream<T> nextStream = getData(pageNumber + 1, pageSize);
+            Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(initializeSearchEntity()));
             stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
         }
         return stream;
@@ -37,6 +44,11 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
         return null;
     }
 
-    protected abstract Stream<T> getData(int pageNumber, int pageSize);
+    protected abstract Stream<T> getData(int pageNumber, int pageSize, T searchEntity);
+
+    @Override
+    protected boolean isGridFilterEnabled() {
+        return true;
+    }
 
 }

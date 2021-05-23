@@ -1,21 +1,29 @@
 package io.graphenee.vaadin.flow.base;
 
 import java.math.RoundingMode;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -24,8 +32,10 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridMultiSelectionModel;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
+import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
+import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -34,29 +44,26 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 
-import io.graphenee.core.util.TRCalendarUtil;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
-import io.graphenee.vaadin.flow.renderer.GxLongToDateRenderer;
-import io.graphenee.vaadin.flow.renderer.GxLongToDateTimeRenderer;
-import io.graphenee.vaadin.flow.renderer.GxTimestampRenderer;
+import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -73,6 +80,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     private boolean isBuilt = false;
 
     private boolean editable = true;
+
+    private boolean dragAndDropEnabled = false;
 
     private MenuItem addMenuItem;
 
@@ -98,7 +107,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     private List<T> items;
 
-    private Column<T> columnByKey;
+    private Map<String, MenuItem> hidingColumnMap = new HashMap<>();
+
+    private T searchEntity;
+
+    private NumberFormat defaultNumberFormat;
 
     public GxAbstractEntityList(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -109,6 +122,15 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         addClassName("gx-abstract-entity-list");
     }
 
+    protected T initializeSearchEntity() {
+        try {
+            return entityClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     synchronized private GxAbstractEntityList<T> build() {
         if (!isBuilt) {
             dataGrid = dataGrid(entityClass);
@@ -120,6 +142,19 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             if (dataProvider != null) {
                 dataGrid.setDataProvider(dataProvider);
             }
+
+            dataGrid.setRowsDraggable(true);
+            dataGrid.addDragStartListener(event -> {
+                onDragStart(event);
+            });
+
+            dataGrid.addDragEndListener(event -> {
+                onDragEnd(event);
+            });
+
+            dataGrid.addDropListener(event -> {
+                onDrop(event);
+            });
 
             dataGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
 
@@ -165,9 +200,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                 for (int i = 0; i < visibleProperties().length; i++) {
                     String propertyName = visibleProperties()[i];
                     Column<T> column = dataGrid.getColumnByKey(propertyName);
-                    PropertyDefinition<T, ?> propertyDefinition;
+                    PropertyDefinition<T, Object> propertyDefinition;
                     try {
-                        propertyDefinition = propertySet.getProperty(propertyName).get();
+                        propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
                         Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
                         if (renderer != null) {
                             if (column != null)
@@ -179,10 +214,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                                 column = dataGrid.addColumn(propertyName);
                         }
                         configureDefaults(propertyName, column, propertyDefinition);
-                        if (i == 0 || i == visibleProperties().length - 1) {
-                            column.setFlexGrow(1);
-                            column.setAutoWidth(true);
-                        }
+
                         if (isGridFilterEnabled()) {
                             addFilteredColumn(column, propertyDefinition);
                         }
@@ -191,11 +223,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                         MenuItem columnMenuItem = columnsSubMenu.addItem(propertyDefinition.getCaption(), cl -> {
                             boolean checked = cl.getSource().isChecked();
                             cl.getSource().setChecked(checked);
-                            columnByKey = dataGrid.getColumnByKey(propertyName);
+                            Column<T> columnByKey = dataGrid.getColumnByKey(propertyName);
                             columnByKey.setVisible(checked);
                         });
                         columnMenuItem.setCheckable(true);
                         columnMenuItem.setChecked(true);
+                        hidingColumnMap.put(propertyName, columnMenuItem);
                     } catch (Exception ex) {
                         log.warn(propertyName + " error: " + ex.getMessage());
                     }
@@ -205,7 +238,17 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                 }
                 dataGrid.setColumnOrder(columns);
                 Column<T> endColumn = dataGrid.addComponentColumn(source -> new Span());
-                endColumn.setResizable(false);
+                endColumn.setKey("__gxLastColumn");
+                endColumn.setFlexGrow(1);
+            }
+
+            dataGrid.getColumns().stream().filter(c -> !c.getKey().equals("__gxLastColumn")).forEach(col -> col.setVisible(false));
+
+            for (String key : visibleProperties()) {
+                Column<T> columnByKey = dataGrid.getColumnByKey(key);
+                if (columnByKey != null) {
+                    columnByKey.setVisible(true);
+                }
             }
 
             mainLayout.addToPrimary(dataGrid);
@@ -247,6 +290,24 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             isBuilt = true;
         }
         return this;
+    }
+
+    protected void onDrop(GridDropEvent<T> event) {
+    }
+
+    protected void onDragEnd(GridDragEndEvent<T> event) {
+    }
+
+    protected void onDragStart(GridDragStartEvent<T> event) {
+    }
+
+    protected void setColumnVisibility(String propertyName, boolean isVisible) {
+        MenuItem mi = hidingColumnMap.get(propertyName);
+        if (mi != null) {
+            mi.setChecked(isVisible);
+            Column<T> columnByKey = entityGrid().getColumnByKey(propertyName);
+            columnByKey.setVisible(isVisible);
+        }
     }
 
     protected Grid<T> dataGrid(Class<T> entityClass) {
@@ -310,30 +371,153 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     }
 
     @SuppressWarnings("unchecked")
-    private void addFilteredColumn(Column<T> column, PropertyDefinition<T, ?> propertyDefinition) {
-        if (dataGrid.getDataProvider() instanceof InMemoryDataProvider) {
-            InMemoryDataProvider<T> dataProvider = (InMemoryDataProvider<T>) dataGrid.getDataProvider();
-            TextField filterTF = new TextField();
-            filterTF.setClearButtonVisible(true);
-            filterTF.addValueChangeListener(event -> {
+    private void addFilteredColumn(Column<T> column, PropertyDefinition<T, Object> propertyDefinition) {
+        if (searchEntity == null) {
+            searchEntity = initializeSearchEntity();
+        }
+        AbstractField<?, ?> columnFilter = defaultColumnFilterForProperty(column.getKey(), propertyDefinition);
+        columnFilter.addValueChangeListener(event -> {
+            if (entityGrid().getDataProvider() instanceof InMemoryDataProvider) {
+                InMemoryDataProvider<T> dataProvider = (InMemoryDataProvider<T>) entityGrid().getDataProvider();
                 dataProvider.addFilter(fe -> {
-                    Object value = propertyDefinition.getGetter().apply(fe);
-                    if (value != null) {
-                        return StringUtils.containsIgnoreCase(value.toString(), filterTF.getValue());
+                    if (columnFilter.isEmpty()) {
+                        return true;
                     }
-                    return false;
+                    Object filterValue = columnFilter.getValue();
+                    Object columnValue = propertyDefinition.getGetter().apply(fe);
+                    boolean matched = filterValue.equals(columnValue);
+                    if (!matched) {
+                        String fv = filterValue.toString().trim();
+                        String cv = columnValue.toString().trim();
+                        matched = fv.equalsIgnoreCase(cv);
+                        if (!matched) {
+                            try {
+                                Pattern p = Pattern.compile(fv, Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
+                                matched = p.matcher(cv).find();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    return matched;
                 });
                 dataProvider.refreshAll();
-            });
-
-            if (headerRow == null) {
-                headerRow = dataGrid.appendHeaderRow();
+            } else if (entityGrid().getDataProvider() instanceof ConfigurableFilterDataProvider) {
+                ConfigurableFilterDataProvider<T, Void, Object> dataProvider = (ConfigurableFilterDataProvider<T, Void, Object>) entityGrid().getDataProvider();
+                propertyDefinition.getSetter().ifPresent(setter -> {
+                    if (event.getValue() == null || event.getValue().toString().isBlank()) {
+                        setter.accept(searchEntity, null);
+                    } else {
+                        Object o = event.getValue();
+                        setter.accept(searchEntity, convertValue(o, column.getKey(), propertyDefinition.getType()));
+                    }
+                    dataProvider.setFilter(searchEntity);
+                });
             }
+        });
 
-            headerRow.getCell(column).setComponent(filterTF);
-            filterTF.setValueChangeMode(ValueChangeMode.EAGER);
-            filterTF.setPlaceholder(propertyDefinition.getCaption());
+        if (headerRow == null) {
+            headerRow = dataGrid.appendHeaderRow();
         }
+
+        headerRow.getCell(column).setComponent(columnFilter);
+    }
+
+    private Object convertValue(Object o, String key, Class<Object> type) {
+        try {
+            if (o instanceof LocalDate) {
+                Date d = java.sql.Date.valueOf((LocalDate) o);
+                if (d.getClass().equals(type))
+                    return d;
+                if (type.equals(Long.class))
+                    return d.getTime();
+                if (type.equals(Timestamp.class))
+                    return new Timestamp(d.getTime());
+            }
+            if (o instanceof LocalDateTime) {
+                Timestamp d = Timestamp.valueOf((LocalDateTime) o);
+                if (d.getClass().equals(type))
+                    return d;
+                if (type.equals(Long.class))
+                    return d.getTime();
+                if (type.equals(Date.class))
+                    return new Date(d.getTime());
+            }
+            if (o instanceof Boolean) {
+                Boolean b = (Boolean) o;
+                if (b.getClass().equals(type))
+                    return b;
+            }
+            if (o instanceof String) {
+                String v = (String) o;
+                if (type.equals(String.class))
+                    return v;
+                if (type.equals(Integer.class))
+                    return Integer.valueOf(v);
+                if (type.equals(Long.class))
+                    return Long.valueOf(v);
+                if (type.equals(Double.class))
+                    return Double.valueOf(v);
+                if (type.equals(Boolean.class))
+                    return Boolean.valueOf(v);
+            }
+            if (o instanceof Number) {
+                Number n = (Number) o;
+                if (type.equals(Integer.class))
+                    return n.intValue();
+                if (type.equals(Long.class))
+                    return n.longValue();
+                if (type.equals(Double.class))
+                    return n.doubleValue();
+                if (type.equals(Float.class))
+                    return n.floatValue();
+            }
+            return o;
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+        AbstractField<?, ?> filter = columnFilterForProperty(propertyName, propertyDefinition);
+        if (filter == null) {
+            if (propertyName.matches("date.*|.*Date")) {
+                if (propertyDefinition.getType().equals(Long.class)) {
+                    filter = new DatePicker();
+                } else if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
+                    filter = new DatePicker();
+                }
+            }
+            if (filter == null && propertyName.matches("dateTime.*|.*DateTime")) {
+                if (propertyDefinition.getType().equals(Long.class)) {
+                    filter = new DateTimePicker();
+                }
+            }
+            if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
+                filter = new DateTimePicker();
+            }
+            if (filter == null && propertyDefinition.getType().equals(Date.class)) {
+                filter = new DatePicker();
+            }
+            if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
+                filter = new Checkbox();
+            }
+            if (filter == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+                filter = new NumberField();
+            }
+            if (filter == null) {
+                filter = new TextField();
+            }
+        }
+        filter.getElement().getStyle().set("width", "100%");
+        filter.getElement().setProperty("clearButtonVisible", true);
+        filter.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+        return filter;
+    }
+
+    protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+        return null;
     }
 
     protected void decorateMenuBar(MenuBar menuBar) {
@@ -347,42 +531,44 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         Renderer<T> renderer = rendererForProperty(propertyName, propertyDefinition);
         if (renderer == null) {
             if (propertyName.matches("date.*|.*Date")) {
-                if (propertyDefinition.getType().equals(Long.class)) {
-                    renderer = new GxLongToDateRenderer<>((ValueProvider<T, Long>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
+                if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+                    renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResultion.Date);
                 } else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-                    renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
+                    renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResultion.Date);
                 }
             }
             if (renderer == null && propertyName.matches("dateTime.*|.*DateTime")) {
-                if (propertyDefinition.getType().equals(Long.class)) {
-                    renderer = new GxLongToDateTimeRenderer<>((ValueProvider<T, Long>) propertyDefinition.getGetter(), TRCalendarUtil.dateTimeFormatter.toLocalizedPattern());
-                }
-            }
-            if (renderer == null && propertyName.matches("time.*|.*Time")) {
-                if (propertyDefinition.getType().equals(Long.class)) {
-                    renderer = new GxLongToDateTimeRenderer<>((ValueProvider<T, Long>) propertyDefinition.getGetter(), TRCalendarUtil.timeFormatter.toLocalizedPattern());
+                if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+                    renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResultion.DateTime);
                 } else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-                    renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.timeFormatter.toLocalizedPattern());
+                    renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResultion.DateTime);
                 }
             }
             if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-                renderer = new GxTimestampRenderer<>((ValueProvider<T, Timestamp>) propertyDefinition.getGetter(), TRCalendarUtil.dateTimeFormatter.toLocalizedPattern());
+                renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResultion.DateTime);
             }
             if (renderer == null && propertyDefinition.getType().equals(Date.class)) {
-                renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), TRCalendarUtil.dateFormatter.toLocalizedPattern());
+                renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResultion.Date);
             }
             if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
                 renderer = TemplateRenderer.<T> of("<vaadin-checkbox checked=[[item.value]] disabled=true />").withProperty("value", propertyDefinition.getGetter());
             }
             if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-                DecimalFormat numberFormat = new DecimalFormat();
-                numberFormat.setRoundingMode(RoundingMode.CEILING);
-                numberFormat.setGroupingUsed(true);
-                numberFormat.setGroupingSize(3);
+                NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
                 renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), numberFormat);
             }
         }
         return renderer;
+    }
+
+    protected NumberFormat numberFormatForProperty(String propertyName, PropertyDefinition<T, ?> propertyDefinition) {
+        if (defaultNumberFormat == null) {
+            defaultNumberFormat = DecimalFormat.getNumberInstance();
+            defaultNumberFormat.setMaximumFractionDigits(2);
+            defaultNumberFormat.setGroupingUsed(true);
+            defaultNumberFormat.setRoundingMode(RoundingMode.CEILING);
+        }
+        return defaultNumberFormat;
     }
 
     protected Renderer<T> rendererForProperty(String propertyName, PropertyDefinition<T, ?> propertyDefinition) {
@@ -393,6 +579,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         column.setId(propertyName);
         column.setHeader(propertyDefinition.getCaption());
         column.setResizable(true);
+        column.setAutoWidth(true);
+        column.setFlexGrow(0);
         if (propertyDefinition != null) {
             if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
                 column.setTextAlign(ColumnTextAlign.END);
@@ -415,6 +603,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     public boolean isEditable() {
         return editable;
+    }
+
+    public void setDragAndDropEnabled(boolean enabled) {
+        this.dragAndDropEnabled = enabled;
+    }
+
+    public boolean isDragAndDropEnabled() {
+        return this.dragAndDropEnabled;
     }
 
     public void shouldShowToolbar(boolean show) {
@@ -460,6 +656,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     public void refresh() {
         build();
         crudMenuBar.setVisible(isEditable());
+        dataGrid.setRowsDraggable(isDragAndDropEnabled());
         if (!shouldShowFormInDialog()) {
             if (mainLayout.getSecondaryComponent() != null)
                 mainLayout.getSecondaryComponent().setVisible(false);
@@ -535,43 +732,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     protected abstract void onDelete(Collection<T> entities);
 
-    public GxAbstractEntityList<T> withSearchForm(GxAbstractSearchForm<?> searchForm) {
-        setSearchForm(searchForm);
-        return this;
-    }
-
-    public void setSearchForm(GxAbstractSearchForm<?> searchForm) {
-        MenuItem searchMenuItem = customMenuBar.addItem("Search");
-        searchMenuItem.add(new Icon(VaadinIcon.SEARCH));
-        MenuItem clearSearchMenuItem = customMenuBar.addItem("Clear");
-        clearSearchMenuItem.add(new Icon(VaadinIcon.CLOSE));
-        clearSearchMenuItem.setEnabled(false);
-
-        searchMenuItem.addClickListener(cl -> {
-            try {
-                searchForm.showInDialog();
-                clearSearchMenuItem.setEnabled(true);
-                searchForm.getDismissButton().addClickListener(l -> {
-                    clearSearchMenuItem.setEnabled(false);
-                });
-            } catch (Exception e) {
-                Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-            }
-        });
-
-        clearSearchMenuItem.addClickListener(cl -> {
-            try {
-                clearSearchMenuItem.setEnabled(false);
-                onClearSearchFilter();
-            } catch (Exception e) {
-                Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-            }
-        });
-    }
-
-    protected void onClearSearchFilter() {
-    }
-
     public Grid<T> entityGrid() {
         return dataGrid;
     }
@@ -605,10 +765,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     }
 
     public void hideSecondaryComponent() {
-        mainLayout.setSplitterPosition(0.0);
+        mainLayout.getSecondaryComponent().setVisible(false);
         if (formLayout != null) {
             formLayout.removeAll();
         }
+    }
+
+    public boolean isSecondaryComponentVisible() {
+        return mainLayout != null && mainLayout.getSecondaryComponent() != null && mainLayout.getSecondaryComponent().isVisible();
     }
 
     public Dialog showInDialog() {

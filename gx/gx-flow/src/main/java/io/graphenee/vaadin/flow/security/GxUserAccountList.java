@@ -12,11 +12,11 @@ import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
 @Component
 @Scope("prototype")
-public class GxUserAccountList extends GxAbstractEntityLazyList<GxUserAccountBean> {
+public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,14 +38,7 @@ public class GxUserAccountList extends GxAbstractEntityLazyList<GxUserAccountBea
     }
 
     @Override
-    protected int getTotalCount() {
-        if (namespace == null)
-            return dataService.findUserAccount().size();
-        return dataService.findUserAccountByNamespace(namespace).size();
-    }
-
-    @Override
-    protected Stream<GxUserAccountBean> getData(int pageNumber, int pageSize) {
+    protected Stream<GxUserAccountBean> getData() {
         if (namespace == null)
             return dataService.findUserAccount().stream();
         return dataService.findUserAccountByNamespace(namespace).stream();
