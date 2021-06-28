@@ -9,7 +9,7 @@ import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.core.util.TRCalendarUtil;
 
-public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
+public class GxNumberToDateRenderer<T> extends BasicRenderer<T, Number> {
 
     private static final long serialVersionUID = 1L;
 
@@ -22,12 +22,12 @@ public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
     private String datePattern;
     private DateFormat dateFormat;
 
-    public GxDateRenderer(ValueProvider<T, Date> valueProvider, String datePattern) {
+    public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, String datePattern) {
         super(valueProvider);
         this.datePattern = datePattern;
     }
 
-    public GxDateRenderer(ValueProvider<T, Date> valueProvider, GxDateResolution resolution) {
+    public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, GxDateResolution resolution) {
         super(valueProvider);
         switch (resolution) {
         case Date:
@@ -43,12 +43,12 @@ public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
     }
 
     @Override
-    protected String getFormattedValue(Date value) {
+    protected String getFormattedValue(Number value) {
         if (value != null) {
             if (datePattern != null) {
-                return TRCalendarUtil.getFormattedDate(value, datePattern);
+                return TRCalendarUtil.getFormattedDate(new Date(value.longValue()), datePattern);
             }
-            return dateFormat.format(value);
+            return dateFormat.format(new Date(value.longValue()));
         }
         return null;
     }

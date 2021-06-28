@@ -46,7 +46,7 @@
 }
 
 ::-webkit-scrollbar {
-  width: .4em;
+  width: 0.4em;
   background-color: transparent;
   display: block;
   overflow: auto;
@@ -74,4 +74,17 @@
 
 div[slot="application-content"] {
   height: calc(100% - 72px) !important;
+}
+
+[part~="cell"].gx-grid-warning-color {
+  background-color: #ffc107;
+}
+
+[part~="cell"].flex-space-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+[part~="header-cell"] {
+  white-space: normal;
 }
