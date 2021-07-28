@@ -284,7 +284,7 @@ public class JpaSpecificationBuilder<T> {
             }
         }
         Specification<T> spec = (root, cq, cb) -> {
-            return cb.in(root.get(key)).in(filtered);
+            return cb.in(root.get(key)).in(filtered).not();
         };
         specsQueue.add(spec);
         return this;
