@@ -12,7 +12,7 @@ public class GxRadarChart extends VerticalLayout {
     private static final long serialVersionUID = 1L;
     private ApexCharts radarChart;
 
-    public void initializeWithLabelsAndSeries(String[] label, Series... series) {
+    public void initializeWithLabelsAndSeries(String[] label, Series<?>... series) {
 
         radarChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.radar).build()).withSeries(series).withLabels(label).build();
         removeAll();

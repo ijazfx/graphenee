@@ -48,8 +48,11 @@ public class GxSecurityGroupForm extends GxAbstractEntityForm<GxSecurityGroupBea
         isActive = new Checkbox("Is Active?");
         securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
                 .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+        securityPolicyCollectionFault.setSizeFull();
+
         userAccountCollectionFault = new TwinColGrid<GxUserAccountBean>().addFilterableColumn(GxUserAccountBean::getUsername, "User Name", "User Name", true)
                 .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+        userAccountCollectionFault.setSizeFull();
 
         entityForm.add(securityGroupName, securityGroupDescription, priority, isActive);
     }
@@ -72,5 +75,5 @@ public class GxSecurityGroupForm extends GxAbstractEntityForm<GxSecurityGroupBea
         securityPolicyCollectionFault.setItems(gxDataService.findSecurityPolicyByNamespaceActive(entity.getNamespaceFault().getBean()));
         userAccountCollectionFault.setItems(gxDataService.findUserAccountByNamespace(entity.getNamespaceFault().getBean()));
     }
-    
+
 }

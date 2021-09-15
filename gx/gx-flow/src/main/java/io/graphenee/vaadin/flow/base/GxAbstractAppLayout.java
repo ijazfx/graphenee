@@ -101,7 +101,7 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
     }
 
     private String buildTitle() {
-        return flowSetup().appTitle() + " - v" + flowSetup().appVersion();
+        return flowSetup().appTitleWithVersion();
     }
 
     private Component buildProfileMenu() {
@@ -109,7 +109,7 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 
         MenuBar profileMenuBar = new MenuBar();
         profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
-        profileMenuBar.addItem(user.getUsername());
+        profileMenuBar.addItem(user.getFirstName());
         profileMenuBar.addItem("|");
         profileMenuBar.addItem("Sign Out", event -> {
             VaadinSession.getCurrent().close();

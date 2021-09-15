@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 
+@CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
 public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T> {
 
     private static final long serialVersionUID = 1L;
@@ -20,13 +22,14 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
     }
 
     @Override
-    protected DataProvider<T, ?> dataProvider(Class<T> entityClass) {
-        DataProvider<T, Void> dataProvider = new AbstractBackEndHierarchicalDataProvider<T, Void>() {
+    @SuppressWarnings("unchecked")
+    protected DataProvider<T, T> dataProvider(Class<T> entityClass) {
+        DataProvider<T, T> dataProvider = new AbstractBackEndHierarchicalDataProvider<T, T>() {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public int getChildCount(HierarchicalQuery<T, Void> query) {
-                return GxAbstractEntityTreeList.this.getChildCount(query.getParent());
+            public int getChildCount(HierarchicalQuery<T, T> query) {
+                return GxAbstractEntityTreeList.this.getChildCount(query.getParent(), query.getFilter().orElse(initializeSearchEntity()));
             }
 
             @Override
@@ -35,19 +38,18 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
             }
 
             @Override
-            protected Stream<T> fetchChildrenFromBackEnd(HierarchicalQuery<T, Void> query) {
-                return getData(query.getParent());
+            protected Stream<T> fetchChildrenFromBackEnd(HierarchicalQuery<T, T> query) {
+                return getData(query.getParent(), query.getFilter().orElse(initializeSearchEntity()));
             }
         };
-
-        return dataProvider;
+        return (DataProvider<T, T>) dataProvider.withConfigurableFilter();
     }
 
-    protected abstract int getChildCount(T parent);
+    protected abstract int getChildCount(T parent, T probe);
 
     protected abstract boolean hasChildren(T parent);
 
-    protected abstract Stream<T> getData(T parent);
+    protected abstract Stream<T> getData(T parent, T probe);
 
     @Override
     final protected Stream<T> getData() {
@@ -69,8 +71,12 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
         }
         removeList.forEach(c -> treeGrid.removeColumn(c));
         treeGrid.setColumnOrder(keepList);
-        treeGrid.setHierarchyColumn(visibleProperties()[0]);
+        treeGrid.setHierarchyColumn(hierarchyColumnProperty());
         return treeGrid;
+    }
+
+    protected String hierarchyColumnProperty() {
+        return visibleProperties()[0];
     }
 
 }

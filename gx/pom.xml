@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx</artifactId>
 	<packaging>pom</packaging>
-	<version>3.3.1-SNAPSHOT</version>
+	<version>3.3.2-SNAPSHOT</version>
 	<name>Graphenee Parent</name>
 	<description>Graphenee Parent Project</description>
 	<url>https://github.com/ijazfx/graphenee</url>
@@ -49,7 +47,7 @@
 		<version.itextpdf>5.5.12</version.itextpdf>
 		<version.lombok>1.18.12</version.lombok>
 		<version.gson>2.8.6</version.gson>
-		<version.pdfbox>2.0.23</version.pdfbox>
+		<version.pdfbox>3.0.0-RC1</version.pdfbox>
 		<version.poi>4.1.2</version.poi>
 		<version.retrofit>2.5.0</version.retrofit>
 		<version.protobuf>3.8.0</version.protobuf>
@@ -59,6 +57,7 @@
 		<version.jasper>6.12.2</version.jasper>
 		<version.grpc>1.23.0</version.grpc>
 		<version.firebase.admin>6.12.2</version.firebase.admin>
+		<version.rxjava>3.1.1</version.rxjava>
 	</properties>
 
 	<!-- Repositories -->
@@ -243,6 +242,11 @@
 				<groupId>com.google.firebase</groupId>
 				<artifactId>firebase-admin</artifactId>
 				<version>${version.firebase.admin}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.reactivex.rxjava3</groupId>
+				<artifactId>rxjava</artifactId>
+				<version>${version.rxjava}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
