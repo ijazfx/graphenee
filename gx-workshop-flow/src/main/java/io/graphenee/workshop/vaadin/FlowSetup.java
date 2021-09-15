@@ -9,7 +9,6 @@ import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 
 import org.springframework.stereotype.Component;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.base.GxMenuItem;
 import io.graphenee.vaadin.flow.security.GxSecurityGroupListView;
@@ -35,9 +34,9 @@ public class FlowSetup extends GxAbstractFlowSetup {
         List<GxMenuItem> items = new ArrayList<>();
 
         GxMenuItem securityMenuItem = GxMenuItem.create("Security", VaadinIcon.SHIELD.create());
-        securityMenuItem.add(GxMenuItem.create("User Accounts", VaadinIcon.USER.create(), GxUserAccountListView.VIEW_NAME));
-        securityMenuItem.add(GxMenuItem.create("Security Groups", VaadinIcon.TABLE.create(), GxSecurityGroupListView.VIEW_NAME));
-        securityMenuItem.add(GxMenuItem.create("Security Policies", VaadinIcon.TABLE.create(), GxSecurityPolicyListView.VIEW_NAME));
+        securityMenuItem.add(GxMenuItem.create("User Accounts", VaadinIcon.USER.create(), GxUserAccountListView.class));
+        securityMenuItem.add(GxMenuItem.create("Security Groups", VaadinIcon.TABLE.create(), GxSecurityGroupListView.class));
+        securityMenuItem.add(GxMenuItem.create("Security Policies", VaadinIcon.TABLE.create(), GxSecurityPolicyListView.class));
         items.add(securityMenuItem);
 
         return items;

@@ -12,11 +12,11 @@ import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
 @Component
 @Scope("prototype")
-public class GxSecurityGroupList extends GxAbstractEntityLazyList<GxSecurityGroupBean> {
+public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBean> {
     private static final long serialVersionUID = 1L;
 
 
@@ -33,14 +33,7 @@ public class GxSecurityGroupList extends GxAbstractEntityLazyList<GxSecurityGrou
     }
 
     @Override
-    protected int getTotalCount() {
-        if(namespace == null)
-            return dataService.findSecurityGroup().size();
-        return dataService.findSecurityGroupByNamespace(namespace).size();
-    }
-
-    @Override
-    protected Stream<GxSecurityGroupBean> getData(int pageNumber, int pageSize) {
+    protected Stream<GxSecurityGroupBean> getData() {
         if(namespace == null)
             return dataService.findSecurityGroup().stream();
         return dataService.findSecurityGroupByNamespace(namespace).stream();

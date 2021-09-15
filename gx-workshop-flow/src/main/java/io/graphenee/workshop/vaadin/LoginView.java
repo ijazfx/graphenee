@@ -1,9 +1,10 @@
 package io.graphenee.workshop.vaadin;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
+import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.Route;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;
@@ -14,7 +15,7 @@ import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.base.GxAbstractLoginView;
 import io.graphenee.vaadin.flow.security.GxUserAccountAuthenticatedUser;
 
-@Route("login")
+@Route(value = "login")
 public class LoginView extends GxAbstractLoginView {
 
 	private static final long serialVersionUID = 1L;

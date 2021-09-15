@@ -65,8 +65,11 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 		isPasswordChangeRequired = new Checkbox("Is Password Change Required?");
 		securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
 				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+		securityPolicyCollectionFault.setSizeFull();
+
 		securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>().addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
 				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+		securityGroupCollectionFault.setSizeFull();
 
 		// Radio Buttons for gender
 		// gender = new RadioButtonGroup<>();

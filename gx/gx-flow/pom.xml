@@ -89,6 +89,14 @@
 			<artifactId>twincolgrid</artifactId>
 			<version>2.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>io.reactivex.rxjava3</groupId>
+			<artifactId>rxjava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+		</dependency>
 	</dependencies>
 
 	<!-- Build -->
