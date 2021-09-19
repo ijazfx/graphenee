@@ -10,10 +10,34 @@
 	<!-- Parent -->
 	<parent>
 		<groupId>io.graphenee</groupId>
-		<version>2.1.0-SNAPSHOT</version>
+		<version>3.3.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 		<artifactId>gx</artifactId>
 	</parent>
+
+	<properties>
+		<version.jbpm>6.4.0.Final</version.jbpm>
+		<version.drools>6.4.0.Final</version.drools>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.drools</groupId>
+				<artifactId>drools-bom</artifactId>
+				<type>pom</type>
+				<version>${version.drools}</version>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jbpm</groupId>
+				<artifactId>jbpm-bom</artifactId>
+				<type>pom</type>
+				<version>${version.jbpm}</version>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<!-- Dependencies -->
 	<dependencies>

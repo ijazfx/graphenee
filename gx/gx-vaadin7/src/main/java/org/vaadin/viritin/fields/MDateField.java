@@ -15,152 +15,154 @@ import java.util.Map;
  */
 public class MDateField extends DateField {
 
-    public MDateField() {
-    }
+	private static final long serialVersionUID = 1L;
 
-    public MDateField(String caption) {
-        super(caption);
-    }
+	public MDateField() {
+	}
 
-    public MDateField(String caption, Property dataSource) {
-        super(caption, dataSource);
-    }
+	public MDateField(String caption) {
+		super(caption);
+	}
 
-    public MDateField(Property dataSource) throws IllegalArgumentException {
-        super(dataSource);
-    }
+	public MDateField(String caption, Property dataSource) {
+		super(caption, dataSource);
+	}
 
-    public MDateField(String caption, Date value) {
-        super(caption, value);
-    }
+	public MDateField(Property dataSource) throws IllegalArgumentException {
+		super(dataSource);
+	}
 
-    public enum InitialTimeMode {
-        START_OF_DAY, END_OF_DAY, NOW
-    }
+	public MDateField(String caption, Date value) {
+		super(caption, value);
+	}
 
-    private InitialTimeMode initialTimeMode;
+	public enum InitialTimeMode {
+		START_OF_DAY,
+		END_OF_DAY,
+		NOW
+	}
 
-    /**
-     * Flag to tell if setting the initial (from null to something) value by the
-     * end user
-     */
-    private boolean settingInitialValue;
+	private InitialTimeMode initialTimeMode;
 
-    /**
-     * @return the method how value of the time part is to be initialized when
-     * resolution setting don't show time.
-     */
-    public InitialTimeMode getInitialTimeMode() {
-        return initialTimeMode;
-    }
+	/**
+	 * Flag to tell if setting the initial (from null to something) value by the
+	 * end user
+	 */
+	private boolean settingInitialValue;
 
-    /**
-     *
-     * @param initialTimeMode the method how value of the time part is to be initialized when
-     * resolution setting don't show time.
-     */
-    public void setInitialTimeMode(InitialTimeMode initialTimeMode) {
-        this.initialTimeMode = initialTimeMode;
-    }
+	/**
+	 * @return the method how value of the time part is to be initialized when
+	 * resolution setting don't show time.
+	 */
+	public InitialTimeMode getInitialTimeMode() {
+		return initialTimeMode;
+	}
 
-    @Override
-    public void changeVariables(Object source, Map<String, Object> variables) {
-        if (getValue() == null) {
-            settingInitialValue = true;
-        }
-        super.changeVariables(source, variables);
-        settingInitialValue = false;
-    }
+	/**
+	 *
+	 * @param initialTimeMode the method how value of the time part is to be initialized when
+	 * resolution setting don't show time.
+	 */
+	public void setInitialTimeMode(InitialTimeMode initialTimeMode) {
+		this.initialTimeMode = initialTimeMode;
+	}
 
-    @Override
-    protected void setValue(Date newValue, boolean repaintIsNotNeeded) throws ReadOnlyException {
-        if (settingInitialValue && getResolution().ordinal() > Resolution.HOUR.ordinal()) {
-            if (getInitialTimeMode() == InitialTimeMode.START_OF_DAY) {
-                newValue.setHours(0);
-                newValue.setMinutes(0);
-                newValue.setSeconds(0);
-                newValue.setTime(
-                        newValue.getTime() - newValue.getTime() % 1000l);
-            } else if (getInitialTimeMode() == InitialTimeMode.END_OF_DAY) {
-                newValue.setHours(23);
-                newValue.setMinutes(59);
-                newValue.setSeconds(59);
-                newValue.setTime(
-                        newValue.getTime() - newValue.getTime() % 1000l + 999l);
-            }
-        }
-        super.setValue(newValue, repaintIsNotNeeded);
-    }
+	@Override
+	public void changeVariables(Object source, Map<String, Object> variables) {
+		if (getValue() == null) {
+			settingInitialValue = true;
+		}
+		super.changeVariables(source, variables);
+		settingInitialValue = false;
+	}
 
-    public MDateField withIcon(Resource icon) {
-        setIcon(icon);
-        return this;
-    }
+	@Override
+	protected void setValue(Date newValue, boolean repaintIsNotNeeded) throws ReadOnlyException {
+		if (settingInitialValue && getResolution().ordinal() > Resolution.HOUR.ordinal()) {
+			if (getInitialTimeMode() == InitialTimeMode.START_OF_DAY) {
+				newValue.setHours(0);
+				newValue.setMinutes(0);
+				newValue.setSeconds(0);
+				newValue.setTime(newValue.getTime() - newValue.getTime() % 1000l);
+			} else if (getInitialTimeMode() == InitialTimeMode.END_OF_DAY) {
+				newValue.setHours(23);
+				newValue.setMinutes(59);
+				newValue.setSeconds(59);
+				newValue.setTime(newValue.getTime() - newValue.getTime() % 1000l + 999l);
+			}
+		}
+		super.setValue(newValue, repaintIsNotNeeded);
+	}
 
-    public MDateField withResolution(Resolution resolution) {
-        setResolution(resolution);
-        return this;
-    }
+	public MDateField withIcon(Resource icon) {
+		setIcon(icon);
+		return this;
+	}
 
-    public MDateField withStyleName(String... styleNames) {
-        for (String styleName : styleNames) {
-            addStyleName(styleName);
-        }
-        return this;
-    }
+	public MDateField withResolution(Resolution resolution) {
+		setResolution(resolution);
+		return this;
+	}
 
-    public MDateField withRequired(boolean required) {
-        setRequired(required);
-        return this;
-    }
+	public MDateField withStyleName(String... styleNames) {
+		for (String styleName : styleNames) {
+			addStyleName(styleName);
+		}
+		return this;
+	}
 
-    public MDateField withRequiredError(String requiredError) {
-        setRequiredError(requiredError);
-        return this;
-    }
+	public MDateField withRequired(boolean required) {
+		setRequired(required);
+		return this;
+	}
 
-    public MDateField withFullWidth() {
-        setWidth("100%");
-        return this;
-    }
+	public MDateField withRequiredError(String requiredError) {
+		setRequiredError(requiredError);
+		return this;
+	}
 
-    public MDateField withValue(Date newDate) {
-        setValue(newDate);
-        return this;
-    }
+	public MDateField withFullWidth() {
+		setWidth("100%");
+		return this;
+	}
 
-    public MDateField withValueChangeListener(Property.ValueChangeListener listener) {
-        addValueChangeListener(listener);
-        return this;
-    }
+	public MDateField withValue(Date newDate) {
+		setValue(newDate);
+		return this;
+	}
 
-    public MDateField withBlurListener(FieldEvents.BlurListener listener) {
-        addBlurListener(listener);
-        return this;
-    }
+	public MDateField withValueChangeListener(Property.ValueChangeListener listener) {
+		addValueChangeListener(listener);
+		return this;
+	}
 
-    public MDateField withWidth(float width, Unit unit) {
-        setWidth(width, unit);
-        return this;
-    }
+	public MDateField withBlurListener(FieldEvents.BlurListener listener) {
+		addBlurListener(listener);
+		return this;
+	}
 
-    public MDateField withWidth(String width) {
-        setWidth(width);
-        return this;
-    }
+	public MDateField withWidth(float width, Unit unit) {
+		setWidth(width, unit);
+		return this;
+	}
 
-    public MDateField withId(String id) {
-        setId(id);
-        return this;
-    }
+	public MDateField withWidth(String width) {
+		setWidth(width);
+		return this;
+	}
 
-    public MDateField withVisible(boolean visible) {
-        setVisible(visible);
-        return this;
-    }
+	public MDateField withId(String id) {
+		setId(id);
+		return this;
+	}
 
-    public MDateField withDateFormat(String dateFormat){
-        setDateFormat(dateFormat);
-        return this;
-    }
+	public MDateField withVisible(boolean visible) {
+		setVisible(visible);
+		return this;
+	}
+
+	public MDateField withDateFormat(String dateFormat) {
+		setDateFormat(dateFormat);
+		return this;
+	}
 }

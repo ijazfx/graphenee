@@ -31,6 +31,7 @@ import com.vaadin.server.CompositeErrorMessage;
 import com.vaadin.server.ErrorMessage;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * A an extension to basic Vaadin TextField. Uses the only sane default for
@@ -62,6 +63,7 @@ public class MTextField extends TextField implements EagerValidateable {
 		autocomplete = AutoComplete.off;
 		autocorrect = AutoCorrect.off;
 		autocapitalize = AutoCapitalize.off;
+		setWidth("100%");
 	}
 
 	public MTextField(String caption) {
@@ -131,6 +133,21 @@ public class MTextField extends TextField implements EagerValidateable {
 	public MTextField withConverter(Converter<String, ?> converter) {
 		setConverter(converter);
 		return this;
+	}
+
+	public MTextField alignRight() {
+		setStyleName(ValoTheme.TEXTFIELD_ALIGN_RIGHT);
+		return this;
+	}
+
+	public MTextField alignCenter() {
+		setStyleName(ValoTheme.TEXTFIELD_ALIGN_CENTER);
+		return this;
+	}
+
+	@Override
+	public void setConverter(Class<?> datamodelType) {
+		super.setConverter(datamodelType);
 	}
 
 	public MTextField withFullWidth() {

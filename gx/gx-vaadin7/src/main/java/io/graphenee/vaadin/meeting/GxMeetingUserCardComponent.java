@@ -23,6 +23,8 @@ public class GxMeetingUserCardComponent extends AbstractCardComponent<GxMeetingU
 
 	@Override
 	protected void addComponentToLayout(MVerticalLayout layout, GxMeetingUser user) {
+		layout.setSpacing(false);
+		layout.setMargin(false);
 		Label video = new Label();
 		video.setPrimaryStyleName("remotePeerStream");
 		video.setContentMode(ContentMode.HTML);

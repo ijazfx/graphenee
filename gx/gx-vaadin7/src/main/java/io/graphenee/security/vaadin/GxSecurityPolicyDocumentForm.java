@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextArea;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
@@ -31,6 +31,8 @@ import io.graphenee.vaadin.TRAbstractForm;
 @Scope("prototype")
 public class GxSecurityPolicyDocumentForm extends TRAbstractForm<GxSecurityPolicyDocumentBean> {
 
+	private static final long serialVersionUID = 1L;
+
 	@Autowired
 	GxDataService dataService;
 
@@ -38,7 +40,7 @@ public class GxSecurityPolicyDocumentForm extends TRAbstractForm<GxSecurityPolic
 	MCheckBox isDefault;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		documentJson = new MTextArea("Policy (JSON)").withRequired(true);
 		isDefault = new MCheckBox("Is Default?");
 		form.addComponents(documentJson, isDefault);

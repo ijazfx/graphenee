@@ -1,9 +1,9 @@
 package io.graphenee.vaadin;
 
 import org.vaadin.viritin.fields.MPasswordField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.Validator;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.bean.GxChangePasswordBean;
 
@@ -20,7 +20,7 @@ public class GxChangePasswordForm extends TRAbstractForm<GxChangePasswordBean> {
 	}
 
 	@Override
-	protected void addFieldsToForm(FormLayout form, GxChangePasswordBean entity) {
+	protected void addFieldsToForm(MVerticalLayout form, GxChangePasswordBean entity) {
 		currentPassword = new MPasswordField("Current Password").withRequired(true);
 		newPassword = new MPasswordField("Desired Password").withRequired(true);
 		confirmNewPassword = new MPasswordField("Re-type Password").withRequired(true);

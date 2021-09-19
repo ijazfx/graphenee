@@ -46,7 +46,7 @@ public class TRFileContentUtil {
 	public static String getMimeType(String filename) {
 		String[] parts = filename.toLowerCase().split("[.]");
 		String ext = parts[parts.length - 1];
-		if (ext.matches("(jpg|jpeg|gif|png|bmp|tiff)")) {
+		if (ext.matches("(jpg|jpeg|gif|png|bmp|tiff|webp|gif)")) {
 			return "image/" + ext;
 		}
 		if (ext.matches("(pdf)")) {
@@ -61,7 +61,7 @@ public class TRFileContentUtil {
 		if (ext.matches("(avi)")) {
 			return "video/x-msvideo";
 		}
-		if (ext.matches("aac|ac3|aic|amr|flac|aiff|ts|wma|ogg|opus|wav|m4a|mp1|mp2|mp3"))
+		if (ext.matches("aac|ac3|aic|amr|flac|aiff|ts|wma|ogg|opus|wav|m4a|mp1|mp2|mp3|weba"))
 			return "audio/" + ext;
 		if (ext.matches("(mpeg|mpg)")) {
 			return "video/mpeg";
@@ -69,17 +69,53 @@ public class TRFileContentUtil {
 		if (ext.matches("(webm|m4v|mp4)")) {
 			return "video/" + ext;
 		}
-		if (ext.matches("(mov)")) {
+		if (ext.matches("(mov|qt)")) {
 			return "video/quicktime";
 		}
-		if (ext.matches("(doc|docx)")) {
+		if (ext.matches("(mkv)")) {
+			return "video/x-matroska";
+		}
+		if (ext.matches("(flv)")) {
+			return "video/x-flv";
+		}
+		if (ext.matches("(mpeg-4)")) {
+			return "video/mp4";
+		}
+		if (ext.matches("(3gp)")) {
+			return "video/3gpp";
+		}
+		if (ext.matches("(wmv)")) {
+			return "video/x-ms-wmv";
+		}
+		if (ext.matches("(ts)")) {
+			return "video/MP2T";
+		}
+		if (ext.matches("(doc)")) {
 			return "application/msword";
 		}
-		if (ext.matches("(xls|xlsx)")) {
+		if (ext.matches("(docx)")) {
+			return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+		}
+		if (ext.matches("(xls)")) {
 			return "application/vnd.ms-excel";
 		}
-		if (ext.matches("(ppt|pptx)")) {
+		if (ext.matches("(xlsx)")) {
+			return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+		}
+		if (ext.matches("(ppt)")) {
 			return "application/vnd.ms-powerpoint";
+		}
+		if (ext.matches("(pptx)")) {
+			return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+		}
+		if (ext.matches("(odp)")) {
+			return "application/vnd.oasis.opendocument.presentation";
+		}
+		if (ext.matches("(ods)")) {
+			return "application/vnd.oasis.opendocument.spreadsheet";
+		}
+		if (ext.matches("(odt)")) {
+			return "application/vnd.oasis.opendocument.text";
 		}
 		if (ext.matches("(epub)")) {
 			return "application/epub+zip";

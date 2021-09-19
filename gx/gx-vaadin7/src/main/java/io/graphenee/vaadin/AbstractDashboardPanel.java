@@ -36,6 +36,7 @@ import org.vaadin.viritin.layouts.MHorizontalLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.vaadin.event.DashboardEvent;
 import io.graphenee.vaadin.event.DashboardEventBus;
 import io.graphenee.vaadin.util.DashboardUtils;
@@ -84,7 +85,8 @@ public abstract class AbstractDashboardPanel extends MVerticalLayout {
 	}
 
 	private MVerticalLayout buildComponentLayout() {
-		MVerticalLayout layout = new MVerticalLayout().withMargin(true).withSpacing(true);
+		addStyleName("viewroot");
+		MVerticalLayout layout = new MVerticalLayout().withMargin(false).withSpacing(true);
 		layout.setSizeFull();
 		layout.addStyleName("viewlayout");
 		return layout;

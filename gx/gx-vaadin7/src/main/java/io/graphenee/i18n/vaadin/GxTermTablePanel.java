@@ -137,7 +137,6 @@ public class GxTermTablePanel extends AbstractEntityTablePanel<GxTermBean> {
 	@Override
 	protected void postBuild() {
 		hideToolbar();
-		entityTable().setHeight("250px");
 	}
 
 	public void initializeWithEntity(GxTermBean gxTermBean) {

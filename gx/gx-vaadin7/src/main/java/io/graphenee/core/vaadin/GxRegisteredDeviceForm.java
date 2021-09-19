@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.FormLayout;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
@@ -34,7 +34,7 @@ public class GxRegisteredDeviceForm extends TRAbstractForm<GxRegisteredDeviceBea
 	MCheckBox isTablet;
 
 	@Override
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		systemName = new MTextField("Platform Name").withRequired(true);
 		systemName.setMaxLength(50);
 		deviceToken = new MTextField("Device Token").withRequired(true);

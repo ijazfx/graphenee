@@ -17,19 +17,18 @@ package io.graphenee.vaadin;
 
 import javax.annotation.PostConstruct;
 
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.layouts.MFormLayout;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 
@@ -120,25 +119,23 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	private Component buildDetailsForm() {
-		MFormLayout form = new MFormLayout();
-		//@TODO: remove this.
-		form.setStyleName(ValoTheme.FORMLAYOUT_LIGHT);
+		MVerticalLayout form = new MVerticalLayout().withMargin(true).withSpacing(true);
 		addFieldsToForm(form);
 		return form;
 	}
 
-	protected void addFieldsToForm(FormLayout form) {
+	protected void addFieldsToForm(MVerticalLayout form) {
 		addFieldsToForm(form, getEntity());
 	}
 
-	protected void addFieldsToForm(FormLayout form, T entity) {
+	protected void addFieldsToForm(MVerticalLayout form, T entity) {
 	}
 
 	protected abstract String formTitle();
 
 	@Override
 	protected Component createContent() {
-		MVerticalLayout content = new MVerticalLayout().withMargin(true);
+		MVerticalLayout content = new MVerticalLayout().withMargin(false);
 		content.setSizeFull();
 		MVerticalLayout contentLayout = new MVerticalLayout().withStyleName("content-layout");
 		contentLayout.setSizeFull();
@@ -182,11 +179,11 @@ public abstract class TRAbstractForm<T> extends TRAbstractBaseForm<T> {
 	}
 
 	protected String popupWidth() {
-		return safeWidthInPixels(browserWidth());
+		return safeWidthInPixels(1024);
 	}
 
 	protected String popupHeight() {
-		return safeHeightInPixels(browserHeight());
+		return safeHeightInPixels(768);
 	}
 
 	public void hideFooter() {

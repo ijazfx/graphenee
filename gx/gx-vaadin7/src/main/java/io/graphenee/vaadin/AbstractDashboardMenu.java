@@ -23,6 +23,9 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+
 import com.google.common.base.Strings;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
@@ -46,9 +49,6 @@ import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -218,8 +218,15 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 				userMenuItem.addItem("Sign Out", new Command() {
 					@Override
 					public void menuSelected(final MenuItem selectedItem) {
+						UI current = UI.getCurrent();
+						VaadinSession.getCurrent().getUIs().forEach(ui -> {
+							if (ui != current && ui.isAttached()) {
+								ui.getPage().setLocation("/");
+							}
+						});
+						VaadinSession.getCurrent().close();
+						Page.getCurrent().setLocation("/login");
 						VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, null);
-						Page.getCurrent().reload();
 					}
 				});
 			}
@@ -253,30 +260,46 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 		Collection<TRMenuItem> items = menuItems();
 		backButton = new ValoMenuItemButton("Back", GrapheneeTheme.BACK_ICON);
 		backButton.setVisible(false);
-		backButton.withListener(new TRButtonClickListener() {
+		// backButton.withListener(new TRButtonClickListener() {
 
-			@Override
-			public void onButtonClick(ClickEvent event) {
-				String viewName = null;
-				focusedMenuItem = focusedMenuItem.getParent() != null ? focusedMenuItem.getParent().getParent() : null;
-				if (focusedMenuItem == null) {
-					buttonsMap.keySet().forEach(mi -> {
-						buttonsMap.get(mi).setVisible(mi.getParent() == null);
-					});
-					backButton.setVisible(false);
-					viewName = menuItems().get(0).viewName();
-				} else {
-					buttonsMap.values().forEach(vmib -> vmib.setVisible(false));
-					focusedMenuItem.getChildren().forEach(mi -> {
-						buttonsMap.get(mi).setVisible(true);
-					});
-					backButton.setVisible(true);
-					viewName = focusedMenuItem.getChildren().iterator().next().viewName();
-				}
-				//				if (viewName == null)
-				//					viewName = dashboardSetup().dashboardViewName();
-				if (viewName != null)
-					UI.getCurrent().getNavigator().navigateTo(viewName);
+		// 	@Override
+		// 	public void onButtonClick(ClickEvent event) {
+		// 		buttonsMap.values().forEach(vmib -> vmib.setVisible(false));
+		// 		focusedMenuItem = focusedMenuItem != null ? focusedMenuItem.getParent() : null;
+		// 		// System.err.println(focusedMenuItem != null ? focusedMenuItem.caption() : "null");
+		// 		if(focusedMenuItem == null) {
+		// 			buttonsMap.keySet().forEach(mi -> {
+		// 				buttonsMap.get(mi).setVisible(mi.getParent() == null);
+		// 			});
+		// 			backButton.setVisible(false);
+		// 		} else if(focusedMenuItem.getChildren() != null) {
+		// 			focusedMenuItem.getChildren().forEach(mi -> {
+		// 				buttonsMap.get(mi).setVisible(true);
+		// 			});
+		// 		}
+		// 		String viewName = focusedMenuItem != null ? focusedMenuItem.viewName() : dashboardSetup().dashboardViewName();
+		// 		if(viewName != null) {
+		// 			UI.getCurrent().getNavigator().navigateTo(viewName);
+		// 		}
+		// 	}
+		// });
+
+		backButton.withListener(cl -> {
+			buttonsMap.values().forEach(vmib -> vmib.setVisible(false));
+			focusedMenuItem = focusedMenuItem != null ? focusedMenuItem.getParent() : null;
+			if(focusedMenuItem == null) {
+				buttonsMap.keySet().forEach(mi -> {
+					buttonsMap.get(mi).setVisible(mi.getParent() == null);
+				});
+				backButton.setVisible(false);
+			} else if(focusedMenuItem.hasChildren()) {
+				focusedMenuItem.getChildren().forEach(mi -> {
+					buttonsMap.get(mi).setVisible(true);
+				});
+			}
+			String viewName = focusedMenuItem != null ? focusedMenuItem.viewName() : dashboardSetup().dashboardViewName();
+			if(viewName != null) {
+				UI.getCurrent().getNavigator().navigateTo(viewName);
 			}
 		});
 
@@ -301,7 +324,9 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 					continue;
 				ValoMenuItemButton valoMenuItemButton = new ValoMenuItemButton(menuItem.hasChildren() ? null : menuItem.viewName(), menuItem.caption(), menuItem.icon())
 						.withListener(event -> {
-							focusedMenuItem = menuItem;
+							if(menuItem.hasChildren()) {
+								focusedMenuItem = menuItem;
+							} 
 							if (menuItem.viewName() != null)
 								UI.getCurrent().getNavigator().navigateTo(menuItem.viewName());
 							if (menuItem.hasChildren()) {
@@ -417,21 +442,7 @@ public abstract class AbstractDashboardMenu extends CustomComponent {
 				if (vmib.viewName.equals(event.getViewName() + "/" + event.getParameters())
 						|| (vmib.viewName.equals(event.getViewName()) && event.getParameters().equalsIgnoreCase(""))) {
 					vmib.addStyleName(STYLE_SELECTED);
-					focusedMenuItem = mi;
 				}
-			}
-		}
-		if (focusedMenuItem != null) {
-			if (focusedMenuItem.getParent() == null) {
-				backButton.setVisible(false);
-				buttonsMap.keySet().forEach(mi -> {
-					buttonsMap.get(mi).setVisible(mi.getParent() == null);
-				});
-			} else {
-				backButton.setVisible(true);
-				buttonsMap.keySet().forEach(mi -> {
-					buttonsMap.get(mi).setVisible(mi.getParent() != null && mi.getParent().equals(focusedMenuItem.getParent()));
-				});
 			}
 		}
 	}
