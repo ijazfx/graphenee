@@ -23,7 +23,7 @@ public class GxAreaChart extends VerticalLayout {
     private static final long serialVersionUID = 1L;
     private ApexCharts areaChart;
 
-    public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series... series) {
+    public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
         areaChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.area).withZoom(ZoomBuilder.get().withEnabled(false).build()).build())
                 .withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withStroke(StrokeBuilder.get().withCurve(Curve.straight).build()).withSeries(series)
                 .withSubtitle(TitleSubtitleBuilder.get().withAlign(Align.left).build()).withLabels(xAxisLabel).withXaxis(XAxisBuilder.get().withType(XAxisType.categories).build())

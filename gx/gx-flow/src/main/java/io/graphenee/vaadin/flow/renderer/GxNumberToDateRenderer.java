@@ -13,7 +13,11 @@ public class GxNumberToDateRenderer<T> extends BasicRenderer<T, Number> {
 
     private static final long serialVersionUID = 1L;
 
+<<<<<<< HEAD
     public static enum GxDateResultion {
+=======
+    public static enum GxDateResolution {
+>>>>>>> c28c6acb5a426e637e7132eec1646a0639a30851
         Date,
         Time,
         DateTime;
@@ -27,7 +31,11 @@ public class GxNumberToDateRenderer<T> extends BasicRenderer<T, Number> {
         this.datePattern = datePattern;
     }
 
+<<<<<<< HEAD
     public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, GxDateResultion resolution) {
+=======
+    public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, GxDateResolution resolution) {
+>>>>>>> c28c6acb5a426e637e7132eec1646a0639a30851
         super(valueProvider);
         switch (resolution) {
         case Date:

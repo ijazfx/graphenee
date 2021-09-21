@@ -1,4 +1,4 @@
-package io.graphenee.vaadin.flow.base;
+package io.graphenee.vaadin.flow.component;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Label;

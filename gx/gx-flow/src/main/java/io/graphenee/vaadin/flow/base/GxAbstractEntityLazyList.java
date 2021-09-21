@@ -2,10 +2,14 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
 
+import io.reactivex.rxjava3.core.ObservableEmitter;
+
+@CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
 public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T> {
 
     private static final long serialVersionUID = 1L;
@@ -23,7 +27,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
         return (DataProvider<T, T>) fromFilteringCallbacks.withConfigurableFilter();
     }
 
-    protected abstract int getTotalCount(T probe);
+    protected abstract int getTotalCount(T searchEntity);
 
     private Stream<T> getPagedData(Query<T, T> query) {
         int offset = query.getOffset();
@@ -45,6 +49,44 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
     }
 
     protected abstract Stream<T> getData(int pageNumber, int pageSize, T searchEntity);
+
+    protected void exportData(ObservableEmitter<T> emitter) {
+        Stream<T> data = null;
+        if (!entityGrid().getSelectedItems().isEmpty()) {
+            data = entityGrid().getSelectedItems().stream();
+            data.forEach(d -> {
+                if (emitter.isDisposed()) {
+                    return;
+                }
+                emitter.onNext(d);
+            });
+            emitter.onComplete();
+        } else {
+            int count = getTotalCount(getSearchEntity());
+            if (count > 0) {
+                int pages = count / 100;
+                for (int i = 0; i < pages; i++) {
+                    data = getData(i, 100, getSearchEntity());
+                    data.forEach(d -> {
+                        if (emitter.isDisposed()) {
+                            return;
+                        }
+                        emitter.onNext(d);
+                    });
+                }
+                int remaining = count - (pages * 100);
+                data = getData(pages, remaining, getSearchEntity());
+                data.forEach(d -> {
+                    if (emitter.isDisposed()) {
+                        return;
+                    }
+                    emitter.onNext(d);
+                });
+                emitter.onComplete();
+            }
+        }
+
+    }
 
     @Override
     protected boolean isGridFilterEnabled() {

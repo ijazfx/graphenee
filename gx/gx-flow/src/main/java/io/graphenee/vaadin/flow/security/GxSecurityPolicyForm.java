@@ -157,9 +157,11 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 
         securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>().addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
                 .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+        securityGroupCollectionFault.setSizeFull();
 
         userAccountCollectionFault = new TwinColGrid<GxUserAccountBean>().addFilterableColumn(GxUserAccountBean::getUsername, "User Name", "User Name", true)
                 .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+        userAccountCollectionFault.setSizeFull();
     }
 
     @Override

@@ -6,8 +6,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -49,11 +48,16 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
     }
 
     protected Component getCaptionComponent() {
-        VerticalLayout captionComponent = new VerticalLayout(new H4(getCaption()));
-        captionComponent.setMargin(false);
-        captionComponent.setSpacing(false);
-        // captionComponent.setPadding(true);
-        return captionComponent;
+        H3 lblCaption = new H3(getCaption());
+        lblCaption.getElement().getStyle().set("padding", "0");
+        lblCaption.getElement().getStyle().set("font-size", "var(--lumo-font-size-xl");
+        lblCaption.getElement().getStyle().set("color", "var(--lumo-primary-color");
+        lblCaption.getElement().getStyle().set("margin-bottom", "0.4em");
+        lblCaption.getElement().getStyle().set("margin-left", "0.85em");
+        lblCaption.getElement().getStyle().set("margin-top", "1em");
+        lblCaption.getElement().getStyle().set("border-bottom", "0.2em solid var(--lumo-primary-color)");
+        lblCaption.getElement().getStyle().set("display", "inline-block");
+        return lblCaption;
     }
 
     @Override

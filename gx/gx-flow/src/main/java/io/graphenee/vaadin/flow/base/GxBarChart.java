@@ -20,7 +20,7 @@ public class GxBarChart extends VerticalLayout {
 
     private ApexCharts barChart;
 
-    public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series... series) {
+    public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
         barChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.bar).build())
                 .withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(false).withColumnWidth("55%").build()).build())
                 .withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withStroke(StrokeBuilder.get().withShow(true).withWidth(2.0).withColors("transparent").build())
