@@ -13,14 +13,8 @@ public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
 
     private static final long serialVersionUID = 1L;
 
-<<<<<<< HEAD
-    public static enum GxDateResultion {
-=======
     public static enum GxDateResolution {
->>>>>>> c28c6acb5a426e637e7132eec1646a0639a30851
-        Date,
-        Time,
-        DateTime;
+        Date, Time, DateTime;
     }
 
     private String datePattern;
@@ -31,22 +25,18 @@ public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
         this.datePattern = datePattern;
     }
 
-<<<<<<< HEAD
-    public GxDateRenderer(ValueProvider<T, Date> valueProvider, GxDateResultion resolution) {
-=======
     public GxDateRenderer(ValueProvider<T, Date> valueProvider, GxDateResolution resolution) {
->>>>>>> c28c6acb5a426e637e7132eec1646a0639a30851
         super(valueProvider);
         switch (resolution) {
-        case Date:
-            dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
-        break;
-        case Time:
-            dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
-        break;
-        case DateTime:
-            dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
-        break;
+            case Date:
+                dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+                break;
+            case Time:
+                dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
+                break;
+            case DateTime:
+                dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
+                break;
         }
     }
 
