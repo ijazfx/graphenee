@@ -40,6 +40,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridMultiSelectionModel;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
@@ -378,7 +379,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			});
 
 			dataGrid.addItemClickListener(icl -> {
-				openForm(icl.getItem());
+				onGridItemClicked(icl);
 			});
 
 			decorateGrid(dataGrid);
@@ -395,6 +396,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			isBuilt = true;
 		}
 		return this;
+	}
+
+	protected void onGridItemClicked(ItemClickEvent<T> icl) {
+		openForm(icl.getItem());
 	}
 
 	protected void exportData(ObservableEmitter<T> emitter) {

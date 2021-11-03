@@ -253,8 +253,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	public void setEntity(T entity) {
 		this.entity = entity;
 		build();
-		saveButton.setVisible(isEditable());
-		resetButton.setVisible(isEditable());
 		entityBound = false;
 		preBinding(entity);
 		dataBinder.readBean(entity);
@@ -274,6 +272,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		if (shouldFocusFirstFieldOnShow()) {
 			focusFirst(this);
 		}
+		saveButton.setVisible(isEditable());
+		resetButton.setVisible(isEditable());
 	}
 
 	protected boolean shouldFocusFirstFieldOnShow() {
