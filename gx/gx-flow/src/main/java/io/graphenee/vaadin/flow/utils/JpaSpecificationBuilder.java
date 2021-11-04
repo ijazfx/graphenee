@@ -418,4 +418,60 @@ public class JpaSpecificationBuilder<T> {
         return this;
     }
 
+    public JpaSpecificationBuilder<T> isEmpty(String key) {
+        if (key == null)
+            return this;
+        Specification<T> spec = (root, cq, cb) -> {
+            return cb.isEmpty(root.get(key));
+        };
+        specsQueue.add(spec);
+        return this;
+    }
+
+    public JpaSpecificationBuilder<T> isNotEmpty(String key) {
+        if (key == null)
+            return this;
+        Specification<T> spec = (root, cq, cb) -> {
+            return cb.isNotEmpty(root.get(key));
+        };
+        specsQueue.add(spec);
+        return this;
+    }
+
+    public JpaSpecificationBuilder<T> isNull(String key) {
+        if (key == null)
+            return this;
+        Specification<T> spec = (root, cq, cb) -> {
+            if (key.contains(".")) {
+                String[] parts = key.split("\\.");
+                Join<Object, Object> join = root.join(parts[0]);
+                for (int i = 1; i < parts.length - 1; i++) {
+                    join = join.join(parts[i]);
+                }
+                return join.get(parts[parts.length - 1]).isNull();
+            }
+            return cb.isNull(root.get(key));
+        };
+        specsQueue.add(spec);
+        return this;
+    }
+
+    public JpaSpecificationBuilder<T> isNotNull(String key) {
+        if (key == null)
+            return this;
+        Specification<T> spec = (root, cq, cb) -> {
+            if (key.contains(".")) {
+                String[] parts = key.split("\\.");
+                Join<Object, Object> join = root.join(parts[0]);
+                for (int i = 1; i < parts.length - 1; i++) {
+                    join = join.join(parts[i]);
+                }
+                return join.get(parts[parts.length - 1]).isNotNull();
+            }
+            return cb.isNotNull(root.get(key));
+        };
+        specsQueue.add(spec);
+        return this;
+    }
+
 }

@@ -109,7 +109,7 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 
         MenuBar profileMenuBar = new MenuBar();
         profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
-        profileMenuBar.addItem(user.getFirstName());
+        profileMenuBar.addItem(user.getFirstNameLastName());
         profileMenuBar.addItem("|");
         profileMenuBar.addItem("Sign Out", event -> {
             VaadinSession.getCurrent().close();

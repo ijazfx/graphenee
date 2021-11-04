@@ -50,7 +50,7 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
         loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
         loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
         loginForm.getElement().getStyle().set("background", "white");
-        loginForm.setForgotPasswordButtonVisible(true);
+        loginForm.setForgotPasswordButtonVisible(isForgotPasswordButtonVisible());
         LoginI18n loginI18n = LoginI18n.createDefault();
         loginI18n.getForm().setTitle(flowSetup().appTitleWithVersion());
         loginI18n.getForm().setForgotPassword("Forgot Password? Click here to Reset!");
@@ -116,7 +116,12 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
     protected abstract GxAbstractFlowSetup flowSetup();
 
-    protected abstract GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
+    protected abstract GxAuthenticatedUser onLogin(LoginEvent event)
+            throws AuthenticationFailedException, PasswordChangeRequiredException;
+
+    protected boolean isForgotPasswordButtonVisible() {
+        return true;
+    }
 
     protected void onForgotPassword(ForgotPasswordEvent event) {
         getUI().ifPresent(ui -> {

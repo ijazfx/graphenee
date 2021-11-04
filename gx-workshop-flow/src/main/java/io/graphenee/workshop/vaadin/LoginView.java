@@ -1,7 +1,6 @@
 package io.graphenee.workshop.vaadin;
 
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
-import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;

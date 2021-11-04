@@ -40,6 +40,7 @@ import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridMultiSelectionModel;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
@@ -95,7 +96,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
 	private SplitLayout mainLayout;
-	private Dialog dialog;
+	private GxDialog dialog;
 	private Grid<T> dataGrid;
 	private Class<T> entityClass;
 	private Map<T, GxAbstractEntityForm<T>> formCache = new HashMap<>();
@@ -378,7 +379,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			});
 
 			dataGrid.addItemClickListener(icl -> {
-				openForm(icl.getItem());
+				onGridItemClicked(icl);
 			});
 
 			decorateGrid(dataGrid);
@@ -395,6 +396,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			isBuilt = true;
 		}
 		return this;
+	}
+
+	protected void onGridItemClicked(ItemClickEvent<T> icl) {
+		openForm(icl.getItem());
 	}
 
 	protected void exportData(ObservableEmitter<T> emitter) {
@@ -939,7 +944,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		layout.add(GxAbstractEntityList.this, dlgFooter);
 		layout.setFlexGrow(2, GxAbstractEntityList.this);
 		GxDialog dlg = new GxDialog(layout);
-        dlg.addThemeVariants(DialogVariant.NO_PADDING);
+		dlg.addThemeVariants(DialogVariant.NO_PADDING);
 		dlg.setId("dlg" + UUID.randomUUID().toString().replace("-", ""));
 		dlg.setWidth(dialogWidth());
 		dlg.setHeight(dialogHeight());
@@ -958,10 +963,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			}
 		});
 		return dlg;
-	}
-
-	protected String dialogSize() {
-		return "800px";
 	}
 
 	public void dismissDialog() {
