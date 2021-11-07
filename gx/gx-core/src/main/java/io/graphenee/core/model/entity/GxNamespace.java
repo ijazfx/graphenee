@@ -31,12 +31,15 @@ import javax.persistence.Transient;
 
 import io.graphenee.core.model.CollectionFault;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Include;
 import lombok.NoArgsConstructor;
 
 /**
  * The persistent class for the gx_namespace database table.
  */
 @Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
 @Entity
 @Table(name = "gx_namespace")
@@ -45,6 +48,7 @@ public class GxNamespace implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Include
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 

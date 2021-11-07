@@ -3,7 +3,7 @@
   "license": "UNLICENSED",
   "vaadin": {
     "dependencies": {
-      "lit-element": "^2.2.1",
+      "lit-element": "2.4.0",
       "@polymer/polymer": "3.2.0",
       "@webcomponents/webcomponentsjs": "^2.2.10",
       "@vaadin/vaadin-icons": "4.3.2",
@@ -47,7 +47,7 @@
       "@polymer/paper-badge": "3.0.1",
       "@polymer/paper-ripple": "3.0.2",
       "multiselect-combo-box": "2.4.2",
-      "apexcharts": "3.26.0",
+      "apexcharts": "3.26.3",
       "onecolor": "3.1.0",
       "viz.js": "2.1.2",
       "svg-pan-zoom": "3.6.1",
@@ -68,7 +68,7 @@
       "raw-loader": "3.1.0",
       "webpack-cli": "3.3.11",
       "webpack": "4.42.0",
-      "chokidar": "^3.4.0",
+      "chokidar": "^3.5.0",
       "webpack-merge": "4.2.2",
       "webpack-dev-server": "3.11.0",
       "script-ext-html-webpack-plugin": "2.1.4",
@@ -81,7 +81,7 @@
       "typescript": "4.0.3",
       "ts-loader": "8.0.12"
     },
-    "hash": "e486d7af8621074f49291220ce651e3c9e8eea565650a8a7aa439923b27bb445"
+    "hash": "6fbe1cd88bf89877ffdc5e6fb25f18dfb732c66f53820f9a36c452f9dfb0fc1a"
   },
   "dependencies": {
     "@polymer/app-layout": "3.1.0",
@@ -125,21 +125,13 @@
     "@vaadin/vaadin-time-picker": "2.4.0",
     "@vaadin/vaadin-upload": "4.4.1",
     "@webcomponents/webcomponentsjs": "^2.2.10",
-    "apexcharts": "3.26.0",
-    "lit-element": "^2.2.1",
+    "apexcharts": "3.26.3",
+    "lit-element": "2.4.0",
     "multiselect-combo-box": "2.4.2",
     "onecolor": "3.1.0",
     "viz.js": "2.1.2",
     "svg-pan-zoom": "3.6.1",
-    "@vaadin/vaadin-crud": "1.3.0",
-    "@vaadin/vaadin-charts": "6.3.1",
-    "@vaadin/vaadin-grid-pro": "2.2.2",
-    "@vaadin/vaadin-confirm-dialog": "1.3.0",
-    "@vaadin/vaadin-cookie-consent": "1.2.0",
-    "@vaadin/vaadin-board": "2.2.0",
-    "@vaadin/vaadin-shrinkwrap": "14.5.3",
-    "@vaadin/vaadin-avatar": "1.0.4",
-    "@vaadin/vaadin-rich-text-editor": "1.3.0"
+    "@vaadin/vaadin-avatar": "1.0.4"
   },
   "devDependencies": {
     "webpack-babel-multi-target-plugin": "2.3.3",
@@ -148,7 +140,7 @@
     "raw-loader": "3.1.0",
     "webpack-cli": "3.3.11",
     "webpack": "4.42.0",
-    "chokidar": "^3.4.0",
+    "chokidar": "^3.5.0",
     "webpack-merge": "4.2.2",
     "webpack-dev-server": "3.11.0",
     "script-ext-html-webpack-plugin": "2.1.4",

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.base.GxMenuItem;
+import io.graphenee.vaadin.flow.base.GxRegisteredDeviceListView;
 import io.graphenee.vaadin.flow.security.GxSecurityGroupListView;
 import io.graphenee.vaadin.flow.security.GxSecurityPolicyListView;
 import io.graphenee.vaadin.flow.security.GxUserAccountListView;
@@ -37,6 +38,7 @@ public class FlowSetup extends GxAbstractFlowSetup {
         securityMenuItem.add(GxMenuItem.create("User Accounts", VaadinIcon.USER.create(), GxUserAccountListView.class));
         securityMenuItem.add(GxMenuItem.create("Security Groups", VaadinIcon.TABLE.create(), GxSecurityGroupListView.class));
         securityMenuItem.add(GxMenuItem.create("Security Policies", VaadinIcon.TABLE.create(), GxSecurityPolicyListView.class));
+        securityMenuItem.add(GxMenuItem.create("Registered Device", VaadinIcon.TABLE.create(), GxRegisteredDeviceListView.class));
         items.add(securityMenuItem);
 
         return items;

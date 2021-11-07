@@ -31,7 +31,7 @@ public class ConversionUtil {
 		NUMBER_RANK_TO_WORD_MAP.put(6, "Sixth");
 		NUMBER_RANK_TO_WORD_MAP.put(7, "Seventh");
 		NUMBER_RANK_TO_WORD_MAP.put(8, "Eighth");
-		NUMBER_RANK_TO_WORD_MAP.put(9, "Nineth");
+		NUMBER_RANK_TO_WORD_MAP.put(9, "Ninth");
 		NUMBER_RANK_TO_WORD_MAP.put(10, "Tenth");
 		NUMBER_RANK_TO_WORD_MAP.put(11, "Eleventh");
 		NUMBER_RANK_TO_WORD_MAP.put(12, "Twelfth");

@@ -13,7 +13,12 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import io.graphenee.core.model.GxMappedSuperclass;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Include;
 
+@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Entity
 @Table(name = "gx_registered_device")
 @NamedQuery(name = "GxRegisteredDevice.findAll", query = "select d from GxRegisteredDevice d")
@@ -22,6 +27,7 @@ public class GxRegisteredDevice extends GxMappedSuperclass implements Serializab
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Include
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
@@ -47,68 +53,17 @@ public class GxRegisteredDevice extends GxMappedSuperclass implements Serializab
 	@JoinColumn(name = "oid_namespace")
 	private GxNamespace gxNamespace;
 
-	public Integer getOid() {
-		return oid;
+	public GxRegisteredDevice() {
+		isActive = true;
+		isTablet = false;
 	}
 
-	public void setOid(Integer oid) {
-		this.oid = oid;
+	public boolean is_iOS() {
+		return getSystemName() != null && getSystemName().trim().toLowerCase().equals("ios");
 	}
 
-	public String getSystemName() {
-		return systemName;
-	}
-
-	public void setSystemName(String systemName) {
-		this.systemName = systemName;
-	}
-
-	public Boolean getIsTablet() {
-		return isTablet;
-	}
-
-	public void setIsTablet(Boolean isTablet) {
-		this.isTablet = isTablet;
-	}
-
-	public String getBrand() {
-		return brand;
-	}
-
-	public void setBrand(String brand) {
-		this.brand = brand;
-	}
-
-	public Boolean getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public String getOwnerId() {
-		return ownerId;
-	}
-
-	public void setOwnerId(String ownerId) {
-		this.ownerId = ownerId;
-	}
-
-	public String getDeviceToken() {
-		return deviceToken;
-	}
-
-	public void setDeviceToken(String deviceToken) {
-		this.deviceToken = deviceToken;
-	}
-
-	public GxNamespace getGxNamespace() {
-		return gxNamespace;
-	}
-
-	public void setGxNamespace(GxNamespace gxNamespace) {
-		this.gxNamespace = gxNamespace;
+	public boolean is_Android() {
+		return getSystemName() != null && getSystemName().trim().toLowerCase().equals("android");
 	}
 
 }
