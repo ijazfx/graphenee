@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import io.graphenee.core.GrapheneeCoreConfiguration;
 
 @Configuration
-@ComponentScan(basePackages = { "io.graphenee.vaadin.flow", "io.graphenee.workshop" })
+@ComponentScan(basePackages = { "io.graphenee", "io.graphenee.workshop" })
 public class FlowApplicationConfiguration {
 
     @Autowired
