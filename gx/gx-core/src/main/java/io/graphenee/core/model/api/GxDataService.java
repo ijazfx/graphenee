@@ -362,17 +362,23 @@ public interface GxDataService {
 
 	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
 
+	@Deprecated
 	GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean);
 
+	@Deprecated
 	List<GxRegisteredDeviceBean> findRegisteredDevice();
 
+	@Deprecated
 	List<GxRegisteredDeviceBean> findRegisteredDeviceByNamespace(GxNamespaceBean bean);
 
+	@Deprecated
 	void delete(GxRegisteredDeviceBean bean);
 
+	@Deprecated
 	GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId)
 			throws RegisterDeviceFailedException;
 
+	@Deprecated
 	void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
 
 	GxUserAccountBean findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespaceBean namespace);
