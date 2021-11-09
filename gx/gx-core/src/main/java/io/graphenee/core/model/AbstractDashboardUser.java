@@ -1,8 +1,6 @@
-package io.graphenee.vaadin.flow.domain;
+package io.graphenee.core.model;
 
 import java.util.concurrent.atomic.AtomicInteger;
-
-import io.graphenee.core.model.GxAuthenticatedUser;
 
 public abstract class AbstractDashboardUser<T> implements GxAuthenticatedUser {
 

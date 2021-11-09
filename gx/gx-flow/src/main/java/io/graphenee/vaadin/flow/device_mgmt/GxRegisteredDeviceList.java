@@ -1,17 +1,24 @@
-package io.graphenee.vaadin.flow.base;
+package io.graphenee.vaadin.flow.device_mgmt;
 
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.data.binder.Binder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.api.GxRegisteredDeviceDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxRegisteredDevice;
+import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
 
 @Component
 @Scope("prototype")
@@ -24,9 +31,7 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
     private GxRegisteredDeviceForm form;
 
     @Autowired
-    private GxDataService gxDataService;
-
-    private GxNamespace namespace;
+    private GxNamespaceRepository namespaceRepo;
 
     public GxRegisteredDeviceList() {
         super(GxRegisteredDevice.class);
@@ -34,6 +39,8 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 
     @Override
     protected int getTotalCount(GxRegisteredDevice searchEntity) {
+        if(searchEntity.getGxNamespace() == null)
+            return 0;
         return registeredDeviceDataService.countAll(searchEntity);
     }
 
@@ -51,7 +58,7 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
     @Override
     protected void preEdit(GxRegisteredDevice entity) {
         if (entity.getOid() == null) {
-            entity.setGxNamespace(namespace != null ? namespace : gxDataService.findSystemNamespaceEntity());
+            entity.setGxNamespace(getSearchEntity().getGxNamespace());
         }
     }
 
@@ -71,9 +78,22 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
     }
 
     public void initializeWithNamespace(GxNamespace namespace) {
-        this.namespace = namespace;
         getSearchEntity().setGxNamespace(namespace);
         refresh();
+    }
+
+    @Override
+    protected void decorateSearchForm(FormLayout searchForm, Binder<GxRegisteredDevice> searchBinder) {
+        ComboBox<GxNamespace> namespace = new ComboBox<>("Namespace");
+        namespace.setItemLabelGenerator(GxNamespace::getNamespace);
+        namespace.setItems(namespaceRepo.findAll(Sort.by("namespace")));
+
+        searchForm.add(namespace);
+
+        searchBinder.bind(namespace, "gxNamespace");
+        searchBinder.addValueChangeListener(vcl -> {
+            refresh();
+        });
     }
 
 }

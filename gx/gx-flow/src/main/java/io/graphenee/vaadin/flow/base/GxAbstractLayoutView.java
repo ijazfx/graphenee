@@ -73,7 +73,7 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
             }
             GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
             if (user == null) {
-                event.rerouteTo("login", "");
+                event.rerouteTo("login", route);
             } else if (!route.equals("") && !user.canDoAction(route, "view")) {
                 event.rerouteTo("");
             }

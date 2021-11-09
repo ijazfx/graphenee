@@ -1,4 +1,4 @@
-package io.graphenee.vaadin.flow.base;
+package io.graphenee.vaadin.flow.device_mgmt;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import io.graphenee.core.model.entity.GxRegisteredDevice;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
 @Component
 @Scope("prototype")
@@ -55,6 +56,11 @@ public class GxRegisteredDeviceForm extends GxAbstractEntityForm<GxRegisteredDev
     @Override
     protected String formTitle() {
         return "Device Detail";
+    }
+
+    @Override
+    protected String dialogHeight() {
+        return "400px";
     }
 
 }

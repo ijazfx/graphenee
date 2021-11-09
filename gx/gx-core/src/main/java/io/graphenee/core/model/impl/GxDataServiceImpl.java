@@ -630,13 +630,13 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupByNamespace(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return entity.getGxSecurityGroups().stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		return securityGroupRepo.findByGxNamespace(entity).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
 	}
 
 	@Override
 	public GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupName(GxNamespaceBean namespace, String groupName) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		Optional<GxSecurityGroupBean> securityGroupOptional = entity.getGxSecurityGroups().stream().filter(sg -> {
+		Optional<GxSecurityGroupBean> securityGroupOptional = securityGroupRepo.findByGxNamespace(entity).stream().filter(sg -> {
 			return sg.getSecurityGroupName().equalsIgnoreCase(groupName);
 		}).map(this::makeSecurityGroupBean).findFirst();
 		return securityGroupOptional.isPresent() ? securityGroupOptional.get() : null;
@@ -645,13 +645,14 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupByNamespaceActive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return entity.getGxSecurityGroups().stream().filter(securityGroup -> securityGroup.getIsActive() == true).map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		return securityGroupRepo.findByGxNamespace(entity).stream().filter(securityGroup -> securityGroup.getIsActive() == true).map(this::makeSecurityGroupBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupNameActive(GxNamespaceBean namespace, String groupName) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		Optional<GxSecurityGroupBean> securityGroupOptional = entity.getGxSecurityGroups().stream().filter(sg -> {
+		Optional<GxSecurityGroupBean> securityGroupOptional = securityGroupRepo.findByGxNamespace(entity).stream().filter(sg -> {
 			return sg.getIsActive() && sg.getSecurityGroupName().equalsIgnoreCase(groupName);
 		}).map(this::makeSecurityGroupBean).findFirst();
 		return securityGroupOptional.isPresent() ? securityGroupOptional.get() : null;
@@ -660,7 +661,8 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupByNamespaceInactive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return entity.getGxSecurityGroups().stream().filter(securityGroup -> securityGroup.getIsActive() == false).map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		return securityGroupRepo.findByGxNamespace(entity).stream().filter(securityGroup -> securityGroup.getIsActive() == false).map(this::makeSecurityGroupBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -971,20 +973,20 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyByNamespace(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return entity.getGxSecurityPolicies().stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+		return securityPolicyRepo.findByGxNamespace(entity).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyByNamespaceActive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return entity.getGxSecurityPolicies().stream().filter(securityPolicy -> securityPolicy.getIsActive() == true).map(this::makeSecurityPolicyBean)
+		return securityPolicyRepo.findByGxNamespace(entity).stream().filter(securityPolicy -> securityPolicy.getIsActive() == true).map(this::makeSecurityPolicyBean)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyByNamespaceInactive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return entity.getGxSecurityPolicies().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean)
+		return securityPolicyRepo.findByGxNamespace(entity).stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean)
 				.collect(Collectors.toList());
 	}
 

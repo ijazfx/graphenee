@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
@@ -35,5 +36,7 @@ public interface GxSecurityPolicyRepository extends GxJpaRepository<GxSecurityPo
 	List<GxSecurityPolicy> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
 
 	GxSecurityPolicy findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
+
+	List<GxSecurityPolicy> findByGxNamespace(GxNamespace gxNamespace);
 
 }

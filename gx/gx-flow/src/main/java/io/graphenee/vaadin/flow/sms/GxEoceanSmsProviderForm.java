@@ -17,7 +17,6 @@ package io.graphenee.vaadin.flow.sms;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -40,7 +39,6 @@ public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 
 	private static final Logger L = LoggerFactory.getLogger(GxEoceanSmsProviderForm.class);
 
-	Label providerNameLabel;
 	TextArea namespaceDescription;
 	Checkbox isPrimary;
 
@@ -60,7 +58,6 @@ public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 
 	@Override
 	protected void postBinding(GxSmsProviderBean entity) {
-		providerNameLabel.setText(entity.getProviderName());
 		try {
 			configBuilder = GxSmsConfigProtos.EoceanConfig.parseFrom(entity.getConfigData()).toBuilder();
 			baseUrl.setValue(configBuilder.getBaseUrl());
@@ -80,14 +77,12 @@ public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 
 	@Override
 	protected String formTitle() {
-		return "Eocean SMS Configuration";
+		return getEntity().getProviderName();
 	}
 
 	@Override
 	protected void decorateForm(HasComponents form) {
-		providerNameLabel = new Label("Provider");
 		isPrimary = new Checkbox("Is Primary?");
-		form.add(providerNameLabel, isPrimary);
 		baseUrl = new TextField("Base URL");
 		baseUrl.addValueChangeListener(event -> {
 			if (isEntityBound()) {
@@ -129,7 +124,15 @@ public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 					configBuilder.clearSenderId();
 			}
 		});
-		form.add(baseUrl, user, password, senderId);
+		form.add(baseUrl, user, password, senderId, isPrimary);
+
+		setColspan(baseUrl, 2);
+		setColspan(isPrimary, 2);
+	}
+
+	@Override
+	protected String dialogHeight() {
+		return "400px";
 	}
 
 }

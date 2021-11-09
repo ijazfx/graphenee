@@ -17,7 +17,6 @@ package io.graphenee.vaadin.flow.sms;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -40,7 +39,6 @@ public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 
 	private static final Logger L = LoggerFactory.getLogger(GxTwilioSmsProviderForm.class);
 
-	Label providerNameLabel;
 	TextArea namespaceDescription;
 	Checkbox isPrimary;
 
@@ -52,7 +50,6 @@ public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 
 	@Override
 	protected void postBinding(GxSmsProviderBean entity) {
-		providerNameLabel.setText(entity.getProviderName());
 		try {
 			configBuilder = GxSmsConfigProtos.TwilioConfig.parseFrom(entity.getConfigData()).toBuilder();
 			accountSid.setValue(configBuilder.getAccountSid());
@@ -71,14 +68,12 @@ public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 
 	@Override
 	protected String formTitle() {
-		return "Twilio SMS Configuration";
+		return getEntity().getProviderName();
 	}
 
 	@Override
 	protected void decorateForm(HasComponents form) {
-		providerNameLabel = new Label("Provider");
 		isPrimary = new Checkbox("Is Primary?");
-		form.add(providerNameLabel, isPrimary);
 		accountSid = new TextField("Account SID");
 		accountSid.addValueChangeListener(event -> {
 			if (isEntityBound()) {
@@ -109,7 +104,14 @@ public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 					configBuilder.clearSenderId();
 			}
 		});
-		form.add(accountSid, authToken, senderId);
+		form.add(accountSid, authToken, senderId, isPrimary);
+		
+		setColspan(isPrimary, 2);
+	}
+
+	@Override
+	protected String dialogHeight() {
+		return "400px";
 	}
 
 }

@@ -1,4 +1,4 @@
-package io.graphenee.vaadin.flow.domain;
+package io.graphenee.core.model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
