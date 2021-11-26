@@ -75,17 +75,18 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
                     });
                 }
                 int remaining = count - (pages * 100);
-                data = getData(pages, remaining, getSearchEntity());
-                data.forEach(d -> {
-                    if (emitter.isDisposed()) {
-                        return;
-                    }
-                    emitter.onNext(d);
-                });
+                if (remaining > 0) {
+                    data = getData(pages, 100, getSearchEntity());
+                    data.forEach(d -> {
+                        if (emitter.isDisposed()) {
+                            return;
+                        }
+                        emitter.onNext(d);
+                    });
+                }
                 emitter.onComplete();
             }
         }
-
     }
 
     @Override
