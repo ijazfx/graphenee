@@ -2,6 +2,7 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.stream.Stream;
 
+import com.twilio.rest.sync.v1.service.SyncStreamReader;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -75,17 +76,18 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
                     });
                 }
                 int remaining = count - (pages * 100);
-                data = getData(pages, remaining, getSearchEntity());
-                data.forEach(d -> {
-                    if (emitter.isDisposed()) {
-                        return;
-                    }
-                    emitter.onNext(d);
-                });
+                if (remaining > 0) {
+                    data = getData(pages, 100, getSearchEntity());
+                    data.forEach(d -> {
+                        if (emitter.isDisposed()) {
+                            return;
+                        }
+                        emitter.onNext(d);
+                    });
+                }
                 emitter.onComplete();
             }
         }
-
     }
 
     @Override

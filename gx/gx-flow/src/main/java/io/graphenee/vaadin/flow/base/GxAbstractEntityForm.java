@@ -92,8 +92,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 								dialog.close();
 							}
 						} catch (Exception e) {
-							e.printStackTrace();
-							Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+							// e.printStackTrace();
+							// Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 						}
 					}
 				});

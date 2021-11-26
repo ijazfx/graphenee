@@ -67,6 +67,8 @@ public class GxTerm implements Serializable {
 	private GxSupportedLocale gxSupportedLocale;
 
 	public GxTerm() {
+		isActive = true;
+		isProtected = false;
 	}
 
 	public Integer getOid() {
@@ -131,6 +133,10 @@ public class GxTerm implements Serializable {
 
 	public void setGxSupportedLocale(GxSupportedLocale gxSupportedLocale) {
 		this.gxSupportedLocale = gxSupportedLocale;
+	}
+
+	public String getLanguage() {
+		return gxSupportedLocale != null ? gxSupportedLocale.getLocaleName() : null;
 	}
 
 }

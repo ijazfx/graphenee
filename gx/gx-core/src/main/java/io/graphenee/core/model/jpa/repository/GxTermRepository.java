@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
@@ -35,6 +36,8 @@ public interface GxTermRepository extends GxJpaRepository<GxTerm, Integer> {
 	GxTerm findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(String termKey, String localeCode);
 
 	List<GxTerm> findByTermKey(String termKey);
+
+	List<GxTerm> findByGxNamespaceAndTermKey(GxNamespace namespace, String termKey);
 
 	@Modifying
 	@Query("Delete from GxTerm t WHERE t.termKey = :termKey AND t.gxNamespace.oid = :oidNamespace")
