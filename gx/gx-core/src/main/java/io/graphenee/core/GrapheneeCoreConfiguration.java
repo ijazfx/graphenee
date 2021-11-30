@@ -32,7 +32,7 @@ import io.graphenee.core.util.DataSourceUtil;
 
 @Configuration
 @ConditionalOnClass(DataSource.class)
-@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false) 
 @ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeCoreConfiguration {
 

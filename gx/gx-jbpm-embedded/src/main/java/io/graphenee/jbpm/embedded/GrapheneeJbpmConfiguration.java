@@ -26,17 +26,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 
+import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.core.util.DataSourceUtil;
 
 @Configuration
 @ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
+@EnableJpaRepositories(entityManagerFactoryRef ="jbpmEntityManagerFactory",transactionManagerRef = "jbpmTransactionManager" ,basePackages = { "io.graphenee.jbpm.embedded.repository" })
+@EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE, "io.graphenee.jbpm.embedded.model" })
 @ComponentScan("io.graphenee.jbpm.embedded")
 public class GrapheneeJbpmConfiguration {
 
@@ -83,7 +88,7 @@ public class GrapheneeJbpmConfiguration {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		DataSource ds = grapheneeJbpmProperties().getDataSource();
 		em.setDataSource(ds);
-		em.setPackagesToScan("org.jbpm", "org.drools");
+		em.setPackagesToScan("org.jbpm", "org.drools","io.graphenee.jbpm.embedded.model");
 		em.setPersistenceUnitName("org.jbpm.persistence.jpa");
 		em.setPersistenceProviderClass(HibernatePersistenceProvider.class);
 		em.setJpaDialect(new HibernateJpaDialect());
