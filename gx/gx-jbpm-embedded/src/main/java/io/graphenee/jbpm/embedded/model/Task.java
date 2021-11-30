@@ -1,17 +1,24 @@
 package io.graphenee.jbpm.embedded.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQuery;
 
 /**
  * The persistent class for the Task database table.
  * 
  */
 @Entity
-@NamedQuery(name="Task.findAll", query="SELECT t FROM Task t")
+@NamedQuery(name = "Task.findAll", query = "SELECT t FROM Task t")
 public class Task implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -55,7 +62,7 @@ public class Task implements Serializable {
 
 	private String name;
 
-	@Column(name="OPTLOCK")
+	@Column(name = "OPTLOCK")
 	private Integer optlock;
 
 	private Integer outputAccessType;
@@ -89,6 +96,20 @@ public class Task implements Serializable {
 	private String taskType;
 
 	private BigDecimal workItemId;
+
+
+	//bi-directional many-to-many association to OrganizationalEntity
+	@ManyToMany
+	@JoinTable(
+		name="PeopleAssignments_PotOwners"
+		, joinColumns={
+			@JoinColumn(name="task_id")
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="entity_id")
+			}
+		)
+	private List<OrganizationalEntity> organizationalEntities;
 
 	public Task() {
 	}
@@ -381,4 +402,11 @@ public class Task implements Serializable {
 		this.actualOwnerId = actualOwnerId;
 	}
 
+	public List<OrganizationalEntity> getOrganizationalEntities() {
+		return this.organizationalEntities;
+	}
+
+	public void setOrganizationalEntities(List<OrganizationalEntity> organizationalEntities) {
+		this.organizationalEntities = organizationalEntities;
+	}
 }

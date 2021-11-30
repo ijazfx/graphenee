@@ -22,4 +22,6 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
 
 	Page<Task> findPageByActualOwnerIdInAndStatusIn(List<String> ownerIds, List<String> statuses, Pageable pageRequest);
 
+	Page<Task> findPageByPeopleAssignmentsPotOwnersEntityIdInAndStatusIn(List<String> entityIds, List<String> statuses, Pageable pageRequest);
+
 }
