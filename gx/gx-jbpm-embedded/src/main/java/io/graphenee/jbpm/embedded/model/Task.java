@@ -1,8 +1,7 @@
 package io.graphenee.jbpm.embedded.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -25,18 +24,18 @@ public class Task implements Serializable {
 	@Id
 	private long id;
 
-	private Date activationTime;
+	private Timestamp activationTime;
 
 	@Column(name = "actualOwner_id")
 	private String actualOwnerId;
 
 	private String allowedToDelegate;
 
-	private short archived;
+	private Integer archived;
 
 	private String createdBy_id;
 
-	private Date createdOn;
+	private Timestamp createdOn;
 
 	private String deploymentId;
 
@@ -44,15 +43,15 @@ public class Task implements Serializable {
 
 	private Integer documentAccessType;
 
-	private BigDecimal documentContentId;
+	private Integer documentContentId;
 
 	private String documentType;
 
-	private Date expirationTime;
+	private Timestamp expirationTime;
 
 	private Integer faultAccessType;
 
-	private BigDecimal faultContentId;
+	private Integer faultContentId;
 
 	private String faultName;
 
@@ -67,11 +66,11 @@ public class Task implements Serializable {
 
 	private Integer outputAccessType;
 
-	private BigDecimal outputContentId;
+	private Integer outputContentId;
 
 	private String outputType;
 
-	private BigDecimal parentId;
+	private Integer parentId;
 
 	private Integer previousStatus;
 
@@ -79,9 +78,9 @@ public class Task implements Serializable {
 
 	private String processId;
 
-	private BigDecimal processInstanceId;
+	private Integer processInstanceId;
 
-	private BigDecimal processSessionId;
+	private Integer processSessionId;
 
 	private Boolean skipable;
 
@@ -95,7 +94,7 @@ public class Task implements Serializable {
 
 	private String taskType;
 
-	private BigDecimal workItemId;
+	private Integer workItemId;
 
 
 	//bi-directional many-to-many association to OrganizationalEntity
@@ -122,11 +121,11 @@ public class Task implements Serializable {
 		this.id = id;
 	}
 
-	public Date getActivationTime() {
+	public Timestamp getActivationTime() {
 		return this.activationTime;
 	}
 
-	public void setActivationTime(Date activationTime) {
+	public void setActivationTime(Timestamp activationTime) {
 		this.activationTime = activationTime;
 	}
 
@@ -138,11 +137,11 @@ public class Task implements Serializable {
 		this.allowedToDelegate = allowedToDelegate;
 	}
 
-	public short getArchived() {
+	public Integer getArchived() {
 		return this.archived;
 	}
 
-	public void setArchived(short archived) {
+	public void setArchived(Integer archived) {
 		this.archived = archived;
 	}
 
@@ -154,11 +153,11 @@ public class Task implements Serializable {
 		this.createdBy_id = createdBy_id;
 	}
 
-	public Date getCreatedOn() {
+	public Timestamp getCreatedOn() {
 		return this.createdOn;
 	}
 
-	public void setCreatedOn(Date createdOn) {
+	public void setCreatedOn(Timestamp createdOn) {
 		this.createdOn = createdOn;
 	}
 
@@ -186,11 +185,11 @@ public class Task implements Serializable {
 		this.documentAccessType = documentAccessType;
 	}
 
-	public BigDecimal getDocumentContentId() {
+	public Integer getDocumentContentId() {
 		return this.documentContentId;
 	}
 
-	public void setDocumentContentId(BigDecimal documentContentId) {
+	public void setDocumentContentId(Integer documentContentId) {
 		this.documentContentId = documentContentId;
 	}
 
@@ -202,11 +201,11 @@ public class Task implements Serializable {
 		this.documentType = documentType;
 	}
 
-	public Date getExpirationTime() {
+	public Timestamp getExpirationTime() {
 		return this.expirationTime;
 	}
 
-	public void setExpirationTime(Date expirationTime) {
+	public void setExpirationTime(Timestamp expirationTime) {
 		this.expirationTime = expirationTime;
 	}
 
@@ -218,11 +217,11 @@ public class Task implements Serializable {
 		this.faultAccessType = faultAccessType;
 	}
 
-	public BigDecimal getFaultContentId() {
+	public Integer getFaultContentId() {
 		return this.faultContentId;
 	}
 
-	public void setFaultContentId(BigDecimal faultContentId) {
+	public void setFaultContentId(Integer faultContentId) {
 		this.faultContentId = faultContentId;
 	}
 
@@ -274,11 +273,11 @@ public class Task implements Serializable {
 		this.outputAccessType = outputAccessType;
 	}
 
-	public BigDecimal getOutputContentId() {
+	public Integer getOutputContentId() {
 		return this.outputContentId;
 	}
 
-	public void setOutputContentId(BigDecimal outputContentId) {
+	public void setOutputContentId(Integer outputContentId) {
 		this.outputContentId = outputContentId;
 	}
 
@@ -290,11 +289,11 @@ public class Task implements Serializable {
 		this.outputType = outputType;
 	}
 
-	public BigDecimal getParentId() {
+	public Integer getParentId() {
 		return this.parentId;
 	}
 
-	public void setParentId(BigDecimal parentId) {
+	public void setParentId(Integer parentId) {
 		this.parentId = parentId;
 	}
 
@@ -322,19 +321,19 @@ public class Task implements Serializable {
 		this.processId = processId;
 	}
 
-	public BigDecimal getProcessInstanceId() {
+	public Integer getProcessInstanceId() {
 		return this.processInstanceId;
 	}
 
-	public void setProcessInstanceId(BigDecimal processInstanceId) {
+	public void setProcessInstanceId(Integer processInstanceId) {
 		this.processInstanceId = processInstanceId;
 	}
 
-	public BigDecimal getProcessSessionId() {
+	public Integer getProcessSessionId() {
 		return this.processSessionId;
 	}
 
-	public void setProcessSessionId(BigDecimal processSessionId) {
+	public void setProcessSessionId(Integer processSessionId) {
 		this.processSessionId = processSessionId;
 	}
 
@@ -386,11 +385,11 @@ public class Task implements Serializable {
 		this.taskType = taskType;
 	}
 
-	public BigDecimal getWorkItemId() {
+	public Integer getWorkItemId() {
 		return this.workItemId;
 	}
 
-	public void setWorkItemId(BigDecimal workItemId) {
+	public void setWorkItemId(Integer workItemId) {
 		this.workItemId = workItemId;
 	}
 

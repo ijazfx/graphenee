@@ -1,11 +1,13 @@
 package io.graphenee.jbpm.embedded.model;
 
 import java.io.Serializable;
-import javax.persistence.*;
-
-import model.Task;
-
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.NamedQuery;
 
 
 /**
