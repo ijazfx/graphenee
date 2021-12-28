@@ -61,6 +61,9 @@ public class GxSupportedLocale implements Serializable {
 	private List<GxTerm> gxTerms = new ArrayList<>();
 
 	public GxSupportedLocale() {
+		isActive = true;
+		isProtected = false;
+		isLeftToRight = true;
 	}
 
 	public Integer getOid() {

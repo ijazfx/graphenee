@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -41,6 +42,7 @@ import com.vaadin.flow.component.grid.GridMultiSelectionModel;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.ItemClickEvent;
+import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
@@ -134,6 +136,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private List<T> items;
 
 	private Map<String, MenuItem> hidingColumnMap = new HashMap<>();
+	private Map<String, AbstractField<?, ?>> editorComponentMap = new HashMap<>();
 
 	private T searchEntity;
 
@@ -309,6 +312,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 						if (isGridFilterEnabled()) {
 							addFilteredColumn(column, propertyDefinition);
 						}
+
+						if (isGridInlineEditingEnabled()) {
+							addInlineEditColumn(column, propertyDefinition);
+						}
+
 						decorateColumn(propertyName, column);
 						SubMenu columnsSubMenu = columnsMenuItem.getSubMenu();
 						MenuItem columnMenuItem = columnsSubMenu.addItem(propertyDefinition.getCaption(), cl -> {
@@ -382,6 +390,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				onGridItemClicked(icl);
 			});
 
+			dataGrid.addItemDoubleClickListener(icl -> {
+				onGridItemDoubleClicked(icl);
+			});
+
 			decorateGrid(dataGrid);
 
 			for (String p : availableProperties()) {
@@ -396,6 +408,77 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			isBuilt = true;
 		}
 		return this;
+	}
+
+	protected boolean isGridInlineEditingEnabled() {
+		return false;
+	}
+
+	private void addInlineEditColumn(Column<T> column, PropertyDefinition<T, Object> propertyDefinition) {
+		AbstractField<?, ?> editorComponent = editorComponentMap.get(column.getKey());
+		if (editorComponent == null) {
+			editorComponent = defaultInlineEditorForProperty(column.getKey(), propertyDefinition);
+			if (editorComponent != null) {
+				dataGrid.getEditor().getBinder().forField(editorComponent).bind(column.getKey());
+				column.setEditorComponent(editorComponent);
+				editorComponentMap.put(column.getKey(), editorComponent);
+			}
+		}
+
+	}
+
+	protected void onGridItemDoubleClicked(ItemDoubleClickEvent<T> icl) {
+		if (isGridInlineEditingEnabled()) {
+			String propertyName = icl.getColumn().getKey();
+			if (propertyName != null) {
+				AbstractField<?, ?> editorComponent = editorComponentMap.get(propertyName);
+				dataGrid.getEditor().editItem(icl.getItem());
+				if (editorComponent instanceof Focusable) {
+					((Focusable<?>) editorComponent).focus();
+				}
+			}
+		}
+	}
+
+	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+		AbstractField<?, ?> c = inlineEditorForProperty(propertyName, propertyDefinition);
+		if (c == null) {
+			if (propertyName.matches("date.*|.*Date")) {
+				if (propertyDefinition.getType().equals(Long.class)) {
+					c = new DatePicker();
+				} else if (c == null && propertyDefinition.getType().equals(Timestamp.class)) {
+					c = new DatePicker();
+				}
+			}
+			if (c == null && propertyName.matches("dateTime.*|.*DateTime")) {
+				if (propertyDefinition.getType().equals(Long.class)) {
+					c = new DateTimePicker();
+				}
+			}
+			if (c == null && propertyDefinition.getType().equals(Timestamp.class)) {
+				c = new DateTimePicker();
+			}
+			if (c == null && propertyDefinition.getType().equals(Date.class)) {
+				c = new DatePicker();
+			}
+			if (c == null && propertyDefinition.getType().equals(Boolean.class)) {
+				c = new Checkbox();
+			}
+			if (c == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+				c = new NumberField();
+			}
+			if (c == null) {
+				c = new TextField();
+			}
+		}
+		c.getElement().getStyle().set("width", "100%");
+		c.getElement().setProperty("clearButtonVisible", true);
+		c.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+		return c;
+	}
+
+	protected AbstractField<?, ?> inlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+		return null;
 	}
 
 	protected void onGridItemClicked(ItemClickEvent<T> icl) {
@@ -446,6 +529,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	protected Grid<T> dataGrid(Class<T> entityClass) {
 		Grid<T> dataGrid = new Grid<>(entityClass, true);
+		if (isGridInlineEditingEnabled()) {
+			Binder<T> editBinder = new Binder<>(entityClass);
+			dataGrid.getEditor().setBinder(editBinder);
+		}
 		List<Column<T>> removeList = new ArrayList<>(dataGrid.getColumns());
 		for (String key : availableProperties()) {
 			Column<T> column = dataGrid.getColumnByKey(key);
