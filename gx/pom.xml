@@ -50,7 +50,7 @@
 		<version.pdfbox>3.0.0-RC1</version.pdfbox>
 		<version.poi>4.1.2</version.poi>
 		<version.retrofit>2.5.0</version.retrofit>
-		<version.protobuf>3.8.0</version.protobuf>
+		<version.protobuf>3.16.1</version.protobuf>
 		<version.commons.beanutils>1.9.4</version.commons.beanutils>
 		<version.commons.io>2.8.0</version.commons.io>
 		<version.vaadin>7.7.17</version.vaadin>
