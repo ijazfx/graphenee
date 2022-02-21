@@ -5,7 +5,7 @@ import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 
 import io.graphenee.core.model.Fault;
-import io.graphenee.core.util.KeyValueWrapper;
+import io.graphenee.util.KeyValueWrapper;
 
 public class FaultToValueConverter<ID, T> implements Converter<T, Fault<ID, T>> {
     private static final long serialVersionUID = 1L;

@@ -24,6 +24,9 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.function.Supplier;
 
+import com.vaadin.server.FileResource;
+import com.vaadin.server.Page;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -32,144 +35,141 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.vaadin.server.FileResource;
-import com.vaadin.server.Page;
-
-import io.graphenee.core.util.KeyValueWrapper;
-import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.util.KeyValueWrapper;
+import io.graphenee.util.TRCalendarUtil;
 
 public class ExportDataSpreadSheetComponent {
 
-	private static final String FILE_EXTENSION_XLS = ".xls";
-	private Collection<String> columnsCaptions;
-	private Collection<String> dataColumns;
-	private Collection<Object> dataItems;
-	private Sheet sheet;
-	private String fileName;
-	private Supplier<Collection<String>> columnsCaptionsSupplier;
-	private Supplier<Collection<String>> dataColumnSupplier;
-	private Supplier<Collection<Object>> dataItemsSupplier;
+    private static final String FILE_EXTENSION_XLS = ".xls";
+    private Collection<String> columnsCaptions;
+    private Collection<String> dataColumns;
+    private Collection<Object> dataItems;
+    private Sheet sheet;
+    private String fileName;
+    private Supplier<Collection<String>> columnsCaptionsSupplier;
+    private Supplier<Collection<String>> dataColumnSupplier;
+    private Supplier<Collection<Object>> dataItemsSupplier;
 
-	private CellStyle defaultDateStyle = null;
+    private CellStyle defaultDateStyle = null;
 
-	public ExportDataSpreadSheetComponent withFileName(String fileName) {
-		this.fileName = fileName;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
 
-	public ExportDataSpreadSheetComponent withDataColumns(Collection<String> dataColumns) {
-		this.dataColumns = dataColumns;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withDataColumns(Collection<String> dataColumns) {
+        this.dataColumns = dataColumns;
+        return this;
+    }
 
-	public ExportDataSpreadSheetComponent withColumnsCaptions(Collection<String> columnsCaptions) {
-		this.columnsCaptions = columnsCaptions;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withColumnsCaptions(Collection<String> columnsCaptions) {
+        this.columnsCaptions = columnsCaptions;
+        return this;
+    }
 
-	public ExportDataSpreadSheetComponent withDataColumns(Supplier<Collection<String>> supplier) {
-		this.dataColumnSupplier = supplier;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withDataColumns(Supplier<Collection<String>> supplier) {
+        this.dataColumnSupplier = supplier;
+        return this;
+    }
 
-	public ExportDataSpreadSheetComponent withColumnsCaptions(Supplier<Collection<String>> supplier) {
-		this.columnsCaptionsSupplier = supplier;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withColumnsCaptions(Supplier<Collection<String>> supplier) {
+        this.columnsCaptionsSupplier = supplier;
+        return this;
+    }
 
-	public ExportDataSpreadSheetComponent withDataItems(Supplier<Collection<Object>> supplier) {
-		this.dataItemsSupplier = supplier;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withDataItems(Supplier<Collection<Object>> supplier) {
+        this.dataItemsSupplier = supplier;
+        return this;
+    }
 
-	public ExportDataSpreadSheetComponent withDataItems(Collection<Object> dataItems) {
-		this.dataItems = dataItems;
-		return this;
-	}
+    public ExportDataSpreadSheetComponent withDataItems(Collection<Object> dataItems) {
+        this.dataItems = dataItems;
+        return this;
+    }
 
-	public void prepareDownload() {
-		try {
-			File file = File.createTempFile(UUID.randomUUID().toString(), "xls");
-			FileOutputStream fos = new FileOutputStream(file);
-			writeToOutputStream(fos);
-			fos.close();
-			FileResource resource = new FileResource(file) {
-				public String getFilename() {
-					return ExportDataSpreadSheetComponent.this.fileName != null ? ExportDataSpreadSheetComponent.this.fileName : "exported-data.xls";
-				};
-			};
-			Page.getCurrent().open(resource, "_blank", false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public void prepareDownload() {
+        try {
+            File file = File.createTempFile(UUID.randomUUID().toString(), "xls");
+            FileOutputStream fos = new FileOutputStream(file);
+            writeToOutputStream(fos);
+            fos.close();
+            FileResource resource = new FileResource(file) {
+                public String getFilename() {
+                    return ExportDataSpreadSheetComponent.this.fileName != null ? ExportDataSpreadSheetComponent.this.fileName : "exported-data.xls";
+                };
+            };
+            Page.getCurrent().open(resource, "_blank", false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void writeToOutputStream(OutputStream stream) throws IOException {
-		if (columnsCaptionsSupplier != null) {
-			columnsCaptions = columnsCaptionsSupplier.get();
-		}
-		if (dataColumnSupplier != null) {
-			dataColumns = dataColumnSupplier.get();
-		}
-		if (!CollectionUtils.isEmpty(dataColumns)) {
-			if (dataItemsSupplier != null) {
-				dataItems = dataItemsSupplier.get();
-			}
-			XSSFWorkbook workbook = new XSSFWorkbook();
-			defaultDateStyle = workbook.createCellStyle();
-			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
-			sheet = workbook.createSheet();
-			buildHeaderRow();
-			buildDataRows();
-			workbook.write(stream);
-			workbook.close();
-		}
-	}
+    public void writeToOutputStream(OutputStream stream) throws IOException {
+        if (columnsCaptionsSupplier != null) {
+            columnsCaptions = columnsCaptionsSupplier.get();
+        }
+        if (dataColumnSupplier != null) {
+            dataColumns = dataColumnSupplier.get();
+        }
+        if (!CollectionUtils.isEmpty(dataColumns)) {
+            if (dataItemsSupplier != null) {
+                dataItems = dataItemsSupplier.get();
+            }
+            XSSFWorkbook workbook = new XSSFWorkbook();
+            defaultDateStyle = workbook.createCellStyle();
+            defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
+            sheet = workbook.createSheet();
+            buildHeaderRow();
+            buildDataRows();
+            workbook.write(stream);
+            workbook.close();
+        }
+    }
 
-	private void buildHeaderRow() {
-		Row headerRow = sheet.createRow(0);
-		int i = 0;
-		for (String property : columnsCaptions) {
-			headerRow.createCell(i++).setCellValue(camelCaseToRegular(property));
-		}
-	}
+    private void buildHeaderRow() {
+        Row headerRow = sheet.createRow(0);
+        int i = 0;
+        for (String property : columnsCaptions) {
+            headerRow.createCell(i++).setCellValue(camelCaseToRegular(property));
+        }
+    }
 
-	private void buildDataRows() {
-		if (!CollectionUtils.isEmpty(dataItems)) {
-			int i = 1;
-			for (Object dataItem : dataItems) {
-				Row row = sheet.createRow(i++);
-				buildDataRow(row, dataItem);
-			}
-		}
-	}
+    private void buildDataRows() {
+        if (!CollectionUtils.isEmpty(dataItems)) {
+            int i = 1;
+            for (Object dataItem : dataItems) {
+                Row row = sheet.createRow(i++);
+                buildDataRow(row, dataItem);
+            }
+        }
+    }
 
-	private void buildDataRow(Row row, Object item) {
-		int i = 0;
-		KeyValueWrapper kvw = new KeyValueWrapper(item);
-		for (String property : dataColumns) {
-			Object value = kvw.valueForKeyPath(property);
-			Cell cell = row.createCell(i++);
-			if (value instanceof String) {
-				cell.setCellValue(value.toString());
-			} else if (value instanceof Boolean) {
-				cell.setCellValue((Boolean) value);
-			} else if (value instanceof Double) {
-				cell.setCellValue(((Double) value).doubleValue());
-			} else if (value instanceof Number) {
-				cell.setCellValue(((Number) value).intValue());
-			} else if (value instanceof Date) {
-				if (defaultDateStyle != null)
-					cell.setCellStyle(defaultDateStyle);
-				cell.setCellValue((Date) value);
-			} else {
-				cell.setCellValue("");
-			}
-		}
-	}
+    private void buildDataRow(Row row, Object item) {
+        int i = 0;
+        KeyValueWrapper kvw = new KeyValueWrapper(item);
+        for (String property : dataColumns) {
+            Object value = kvw.valueForKeyPath(property);
+            Cell cell = row.createCell(i++);
+            if (value instanceof String) {
+                cell.setCellValue(value.toString());
+            } else if (value instanceof Boolean) {
+                cell.setCellValue((Boolean) value);
+            } else if (value instanceof Double) {
+                cell.setCellValue(((Double) value).doubleValue());
+            } else if (value instanceof Number) {
+                cell.setCellValue(((Number) value).intValue());
+            } else if (value instanceof Date) {
+                if (defaultDateStyle != null)
+                    cell.setCellStyle(defaultDateStyle);
+                cell.setCellValue((Date) value);
+            } else {
+                cell.setCellValue("");
+            }
+        }
+    }
 
-	private String camelCaseToRegular(String string) {
-		return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
-	}
+    private String camelCaseToRegular(String string) {
+        return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
+    }
 
 }

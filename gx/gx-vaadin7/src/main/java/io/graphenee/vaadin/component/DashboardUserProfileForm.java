@@ -17,46 +17,46 @@ package io.graphenee.vaadin.component;
 
 import java.util.Arrays;
 
+import com.vaadin.ui.ComboBox;
+
 import org.vaadin.viritin.fields.MPasswordField;
 import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.vaadin.ui.ComboBox;
-
-import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.util.enums.GenderEnum;
 import io.graphenee.vaadin.TRAbstractForm;
 
 public class DashboardUserProfileForm extends TRAbstractForm<GxAuthenticatedUser> {
 
-	MTextField firstName;
-	MTextField lastName;
-	MTextField username;
-	MPasswordField password;
-	ComboBox gender;
+    MTextField firstName;
+    MTextField lastName;
+    MTextField username;
+    MPasswordField password;
+    ComboBox gender;
 
-	@Override
-	protected boolean eagerValidationEnabled() {
-		return true;
-	}
+    @Override
+    protected boolean eagerValidationEnabled() {
+        return true;
+    }
 
-	@Override
-	protected String formTitle() {
-		return "User Profile";
-	}
+    @Override
+    protected String formTitle() {
+        return "User Profile";
+    }
 
-	@Override
-	protected void addFieldsToForm(MVerticalLayout form) {
-		firstName = new MTextField("First Name");
-		firstName.setEnabled(false);
-		lastName = new MTextField("Last Name");
-		lastName.setEnabled(false);
-		username = new MTextField("Username");
-		username.setEnabled(false);
-		gender = new ComboBox("Gender");
-		gender.addItems(Arrays.asList(GenderEnum.values()));
-		password = new MPasswordField("Password");
-		form.addComponents(firstName, lastName, gender, username, password);
-	}
+    @Override
+    protected void addFieldsToForm(MVerticalLayout form) {
+        firstName = new MTextField("First Name");
+        firstName.setEnabled(false);
+        lastName = new MTextField("Last Name");
+        lastName.setEnabled(false);
+        username = new MTextField("Username");
+        username.setEnabled(false);
+        gender = new ComboBox("Gender");
+        gender.addItems(Arrays.asList(GenderEnum.values()));
+        password = new MPasswordField("Password");
+        form.addComponents(firstName, lastName, gender, username, password);
+    }
 
 }

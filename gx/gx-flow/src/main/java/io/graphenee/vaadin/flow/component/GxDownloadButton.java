@@ -21,117 +21,117 @@ import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.shared.Registration;
 
-import io.graphenee.core.callback.TRVoidCallback;
-import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.util.TRCalendarUtil;
+import io.graphenee.util.callback.TRVoidCallback;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @NoArgsConstructor
 public class GxDownloadButton extends Button {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Setter
-	@Getter
-	private String defaultFileName = TRCalendarUtil.getCurrentTimeStamp() + "-download";
+    @Setter
+    @Getter
+    private String defaultFileName = TRCalendarUtil.getCurrentTimeStamp() + "-download";
 
-	@Setter
-	@Getter
-	private InputStreamFactory inputStreamFactory;
+    @Setter
+    @Getter
+    private InputStreamFactory inputStreamFactory;
 
-	@Setter
-	@Getter
-	private boolean iconVisible = true;
+    @Setter
+    @Getter
+    private boolean iconVisible = true;
 
-	@Setter
-	private TRVoidCallback beforeDownloadCallback;
+    @Setter
+    private TRVoidCallback beforeDownloadCallback;
 
-	private Anchor anchor;
+    private Anchor anchor;
 
-	public GxDownloadButton(String text) {
-		super(text);
+    public GxDownloadButton(String text) {
+        super(text);
 
-		if (isIconVisible())
-			setIcon(VaadinIcon.DOWNLOAD.create());
+        if (isIconVisible())
+            setIcon(VaadinIcon.DOWNLOAD.create());
 
-		setDisableOnClick(true);
-		addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        setDisableOnClick(true);
+        addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-		addClickListener(event -> {
-			Button button = event.getSource();
-			button.setText("Preparing Download...");
-			getParent().ifPresent(component -> {
-				Objects.requireNonNull(defaultFileName, "File name  must not be null");
-				Objects.requireNonNull(inputStreamFactory, "Stream resource must not be null");
+        addClickListener(event -> {
+            Button button = event.getSource();
+            button.setText("Preparing Download...");
+            getParent().ifPresent(component -> {
+                Objects.requireNonNull(defaultFileName, "File name  must not be null");
+                Objects.requireNonNull(inputStreamFactory, "Stream resource must not be null");
 
-				if (anchor == null) {
-					anchor = new Anchor();
-					Element anchorElement = anchor.getElement();
-					anchorElement.setAttribute("download", true);
-					anchorElement.getStyle().set("display", "none");
-					component.getElement().appendChild(anchor.getElement());
+                if (anchor == null) {
+                    anchor = new Anchor();
+                    Element anchorElement = anchor.getElement();
+                    anchorElement.setAttribute("download", true);
+                    anchorElement.getStyle().set("display", "none");
+                    component.getElement().appendChild(anchor.getElement());
 
-					anchorElement.addEventListener("click", listener -> fireEvent(new DownloadStartEvent(this, true, listener)));
-				}
+                    anchorElement.addEventListener("click", listener -> fireEvent(new DownloadStartEvent(this, true, listener)));
+                }
 
-				if (beforeDownloadCallback != null) {
-					beforeDownloadCallback.execute();
-				}
-				Optional<UI> optionalUI = getUI();
-				Executors.newSingleThreadExecutor().execute(() -> {
-					try {
-						InputStream is = getInputStreamFactory().createInputStream();
-						StreamResource streamResource = new StreamResource(defaultFileName, () -> is);
-						streamResource.setCacheTime(0);
-						optionalUI.ifPresent(ui -> ui.access(() -> {
-							anchor.setHref(streamResource);
-							anchor.getElement().callJsFunction("click");
-							ui.push();
-						}));
-					} catch (Exception e) {
-						e.printStackTrace();
-						throw new RuntimeException(e);
-					}
-				});
-			});
-		});
+                if (beforeDownloadCallback != null) {
+                    beforeDownloadCallback.execute();
+                }
+                Optional<UI> optionalUI = getUI();
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    try {
+                        InputStream is = getInputStreamFactory().createInputStream();
+                        StreamResource streamResource = new StreamResource(defaultFileName, () -> is);
+                        streamResource.setCacheTime(0);
+                        optionalUI.ifPresent(ui -> ui.access(() -> {
+                            anchor.setHref(streamResource);
+                            anchor.getElement().callJsFunction("click");
+                            ui.push();
+                        }));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
+                    }
+                });
+            });
+        });
 
-		addDownloadStartListener(listener -> {
-			GxDownloadButton button = listener.getSource();
-			button.setText(text);
-			button.setEnabled(true);
-		});
-	}
+        addDownloadStartListener(listener -> {
+            GxDownloadButton button = listener.getSource();
+            button.setText(text);
+            button.setEnabled(true);
+        });
+    }
 
-	@Override
-	protected void onDetach(DetachEvent detachEvent) {
-		if (anchor != null) {
-			getParent().map(Component::getElement).ifPresent(parentElement -> {
-				Element anchorElement = anchor.getElement();
-				if (anchorElement != null && parentElement.getChildren().anyMatch(anchorElement::equals)) {
-					parentElement.removeChild(anchorElement);
-				}
-			});
-		}
-	}
+    @Override
+    protected void onDetach(DetachEvent detachEvent) {
+        if (anchor != null) {
+            getParent().map(Component::getElement).ifPresent(parentElement -> {
+                Element anchorElement = anchor.getElement();
+                if (anchorElement != null && parentElement.getChildren().anyMatch(anchorElement::equals)) {
+                    parentElement.removeChild(anchorElement);
+                }
+            });
+        }
+    }
 
-	public Registration addDownloadStartListener(ComponentEventListener<DownloadStartEvent> listener) {
-		Registration registration = addListener(DownloadStartEvent.class, listener);
-		return registration;
-	}
+    public Registration addDownloadStartListener(ComponentEventListener<DownloadStartEvent> listener) {
+        Registration registration = addListener(DownloadStartEvent.class, listener);
+        return registration;
+    }
 
-	public static class DownloadStartEvent extends ComponentEvent<GxDownloadButton> {
+    public static class DownloadStartEvent extends ComponentEvent<GxDownloadButton> {
 
-		private final DomEvent clientSideEvent;
+        private final DomEvent clientSideEvent;
 
-		public DownloadStartEvent(GxDownloadButton source, boolean fromClient, DomEvent clientSideEvent) {
-			super(source, fromClient);
-			this.clientSideEvent = clientSideEvent;
-		}
+        public DownloadStartEvent(GxDownloadButton source, boolean fromClient, DomEvent clientSideEvent) {
+            super(source, fromClient);
+            this.clientSideEvent = clientSideEvent;
+        }
 
-		public DomEvent getClientSideEvent() {
-			return clientSideEvent;
-		}
-	}
+        public DomEvent getClientSideEvent() {
+            return clientSideEvent;
+        }
+    }
 
 }

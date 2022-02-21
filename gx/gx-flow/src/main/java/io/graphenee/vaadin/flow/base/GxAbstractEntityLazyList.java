@@ -2,7 +2,6 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.stream.Stream;
 
-import com.twilio.rest.sync.v1.service.SyncStreamReader;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;

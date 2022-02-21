@@ -1,85 +1,85 @@
 package io.graphenee.core.model;
 
-import io.graphenee.core.enums.GenderEnum;
+import io.graphenee.util.enums.GenderEnum;
 
 public interface GxAuthenticatedUser {
 
-	int getUnreadNotificationCount();
+    int getUnreadNotificationCount();
 
-	void setUnreadNotificationCount(int count);
+    void setUnreadNotificationCount(int count);
 
-	byte[] getProfilePhoto();
+    byte[] getProfilePhoto();
 
-	String getFirstName();
+    String getFirstName();
 
-	void setFirstName(String firstName);
+    void setFirstName(String firstName);
 
-	String getLastName();
+    String getLastName();
 
-	void setLastName(String lastName);
+    void setLastName(String lastName);
 
-	String getUsername();
+    String getUsername();
 
-	void setUsername(String username);
+    void setUsername(String username);
 
-	String getPassword();
+    String getPassword();
 
-	void setPassword(String password);
+    void setPassword(String password);
 
-	GenderEnum getGender();
+    GenderEnum getGender();
 
-	void setGender(GenderEnum gender);
+    void setGender(GenderEnum gender);
 
-	String getEmail();
+    String getEmail();
 
-	void setEmail(String email);
+    void setEmail(String email);
 
-	String getMobileNumber();
+    String getMobileNumber();
 
-	void setMobileNumber(String mobileNumber);
+    void setMobileNumber(String mobileNumber);
 
-	default boolean isPasswordChangeRequired() {
-		return false;
-	}
+    default boolean isPasswordChangeRequired() {
+        return false;
+    }
 
-	default String getFirstNameLastName() {
-		if (getFirstName() != null) {
-			if (getLastName() != null) {
-				return getFirstName() + " " + getLastName();
-			}
-			return getFirstName();
-		}
-		if (getLastName() != null) {
-			return getLastName();
-		}
-		if (getUsername() != null) {
-			return getUsername();
-		}
-		return "Anonymous";
-	}
+    default String getFirstNameLastName() {
+        if (getFirstName() != null) {
+            if (getLastName() != null) {
+                return getFirstName() + " " + getLastName();
+            }
+            return getFirstName();
+        }
+        if (getLastName() != null) {
+            return getLastName();
+        }
+        if (getUsername() != null) {
+            return getUsername();
+        }
+        return "Anonymous";
+    }
 
-	default String getLastNameFirstName() {
-		if (getLastName() != null) {
-			if (getFirstName() != null) {
-				return getLastName() + ", " + getFirstName();
-			}
-			return getLastName();
-		}
-		if (getFirstName() != null) {
-			return getFirstName();
-		}
-		if (getUsername() != null) {
-			return getUsername();
-		}
-		return "Anonymous";
-	}
+    default String getLastNameFirstName() {
+        if (getLastName() != null) {
+            if (getFirstName() != null) {
+                return getLastName() + ", " + getFirstName();
+            }
+            return getLastName();
+        }
+        if (getFirstName() != null) {
+            return getFirstName();
+        }
+        if (getUsername() != null) {
+            return getUsername();
+        }
+        return "Anonymous";
+    }
 
-	default boolean canDoAction(String resource, String action) {
-		return true;
-	}
+    default boolean canDoAction(String resource, String action) {
+        return true;
+    }
 
-	default boolean canDoAction(String resource, String action, boolean forceRefresh) {
-		return true;
-	}
+    default boolean canDoAction(String resource, String action, boolean forceRefresh) {
+        return true;
+    }
 
 }

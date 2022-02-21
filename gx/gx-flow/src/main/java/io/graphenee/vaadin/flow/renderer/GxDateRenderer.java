@@ -7,14 +7,16 @@ import java.util.Date;
 import com.vaadin.flow.data.renderer.BasicRenderer;
 import com.vaadin.flow.function.ValueProvider;
 
-import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.util.TRCalendarUtil;
 
 public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
 
     private static final long serialVersionUID = 1L;
 
     public static enum GxDateResolution {
-        Date, Time, DateTime;
+        Date,
+        Time,
+        DateTime;
     }
 
     private String datePattern;
@@ -28,15 +30,15 @@ public class GxDateRenderer<T> extends BasicRenderer<T, Date> {
     public GxDateRenderer(ValueProvider<T, Date> valueProvider, GxDateResolution resolution) {
         super(valueProvider);
         switch (resolution) {
-            case Date:
-                dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
-                break;
-            case Time:
-                dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
-                break;
-            case DateTime:
-                dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
-                break;
+        case Date:
+            dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+        break;
+        case Time:
+            dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
+        break;
+        case DateTime:
+            dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
+        break;
         }
     }
 

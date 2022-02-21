@@ -16,7 +16,7 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
-import io.graphenee.core.util.JpaSpecificationBuilder;
+import io.graphenee.util.JpaSpecificationBuilder;
 
 @Service
 @Transactional

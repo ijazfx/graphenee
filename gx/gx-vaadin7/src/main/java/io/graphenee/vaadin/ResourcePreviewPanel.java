@@ -34,69 +34,68 @@ import io.graphenee.vaadin.util.VaadinUtils;
 @SuppressWarnings("serial")
 public class ResourcePreviewPanel extends TRAbstractPanel {
 
-	private BrowserFrame viewer;
-	private MButton downloadButton;
+    private BrowserFrame viewer;
+    private MButton downloadButton;
 
-	@Override
-	protected boolean isSpringComponent() {
-		return false;
-	}
+    @Override
+    protected boolean isSpringComponent() {
+        return false;
+    }
 
-	@Override
-	protected void addButtonsToFooter(MHorizontalLayout layout) {
-		downloadButton = new MButton("Download").withStyleName(ValoTheme.BUTTON_PRIMARY).withVisible(true);
-		layout.addComponentAsFirst(downloadButton);
-		layout.setExpandRatio(downloadButton, 1);
-		layout.setWidth("100%");
-	}
+    @Override
+    protected void addButtonsToFooter(MHorizontalLayout layout) {
+        downloadButton = new MButton("Download").withStyleName(ValoTheme.BUTTON_PRIMARY).withVisible(true);
+        layout.addComponentAsFirst(downloadButton);
+        layout.setExpandRatio(downloadButton, 1);
+        layout.setWidth("100%");
+    }
 
-	@Override
-	protected String panelTitle() {
-		return "Preview";
-	}
+    @Override
+    protected String panelTitle() {
+        return "Preview";
+    }
 
-	@Override
-	protected void addComponentsToContentLayout(MVerticalLayout layout) {
-		viewer = new BrowserFrame(null);
-		viewer.setResponsive(true);
-		viewer.setSizeFull();
-		layout.add(viewer);
-		layout.setExpandRatio(viewer, 1);
-	}
+    @Override
+    protected void addComponentsToContentLayout(MVerticalLayout layout) {
+        viewer = new BrowserFrame(null);
+        viewer.setResponsive(true);
+        viewer.setSizeFull();
+        layout.add(viewer);
+        layout.setExpandRatio(viewer, 1);
+    }
 
-	@Override
-	protected String popupHeight() {
-		return Math.round(VaadinUtils.browserHeight() * 0.9) + "px";
-	}
+    @Override
+    protected String popupHeight() {
+        return Math.round(VaadinUtils.browserHeight() * 0.9) + "px";
+    }
 
-	@Override
-	protected String popupWidth() {
-		return Math.round(VaadinUtils.browserWidth() * 0.9) + "px";
-	}
+    @Override
+    protected String popupWidth() {
+        return Math.round(VaadinUtils.browserWidth() * 0.9) + "px";
+    }
 
-	public void preview(Resource resource) {
-		build();
-		viewer.setSource(resource);
-		FileDownloader downloader = new FileDownloader(resource);
-		downloader.setErrorHandler(new ErrorHandler() {
+    public void preview(Resource resource) {
+        build();
+        viewer.setSource(resource);
+        FileDownloader downloader = new FileDownloader(resource);
+        downloader.setErrorHandler(new ErrorHandler() {
 
-			@Override
-			public void error(com.vaadin.server.ErrorEvent event) {
-				event.getThrowable().printStackTrace();
-				UI.getCurrent().access(() -> {
-					GxNotification.closable(
-							"Download the file again and wait until the download is finished before you open the file.",
-							Type.ERROR_MESSAGE).show(Page.getCurrent());
-					UI.getCurrent().push();
-				});
-			}
-		});
-		downloader.extend(downloadButton);
-		openInModalPopup();
-	}
+            @Override
+            public void error(com.vaadin.server.ErrorEvent event) {
+                event.getThrowable().printStackTrace();
+                UI.getCurrent().access(() -> {
+                    GxNotification.closable("Download the file again and wait until the download is finished before you open the file.", Type.ERROR_MESSAGE)
+                            .show(Page.getCurrent());
+                    UI.getCurrent().push();
+                });
+            }
+        });
+        downloader.extend(downloadButton);
+        openInModalPopup();
+    }
 
-	public void download(Resource resource) {
-		preview(resource);
-	}
+    public void download(Resource resource) {
+        preview(resource);
+    }
 
 }
