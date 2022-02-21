@@ -21,15 +21,20 @@ import org.springframework.stereotype.Service;
 import io.graphenee.core.api.GxNamespaceService;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 
 @Service
 public class GxNamespaceServiceImpl implements GxNamespaceService {
 
 	private static final String SYSTEM_NAMESPACE = "io.graphenee.system";
-	private static final String APPLICATION_NAMESPACE = "io.graphenee.application";
+	private static final String APPLICATION_NAMESPACE = "io.graphenee.core";
 
 	@Autowired
 	GxDataService dataService;
+
+	@Autowired
+	GxNamespaceRepository repo;
 
 	@Override
 	public GxNamespaceBean systemNamespace() {
@@ -49,6 +54,26 @@ public class GxNamespaceServiceImpl implements GxNamespaceService {
 	@Override
 	public GxNamespaceBean findByOid(Integer oidNamespace) {
 		return dataService.findNamespace(oidNamespace);
+	}
+
+	@Override
+	public GxNamespace systemNamespaceEntity() {
+		return repo.findByNamespace(SYSTEM_NAMESPACE);
+	}
+
+	@Override
+	public GxNamespace applicationNamespaceEntity() {
+		return repo.findByNamespace(APPLICATION_NAMESPACE);
+	}
+
+	@Override
+	public GxNamespace namespaceEntity(String namespace) {
+		return repo.findByNamespace(namespace);
+	}
+
+	@Override
+	public GxNamespace findEntityByOid(Integer oidNamespace) {
+		return repo.findOne(oidNamespace);
 	}
 
 }
