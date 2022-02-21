@@ -21,43 +21,43 @@ import com.vaadin.data.Container;
 import com.vaadin.ui.ComboBox;
 
 import io.graphenee.core.model.Fault;
-import io.graphenee.core.util.KeyValueWrapper;
+import io.graphenee.util.KeyValueWrapper;
 
 public class FaultComboBox extends ComboBox {
 
-	public FaultComboBox() {
-		super();
-	}
+    public FaultComboBox() {
+        super();
+    }
 
-	public FaultComboBox(String caption, Collection<?> options) {
-		super(caption, options);
-	}
+    public FaultComboBox(String caption, Collection<?> options) {
+        super(caption, options);
+    }
 
-	public FaultComboBox(String caption, Container dataSource) {
-		super(caption, dataSource);
-	}
+    public FaultComboBox(String caption, Container dataSource) {
+        super(caption, dataSource);
+    }
 
-	public FaultComboBox(String caption) {
-		super(caption);
-	}
+    public FaultComboBox(String caption) {
+        super(caption);
+    }
 
-	@Override
-	public String getItemCaption(Object itemId) {
-		if (itemId instanceof Fault) {
-			if (((Fault) itemId) != null && ((Fault) itemId).getValue() != null) {
-				return new KeyValueWrapper(((Fault) itemId).getValue()).stringForKeyPath((String) super.getItemCaptionPropertyId());
-			}
-		}
-		return super.getItemCaption(itemId);
-	}
+    @Override
+    public String getItemCaption(Object itemId) {
+        if (itemId instanceof Fault) {
+            if (((Fault) itemId) != null && ((Fault) itemId).getValue() != null) {
+                return new KeyValueWrapper(((Fault) itemId).getValue()).stringForKeyPath((String) super.getItemCaptionPropertyId());
+            }
+        }
+        return super.getItemCaption(itemId);
+    }
 
-	@Override
-	public Object getValue() {
-		Fault beanFault = (Fault) super.getValue();
-		if (beanFault == null) {
-			return null;
-		}
-		return beanFault;
-	}
+    @Override
+    public Object getValue() {
+        Fault beanFault = (Fault) super.getValue();
+        if (beanFault == null) {
+            return null;
+        }
+        return beanFault;
+    }
 
 }

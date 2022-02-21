@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 
-import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.vaadin.flow.component.GxWeekPicker.WeekRange;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
@@ -19,35 +19,35 @@ import lombok.Getter;
  * GxWeekPicker
  */
 public class GxWeekPicker extends ComboBox<WeekRange> {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public GxWeekPicker() {
-		setLabel("Week Picker");
-		setItems(IntStream.rangeClosed(1, 52).mapToObj(i -> new WeekRange(i)));
-	}
+    public GxWeekPicker() {
+        setLabel("Week Picker");
+        setItems(IntStream.rangeClosed(1, 52).mapToObj(i -> new WeekRange(i)));
+    }
 
-	@Getter
-	@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-	public static class WeekRange {
+    @Getter
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    public static class WeekRange {
 
-		@Include
-		private Integer weekNumber;
+        @Include
+        private Integer weekNumber;
 
-		private Date startDate;
-		private Date endDate;
+        private Date startDate;
+        private Date endDate;
 
-		public WeekRange(Integer weekNumber) {
-			this.weekNumber = weekNumber;
-			LocalDate localDate = LocalDate.now().with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-			Date date = TRCalendarUtil.toDateFromLocalDate(localDate);
-			this.startDate = TRCalendarUtil.startOfWeek(date);
-			this.endDate = TRCalendarUtil.endOfWeek(date);
-		}
+        public WeekRange(Integer weekNumber) {
+            this.weekNumber = weekNumber;
+            LocalDate localDate = LocalDate.now().with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            Date date = TRCalendarUtil.toDateFromLocalDate(localDate);
+            this.startDate = TRCalendarUtil.startOfWeek(date);
+            this.endDate = TRCalendarUtil.endOfWeek(date);
+        }
 
-		@Override
-		public String toString() {
-			return getWeekNumber().toString();
-		}
+        @Override
+        public String toString() {
+            return getWeekNumber().toString();
+        }
 
-	}
+    }
 }

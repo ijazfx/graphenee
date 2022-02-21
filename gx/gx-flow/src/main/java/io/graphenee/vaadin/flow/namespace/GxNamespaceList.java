@@ -53,4 +53,9 @@ public class GxNamespaceList extends GxAbstractEntityList<GxNamespace> {
             repo.deleteInBatch(entities);
     }
 
+    @Override
+    protected boolean shouldShowExportDataMenu() {
+        return false;
+    }
+
 }

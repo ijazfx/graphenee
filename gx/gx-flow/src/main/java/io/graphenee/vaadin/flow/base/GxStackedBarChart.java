@@ -24,7 +24,7 @@ import com.github.appreciated.apexcharts.config.yaxis.builder.TitleBuilder;
 import com.github.appreciated.apexcharts.helper.Series;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import io.graphenee.core.util.TRCalendarUtil;
+import io.graphenee.util.TRCalendarUtil;
 
 public class GxStackedBarChart extends VerticalLayout {
 
