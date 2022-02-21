@@ -47,7 +47,7 @@ public enum GxAudioType {
         this.extension = extension;
     }
 
-    public static GxAudioType accessKeyType(String mimeType) {
+    public static GxAudioType findByMimeType(String mimeType) {
         if (mimeType == GxAudioType.WEBM_AUDIO.mimeType)
             return GxAudioType.WEBM_AUDIO;
         if (mimeType == GxAudioType.MP3.mimeType)

@@ -47,7 +47,7 @@ public enum GxVideoType {
         this.extension = extension;
     }
 
-    public static GxVideoType accessKeyType(String mimeType) {
+    public static GxVideoType findByMimeType(String mimeType) {
         if (mimeType == GxVideoType.WEBM_VIDEO.mimeType)
             return GxVideoType.WEBM_VIDEO;
         if (mimeType == GxVideoType.MP4.mimeType)
