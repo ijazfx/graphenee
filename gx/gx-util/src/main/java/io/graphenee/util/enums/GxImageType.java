@@ -17,6 +17,7 @@ package io.graphenee.util.enums;
 
 public enum GxImageType {
     JPEG("image/jpeg", "jpeg"),
+    JPG("image/jpg", "jpg"),
     PNG("image/png", "png"),
     WEB_IMAGE("image/webp", "webp");
 
@@ -45,14 +46,15 @@ public enum GxImageType {
         this.extension = extension;
     }
 
-    public static GxImageType accessKeyType(String mimeType) {
-        if (mimeType == GxImageType.JPEG.mimeType)
+    public static GxImageType findByMimeType(String mimeType) {
+        if (mimeType.equals(JPEG.mimeType))
             return GxImageType.JPEG;
-        if (mimeType == GxImageType.PNG.mimeType)
+        if (mimeType.equals(PNG.mimeType))
             return GxImageType.PNG;
-        if (mimeType == GxImageType.WEB_IMAGE.mimeType)
+        if (mimeType.equals(WEB_IMAGE.mimeType))
             return GxImageType.WEB_IMAGE;
-
+        if (mimeType.equals(JPG.mimeType))
+            return GxImageType.JPG;
         return null;
     }
 
