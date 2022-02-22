@@ -46,6 +46,7 @@ import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
+import com.vaadin.flow.component.grid.dnd.GridDropMode;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -68,9 +69,9 @@ import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
@@ -108,6 +109,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     private boolean editable = true;
 
     private boolean dragAndDropEnabled = false;
+
+    private boolean rowDraggable = false;
 
     private MenuItem addMenuItem;
 
@@ -187,7 +190,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                 dataGrid.setDataProvider(dataProvider);
             }
 
-            dataGrid.setRowsDraggable(true);
             dataGrid.addDragStartListener(event -> {
                 onDragStart(event);
             });
@@ -289,6 +291,20 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             List<Column<T>> columns = new ArrayList<>();
             if (availableProperties() != null && availableProperties().length > 0) {
                 PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
+                Column<T> editColumn = dataGrid.addComponentColumn(source -> {
+                    Button rowEditButton = new Button(VaadinIcon.EDIT.create());
+                    rowEditButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY_INLINE);
+                    rowEditButton.addClickListener(cl -> {
+                        openForm(source);
+                    });
+                    return rowEditButton;
+                });
+                editColumn.setKey("__gxEditColumn");
+                editColumn.setWidth("50px");
+                editColumn.setTextAlign(ColumnTextAlign.CENTER);
+                editColumn.setResizable(false);
+                editColumn.setFlexGrow(0);
+                columns.add(editColumn);
                 for (int i = 0; i < availableProperties().length; i++) {
                     String propertyName = availableProperties()[i];
                     Column<T> column = dataGrid.getColumnByKey(propertyName);
@@ -297,8 +313,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                         propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
                         Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
                         if (renderer != null) {
-                            if (column != null)
-                                dataGrid.removeColumn(column);
+                            dataGrid.removeColumn(column);
                             column = dataGrid.addColumn(renderer);
                             column.setKey(propertyName);
                         } else {
@@ -342,7 +357,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                 endColumn.setAutoWidth(true);
             }
 
-            dataGrid.getColumns().stream().filter(c -> !c.getKey().equals("__gxLastColumn")).forEach(col -> col.setVisible(false));
+            dataGrid.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column")).forEach(col -> col.setVisible(false));
 
             for (String key : availableProperties()) {
                 Column<T> columnByKey = dataGrid.getColumnByKey(key);
@@ -487,7 +502,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     }
 
     protected void onGridItemClicked(ItemClickEvent<T> icl) {
-        openForm(icl.getItem());
     }
 
     protected void exportData(ObservableEmitter<T> emitter) {
@@ -782,7 +796,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                 renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
             }
             if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
-                renderer = TemplateRenderer.<T> of("<vaadin-checkbox checked=[[item.value]] disabled=true />").withProperty("value", propertyDefinition.getGetter());
+                renderer = new ComponentRenderer(s -> {
+                    Checkbox c = new Checkbox();
+                    Boolean value = (Boolean) propertyDefinition.getGetter().apply((T) s);
+                    c.setValue((Boolean) value);
+                    c.setReadOnly(true);
+                    return c;
+                });
+                // renderer = TemplateRenderer.<T> of("<vaadin-checkbox checked=[[item.value]] disabled=true />").withProperty("value", propertyDefinition.getGetter());
             }
             if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
                 NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
@@ -846,6 +867,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         return this.dragAndDropEnabled;
     }
 
+    public void setRowDraggable(boolean draggable) {
+        this.rowDraggable = draggable;
+    }
+
+    public boolean isRowDraggable() {
+        return this.rowDraggable;
+    }
+
     public void shouldShowToolbar(boolean show) {
         if (menuBarLayout != null) {
             menuBarLayout.setVisible(show);
@@ -902,7 +931,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         build();
         entityGrid().deselectAll();
         crudMenuBar.setVisible(isEditable());
-        dataGrid.setRowsDraggable(isDragAndDropEnabled());
+        dataGrid.getColumns().stream().filter(c -> c.getKey().equals("__gxEditColumn")).forEach(c -> c.setVisible(isEditable()));
+        if (isDragAndDropEnabled()) {
+            dataGrid.setRowsDraggable(isRowDraggable());
+            dataGrid.setDropMode(GridDropMode.ON_GRID);
+        } else {
+            dataGrid.setRowsDraggable(false);
+            dataGrid.setDropMode(null);
+        }
         if (!shouldShowFormInDialog()) {
             if (mainLayout.getSecondaryComponent() != null)
                 mainLayout.getSecondaryComponent().setVisible(false);

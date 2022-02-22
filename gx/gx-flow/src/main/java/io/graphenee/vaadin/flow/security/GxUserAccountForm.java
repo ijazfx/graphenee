@@ -30,108 +30,108 @@ import io.graphenee.vaadin.flow.converter.BeanCollectionFaultToSetConverter;
 @Component
 @Scope("prototype")
 public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public GxUserAccountForm() {
-		super(GxUserAccountBean.class);
-	}
+    public GxUserAccountForm() {
+        super(GxUserAccountBean.class);
+    }
 
-	private TextField username;
-	private TextField firstName;
-	private TextField lastName;
-	private TextField email;
-	private Checkbox isActive;
-	private Checkbox isLocked;
-	private Checkbox isPasswordChangeRequired;
-	private PasswordField newPassword;
-	private PasswordField password;
-	FileUploader imageUploader;
-	private TwinColGrid<GxSecurityPolicyBean> securityPolicyCollectionFault;
-	private TwinColGrid<GxSecurityGroupBean> securityGroupCollectionFault;
+    private TextField username;
+    private TextField firstName;
+    private TextField lastName;
+    private TextField email;
+    private Checkbox isActive;
+    private Checkbox isLocked;
+    private Checkbox isPasswordChangeRequired;
+    private PasswordField newPassword;
+    private PasswordField password;
+    FileUploader imageUploader;
+    private TwinColGrid<GxSecurityPolicyBean> securityPolicyCollectionFault;
+    private TwinColGrid<GxSecurityGroupBean> securityGroupCollectionFault;
 
-	@Autowired
-	GxDataService gxDataService;
+    @Autowired
+    GxDataService gxDataService;
 
-	@Override
-	protected void decorateForm(HasComponents entityForm) {
-		username = new TextField("Username");
+    @Override
+    protected void decorateForm(HasComponents entityForm) {
+        username = new TextField("Username");
 
-		firstName = new TextField("First Name");
-		lastName = new TextField("Last Name");
-		email = new TextField("Email");
+        firstName = new TextField("First Name");
+        lastName = new TextField("Last Name");
+        email = new TextField("Email");
 
-		isActive = new Checkbox("Is Active?");
-		isLocked = new Checkbox("Is Locked?");
-		isPasswordChangeRequired = new Checkbox("Is Password Change Required?");
-		securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
-				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-		securityPolicyCollectionFault.setSizeFull();
+        isActive = new Checkbox("Is Active?");
+        isLocked = new Checkbox("Is Locked?");
+        isPasswordChangeRequired = new Checkbox("Is Password Change Required?");
+        securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
+                .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+        securityPolicyCollectionFault.setSizeFull();
 
-		securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>().addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
-				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-		securityGroupCollectionFault.setSizeFull();
+        securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>().addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
+                .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+        securityGroupCollectionFault.setSizeFull();
 
-		// Radio Buttons for gender
-		// gender = new RadioButtonGroup<>();
-		// gender.setLabel("Gender");
-		// gender.setItems(GenderEnum.Male, GenderEnum.Female, GenderEnum.Undisclosed);
-		// gender.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-		// radioGroup.setValue("Option one");
-		// add(radioGroup);
-		// System.err.println(GenderEnum.valueOf("M"));
+        // Radio Buttons for gender
+        // gender = new RadioButtonGroup<>();
+        // gender.setLabel("Gender");
+        // gender.setItems(GenderEnum.Male, GenderEnum.Female, GenderEnum.Undisclosed);
+        // gender.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+        // radioGroup.setValue("Option one");
+        // add(radioGroup);
+        // System.err.println(GenderEnum.valueOf("M"));
 
-		newPassword = new PasswordField("New Password");
-		password = new PasswordField("Confirm Password");
+        newPassword = new PasswordField("New Password");
+        password = new PasswordField("Confirm Password");
 
-		newPassword.addValueChangeListener(vcl -> {
-			password.clear();
-			password.setEnabled(vcl.getValue().length() > 1);
-		});
+        newPassword.addValueChangeListener(vcl -> {
+            password.clear();
+            password.setEnabled(vcl.getValue().length() > 1);
+        });
 
-		imageUploader = new FileUploader("Profile Image");
-		imageUploader.setAllowedFileTypes("image/png", "image/jpg", "image/jpeg");
-		imageUploader.addValueChangeListener(event -> {
-			System.err.println(event.getValue());
-		});
+        imageUploader = new FileUploader("Profile Image");
+        // imageUploader.setAllowedFileTypes("image/png", "image/jpg", "image/jpeg");
+        imageUploader.addValueChangeListener(event -> {
+            System.err.println(event.getValue());
+        });
 
-		entityForm.add(username, firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, newPassword, password, imageUploader);
+        entityForm.add(username, firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, newPassword, password, imageUploader);
 
-		setColspan(isPasswordChangeRequired, 2);
-	}
+        setColspan(isPasswordChangeRequired, 2);
+    }
 
-	@Override
-	protected void bindFields(Binder<GxUserAccountBean> dataBinder) {
-		dataBinder.forMemberField(username).asRequired();
-		dataBinder.forMemberField(email).withValidator(new EmailValidator("Must be a valid email address"));
-		dataBinder.forMemberField(securityPolicyCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
-		dataBinder.forMemberField(securityGroupCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityGroupBean>());
-		dataBinder.forMemberField(password).withValidator(new Validator<String>() {
+    @Override
+    protected void bindFields(Binder<GxUserAccountBean> dataBinder) {
+        dataBinder.forMemberField(username).asRequired();
+        dataBinder.forMemberField(email).withValidator(new EmailValidator("Must be a valid email address"));
+        dataBinder.forMemberField(securityPolicyCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
+        dataBinder.forMemberField(securityGroupCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityGroupBean>());
+        dataBinder.forMemberField(password).withValidator(new Validator<String>() {
 
-			private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-			@Override
-			public ValidationResult apply(String value, ValueContext context) {
-				if (newPassword.getValue().equals(value)) {
-					return ValidationResult.ok();
-				}
-				return ValidationResult.error("Confirm password does not match with new password!");
-			}
+            @Override
+            public ValidationResult apply(String value, ValueContext context) {
+                if (newPassword.getValue().equals(value)) {
+                    return ValidationResult.ok();
+                }
+                return ValidationResult.error("Confirm password does not match with new password!");
+            }
 
-		});
-	}
+        });
+    }
 
-	@Override
-	protected void addTabsToForm(List<GxTabItem> tabItems) {
-		tabItems.add(GxTabItem.create(1, "Policies", securityPolicyCollectionFault));
-		tabItems.add(GxTabItem.create(2, "Groups", securityGroupCollectionFault));
-	}
+    @Override
+    protected void addTabsToForm(List<GxTabItem> tabItems) {
+        tabItems.add(GxTabItem.create(1, "Policies", securityPolicyCollectionFault));
+        tabItems.add(GxTabItem.create(2, "Groups", securityGroupCollectionFault));
+    }
 
-	@Override
-	protected void preBinding(GxUserAccountBean entity) {
-		newPassword.clear();
-		password.setEnabled(false);
-		securityPolicyCollectionFault.setItems(gxDataService.findSecurityPolicyByNamespaceActive(entity.getNamespaceFault().getBean()));
-		securityGroupCollectionFault.setItems(gxDataService.findSecurityGroupByNamespaceActive(entity.getNamespaceFault().getBean()));
-	}
+    @Override
+    protected void preBinding(GxUserAccountBean entity) {
+        newPassword.clear();
+        password.setEnabled(false);
+        securityPolicyCollectionFault.setItems(gxDataService.findSecurityPolicyByNamespaceActive(entity.getNamespaceFault().getBean()));
+        securityGroupCollectionFault.setItems(gxDataService.findSecurityGroupByNamespaceActive(entity.getNamespaceFault().getBean()));
+    }
 
 }
