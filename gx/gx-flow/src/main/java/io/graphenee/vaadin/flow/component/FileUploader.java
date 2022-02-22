@@ -23,8 +23,8 @@ import com.vaadin.flow.server.StreamResource;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.StreamUtils;
 
-import io.graphenee.core.storage.FileStorage;
-import io.graphenee.core.util.TRFileContentUtil;
+import io.graphenee.util.TRFileContentUtil;
+import io.graphenee.util.storage.FileStorage;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;

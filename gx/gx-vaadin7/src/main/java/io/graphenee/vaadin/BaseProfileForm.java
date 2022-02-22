@@ -1,54 +1,54 @@
 package io.graphenee.vaadin;
 
+import com.vaadin.ui.ComboBox;
+
 import org.vaadin.viritin.fields.MTextField;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
-import com.vaadin.ui.ComboBox;
-
-import io.graphenee.core.enums.GenderEnum;
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.util.enums.GenderEnum;
 import io.graphenee.vaadin.component.FileChooser;
 
 @SuppressWarnings("serial")
 public class BaseProfileForm<T extends GxAuthenticatedUser> extends TRAbstractForm<T> {
 
-	MTextField firstName;
+    MTextField firstName;
 
-	MTextField lastName;
+    MTextField lastName;
 
-	MTextField username;
+    MTextField username;
 
-	ComboBox gender;
+    ComboBox gender;
 
-	MTextField email;
+    MTextField email;
 
-	MTextField mobileNumber;
+    MTextField mobileNumber;
 
-	FileChooser profilePhoto;
+    FileChooser profilePhoto;
 
-	@Override
-	protected boolean eagerValidationEnabled() {
-		return true;
-	}
+    @Override
+    protected boolean eagerValidationEnabled() {
+        return true;
+    }
 
-	@Override
-	protected String formTitle() {
-		return "Profile";
-	}
+    @Override
+    protected String formTitle() {
+        return "Profile";
+    }
 
-	@Override
-	protected void addFieldsToForm(MVerticalLayout form) {
-		firstName = new MTextField("First Name");
-		lastName = new MTextField("Last Name");
-		username = new MTextField("Username");
-		email = new MTextField("Email");
-		mobileNumber = new MTextField("Mobile Number");
-		gender = new ComboBox("Sex");
-		gender.addItems(GenderEnum.Male, GenderEnum.Female);
+    @Override
+    protected void addFieldsToForm(MVerticalLayout form) {
+        firstName = new MTextField("First Name");
+        lastName = new MTextField("Last Name");
+        username = new MTextField("Username");
+        email = new MTextField("Email");
+        mobileNumber = new MTextField("Mobile Number");
+        gender = new ComboBox("Sex");
+        gender.addItems(GenderEnum.Male, GenderEnum.Female);
 
-		profilePhoto = new FileChooser("Photo");
+        profilePhoto = new FileChooser("Photo");
 
-		form.addComponents(firstName, lastName, gender, username, email, mobileNumber, profilePhoto);
-	}
+        form.addComponents(firstName, lastName, gender, username, email, mobileNumber, profilePhoto);
+    }
 
 }

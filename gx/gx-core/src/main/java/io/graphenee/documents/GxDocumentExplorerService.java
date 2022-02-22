@@ -6,7 +6,7 @@ import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
-import io.graphenee.core.storage.FileStorage;
+import io.graphenee.util.storage.FileStorage;
 
 public interface GxDocumentExplorerService {
 

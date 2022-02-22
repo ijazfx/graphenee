@@ -207,11 +207,4 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		refresh();
 	}
 
-	@Override
-	protected void postBuild() {
-		entityGrid().addItemDoubleClickListener(vcl -> {
-			initializeWithDocumentExplorerItem(vcl.getItem());
-		});
-	}
-
 }

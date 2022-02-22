@@ -5,7 +5,9 @@ create table gx_folder (
 	note varchar(200),
 	tags text,
 	oid_folder integer,
-	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade
+	oid_namespace integer not null,
+	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade,
+	foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
 );
 
 create table gx_folder_audit_log_join (
@@ -19,7 +21,9 @@ create table gx_document_type (
 	oid serial primary key,
 	name varchar(20) not null,
 	note varchar(200),
-	tags text
+	tags text,
+	oid_namespace integer not null,
+	foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
 );
 
 create table gx_document (
@@ -34,8 +38,10 @@ create table gx_document (
 	tags text,
 	oid_document integer,
 	oid_folder integer,
+	oid_namespace integer not null,
 	foreign key (oid_document) references gx_document(oid) on delete cascade on update cascade,
-	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade
+	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade,
+	foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
 );
 
 create table gx_document_audit_log_join (

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
@@ -59,18 +60,19 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
     @Override
     protected Grid<T> dataGrid(Class<T> entityClass) {
         GxTreeGrid<T> treeGrid = new GxTreeGrid<>(entityClass);
+        if (isGridInlineEditingEnabled()) {
+            Binder<T> editBinder = new Binder<>(entityClass);
+            treeGrid.getEditor().setBinder(editBinder);
+        }
         List<Column<T>> removeList = new ArrayList<>(treeGrid.getColumns());
-        List<Column<T>> keepList = new ArrayList<>();
-        for (String key : visibleProperties()) {
+        for (String key : availableProperties()) {
             Column<T> column = treeGrid.getColumnByKey(key);
             if (column != null) {
                 column.setVisible(true);
                 removeList.remove(column);
-                keepList.add(column);
             }
         }
         removeList.forEach(c -> treeGrid.removeColumn(c));
-        treeGrid.setColumnOrder(keepList);
         treeGrid.setHierarchyColumn(hierarchyColumnProperty());
         return treeGrid;
     }

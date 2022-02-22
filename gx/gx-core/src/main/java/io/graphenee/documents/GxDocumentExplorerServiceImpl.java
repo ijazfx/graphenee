@@ -14,8 +14,8 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.repository.GxDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxDocumentTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxFolderRepository;
-import io.graphenee.core.storage.FileStorage;
-import io.graphenee.core.util.JpaSpecificationBuilder;
+import io.graphenee.util.JpaSpecificationBuilder;
+import io.graphenee.util.storage.FileStorage;
 
 @Service
 public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService {

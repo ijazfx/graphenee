@@ -1,16 +1,6 @@
 @font-face {
-  font-family: "Roboto";
-  src: url("/frontend/fonts/Roboto-Regular.ttf");
-}
-
-@font-face {
   font-family: "Roboto Condensed";
   src: url("/frontend/fonts/RobotoCondensed-Regular.ttf");
-}
-
-@font-face {
-  font-family: "Lato";
-  src: url("/frontend/fonts/Lato-Regular.ttf");
 }
 
 * {
