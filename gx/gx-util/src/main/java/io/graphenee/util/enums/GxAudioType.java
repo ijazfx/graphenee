@@ -48,15 +48,15 @@ public enum GxAudioType {
     }
 
     public static GxAudioType findByMimeType(String mimeType) {
-        if (mimeType == GxAudioType.WEBM_AUDIO.mimeType)
+        if (mimeType.equals(GxAudioType.WEBM_AUDIO.mimeType))
             return GxAudioType.WEBM_AUDIO;
-        if (mimeType == GxAudioType.MP3.mimeType)
+        if (mimeType.equals(GxAudioType.MP3.mimeType))
             return GxAudioType.MP3;
-        if (mimeType == GxAudioType.WAV.mimeType)
+        if (mimeType.equals(GxAudioType.WAV.mimeType))
             return GxAudioType.WAV;
-        if (mimeType == GxAudioType.M4A.mimeType)
+        if (mimeType.equals(GxAudioType.M4A.mimeType))
             return GxAudioType.M4A;
-        if (mimeType == GxAudioType.OGG_AUDIO.mimeType)
+        if (mimeType.equals(GxAudioType.OGG_AUDIO.mimeType))
             return GxAudioType.OGG_AUDIO;
 
         return null;

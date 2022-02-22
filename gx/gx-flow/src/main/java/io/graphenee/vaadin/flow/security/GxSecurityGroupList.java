@@ -3,6 +3,10 @@ package io.graphenee.vaadin.flow.security;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.data.binder.Binder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,7 +23,6 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBean> {
     private static final long serialVersionUID = 1L;
 
-
     @Autowired
     GxDataService dataService;
 
@@ -34,7 +37,7 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBea
 
     @Override
     protected Stream<GxSecurityGroupBean> getData() {
-        if(namespace == null)
+        if (namespace == null)
             return dataService.findSecurityGroup().stream();
         return dataService.findSecurityGroupByNamespace(namespace).stream();
     }
@@ -64,11 +67,27 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroupBea
     @Override
     protected void preEdit(GxSecurityGroupBean entity) {
         if (entity.getOid() == null) {
-            if(namespace == null) {
+            if (namespace == null) {
                 namespace = dataService.findSystemNamespace();
             }
             entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
         }
+    }
+
+    @Override
+    protected void decorateSearchForm(FormLayout searchForm, Binder<GxSecurityGroupBean> searchBinder) {
+        ComboBox<GxNamespaceBean> namespaceComboBox = new ComboBox<>("Namespace");
+        namespaceComboBox.setItemLabelGenerator(GxNamespaceBean::getNamespace);
+        namespaceComboBox.setClearButtonVisible(true);
+        namespaceComboBox.setItems(dataService.findNamespace());
+        namespaceComboBox.setValue(namespace);
+
+        namespaceComboBox.addValueChangeListener(vcl -> {
+            namespace = vcl.getValue();
+            refresh();
+        });
+
+        searchForm.add(namespaceComboBox);
     }
 
     public void initializeWithNamespace(GxNamespaceBean namespace) {
