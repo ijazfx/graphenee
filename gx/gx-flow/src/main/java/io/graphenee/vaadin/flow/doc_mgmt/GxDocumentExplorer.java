@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -205,6 +206,11 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     public void initializeWithDocumentExplorerItem(GxDocumentExplorerItem item) {
         this.selectedItem = item;
         refresh();
+    }
+
+    @Override
+    protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
+      initializeWithDocumentExplorerItem(icl.getItem());
     }
 
 }

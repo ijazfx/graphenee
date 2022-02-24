@@ -26,7 +26,9 @@ import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
     private static final long serialVersionUID = 1L;
@@ -144,7 +146,11 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
             dataBinder = new Binder<>(entityClass, true);
             bindFields(dataBinder);
-            dataBinder.bindInstanceFields(GxAbstractEntityForm.this);
+            try {
+                dataBinder.bindInstanceFields(GxAbstractEntityForm.this);
+            } catch (Exception ex) {
+                log.warn(ex.getMessage());
+            }
             postBuild();
 
             isBuilt = true;

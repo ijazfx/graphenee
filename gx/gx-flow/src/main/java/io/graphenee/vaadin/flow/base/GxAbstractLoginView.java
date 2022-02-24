@@ -58,6 +58,8 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
         loginI18n.getForm().setPassword("Password");
         loginForm.setI18n(loginI18n);
 
+        loginForm.getChildren().forEach(System.out::println);
+
         loginLayout.add(loginForm);
         add(loginLayout);
         setAlignSelf(Alignment.CENTER, loginLayout);
@@ -116,8 +118,7 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
     protected abstract GxAbstractFlowSetup flowSetup();
 
-    protected abstract GxAuthenticatedUser onLogin(LoginEvent event)
-            throws AuthenticationFailedException, PasswordChangeRequiredException;
+    protected abstract GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
 
     protected boolean isForgotPasswordButtonVisible() {
         return true;

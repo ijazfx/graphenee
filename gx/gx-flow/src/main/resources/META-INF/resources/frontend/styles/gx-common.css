@@ -25,9 +25,9 @@
   --lumo-font-size-xs: 0.75rem;
   --lumo-font-size-xxs: 0.6875rem;
   --lumo-primary-text-color: #fff(0, 128, 153);
-  --lumo-primary-color-50pct: rgba(172, 57, 86, 0.5);
-  --lumo-primary-color-10pct: rgba(172, 57, 86, 0.1);
-  --lumo-primary-color: rgb(172, 57, 86);
+  --lumo-primary-color-50pct: rgba(57, 172, 118, 0.5);
+  --lumo-primary-color-10pct: rgba(57, 172, 118, 0.1);
+  --lumo-primary-color: rgb(57, 172, 118);
   --lumo-error-text-color: rgb(213, 1, 5);
   --lumo-error-color-50pct: rgba(213, 1, 5, 0.5);
   --lumo-error-color-10pct: rgba(213, 1, 5, 0.1);
