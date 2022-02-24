@@ -20,6 +20,7 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.server.StreamResource;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.StreamUtils;
 
@@ -221,8 +222,32 @@ public class FileUploader extends CustomField<String> {
                 if (image == null) {
                     image = IconUtils.fileExtensionIconResource("bin");
                 }
-                image.setHeight("32px");
+                image.setHeight("48px");
             }
+            image.addClickListener(listener -> {
+                String extension = TRFileContentUtil.getExtensionFromFilename(getValue());
+                if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+                    try {
+                        String src = getValue();
+                        InputStream stream = null;
+                        String resourcePath = storage.resourcePath(getRootFolder(), src);
+                        try {
+                            stream = storage.resolve(resourcePath);
+                        } catch (Exception e) {
+                            File file = new File(src);
+                            src = file.getName();
+                            stream = FileUtils.openInputStream(file);
+                        }
+                        byte[] bytes = IOUtils.toByteArray(stream);
+                        StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+                        ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
+                        resourcePreviewPanel.showInDialog("80%", "80%");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
             return image;
         }
         return null;

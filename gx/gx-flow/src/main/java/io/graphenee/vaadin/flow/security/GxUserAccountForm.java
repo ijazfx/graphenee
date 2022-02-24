@@ -22,6 +22,7 @@ import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
 import io.graphenee.core.model.bean.GxSecurityPolicyBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxTabItem;
 import io.graphenee.vaadin.flow.component.FileUploader;
@@ -51,6 +52,9 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 
     @Autowired
     GxDataService gxDataService;
+
+    @Autowired
+    private FileStorage storage;
 
     @Override
     protected void decorateForm(HasComponents entityForm) {
@@ -89,6 +93,7 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
         });
 
         imageUploader = new FileUploader("Profile Image");
+        imageUploader.setStorage(storage);
         // imageUploader.setAllowedFileTypes("image/png", "image/jpg", "image/jpeg");
         imageUploader.addValueChangeListener(event -> {
             System.err.println(event.getValue());
