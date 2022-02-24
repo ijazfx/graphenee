@@ -17,6 +17,7 @@ package io.graphenee.vaadin.flow.i18n;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.Route;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -24,7 +25,8 @@ import org.springframework.context.annotation.Scope;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
-@GxSecuredView(GxSupportedLocaleView.VIEW_NAME)
+@Route(GxSupportedLocaleView.VIEW_NAME)
+@GxSecuredView
 @Scope("prototype")
 public class GxSupportedLocaleView extends GxVerticalLayoutView {
 

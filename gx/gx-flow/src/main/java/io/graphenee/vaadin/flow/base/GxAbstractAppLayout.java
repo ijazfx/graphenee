@@ -15,6 +15,7 @@ import com.github.appreciated.app.layout.component.menu.left.builder.LeftSubMenu
 import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigationItem;
 import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.applayout.AppLayout.Section;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -57,6 +58,7 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
         GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
         if (mi.hasChildren()) {
             LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
+            
             AtomicBoolean anyMenu = new AtomicBoolean(false);
             mi.getChildren().forEach(smi -> {
                 if (smi.getRoute() == null || user != null && user.canDoAction(smi.getRoute(), "view")) {
