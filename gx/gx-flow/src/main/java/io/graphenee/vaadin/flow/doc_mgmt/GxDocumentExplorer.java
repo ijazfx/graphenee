@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -41,6 +42,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Autowired
 	GxDocumentForm documentForm;
+
+	@Autowired
+	GxDocumentUploadForm uploadForm;
 
 	private GxNamespace namespace;
 
@@ -120,7 +124,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected void customizeAddMenuItem(MenuItem addMenuItem) {
-		addMenuItem.setText("Create");
 		addMenuItem.getSubMenu().addItem("Folder", cl -> {
 			folderForm.setDelegate(folder -> {
 				documentService.saveFolder(List.of(folder));
@@ -140,24 +143,16 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			}
 			folderForm.showInDialog(newFolder);
 		});
-		addMenuItem.getSubMenu().addItem("Document", cl -> {
-			documentForm.setDelegate(document -> {
-				documentService.saveDocument(List.of(document));
+		addMenuItem.getSubMenu().addItem("Upload Document", cl -> {
+			uploadForm.setDelegate(folder -> {
+				documentService.saveFolder(List.of(folder));
 				refresh();
-				documentForm.closeDialog();
+				uploadForm.closeDialog();
 			});
-			GxDocument newDocument = new GxDocument();
-			newDocument.setNamespace(namespace);
-			if (selectedItem != null) {
-				newDocument.setFolder((GxFolder) selectedItem);
+			if (selectedItem instanceof GxFolder) {
+				uploadForm.initializeWithStorage(null);
+				uploadForm.showInDialog((GxFolder) selectedItem);
 			}
-			if (entityGrid().getSelectedItems().size() == 1) {
-				GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
-				if (!selectedContainer.isFile()) {
-					newDocument.setFolder((GxFolder) selectedContainer);
-				}
-			}
-			documentForm.showInDialog(newDocument);
 		});
 	}
 
@@ -165,11 +160,11 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
 		MenuBar navBar = new MenuBar();
 		navBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
-		navBar.addItem(VaadinIcon.ARROW_UP.create(), cl -> {
+		navBar.addItem(VaadinIcon.ANGLE_UP.create(), cl -> {
 			initializeWithNamespace(namespace);
 		});
 
-		navBar.addItem(VaadinIcon.ARROW_LEFT.create(), cl -> {
+		navBar.addItem(VaadinIcon.ANGLE_LEFT.create(), cl -> {
 			initializeWithDocumentExplorerItem(selectedItem != null ? selectedItem.getParent() : null);
 		});
 
@@ -205,6 +200,11 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	public void initializeWithDocumentExplorerItem(GxDocumentExplorerItem item) {
 		this.selectedItem = item;
 		refresh();
+	}
+
+	@Override
+	protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
+		initializeWithDocumentExplorerItem(icl.getItem());
 	}
 
 }

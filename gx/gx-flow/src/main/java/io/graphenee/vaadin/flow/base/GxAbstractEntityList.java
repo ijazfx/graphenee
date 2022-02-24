@@ -228,13 +228,13 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             customMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
             columnMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 
-            addMenuItem = crudMenuBar.addItem("Add");
+            addMenuItem = crudMenuBar.addItem(VaadinIcon.PLUS.create());
             customizeAddMenuItem(addMenuItem);
 
-            editMenuItem = crudMenuBar.addItem("Edit");
+            editMenuItem = crudMenuBar.addItem(VaadinIcon.EDIT.create());
             customizeEditMenuItem(editMenuItem);
 
-            deleteMenuItem = crudMenuBar.addItem("Delete");
+            deleteMenuItem = crudMenuBar.addItem(VaadinIcon.TRASH.create());
             customizeDeleteMenuItem(deleteMenuItem);
 
             //@TODO: need to fix the export function. The URL is not absolute as well in the export component.

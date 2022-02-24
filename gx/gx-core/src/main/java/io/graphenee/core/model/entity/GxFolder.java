@@ -120,4 +120,12 @@ public class GxFolder implements Serializable, GxDocumentExplorerItem {
 		return getFolder();
 	}
 
+	public GxDocument addDocument(GxDocument document) {
+		if (!documents.contains(document)) {
+			documents.add(document);
+			document.setFolder(this);
+		}
+		return document;
+	}
+
 }

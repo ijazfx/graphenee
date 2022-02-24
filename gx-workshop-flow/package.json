@@ -21,7 +21,6 @@
       "@polymer/paper-ripple": "3.0.2",
       "@polymer/paper-tabs": "3.1.0",
       "@polymer/polymer": "3.2.0",
-      "@vaadin-component-factory/vcf-breadcrumb": "1.2.2",
       "@vaadin/router": "1.7.2",
       "@vaadin/vaadin-accordion": "1.2.0",
       "@vaadin/vaadin-app-layout": "2.2.0",
@@ -102,7 +101,7 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "68920f6105bb5c54df1f0e2258e0f3f6413f0d615e5c3b4fbaedaa9b96a988ee"
+    "hash": "aadcc909d5617b256a3468cd5816a1e3580b0a1e85e9ae74a49685b3f904e64b"
   },
   "dependencies": {
     "@polymer/app-layout": "3.1.0",
@@ -123,7 +122,6 @@
     "@polymer/paper-ripple": "3.0.2",
     "@polymer/paper-tabs": "3.1.0",
     "@polymer/polymer": "3.2.0",
-    "@vaadin-component-factory/vcf-breadcrumb": "1.2.2",
     "@vaadin/vaadin-accordion": "1.2.0",
     "@vaadin/vaadin-app-layout": "2.2.0",
     "@vaadin/vaadin-avatar": "1.0.4",
