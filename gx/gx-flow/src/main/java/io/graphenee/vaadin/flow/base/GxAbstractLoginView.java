@@ -10,6 +10,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.login.AbstractLogin.ForgotPasswordEvent;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
+import com.vaadin.flow.component.login.AbstractLogin;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
@@ -57,8 +58,6 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
         loginI18n.getForm().setUsername("Login ID");
         loginI18n.getForm().setPassword("Password");
         loginForm.setI18n(loginI18n);
-
-        loginForm.getChildren().forEach(System.out::println);
 
         loginLayout.add(loginForm);
         add(loginLayout);

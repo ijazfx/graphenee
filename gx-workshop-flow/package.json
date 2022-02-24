@@ -21,6 +21,7 @@
       "@polymer/paper-ripple": "3.0.2",
       "@polymer/paper-tabs": "3.1.0",
       "@polymer/polymer": "3.2.0",
+      "@vaadin-component-factory/vcf-pdf-viewer": "^0.9.4",
       "@vaadin/router": "1.7.2",
       "@vaadin/vaadin-accordion": "1.2.0",
       "@vaadin/vaadin-app-layout": "2.2.0",
@@ -100,7 +101,7 @@
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
     },
-    "hash": "aadcc909d5617b256a3468cd5816a1e3580b0a1e85e9ae74a49685b3f904e64b"
+    "hash": "2c0dd694d4cd5b094263aa160395dc2006373939da96b698e2c7a18ed8ed112f"
   },
   "dependencies": {
     "@polymer/app-layout": "3.1.0",
@@ -121,6 +122,7 @@
     "@polymer/paper-ripple": "3.0.2",
     "@polymer/paper-tabs": "3.1.0",
     "@polymer/polymer": "3.2.0",
+    "@vaadin-component-factory/vcf-pdf-viewer": "^0.9.4",
     "@vaadin/vaadin-accordion": "1.2.0",
     "@vaadin/vaadin-app-layout": "2.2.0",
     "@vaadin/vaadin-avatar": "1.0.4",
