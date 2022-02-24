@@ -20,11 +20,13 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.server.StreamResource;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.StreamUtils;
 
 import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.storage.FileStorage;
+import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
@@ -188,11 +190,13 @@ public class FileUploader extends CustomField<String> {
     private Component createComponent(String fileName) {
         if (fileName != null) {
             String mimeType = TRFileContentUtil.getMimeType(fileName);
+            Image image = null;
+
             if (mimeType.startsWith("image")) {
-                Image image = new Image();
-                image.setWidth("100px");
-                image.setHeight("100px");
                 try {
+                    image = new Image();
+                    image.setWidth("100px");
+                    image.setHeight("100px");
                     InputStream stream = null;
                     String resourcePath = storage.resourcePath(getRootFolder(), fileName);
                     try {
@@ -206,8 +210,45 @@ public class FileUploader extends CustomField<String> {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return image;
+            } else {
+                String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
+                if (mimeType.startsWith("audio")) {
+                    image = IconUtils.fileExtensionIconResource("audio");
+                } else if (mimeType.startsWith("video")) {
+                    image = IconUtils.fileExtensionIconResource("video");
+                } else {
+                    image = IconUtils.fileExtensionIconResource(extension);
+                }
+                if (image == null) {
+                    image = IconUtils.fileExtensionIconResource("bin");
+                }
+                image.setHeight("48px");
             }
+            image.addClickListener(listener -> {
+                String extension = TRFileContentUtil.getExtensionFromFilename(getValue());
+                if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+                    try {
+                        String src = getValue();
+                        InputStream stream = null;
+                        String resourcePath = storage.resourcePath(getRootFolder(), src);
+                        try {
+                            stream = storage.resolve(resourcePath);
+                        } catch (Exception e) {
+                            File file = new File(src);
+                            src = file.getName();
+                            stream = FileUtils.openInputStream(file);
+                        }
+                        byte[] bytes = IOUtils.toByteArray(stream);
+                        StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+                        ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
+                        resourcePreviewPanel.showInDialog("80%", "80%");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
+            return image;
         }
         return null;
     }

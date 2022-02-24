@@ -34,177 +34,183 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityTreeList;
 @Scope("prototype")
 public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplorerItem> {
 
-	@Autowired
-	GxDocumentExplorerService documentService;
+    @Autowired
+    GxDocumentExplorerService documentService;
 
-	@Autowired
-	GxFolderForm folderForm;
+    @Autowired
+    GxFolderForm folderForm;
 
-	@Autowired
-	GxDocumentForm documentForm;
+    @Autowired
+    GxDocumentForm documentForm;
 
-	@Autowired
-	GxDocumentUploadForm uploadForm;
+    private GxNamespace namespace;
 
-	private GxNamespace namespace;
+    private GxDocumentExplorerItem selectedItem;
 
-	private GxDocumentExplorerItem selectedItem;
+    public GxDocumentExplorer() {
+        super(GxDocumentExplorerItem.class);
+    }
 
-	public GxDocumentExplorer() {
-		super(GxDocumentExplorerItem.class);
-	}
+    @Override
+    protected int getChildCount(GxDocumentExplorerItem parent, GxDocumentExplorerItem probe) {
+        if (parent != null) {
+            return documentService.countChildren(parent).intValue();
+        }
+        if (selectedItem != null) {
+            return documentService.countChildren(selectedItem).intValue();
+        }
+        return documentService.countChildren(namespace).intValue();
+    }
 
-	@Override
-	protected int getChildCount(GxDocumentExplorerItem parent, GxDocumentExplorerItem probe) {
-		if (parent != null) {
-			return documentService.countChildren(parent).intValue();
-		}
-		if (selectedItem != null) {
-			return documentService.countChildren(selectedItem).intValue();
-		}
-		return documentService.countChildren(namespace).intValue();
-	}
+    @Override
+    protected boolean hasChildren(GxDocumentExplorerItem parent) {
+        if (parent != null) {
+            return documentService.countChildren(parent) > 0;
+        }
+        if (selectedItem != null) {
+            return documentService.countChildren(selectedItem) > 0;
+        }
+        return documentService.countChildren(namespace) > 0;
+    }
 
-	@Override
-	protected boolean hasChildren(GxDocumentExplorerItem parent) {
-		if (parent != null) {
-			return documentService.countChildren(parent) > 0;
-		}
-		if (selectedItem != null) {
-			return documentService.countChildren(selectedItem) > 0;
-		}
-		return documentService.countChildren(namespace) > 0;
-	}
+    @Override
+    protected Stream<GxDocumentExplorerItem> getData(GxDocumentExplorerItem parent, GxDocumentExplorerItem probe) {
+        if (parent != null) {
+            return documentService.findExplorerItem(parent, "name").stream();
+        }
+        if (selectedItem != null) {
+            return documentService.findExplorerItem(selectedItem, "name").stream();
+        }
+        return documentService.findExplorerItem(namespace, "name").stream();
+    }
 
-	@Override
-	protected Stream<GxDocumentExplorerItem> getData(GxDocumentExplorerItem parent, GxDocumentExplorerItem probe) {
-		if (parent != null) {
-			return documentService.findExplorerItem(parent, "name").stream();
-		}
-		if (selectedItem != null) {
-			return documentService.findExplorerItem(selectedItem, "name").stream();
-		}
-		return documentService.findExplorerItem(namespace, "name").stream();
-	}
+    @Override
+    protected String[] visibleProperties() {
+        return new String[] { "extension", "name", "size", "version" };
+    }
 
-	@Override
-	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "size", "version" };
-	}
+    @Override
+    protected void decorateColumn(String propertyName, Column<GxDocumentExplorerItem> column) {
+        if (propertyName.equals("extension")) {
+            column.setHeader("");
+            column.setAutoWidth(false);
+            column.setWidth("50px");
+            column.setTextAlign(ColumnTextAlign.CENTER);
+        }
+        if (propertyName.equals("name")) {
+            column.setAutoWidth(false);
+            column.setWidth("350px");
+        }
+    }
 
-	@Override
-	protected void decorateColumn(String propertyName, Column<GxDocumentExplorerItem> column) {
-		if (propertyName.equals("extension")) {
-			column.setHeader("");
-			column.setAutoWidth(false);
-			column.setWidth("50px");
-			column.setTextAlign(ColumnTextAlign.CENTER);
-		}
-		if (propertyName.equals("name")) {
-			column.setAutoWidth(false);
-			column.setWidth("350px");
-		}
-	}
+    @Override
+    protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
+        if (propertyName.equals("extension")) {
+            return new ComponentRenderer<>(s -> {
+                Icon icon = null;
+                if (!s.isFile()) {
+                    icon = VaadinIcon.FOLDER_O.create();
+                } else {
+                    icon = VaadinIcon.FILE_O.create();
+                }
+                return icon;
+            });
+        }
+        return super.rendererForProperty(propertyName, propertyDefinition);
+    }
 
-	@Override
-	protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
-		if (propertyName.equals("extension")) {
-			return new ComponentRenderer<>(s -> {
-				Icon icon = null;
-				if (!s.isFile()) {
-					icon = VaadinIcon.FOLDER_O.create();
-				} else {
-					icon = VaadinIcon.FILE_O.create();
-				}
-				return icon;
-			});
-		}
-		return super.rendererForProperty(propertyName, propertyDefinition);
-	}
+    @Override
+    protected void customizeAddMenuItem(MenuItem addMenuItem) {
+        addMenuItem.setText("Create");
+        addMenuItem.getSubMenu().addItem("Folder", cl -> {
+            folderForm.setDelegate(folder -> {
+                documentService.saveFolder(List.of(folder));
+                refresh();
+                folderForm.closeDialog();
+            });
+            GxFolder newFolder = new GxFolder();
+            newFolder.setNamespace(namespace);
+            if (selectedItem != null) {
+                newFolder.setFolder((GxFolder) selectedItem);
+            }
+            if (entityGrid().getSelectedItems().size() == 1) {
+                GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
+                if (!selectedContainer.isFile()) {
+                    newFolder.setFolder((GxFolder) selectedContainer);
+                }
+            }
+            folderForm.showInDialog(newFolder);
+        });
+        addMenuItem.getSubMenu().addItem("Document", cl -> {
+            documentForm.setDelegate(document -> {
+                documentService.saveDocument(List.of(document));
+                refresh();
+                documentForm.closeDialog();
+            });
+            GxDocument newDocument = new GxDocument();
+            newDocument.setNamespace(namespace);
+            if (selectedItem != null) {
+                newDocument.setFolder((GxFolder) selectedItem);
+            }
+            if (entityGrid().getSelectedItems().size() == 1) {
+                GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
+                if (!selectedContainer.isFile()) {
+                    newDocument.setFolder((GxFolder) selectedContainer);
+                }
+            }
+            documentForm.showInDialog(newDocument);
+        });
+    }
 
-	@Override
-	protected void customizeAddMenuItem(MenuItem addMenuItem) {
-		addMenuItem.getSubMenu().addItem("Folder", cl -> {
-			folderForm.setDelegate(folder -> {
-				documentService.saveFolder(List.of(folder));
-				refresh();
-				folderForm.closeDialog();
-			});
-			GxFolder newFolder = new GxFolder();
-			newFolder.setNamespace(namespace);
-			if (selectedItem != null) {
-				newFolder.setFolder((GxFolder) selectedItem);
-			}
-			if (entityGrid().getSelectedItems().size() == 1) {
-				GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
-				if (!selectedContainer.isFile()) {
-					newFolder.setFolder((GxFolder) selectedContainer);
-				}
-			}
-			folderForm.showInDialog(newFolder);
-		});
-		addMenuItem.getSubMenu().addItem("Upload Document", cl -> {
-			uploadForm.setDelegate(folder -> {
-				documentService.saveFolder(List.of(folder));
-				refresh();
-				uploadForm.closeDialog();
-			});
-			if (selectedItem instanceof GxFolder) {
-				uploadForm.initializeWithStorage(null);
-				uploadForm.showInDialog((GxFolder) selectedItem);
-			}
-		});
-	}
+    @Override
+    protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
+        MenuBar navBar = new MenuBar();
+        navBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
+        navBar.addItem(VaadinIcon.ARROW_UP.create(), cl -> {
+            initializeWithNamespace(namespace);
+        });
 
-	@Override
-	protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
-		MenuBar navBar = new MenuBar();
-		navBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
-		navBar.addItem(VaadinIcon.ANGLE_UP.create(), cl -> {
-			initializeWithNamespace(namespace);
-		});
+        navBar.addItem(VaadinIcon.ARROW_LEFT.create(), cl -> {
+            initializeWithDocumentExplorerItem(selectedItem != null ? selectedItem.getParent() : null);
+        });
 
-		navBar.addItem(VaadinIcon.ANGLE_LEFT.create(), cl -> {
-			initializeWithDocumentExplorerItem(selectedItem != null ? selectedItem.getParent() : null);
-		});
+        toolbarLayout.addComponentAtIndex(0, navBar);
+    }
 
-		toolbarLayout.addComponentAtIndex(0, navBar);
-	}
+    @Override
+    protected GxAbstractEntityForm<GxDocumentExplorerItem> getEntityForm(GxDocumentExplorerItem entity) {
+        return null;
+    }
 
-	@Override
-	protected GxAbstractEntityForm<GxDocumentExplorerItem> getEntityForm(GxDocumentExplorerItem entity) {
-		return null;
-	}
+    @Override
+    protected void onSave(GxDocumentExplorerItem entity) {
+        documentService.saveExplorerItem(List.of(entity));
+    }
 
-	@Override
-	protected void onSave(GxDocumentExplorerItem entity) {
-		documentService.saveExplorerItem(List.of(entity));
-	}
+    @Override
+    protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
+        documentService.deleteExplorerItem(new ArrayList<>(entities));
+    }
 
-	@Override
-	protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
-		documentService.deleteExplorerItem(new ArrayList<>(entities));
-	}
+    @Override
+    protected String hierarchyColumnProperty() {
+        return "name";
+    }
 
-	@Override
-	protected String hierarchyColumnProperty() {
-		return "name";
-	}
+    public void initializeWithNamespace(GxNamespace namespace) {
+        this.namespace = namespace;
+        this.selectedItem = null;
+        refresh();
+    }
 
-	public void initializeWithNamespace(GxNamespace namespace) {
-		this.namespace = namespace;
-		this.selectedItem = null;
-		refresh();
-	}
+    public void initializeWithDocumentExplorerItem(GxDocumentExplorerItem item) {
+        this.selectedItem = item;
+        refresh();
+    }
 
-	public void initializeWithDocumentExplorerItem(GxDocumentExplorerItem item) {
-		this.selectedItem = item;
-		refresh();
-	}
-
-	@Override
-	protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
-		initializeWithDocumentExplorerItem(icl.getItem());
-	}
+    @Override
+    protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
+      initializeWithDocumentExplorerItem(icl.getItem());
+    }
 
 }

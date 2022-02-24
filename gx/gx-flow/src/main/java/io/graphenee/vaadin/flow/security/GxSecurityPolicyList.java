@@ -3,6 +3,10 @@ package io.graphenee.vaadin.flow.security;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.data.binder.Binder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -67,6 +71,22 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicyB
             }
             entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
         }
+    }
+
+    @Override
+    protected void decorateSearchForm(FormLayout searchForm, Binder<GxSecurityPolicyBean> searchBinder) {
+        ComboBox<GxNamespaceBean> namespaceComboBox = new ComboBox<>("Namespace");
+        namespaceComboBox.setItemLabelGenerator(GxNamespaceBean::getNamespace);
+        namespaceComboBox.setClearButtonVisible(true);
+        namespaceComboBox.setItems(dataService.findNamespace());
+        namespaceComboBox.setValue(namespace);
+
+        namespaceComboBox.addValueChangeListener(vcl -> {
+            namespace = vcl.getValue();
+            refresh();
+        });
+
+        searchForm.add(namespaceComboBox);
     }
 
     public void initializeWithNamespace(GxNamespaceBean namespace) {

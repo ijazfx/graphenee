@@ -48,15 +48,15 @@ public enum GxVideoType {
     }
 
     public static GxVideoType findByMimeType(String mimeType) {
-        if (mimeType == GxVideoType.WEBM_VIDEO.mimeType)
+        if (mimeType.equals(GxVideoType.WEBM_VIDEO.mimeType))
             return GxVideoType.WEBM_VIDEO;
-        if (mimeType == GxVideoType.MP4.mimeType)
+        if (mimeType.equals(GxVideoType.MP4.mimeType))
             return GxVideoType.MP4;
-        if (mimeType == GxVideoType.MPEG.mimeType)
+        if (mimeType.equals(GxVideoType.MPEG.mimeType))
             return GxVideoType.MPEG;
-        if (mimeType == GxVideoType.M4V.mimeType)
+        if (mimeType.equals(GxVideoType.M4V.mimeType))
             return GxVideoType.M4V;
-        if (mimeType == GxVideoType.OGG_VIDEO.mimeType)
+        if (mimeType.equals(GxVideoType.OGG_VIDEO.mimeType))
             return GxVideoType.OGG_VIDEO;
 
         return null;

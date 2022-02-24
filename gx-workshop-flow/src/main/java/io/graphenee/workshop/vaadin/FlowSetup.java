@@ -32,6 +32,7 @@ public class FlowSetup extends GxAbstractFlowSetup {
     public List<GxMenuItem> menuItems() {
         List<GxMenuItem> items = new ArrayList<>();
 
+        items.add(GxMenuItemFactory.securityMenuItem());
         items.add(GxMenuItemFactory.setupMenuItem());
         items.add(GxMenuItem.create("Documents", VaadinIcon.FOLDER_O.create(), GxDocumentExplorerView.class));
 

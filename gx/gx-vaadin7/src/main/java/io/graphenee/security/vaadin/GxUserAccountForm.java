@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MPasswordField;
 import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.util.converter.Converter;
@@ -45,109 +44,109 @@ import io.graphenee.vaadin.converter.BeanCollectionFaultToSetConverter;
 @Scope("prototype")
 public class GxUserAccountForm extends TRAbstractForm<GxUserAccountBean> {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Autowired
-	GxDataService dataService;
+    @Autowired
+    GxDataService dataService;
 
-	MTextField username;
-	MTextField firstName;
-	MTextField lastName;
-	MTextField fullNameNative;
-	MTextField email;
-	MPasswordField password;
-	MCheckBox isLocked;
-	MCheckBox isActive;
-	MCheckBox isPasswordChangeRequired;
+    MTextField username;
+    MTextField firstName;
+    MTextField lastName;
+    MTextField fullNameNative;
+    MTextField email;
+    MPasswordField password;
+    MCheckBox isLocked;
+    MCheckBox isActive;
+    MCheckBox isPasswordChangeRequired;
 
-	TwinColSelect securityGroupCollectionFault;
-	TwinColSelect securityPolicyCollectionFault;
-	TwinColSelect accessKeyCollectionFault;
+    TwinColSelect securityGroupCollectionFault;
+    TwinColSelect securityPolicyCollectionFault;
+    TwinColSelect accessKeyCollectionFault;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	protected Component getFormComponent() {
-		// detail form
-		MVerticalLayout form = new MVerticalLayout().withMargin(true).withSpacing(true);
-		username = new MTextField("Username").withRequired(true);
-		username.setMaxLength(50);
-		firstName = new MTextField("First Name").withRequired(false);
-		firstName.setMaxLength(30);
-		lastName = new MTextField("Last Name").withRequired(false);
-		lastName.setMaxLength(30);
-		fullNameNative = new MTextField("Full Name (Native)").withRequired(false);
-		fullNameNative.setMaxLength(100);
-		email = new MTextField("Email").withRequired(false);
-		email.setMaxLength(200);
-		password = new MPasswordField("Password").withRequired(false);
-		password.setMaxLength(200);
-		isPasswordChangeRequired = new MCheckBox("Password Change Required?");
-		isLocked = new MCheckBox("Is Locked?");
-		isActive = new MCheckBox("Is Active?");
-		form.addComponents(username, firstName, lastName, fullNameNative, email, password, isPasswordChangeRequired, isLocked, isActive);
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
+    protected Component getFormComponent() {
+        // detail form
+        MVerticalLayout form = new MVerticalLayout().withMargin(true).withSpacing(true);
+        username = new MTextField("Username").withRequired(true);
+        username.setMaxLength(50);
+        firstName = new MTextField("First Name").withRequired(false);
+        firstName.setMaxLength(30);
+        lastName = new MTextField("Last Name").withRequired(false);
+        lastName.setMaxLength(30);
+        fullNameNative = new MTextField("Full Name (Native)").withRequired(false);
+        fullNameNative.setMaxLength(100);
+        email = new MTextField("Email").withRequired(false);
+        email.setMaxLength(200);
+        password = new MPasswordField("Password").withRequired(false);
+        password.setMaxLength(200);
+        isPasswordChangeRequired = new MCheckBox("Password Change Required?");
+        isLocked = new MCheckBox("Is Locked?");
+        isActive = new MCheckBox("Is Active?");
+        form.addComponents(username, firstName, lastName, fullNameNative, email, password, isPasswordChangeRequired, isLocked, isActive);
 
-		// security groups
-		securityGroupCollectionFault = new TwinColSelect();
-		securityGroupCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxSecurityGroupBean>());
-		securityGroupCollectionFault.setSizeFull();
-		securityGroupCollectionFault.setLeftColumnCaption("Available");
-		securityGroupCollectionFault.setRightColumnCaption("Assigned");
+        // security groups
+        securityGroupCollectionFault = new TwinColSelect();
+        securityGroupCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxSecurityGroupBean>());
+        securityGroupCollectionFault.setSizeFull();
+        securityGroupCollectionFault.setLeftColumnCaption("Available");
+        securityGroupCollectionFault.setRightColumnCaption("Assigned");
 
-		// security policies
-		securityPolicyCollectionFault = new TwinColSelect();
-		securityPolicyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
-		securityPolicyCollectionFault.setSizeFull();
-		securityPolicyCollectionFault.setLeftColumnCaption("Available");
-		securityPolicyCollectionFault.setRightColumnCaption("Applied");
+        // security policies
+        securityPolicyCollectionFault = new TwinColSelect();
+        securityPolicyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
+        securityPolicyCollectionFault.setSizeFull();
+        securityPolicyCollectionFault.setLeftColumnCaption("Available");
+        securityPolicyCollectionFault.setRightColumnCaption("Applied");
 
-		// keys
-		accessKeyCollectionFault = new TwinColSelect();
-		accessKeyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxAccessKeyBean>());
-		accessKeyCollectionFault.setSizeFull();
-		accessKeyCollectionFault.setLeftColumnCaption("Available");
-		accessKeyCollectionFault.setRightColumnCaption("Members");
+        // keys
+        accessKeyCollectionFault = new TwinColSelect();
+        accessKeyCollectionFault.setConverter((Converter) new BeanCollectionFaultToSetConverter<GxAccessKeyBean>());
+        accessKeyCollectionFault.setSizeFull();
+        accessKeyCollectionFault.setLeftColumnCaption("Available");
+        accessKeyCollectionFault.setRightColumnCaption("Members");
 
-		TabSheet mainTabSheet = new TabSheet();
-		mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
-		mainTabSheet.setWidth("100%");
-		mainTabSheet.setHeight("100%");
+        TabSheet mainTabSheet = new TabSheet();
+        mainTabSheet.setStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
+        mainTabSheet.setWidth("100%");
+        mainTabSheet.setHeight("100%");
 
-		mainTabSheet.addTab(form, "Details");
-		mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withMargin(true).withFullHeight(), "Security Groups");
-		mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withMargin(true).withFullHeight(), "Security Policies");
-		mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withMargin(true).withFullHeight(), "Access Keys");
+        mainTabSheet.addTab(form, "Details");
+        mainTabSheet.addTab(new MVerticalLayout(securityGroupCollectionFault).withMargin(true).withFullHeight(), "Security Groups");
+        mainTabSheet.addTab(new MVerticalLayout(securityPolicyCollectionFault).withMargin(true).withFullHeight(), "Security Policies");
+        mainTabSheet.addTab(new MVerticalLayout(accessKeyCollectionFault).withMargin(true).withFullHeight(), "Access Keys");
 
-		MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
-		layout.setSizeFull();
-		return layout;
-	}
+        MVerticalLayout layout = new MVerticalLayout(mainTabSheet);
+        layout.setSizeFull();
+        return layout;
+    }
 
-	@Override
-	protected void postBinding(GxUserAccountBean entity) {
-		GxNamespaceBean namespace = null;
-		if (entity.getNamespaceFault() != null) {
-			namespace = entity.getNamespaceFault().getBean();
-		}
-		List<GxSecurityGroupBean> securityGroups = namespace != null ? dataService.findSecurityGroupByNamespace(namespace) : dataService.findSecurityGroup();
-		securityGroupCollectionFault.addItems(securityGroups);
+    @Override
+    protected void postBinding(GxUserAccountBean entity) {
+        GxNamespaceBean namespace = null;
+        if (entity.getNamespaceFault() != null) {
+            namespace = entity.getNamespaceFault().getBean();
+        }
+        List<GxSecurityGroupBean> securityGroups = namespace != null ? dataService.findSecurityGroupByNamespace(namespace) : dataService.findSecurityGroup();
+        securityGroupCollectionFault.addItems(securityGroups);
 
-		List<GxSecurityPolicyBean> securityPolicies = namespace != null ? dataService.findSecurityPolicyByNamespace(namespace) : dataService.findSecurityPolicy();
-		securityPolicyCollectionFault.addItems(securityPolicies);
+        List<GxSecurityPolicyBean> securityPolicies = namespace != null ? dataService.findSecurityPolicyByNamespace(namespace) : dataService.findSecurityPolicy();
+        securityPolicyCollectionFault.addItems(securityPolicies);
 
-		List<GxAccessKeyBean> accessKeyBeans = dataService.findAccessKeyByIsActiveAndGxUserAccountIsNull(true);
-		accessKeyBeans.addAll(entity.getAccessKeyCollectionFault().getBeans());
-		accessKeyCollectionFault.addItems(accessKeyBeans);
+        List<GxAccessKeyBean> accessKeyBeans = dataService.findAccessKeyByIsActiveAndGxUserAccountIsNull(true);
+        accessKeyBeans.addAll(entity.getAccessKeyCollectionFault().getBeans());
+        accessKeyCollectionFault.addItems(accessKeyBeans);
 
-	}
+    }
 
-	@Override
-	protected boolean eagerValidationEnabled() {
-		return true;
-	}
+    @Override
+    protected boolean eagerValidationEnabled() {
+        return true;
+    }
 
-	@Override
-	protected String formTitle() {
-		return "User Account";
-	}
+    @Override
+    protected String formTitle() {
+        return "User Account";
+    }
 
 }
