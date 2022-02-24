@@ -22,7 +22,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -42,6 +41,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
     @Autowired
     GxDocumentForm documentForm;
+
+    @Autowired
+    GxDocumentUploadForm uploadForm;
 
     private GxNamespace namespace;
 
@@ -121,7 +123,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
     @Override
     protected void customizeAddMenuItem(MenuItem addMenuItem) {
-        addMenuItem.setText("Create");
         addMenuItem.getSubMenu().addItem("Folder", cl -> {
             folderForm.setDelegate(folder -> {
                 documentService.saveFolder(List.of(folder));
@@ -142,23 +143,14 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
             folderForm.showInDialog(newFolder);
         });
         addMenuItem.getSubMenu().addItem("Document", cl -> {
-            documentForm.setDelegate(document -> {
-                documentService.saveDocument(List.of(document));
+            uploadForm.setDelegate(folder -> {
+                documentService.saveFolder(List.of(folder));
                 refresh();
-                documentForm.closeDialog();
+                uploadForm.closeDialog();
             });
-            GxDocument newDocument = new GxDocument();
-            newDocument.setNamespace(namespace);
-            if (selectedItem != null) {
-                newDocument.setFolder((GxFolder) selectedItem);
+            if (selectedItem instanceof GxFolder) {
+                uploadForm.showInDialog((GxFolder) selectedItem);
             }
-            if (entityGrid().getSelectedItems().size() == 1) {
-                GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
-                if (!selectedContainer.isFile()) {
-                    newDocument.setFolder((GxFolder) selectedContainer);
-                }
-            }
-            documentForm.showInDialog(newDocument);
         });
     }
 
@@ -210,7 +202,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
     @Override
     protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
-      initializeWithDocumentExplorerItem(icl.getItem());
+        initializeWithDocumentExplorerItem(icl.getItem());
     }
 
 }
