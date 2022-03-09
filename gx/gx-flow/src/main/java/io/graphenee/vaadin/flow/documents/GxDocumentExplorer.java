@@ -1,19 +1,24 @@
-package io.graphenee.vaadin.flow.doc_mgmt;
+package io.graphenee.vaadin.flow.documents;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.menubar.MenuBar;
-import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -22,10 +27,13 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
+import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.documents.GxDocumentExplorerService;
+import io.graphenee.util.storage.FileStorage;
+import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityTreeList;
 
@@ -37,17 +45,24 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     GxDocumentExplorerService documentService;
 
     @Autowired
+    GxDocumentExplorerItemForm form;
+
+    @Autowired
     GxFolderForm folderForm;
 
     @Autowired
     GxDocumentForm documentForm;
 
     @Autowired
-    GxDocumentUploadForm uploadForm;
+    GxFileUploadForm uploadForm;
+
+    FileStorage storage;
 
     private GxNamespace namespace;
 
-    private GxDocumentExplorerItem selectedItem;
+    private GxFolder selectedFolder;
+
+    private HorizontalLayout breadcrumbLayout;
 
     public GxDocumentExplorer() {
         super(GxDocumentExplorerItem.class);
@@ -58,10 +73,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         if (parent != null) {
             return documentService.countChildren(parent).intValue();
         }
-        if (selectedItem != null) {
-            return documentService.countChildren(selectedItem).intValue();
-        }
-        return documentService.countChildren(namespace).intValue();
+        return documentService.countChildren(selectedFolder).intValue();
     }
 
     @Override
@@ -69,10 +81,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         if (parent != null) {
             return documentService.countChildren(parent) > 0;
         }
-        if (selectedItem != null) {
-            return documentService.countChildren(selectedItem) > 0;
-        }
-        return documentService.countChildren(namespace) > 0;
+        return documentService.countChildren(selectedFolder) > 0;
     }
 
     @Override
@@ -80,10 +89,38 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         if (parent != null) {
             return documentService.findExplorerItem(parent, "name").stream();
         }
-        if (selectedItem != null) {
-            return documentService.findExplorerItem(selectedItem, "name").stream();
+        return documentService.findExplorerItem(selectedFolder, "name").stream();
+    }
+
+    private void generateBreadcrumb(GxDocumentExplorerItem parent) {
+        if (breadcrumbLayout == null) {
+            breadcrumbLayout = new HorizontalLayout();
         }
-        return documentService.findExplorerItem(namespace, "name").stream();
+        breadcrumbLayout.removeAll();
+        GxDocumentExplorerItem current = parent != null ? parent : selectedFolder;
+        LinkedList<GxDocumentExplorerItem> list = new LinkedList<>();
+        while (current != null) {
+            list.addFirst(current);
+            current = current.getParent();
+        }
+        for (int i = 0; i < list.size(); i++) {
+            GxDocumentExplorerItem f = list.get(i);
+            if (i > 0) {
+                breadcrumbLayout.add(VaadinIcon.ANGLE_RIGHT.create());
+            }
+            Button button;
+            if (f.getParent() == null) {
+                button = new Button(VaadinIcon.HOME.create());
+                button.addThemeVariants(ButtonVariant.LUMO_ICON);
+            } else {
+                button = new Button(f.getName());
+                button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_SMALL);
+            }
+            button.addClickListener(cl -> {
+                initializeWithFolderAndStorage((GxFolder) f, storage);
+            });
+            breadcrumbLayout.add(button);
+        }
     }
 
     @Override
@@ -124,59 +161,67 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     @Override
     protected void customizeAddMenuItem(MenuItem addMenuItem) {
         addMenuItem.getSubMenu().addItem("Folder", cl -> {
-            folderForm.setDelegate(folder -> {
-                documentService.saveFolder(List.of(folder));
-                refresh();
-                folderForm.closeDialog();
-            });
             GxFolder newFolder = new GxFolder();
             newFolder.setNamespace(namespace);
-            if (selectedItem != null) {
-                newFolder.setFolder((GxFolder) selectedItem);
-            }
             if (entityGrid().getSelectedItems().size() == 1) {
                 GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
                 if (!selectedContainer.isFile()) {
                     newFolder.setFolder((GxFolder) selectedContainer);
                 }
+            } else {
+                newFolder.setFolder(selectedFolder);
             }
             folderForm.showInDialog(newFolder);
         });
         addMenuItem.getSubMenu().addItem("Document", cl -> {
-            uploadForm.setDelegate(folder -> {
-                documentService.saveFolder(List.of(folder));
-                refresh();
-                uploadForm.closeDialog();
-            });
-            if (selectedItem instanceof GxFolder) {
-                uploadForm.showInDialog((GxFolder) selectedItem);
+            GxDocumentExplorerItem selectedContainer = selectedFolder;
+            if (entityGrid().getSelectedItems().size() == 1) {
+                selectedContainer = entityGrid().getSelectedItems().iterator().next();
+            }
+            if (!selectedContainer.isFile()) {
+                uploadForm.showInDialog((GxFolder) selectedContainer);
             }
         });
     }
 
     @Override
-    protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
-        MenuBar navBar = new MenuBar();
-        navBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
-        navBar.addItem(VaadinIcon.ARROW_UP.create(), cl -> {
-            initializeWithNamespace(namespace);
+    protected void postBuild() {
+        folderForm.setDelegate(folder -> {
+            documentService.saveFolder(selectedFolder, List.of(folder));
+            refresh();
+            folderForm.closeDialog();
         });
 
-        navBar.addItem(VaadinIcon.ARROW_LEFT.create(), cl -> {
-            initializeWithDocumentExplorerItem(selectedItem != null ? selectedItem.getParent() : null);
+        uploadForm.initializeWithFileUploadHandeler((parentFolder, uploadedFiles) -> {
+            uploadedFiles.forEach(uploadedFile -> {
+                try {
+                    File file = uploadedFile.getFile();
+                    Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
+                    FileMetaData metaData = savedFile.get();
+                    GxDocument d = new GxDocument();
+                    d.setFolder(parentFolder);
+                    d.setSize((long) metaData.getFileSize());
+                    d.setNamespace(namespace);
+                    d.setName(uploadedFile.getFileName());
+                    d.setPath(metaData.getResourcePath());
+                    d.setMimeType(uploadedFile.getMimeType());
+                    documentService.saveDocument(parentFolder, List.of(d));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                refresh();
+            });
         });
-
-        toolbarLayout.addComponentAtIndex(0, navBar);
     }
 
     @Override
     protected GxAbstractEntityForm<GxDocumentExplorerItem> getEntityForm(GxDocumentExplorerItem entity) {
-        return null;
+        return form;
     }
 
     @Override
     protected void onSave(GxDocumentExplorerItem entity) {
-        documentService.saveExplorerItem(List.of(entity));
+        documentService.saveExplorerItem(selectedFolder, List.of(entity));
     }
 
     @Override
@@ -189,20 +234,32 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         return "name";
     }
 
-    public void initializeWithNamespace(GxNamespace namespace) {
+    public void initializeWithNamespaceAndStorage(GxNamespace namespace, FileStorage storage) {
         this.namespace = namespace;
-        this.selectedItem = null;
+        this.selectedFolder = documentService.findOrCreateNamespaceFolder(namespace);
+        this.storage = storage;
+        generateBreadcrumb(this.selectedFolder);
         refresh();
     }
 
-    public void initializeWithDocumentExplorerItem(GxDocumentExplorerItem item) {
-        this.selectedItem = item;
+    public void initializeWithFolderAndStorage(GxFolder folder, FileStorage storage) {
+        this.selectedFolder = folder;
+        this.storage = storage;
+        generateBreadcrumb(this.selectedFolder);
         refresh();
     }
 
     @Override
     protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
-        initializeWithDocumentExplorerItem(icl.getItem());
+        if (!icl.getItem().isFile()) {
+            initializeWithFolderAndStorage((GxFolder) icl.getItem(), storage);
+        }
+    }
+
+    @Override
+    protected void decorateSearchForm(FormLayout searchForm, Binder<GxDocumentExplorerItem> searchBinder) {
+        breadcrumbLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        searchForm.add(breadcrumbLayout, 10);
     }
 
 }

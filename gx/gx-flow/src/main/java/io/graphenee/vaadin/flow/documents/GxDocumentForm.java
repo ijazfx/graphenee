@@ -1,4 +1,4 @@
-package io.graphenee.vaadin.flow.doc_mgmt;
+package io.graphenee.vaadin.flow.documents;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.textfield.TextArea;

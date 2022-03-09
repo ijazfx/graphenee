@@ -37,25 +37,25 @@ public class GxDocument implements Serializable, GxDocumentExplorerItem {
 	Integer oid;
 
 	UUID documentId = UUID.randomUUID();
-
+	
 	@Include
 	String name;
+	
 	String note;
 	String mimeType;
 	Long size;
-
+	
 	@Include
 	Integer versionNo = 0;
 	String path;
-
+	
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
-
-	@Include
+	
 	@ManyToOne
 	@JoinColumn(name = "oid_document")
 	GxDocument document;
-
+	
 	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_folder")

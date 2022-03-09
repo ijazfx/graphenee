@@ -28,7 +28,6 @@ import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 public class GxNamespaceServiceImpl implements GxNamespaceService {
 
 	private static final String SYSTEM_NAMESPACE = "io.graphenee.system";
-	private static final String APPLICATION_NAMESPACE = "io.graphenee.core";
 
 	@Autowired
 	GxDataService dataService;
@@ -39,11 +38,6 @@ public class GxNamespaceServiceImpl implements GxNamespaceService {
 	@Override
 	public GxNamespaceBean systemNamespace() {
 		return dataService.findNamespace(SYSTEM_NAMESPACE);
-	}
-
-	@Override
-	public GxNamespaceBean applicationNamespace() {
-		return dataService.findNamespace(APPLICATION_NAMESPACE);
 	}
 
 	@Override
@@ -59,11 +53,6 @@ public class GxNamespaceServiceImpl implements GxNamespaceService {
 	@Override
 	public GxNamespace systemNamespaceEntity() {
 		return repo.findByNamespace(SYSTEM_NAMESPACE);
-	}
-
-	@Override
-	public GxNamespace applicationNamespaceEntity() {
-		return repo.findByNamespace(APPLICATION_NAMESPACE);
 	}
 
 	@Override

@@ -10,25 +10,19 @@ import io.graphenee.util.storage.FileStorage;
 
 public interface GxDocumentExplorerService {
 
-	Long countFolder(GxNamespace namespace);
-
-	Long countDocuments(GxNamespace namespace);
-
-	List<GxFolder> findFolder(GxNamespace namespace, String... sortKey);
+	GxFolder findOrCreateNamespaceFolder(GxNamespace namespace);
 
 	List<GxFolder> findFolder(GxFolder parent, String... sortKey);
-
-	List<GxDocument> findDocument(GxNamespace namespace, String... sortKey);
 
 	List<GxDocument> findDocument(GxFolder parent, String... sortKey);
 
 	List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey);
 
-	List<GxDocumentExplorerItem> saveExplorerItem(List<GxDocumentExplorerItem> item);
+	List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> item);
 
-	List<GxFolder> saveFolder(List<GxFolder> folders);
+	List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders);
 
-	List<GxDocument> saveDocument(List<GxDocument> documents);
+	List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents);
 
 	void deleteExplorerItem(List<GxDocumentExplorerItem> items);
 
@@ -38,11 +32,7 @@ public interface GxDocumentExplorerService {
 
 	GxDocument createVersion(GxDocument document, FileStorage storage);
 
-	Long countChildren(GxNamespace namespace);
-
 	Long countChildren(GxDocumentExplorerItem parent);
-
-	List<GxDocumentExplorerItem> findExplorerItem(GxNamespace namespace, String... sortKey);
 
 	List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, String... sortKey);
 

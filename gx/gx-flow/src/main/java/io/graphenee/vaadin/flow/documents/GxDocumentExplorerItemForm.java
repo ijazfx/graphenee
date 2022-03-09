@@ -1,4 +1,4 @@
-package io.graphenee.vaadin.flow.doc_mgmt;
+package io.graphenee.vaadin.flow.documents;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -7,18 +7,18 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import org.springframework.context.annotation.Scope;
 
-import io.graphenee.core.model.entity.GxFolder;
+import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
 @SpringComponent
 @Scope("prototype")
-public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
+public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentExplorerItem> {
 
 	TextField name;
 	TextArea note;
 
-	public GxFolderForm() {
-		super(GxFolder.class);
+	public GxDocumentExplorerItemForm() {
+		super(GxDocumentExplorerItem.class);
 	}
 
 	@Override

@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.core.api;
+package io.graphenee.documents;
 
-import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.entity.GxNamespace;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-public interface GxNamespaceService {
+import io.graphenee.core.GrapheneeCoreConfiguration;
 
-	GxNamespace systemNamespaceEntity();
+@Configuration
+@AutoConfigureAfter(GrapheneeCoreConfiguration.class)
+@ComponentScan(GrapheneeDocumentsConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
+public class GrapheneeDocumentsConfiguration {
 
-	GxNamespace namespaceEntity(String namespace);
-
-	GxNamespace findEntityByOid(Integer oidNamespace);
-
-	GxNamespaceBean systemNamespace();
-
-	GxNamespaceBean namespace(String namespace);
-
-	GxNamespaceBean findByOid(Integer oidNamespace);
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.documents";
 
 }

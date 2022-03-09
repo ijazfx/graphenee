@@ -23,7 +23,9 @@ import io.graphenee.core.GrapheneeCoreConfiguration;
 
 @Configuration
 @AutoConfigureAfter(GrapheneeCoreConfiguration.class)
-@ComponentScan("io.graphenee.i18n")
+@ComponentScan(GrapheneeI18nConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeI18nConfiguration {
+
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.i18n";
 
 }

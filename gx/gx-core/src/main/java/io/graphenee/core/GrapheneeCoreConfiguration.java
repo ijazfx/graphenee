@@ -28,7 +28,6 @@ import io.graphenee.util.DataSourceUtil;
 
 @Configuration
 @ConditionalOnClass(DataSource.class)
-//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
 @EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
 @ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)

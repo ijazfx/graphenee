@@ -30,10 +30,19 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	GxDocumentTypeRepository docTypeRepo;
 
 	@Override
-	public List<GxFolder> findFolder(GxNamespace namespace, String... sortKey) {
+	synchronized public GxFolder findOrCreateNamespaceFolder(GxNamespace namespace) {
 		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-		sb.isNull("folder");
-		return folderRepo.findAll(sb.build(), Sort.by(sortKey));
+		sb.eq("namespace", namespace);
+		sb.eq("name", namespace.getNamespace());
+		List<GxFolder> folders = folderRepo.findAll(sb.build());
+		if (folders.isEmpty()) {
+			GxFolder folder = new GxFolder();
+			folder.setNamespace(namespace);
+			folder.setName(namespace.getNamespace());
+			folder = folderRepo.save(folder);
+			return folder;
+		}
+		return folders.get(0);
 	}
 
 	@Override
@@ -41,13 +50,6 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
 		sb.eq("folder", parent);
 		return folderRepo.findAll(sb.build(), Sort.by(sortKey));
-	}
-
-	@Override
-	public List<GxDocument> findDocument(GxNamespace namespace, String... sortKey) {
-		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
-		sb.isNull("folder");
-		return docRepo.findAll(sb.build(), Sort.by(sortKey));
 	}
 
 	@Override
@@ -65,13 +67,32 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public List<GxFolder> saveFolder(List<GxFolder> folders) {
-		return folderRepo.saveAll(folders);
+	public List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders) {
+		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
+		sb.eq("folder", parent);
+		List<GxFolder> existing = folderRepo.findAll(sb.build());
+		List<GxFolder> newFolders = new ArrayList<>();
+		folders.forEach(f -> {
+			if (!existing.contains(f)) {
+				newFolders.add(f);
+			}
+		});
+		return folderRepo.saveAll(newFolders);
 	}
 
 	@Override
-	public List<GxDocument> saveDocument(List<GxDocument> documents) {
-		return docRepo.saveAll(documents);
+	public List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents) {
+		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
+		sb.eq("folder", parent);
+		sb.eq("versionNo", 0);
+		List<GxDocument> existing = docRepo.findAll(sb.build());
+		List<GxDocument> newDocuments = new ArrayList<>();
+		documents.forEach(d -> {
+			if (!existing.contains(d)) {
+				newDocuments.add(d);
+			}
+		});
+		return docRepo.saveAll(newDocuments);
 	}
 
 	@Override
@@ -91,27 +112,6 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public Long countFolder(GxNamespace namespace) {
-		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-		sb.isNull("folder");
-		return folderRepo.count(sb.build());
-	}
-
-	@Override
-	public Long countDocuments(GxNamespace namespace) {
-		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
-		sb.isNull("folder");
-		return docRepo.count(sb.build());
-	}
-
-	@Override
-	public Long countChildren(GxNamespace namespace) {
-		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-		sb.isNull("folder");
-		return folderRepo.count(sb.build());
-	}
-
-	@Override
 	public Long countChildren(GxDocumentExplorerItem parent) {
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
@@ -128,21 +128,6 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		count = count + docRepo.count(dsb.build());
 
 		return count;
-	}
-
-	@Override
-	public List<GxDocumentExplorerItem> findExplorerItem(GxNamespace namespace, String... sortKey) {
-		List<GxDocumentExplorerItem> items = new ArrayList<>();
-
-		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-		sb.isNull("folder");
-		items.addAll(folderRepo.findAll(sb.build(), Sort.by(sortKey)));
-
-		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-		dsb.isNull("folder");
-		items.addAll(docRepo.findAll(dsb.build(), Sort.by(sortKey)));
-
-		return items;
 	}
 
 	@Override
@@ -166,13 +151,13 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> saveExplorerItem(List<GxDocumentExplorerItem> items) {
+	public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> items) {
 		if (items != null) {
 			for (GxDocumentExplorerItem item : items) {
 				if (item.isFile()) {
-					saveDocument(List.of((GxDocument) item));
+					saveDocument((GxFolder) parent, List.of((GxDocument) item));
 				} else {
-					saveFolder(List.of((GxFolder) item));
+					saveFolder((GxFolder) parent, List.of((GxFolder) item));
 				}
 			}
 		}

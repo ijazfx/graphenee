@@ -47,8 +47,6 @@ import io.graphenee.core.model.entity.GxSmsProvider;
 
 public interface GxDataService {
 
-	public static final String CORE_NAMESPACE = "io.graphenee.core";
-
 	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
 
 	List<GxGenderBean> findGender();

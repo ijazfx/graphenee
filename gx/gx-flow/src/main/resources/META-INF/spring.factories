@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.graphenee.vaadin.flow.GrapheneeFlowConfiguration

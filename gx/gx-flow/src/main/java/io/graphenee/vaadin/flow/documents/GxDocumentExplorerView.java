@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package io.graphenee.vaadin.flow.doc_mgmt;
+package io.graphenee.vaadin.flow.documents;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 
 import io.graphenee.core.api.GxNamespaceService;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
@@ -34,6 +35,9 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 
 	@Autowired
 	GxDocumentExplorer list;
+
+	@Autowired(required = false)
+	FileStorage storage;
 
 	@Autowired
 	GxNamespaceService namespaceService;
@@ -50,8 +54,8 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		GxNamespace namespace = namespaceService.applicationNamespaceEntity();
-		list.initializeWithNamespace(namespace);
+		GxNamespace namespace = namespaceService.systemNamespaceEntity();
+		list.initializeWithNamespaceAndStorage(namespace, storage);
 	}
 
 }

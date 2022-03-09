@@ -37,19 +37,20 @@ public class GxFolder implements Serializable, GxDocumentExplorerItem {
 	Integer oid;
 
 	UUID folderId = UUID.randomUUID();
-
+	
 	@Include
 	String name;
+	
 	String note;
-
+	
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
-
+	
 	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_folder")
 	GxFolder folder;
-
+	
 	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")

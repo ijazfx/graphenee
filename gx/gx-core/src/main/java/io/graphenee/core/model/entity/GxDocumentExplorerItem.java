@@ -12,14 +12,18 @@ public interface GxDocumentExplorerItem {
 
 	String getName();
 
+	void setName(String name);
+
 	String getNote();
+
+	void setNote(String note);
 
 	Integer getVersion();
 
 	Long getSize();
 
 	Boolean hasChildren();
-	
+
 	Integer getChildCount();
 
 	List<GxDocumentExplorerItem> getChildren();

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import io.graphenee.vaadin.flow.GxMenuItemFactory;
 import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.base.GxMenuItem;
-import io.graphenee.vaadin.flow.doc_mgmt.GxDocumentExplorerView;
+import io.graphenee.vaadin.flow.documents.GxDocumentExplorerView;
 
 @Component
 @VaadinSessionScope
