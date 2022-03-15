@@ -52,6 +52,7 @@ public class GxDocument implements Serializable, GxDocumentExplorerItem {
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
 	
+	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_document")
 	GxDocument document;

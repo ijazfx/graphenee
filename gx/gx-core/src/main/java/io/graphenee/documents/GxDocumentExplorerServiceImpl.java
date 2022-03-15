@@ -15,7 +15,6 @@ import io.graphenee.core.model.jpa.repository.GxDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxDocumentTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxFolderRepository;
 import io.graphenee.util.JpaSpecificationBuilder;
-import io.graphenee.util.storage.FileStorage;
 
 @Service
 public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService {
@@ -54,16 +53,17 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 
 	@Override
 	public List<GxDocument> findDocument(GxFolder parent, String... sortKey) {
-		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
-		sb.eq("folder", parent);
-		return docRepo.findAll(sb.build(), Sort.by(sortKey));
+		List<GxDocument> docs = docRepo.findByOidFolder(parent.getOid());
+		return docs;
 	}
 
 	@Override
 	public List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey) {
 		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
 		sb.eq("document", document);
-		return docRepo.findAll(sb.build(), Sort.by(sortKey));
+		List<GxDocument> versions = docRepo.findAll(sb.build(), Sort.by(sortKey).descending());
+		versions.add(document);
+		return versions;
 	}
 
 	@Override
@@ -96,6 +96,22 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
+	public GxDocument createDocumentVersion(GxDocument parentDocument, GxDocument newDocument) {
+		while (parentDocument.getDocument() != null) {
+			parentDocument = parentDocument.getDocument();
+		}
+		Integer maxVersion = docRepo.findMaxVersionByDocument(parentDocument);
+		if (maxVersion == null) {
+			maxVersion = 0;
+		}
+		newDocument.setName(parentDocument.getName());
+		newDocument.setVersionNo(maxVersion + 1);
+		newDocument.setDocument(parentDocument);
+		newDocument.setFolder(parentDocument.getFolder());
+		return docRepo.save(newDocument);
+	}
+
+	@Override
 	public void deleteFolder(List<GxFolder> folders) {
 		folderRepo.deleteInBatch(folders);
 	}
@@ -106,12 +122,6 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public GxDocument createVersion(GxDocument document, FileStorage storage) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Long countChildren(GxDocumentExplorerItem parent) {
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
@@ -119,13 +129,14 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			return docRepo.count(sb.build());
 		}
 		Long count = 0L;
+
+		GxFolder folder = (GxFolder) parent;
+
 		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-		sb.eq("folder", parent);
+		sb.eq("folder", folder);
 		count = folderRepo.count(sb.build());
 
-		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-		dsb.eq("folder", parent);
-		count = count + docRepo.count(dsb.build());
+		count = count + docRepo.countByOidFolder(folder.getOid());
 
 		return count;
 	}
@@ -135,17 +146,18 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 
 		if (parent.isFile()) {
-			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-			dsb.eq("document", parent);
-			items.addAll(docRepo.findAll(dsb.build(), Sort.by(sortKey)));
+			JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
+			sb.eq("document", parent);
+			List<GxDocument> docs = docRepo.findAll(sb.build(), Sort.by(sortKey));
+			items.addAll(docs);
 		} else {
+			GxFolder folder = (GxFolder) parent;
 			JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-			sb.eq("folder", parent);
+			sb.eq("folder", folder);
 			items.addAll(folderRepo.findAll(sb.build(), Sort.by(sortKey)));
 
-			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-			dsb.eq("folder", parent);
-			items.addAll(docRepo.findAll(dsb.build(), Sort.by(sortKey)));
+			List<GxDocument> docs = docRepo.findByOidFolder(folder.getOid());
+			items.addAll(docs);
 		}
 		return items;
 	}

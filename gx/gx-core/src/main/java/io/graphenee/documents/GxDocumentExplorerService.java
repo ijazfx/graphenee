@@ -6,7 +6,6 @@ import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
-import io.graphenee.util.storage.FileStorage;
 
 public interface GxDocumentExplorerService {
 
@@ -24,13 +23,13 @@ public interface GxDocumentExplorerService {
 
 	List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents);
 
+	GxDocument createDocumentVersion(GxDocument parent, GxDocument newDocument);
+
 	void deleteExplorerItem(List<GxDocumentExplorerItem> items);
 
 	void deleteFolder(List<GxFolder> folders);
 
 	void deleteDocument(List<GxDocument> documents);
-
-	GxDocument createVersion(GxDocument document, FileStorage storage);
 
 	Long countChildren(GxDocumentExplorerItem parent);
 

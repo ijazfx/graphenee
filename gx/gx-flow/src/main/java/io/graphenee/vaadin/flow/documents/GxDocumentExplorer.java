@@ -56,6 +56,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     @Autowired
     GxFileUploadForm uploadForm;
 
+    @Autowired
+    GxFileUploadNewVersionForm uploadNewVersionForm;
+
+    @Autowired
+    GxDocumentVersionList versionList;
+
     FileStorage storage;
 
     private GxNamespace namespace;
@@ -160,7 +166,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
     @Override
     protected void customizeAddMenuItem(MenuItem addMenuItem) {
-        addMenuItem.getSubMenu().addItem("Folder", cl -> {
+        addMenuItem.getSubMenu().addItem("Create Folder", cl -> {
             GxFolder newFolder = new GxFolder();
             newFolder.setNamespace(namespace);
             if (entityGrid().getSelectedItems().size() == 1) {
@@ -173,13 +179,22 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
             }
             folderForm.showInDialog(newFolder);
         });
-        addMenuItem.getSubMenu().addItem("Document", cl -> {
+        addMenuItem.getSubMenu().addItem("Upload Document", cl -> {
             GxDocumentExplorerItem selectedContainer = selectedFolder;
             if (entityGrid().getSelectedItems().size() == 1) {
                 selectedContainer = entityGrid().getSelectedItems().iterator().next();
             }
             if (!selectedContainer.isFile()) {
                 uploadForm.showInDialog((GxFolder) selectedContainer);
+            }
+        });
+        addMenuItem.getSubMenu().addItem("Upload New Version", cl -> {
+            GxDocumentExplorerItem selectedContainer = null;
+            if (entityGrid().getSelectedItems().size() == 1) {
+                selectedContainer = entityGrid().getSelectedItems().iterator().next();
+            }
+            if (selectedContainer.isFile()) {
+                uploadNewVersionForm.showInDialog((GxDocument) selectedContainer);
             }
         });
     }
@@ -212,6 +227,24 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
                 refresh();
             });
         });
+
+        uploadNewVersionForm.initializeWithFileUploadHandeler((parentDocument, uploadedFile) -> {
+            try {
+                File file = uploadedFile.getFile();
+                Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
+                FileMetaData metaData = savedFile.get();
+                GxDocument d = new GxDocument();
+                d.setSize((long) metaData.getFileSize());
+                d.setNamespace(namespace);
+                d.setName(uploadedFile.getFileName());
+                d.setPath(metaData.getResourcePath());
+                d.setMimeType(uploadedFile.getMimeType());
+                documentService.createDocumentVersion(parentDocument, d);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            refresh();
+        });
     }
 
     @Override
@@ -242,17 +275,27 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         refresh();
     }
 
-    public void initializeWithFolderAndStorage(GxFolder folder, FileStorage storage) {
-        this.selectedFolder = folder;
+    public void initializeWithFolderAndStorage(GxDocumentExplorerItem parent, FileStorage storage) {
+        this.selectedFolder = parent.isFile() ? ((GxDocument) parent).getFolder() : (GxFolder) parent;
         this.storage = storage;
-        generateBreadcrumb(this.selectedFolder);
+        generateBreadcrumb(parent);
         refresh();
     }
 
     @Override
     protected void onGridItemDoubleClicked(ItemDoubleClickEvent<GxDocumentExplorerItem> icl) {
-        if (!icl.getItem().isFile()) {
-            initializeWithFolderAndStorage((GxFolder) icl.getItem(), storage);
+        GxDocumentExplorerItem item = icl.getItem();
+        if (item.isFile()) {
+            GxDocument doc = (GxDocument) item;
+            while (doc.getDocument() != null) {
+                doc = doc.getDocument();
+            }
+            versionList.initializeWithDocument(doc);
+            versionList.showInDialog(() -> {
+                refresh();
+            });
+        } else {
+            initializeWithFolderAndStorage(icl.getItem(), storage);
         }
     }
 
