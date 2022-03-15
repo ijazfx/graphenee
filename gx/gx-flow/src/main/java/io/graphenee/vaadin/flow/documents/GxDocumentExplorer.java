@@ -290,7 +290,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
             while (doc.getDocument() != null) {
                 doc = doc.getDocument();
             }
-            versionList.initializeWithDocument(doc);
+            versionList.initializeWithDocumentAndStorage(doc, storage);
             versionList.showInDialog(() -> {
                 refresh();
             });

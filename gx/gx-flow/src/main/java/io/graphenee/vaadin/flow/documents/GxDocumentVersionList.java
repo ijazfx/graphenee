@@ -1,8 +1,13 @@
 package io.graphenee.vaadin.flow.documents;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.icon.Icon;
@@ -18,6 +23,7 @@ import org.springframework.context.annotation.Scope;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.storage.FileStorage;
+import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
@@ -30,6 +36,12 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 
     @Autowired
     GxFileUploadNewVersionForm uploadNewVersionForm;
+
+    @Autowired
+    GxDocumentForm form;
+
+    @Autowired
+    GxFileUploadNewVersionForm uploadForm;
 
     FileStorage storage;
 
@@ -81,7 +93,35 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 
     @Override
     protected GxAbstractEntityForm<GxDocument> getEntityForm(GxDocument entity) {
-        return null;
+        return form;
+    }
+
+    @Override
+    protected void customizeAddMenuItem(MenuItem addMenuItem) {
+        addMenuItem.getSubMenu().addItem("Upload New Version", cl -> {
+            uploadNewVersionForm.showInDialog(selectedDocument);
+        });
+    }
+
+    @Override
+    protected void postBuild() {
+        uploadNewVersionForm.initializeWithFileUploadHandeler((parentDocument, uploadedFile) -> {
+            try {
+                File file = uploadedFile.getFile();
+                Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
+                FileMetaData metaData = savedFile.get();
+                GxDocument d = new GxDocument();
+                d.setSize((long) metaData.getFileSize());
+                d.setNamespace(parentDocument.getNamespace());
+                d.setName(uploadedFile.getFileName());
+                d.setPath(metaData.getResourcePath());
+                d.setMimeType(uploadedFile.getMimeType());
+                documentService.createDocumentVersion(parentDocument, d);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            refresh();
+        });
     }
 
     @Override
@@ -91,11 +131,18 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 
     @Override
     protected void onDelete(Collection<GxDocument> entities) {
-
+        List<GxDocument> documents = new ArrayList<>();
+        entities.forEach(e -> {
+            if (e.getDocument() != null) {
+                documents.add(e);
+            }
+        });
+        documentService.deleteDocument(documents);
     }
 
-    public void initializeWithDocument(GxDocument document) {
+    public void initializeWithDocumentAndStorage(GxDocument document, FileStorage storage) {
         this.selectedDocument = document;
+        this.storage = storage;
         refresh();
     }
 

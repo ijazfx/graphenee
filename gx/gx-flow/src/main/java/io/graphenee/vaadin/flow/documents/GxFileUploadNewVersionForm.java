@@ -52,6 +52,7 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 		upload.setMaxFiles(1);
 		upload.setMaxFileSize(1024000000);
 		entityForm.add(upload);
+		setColspan(upload, 2);
 	}
 
 	public void initializeWithFileUploadHandeler(GxFileUploadNewVersionHandler handler) {
@@ -68,12 +69,12 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 
 	@Override
 	protected String dialogHeight() {
-		return "100%";
+		return "300px";
 	}
 
 	@Override
 	protected String dialogWidth() {
-		return "100%";
+		return "500px";
 	}
 
 	@Override
