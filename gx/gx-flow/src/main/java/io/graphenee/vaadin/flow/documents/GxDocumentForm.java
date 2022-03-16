@@ -14,31 +14,33 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 @Scope("prototype")
 public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
-	TextField name;
-	TextArea note;
+    TextField name;
+    TextArea note;
 
-	public GxDocumentForm() {
-		super(GxDocument.class);
-	}
+    public GxDocumentForm() {
+        super(GxDocument.class);
+    }
 
-	@Override
-	protected void decorateForm(HasComponents entityForm) {
-		note = new TextArea("Note");
-		note.setHeight("100px");
-		entityForm.add(name, note);
+    @Override
+    protected void decorateForm(HasComponents entityForm) {
+        name = new TextField("Name");
 
-		setColspan(name, 2);
-		setColspan(note, 2);
-	}
+        note = new TextArea("Note");
+        note.setHeight("100px");
+        entityForm.add(name, note);
 
-	@Override
-	protected String formTitleProperty() {
-		return "name";
-	}
+        setColspan(name, 2);
+        setColspan(note, 2);
+    }
 
-	@Override
-	protected String dialogHeight() {
-		return "350px";
-	}
+    @Override
+    protected String formTitleProperty() {
+        return "name";
+    }
+
+    @Override
+    protected String dialogHeight() {
+        return "350px";
+    }
 
 }

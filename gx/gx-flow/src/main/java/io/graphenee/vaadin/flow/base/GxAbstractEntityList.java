@@ -352,12 +352,13 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                     }
                 }
                 dataGrid.setColumnOrder(columns);
+                decorateGrid(dataGrid);
                 Column<T> endColumn = dataGrid.addComponentColumn(source -> new Span());
                 endColumn.setKey("__gxLastColumn");
                 endColumn.setAutoWidth(true);
             }
 
-            dataGrid.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column")).forEach(col -> col.setVisible(false));
+            dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column")).forEach(col -> col.setVisible(false));
 
             for (String key : availableProperties()) {
                 Column<T> columnByKey = dataGrid.getColumnByKey(key);
@@ -409,8 +410,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             dataGrid.addItemDoubleClickListener(icl -> {
                 onGridItemDoubleClicked(icl);
             });
-
-            decorateGrid(dataGrid);
 
             for (String p : availableProperties()) {
                 setColumnVisibility(p, false);
@@ -633,14 +632,16 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                     boolean matched = filterValue.equals(columnValue);
                     if (!matched) {
                         String fv = filterValue.toString().trim();
-                        String cv = columnValue.toString().trim();
-                        matched = fv.equalsIgnoreCase(cv);
-                        if (!matched) {
-                            try {
-                                Pattern p = Pattern.compile(fv, Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
-                                matched = p.matcher(cv).find();
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                        if (columnValue != null) {
+                            String cv = columnValue.toString().trim();
+                            matched = fv.equalsIgnoreCase(cv);
+                            if (!matched) {
+                                try {
+                                    Pattern p = Pattern.compile(fv, Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
+                                    matched = p.matcher(cv).find();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
@@ -803,7 +804,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                     c.setReadOnly(true);
                     return c;
                 });
-                // renderer = TemplateRenderer.<T> of("<vaadin-checkbox checked=[[item.value]] disabled=true />").withProperty("value", propertyDefinition.getGetter());
             }
             if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
                 NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
@@ -931,7 +931,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         build();
         entityGrid().deselectAll();
         crudMenuBar.setVisible(isEditable());
-        dataGrid.getColumns().stream().filter(c -> c.getKey().equals("__gxEditColumn")).forEach(c -> c.setVisible(isEditable()));
+        dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__gxEditColumn")).forEach(c -> c.setVisible(isEditable()));
         if (isDragAndDropEnabled()) {
             dataGrid.setRowsDraggable(isRowDraggable());
             dataGrid.setDropMode(GridDropMode.ON_GRID);
