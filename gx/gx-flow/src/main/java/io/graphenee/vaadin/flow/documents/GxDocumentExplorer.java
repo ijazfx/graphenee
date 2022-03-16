@@ -1,6 +1,8 @@
 package io.graphenee.vaadin.flow.documents;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -22,8 +24,10 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -36,6 +40,8 @@ import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityTreeList;
+import io.graphenee.vaadin.flow.component.GxNotification;
+import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 
 @SpringComponent
 @Scope("prototype")
@@ -157,6 +163,30 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
                     icon = VaadinIcon.FOLDER_O.create();
                 } else {
                     icon = VaadinIcon.FILE_O.create();
+                    icon.addClickListener(cl -> {
+                        GxDocument document = (GxDocument) s;
+                        String extension = s.getExtension();
+                        String mimeType = s.getMimeType();
+                        if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+                            try {
+                                InputStream stream = null;
+                                String src = document.getPath();
+                                String resourcePath = storage.resourcePath("documents", src);
+                                try {
+                                    stream = storage.resolve(resourcePath);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                byte[] bytes = IOUtils.toByteArray(stream);
+                                StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+                                ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
+                                resourcePreviewPanel.showInDialog("80%", "80%");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
                 }
                 return icon;
             });
@@ -192,9 +222,11 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
             GxDocumentExplorerItem selectedContainer = null;
             if (entityGrid().getSelectedItems().size() == 1) {
                 selectedContainer = entityGrid().getSelectedItems().iterator().next();
-            }
-            if (selectedContainer.isFile()) {
-                uploadNewVersionForm.showInDialog((GxDocument) selectedContainer);
+                if (selectedContainer.isFile()) {
+                    uploadNewVersionForm.showInDialog((GxDocument) selectedContainer);
+                }
+            } else {
+                GxNotification.error("Please select at least one document.");
             }
         });
     }
@@ -207,7 +239,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
             folderForm.closeDialog();
         });
 
-        uploadForm.initializeWithFileUploadHandeler((parentFolder, uploadedFiles) -> {
+        uploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
             uploadedFiles.forEach(uploadedFile -> {
                 try {
                     File file = uploadedFile.getFile();
@@ -218,7 +250,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
                     d.setSize((long) metaData.getFileSize());
                     d.setNamespace(namespace);
                     d.setName(uploadedFile.getFileName());
-                    d.setPath(metaData.getResourcePath());
+                    d.setPath(metaData.getFileName());
                     d.setMimeType(uploadedFile.getMimeType());
                     documentService.saveDocument(parentFolder, List.of(d));
                 } catch (Exception ex) {
@@ -228,7 +260,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
             });
         });
 
-        uploadNewVersionForm.initializeWithFileUploadHandeler((parentDocument, uploadedFile) -> {
+        uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
             try {
                 File file = uploadedFile.getFile();
                 Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
@@ -237,7 +269,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
                 d.setSize((long) metaData.getFileSize());
                 d.setNamespace(namespace);
                 d.setName(uploadedFile.getFileName());
-                d.setPath(metaData.getResourcePath());
+                d.setPath(metaData.getFileName());
                 d.setMimeType(uploadedFile.getMimeType());
                 documentService.createDocumentVersion(parentDocument, d);
             } catch (Exception ex) {

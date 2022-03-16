@@ -52,6 +52,7 @@ public class ResourcePreviewPanel extends VerticalLayout {
         try {
             if (mimeType.startsWith("image")) {
                 Image image = new Image();
+                image.setSizeFull();
                 image.getElement().setAttribute("src", resource);
                 bodyLayout.add(image);
             } else if (mimeType.startsWith("audio")) {

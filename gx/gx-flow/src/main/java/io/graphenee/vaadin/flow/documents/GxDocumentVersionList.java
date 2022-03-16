@@ -1,6 +1,8 @@
 package io.graphenee.vaadin.flow.documents;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,8 +17,10 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -26,6 +30,7 @@ import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 
 @SpringComponent
 @Scope("prototype")
@@ -84,6 +89,30 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
                     icon = VaadinIcon.FOLDER_O.create();
                 } else {
                     icon = VaadinIcon.FILE_O.create();
+                    icon.addClickListener(cl -> {
+                        GxDocument document = (GxDocument) s;
+                        String extension = s.getExtension();
+                        String mimeType = s.getMimeType();
+                        if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+                            try {
+                                InputStream stream = null;
+                                String src = document.getPath();
+                                String resourcePath = storage.resourcePath("documents", src);
+                                try {
+                                    stream = storage.resolve(resourcePath);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                byte[] bytes = IOUtils.toByteArray(stream);
+                                StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+                                ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
+                                resourcePreviewPanel.showInDialog("80%", "80%");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
                 }
                 return icon;
             });
@@ -105,7 +134,7 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 
     @Override
     protected void postBuild() {
-        uploadNewVersionForm.initializeWithFileUploadHandeler((parentDocument, uploadedFile) -> {
+        uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
             try {
                 File file = uploadedFile.getFile();
                 Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
