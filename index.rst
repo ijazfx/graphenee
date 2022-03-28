@@ -1,5 +1,5 @@
-Graphenee:
-
+Graphenee
+=========
 Graphenee - Enterprise Application Development Framework
 
 Graphenee word itself is a combination of Graphene and Enterprise Edition (ee). It is developed using Java, Spring Boot and Vaadin.
