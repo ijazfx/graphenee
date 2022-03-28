@@ -1,4 +1,4 @@
-Graphenee
+Graphenee:
 
 Graphenee - Enterprise Application Development Framework
 
@@ -10,7 +10,7 @@ Development of the Graphenee was started in April 2016 in a private bitbucket re
 
 I believe the framework has a lot of potential and there is huge room for improvement. I welcome the opensource community to review and improve the code, develop and contribute modules and make Graphenee a successful for enterprise application development.
 
-Modules
+Modules:
 
 Graphenee consists of following modules:
 
