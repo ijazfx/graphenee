@@ -25,379 +25,390 @@ import com.vaadin.flow.data.binder.ValidationException;
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private HorizontalLayout formTitleLayout;
-    private Label formTitleLabel;
-    private Component entityForm;
-    private Component toolbar;
-    private Button saveButton;
-    private Button resetButton;
-    private Button dismissButton;
+	private HorizontalLayout formTitleLayout;
+	private Label formTitleLabel;
+	private Component entityForm;
+	private Component toolbar;
+	private Button saveButton;
+	private Button resetButton;
+	private Button dismissButton;
 
-    private Binder<T> dataBinder;
-    private Class<T> entityClass;
-    private T entity;
-    private Tabs tabs;
+	private Binder<T> dataBinder;
+	private Class<T> entityClass;
+	private T entity;
+	private Tabs tabs;
 
-    private boolean entityBound = false;
+	private boolean entityBound = false;
 
-    private boolean isBuilt = false;
+	private boolean isBuilt = false;
 
-    private EntityFormDelegate<T> delegate;
+	private EntityFormDelegate<T> delegate;
 
-    private boolean editable = true;
+	private boolean editable = true;
 
-    private GxDialog dialog = null;
+	private GxDialog dialog = null;
 
-    @Setter
-    private Boolean dialogAutoClose = true;
+	@Setter
+	private Boolean dialogAutoClose = true;
 
-    public GxAbstractEntityForm(Class<T> entityClass) {
-        this.entityClass = entityClass;
-        setSizeFull();
-        setMargin(false);
-        setPadding(false);
-        setSpacing(false);
-    }
+	@Setter
+	@Getter
+	private Boolean dialogCloseOnOutsideClick = false;
 
-    private synchronized GxAbstractEntityForm<T> build() {
-        buildFormTitle();
-        if (!isBuilt) {
-            entityForm = getFormComponent();
-            if (entityForm instanceof HasComponents) {
-                decorateForm((HasComponents) entityForm);
-            }
+	@Setter
+	@Getter
+	private Boolean dialogCloseOnEsc = true;
 
-            toolbar = getToolbarComponent();
+	public GxAbstractEntityForm(Class<T> entityClass) {
+		this.entityClass = entityClass;
+		setSizeFull();
+		setMargin(false);
+		setPadding(false);
+		setSpacing(false);
+	}
 
-            if (toolbar instanceof HasComponents) {
-                HasComponents c = (HasComponents) toolbar;
-                decorateToolbar(c);
-                saveButton = new Button("SAVE");
-                saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-                saveButton.addClickListener(cl -> {
-                    if (entity != null) {
-                        try {
-                            validateForm();
-                            if (delegate != null)
-                                delegate.onSave(entity);
-                            if (dialog != null && dialogAutoClose) {
-                                dialog.close();
-                            }
-                        } catch (Exception e) {
-                            // e.printStackTrace();
-                            // Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-                        }
-                    }
-                });
+	private synchronized GxAbstractEntityForm<T> build() {
+		buildFormTitle();
+		if (!isBuilt) {
+			entityForm = getFormComponent();
+			if (entityForm instanceof HasComponents) {
+				decorateForm((HasComponents) entityForm);
+			}
 
-                customizeSaveButton(saveButton);
+			toolbar = getToolbarComponent();
 
-                resetButton = new Button("RESET");
-                resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-                resetButton.addClickListener(cl -> {
-                    dataBinder.readBean(entity);
-                    if (delegate != null)
-                        delegate.onReset(entity);
-                });
+			if (toolbar instanceof HasComponents) {
+				HasComponents c = (HasComponents) toolbar;
+				decorateToolbar(c);
+				saveButton = new Button("SAVE");
+				saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+				saveButton.addClickListener(cl -> {
+					if (entity != null) {
+						try {
+							validateForm();
+							if (delegate != null)
+								delegate.onSave(entity);
+							if (dialog != null && dialogAutoClose) {
+								dialog.close();
+							}
+						} catch (Exception e) {
+							// e.printStackTrace();
+							// Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+						}
+					}
+				});
 
-                dismissButton = new Button("DISMISS");
-                dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-                dismissButton.addClickListener(cl -> {
-                    if (dialog != null) {
-                        dialog.close();
-                    }
-                    if (delegate != null)
-                        delegate.onDismiss(entity);
-                });
+				customizeSaveButton(saveButton);
 
-                resetButton.getElement().getStyle().set("margin-left", "auto");
-                c.add(saveButton, resetButton, dismissButton);
+				resetButton = new Button("RESET");
+				resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+				resetButton.addClickListener(cl -> {
+					dataBinder.readBean(entity);
+					if (delegate != null)
+						delegate.onReset(entity);
+				});
 
-            }
+				dismissButton = new Button("DISMISS");
+				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+				dismissButton.addClickListener(cl -> {
+					if (dialog != null) {
+						dialog.close();
+					}
+					if (delegate != null)
+						delegate.onDismiss(entity);
+				});
 
-            Scroller scroller = new Scroller();
-            scroller.setSizeFull();
-            VerticalLayout entityFormLayout = new VerticalLayout(entityForm);
-            entityFormLayout.setSizeFull();
-            entityFormLayout.setMargin(false);
-            entityFormLayout.setSpacing(false);
-            entityFormLayout.setPadding(true);
-            scroller.setContent(entityFormLayout);
+				resetButton.getElement().getStyle().set("margin-left", "auto");
+				c.add(saveButton, resetButton, dismissButton);
 
-            List<GxTabItem> tabItems = new ArrayList<>();
-            addTabsToForm(tabItems);
-            tabItems.add(GxTabItem.create(0, defaultTabTitle(), scroller));
+			}
 
-            if (tabItems.size() >= 2) {
-                addTab(tabItems);
-            } else {
-                add(scroller);
-            }
+			Scroller scroller = new Scroller();
+			scroller.setSizeFull();
+			VerticalLayout entityFormLayout = new VerticalLayout(entityForm);
+			entityFormLayout.setSizeFull();
+			entityFormLayout.setMargin(false);
+			entityFormLayout.setSpacing(false);
+			entityFormLayout.setPadding(true);
+			scroller.setContent(entityFormLayout);
 
-            add(toolbar);
+			List<GxTabItem> tabItems = new ArrayList<>();
+			addTabsToForm(tabItems);
+			tabItems.add(GxTabItem.create(0, defaultTabTitle(), scroller));
 
-            dataBinder = new Binder<>(entityClass, true);
-            bindFields(dataBinder);
-            try {
-                dataBinder.bindInstanceFields(GxAbstractEntityForm.this);
-            } catch (Exception ex) {
-                log.warn(ex.getMessage());
-            }
-            postBuild();
+			if (tabItems.size() >= 2) {
+				addTab(tabItems);
+			} else {
+				add(scroller);
+			}
 
-            isBuilt = true;
-        }
-        return this;
+			add(toolbar);
 
-    }
+			dataBinder = new Binder<>(entityClass, true);
+			bindFields(dataBinder);
+			try {
+				dataBinder.bindInstanceFields(GxAbstractEntityForm.this);
+			} catch (Exception ex) {
+				log.warn(ex.getMessage());
+			}
+			postBuild();
 
-    public void validateForm() throws ValidationException {
-        dataBinder.validate();
-        dataBinder.writeBean(entity);
-    }
+			isBuilt = true;
+		}
+		return this;
 
-    private void buildFormTitle() {
-        if (formTitleLabel == null) {
-            formTitleLabel = new Label();
-            formTitleLabel.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
-            formTitleLabel.getStyle().set("font-weight", "bold");
-            formTitleLabel.getStyle().set("color", "var(--lumo-primary-color)");
-            formTitleLabel.getStyle().set("border-bottom", "none");
-            formTitleLabel.getStyle().set("border-radius", "var(--lumo-border-radius)");
-            formTitleLabel.getStyle().set("border-bottom-right-radius", "0px");
-            formTitleLabel.getStyle().set("border-bottom-left-radius", "0px");
-            formTitleLabel.getStyle().set("padding-left", "0.5em");
-            formTitleLabel.getStyle().set("padding-right", "0.5em");
-            formTitleLabel.getStyle().set("padding-top", "0.25em");
-            formTitleLayout = new HorizontalLayout();
-            formTitleLayout.getStyle().set("border-bottom", "2px solid var(--lumo-primary-color-10pct)");
-            formTitleLayout.getStyle().set("padding-left", "0.5em");
-            formTitleLayout.getStyle().set("padding-top", "0.5em");
-            formTitleLayout.setWidthFull();
-            formTitleLayout.add(formTitleLabel);
-            addComponentAsFirst(formTitleLayout);
-        }
-    }
+	}
 
-    protected String defaultTabTitle() {
-        return "Details";
-    }
+	public void validateForm() throws ValidationException {
+		dataBinder.validate();
+		dataBinder.writeBean(entity);
+	}
 
-    protected void customizeSaveButton(Button saveButton) {
-    }
+	private void buildFormTitle() {
+		if (formTitleLabel == null) {
+			formTitleLabel = new Label();
+			formTitleLabel.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
+			formTitleLabel.getStyle().set("font-weight", "bold");
+			formTitleLabel.getStyle().set("color", "var(--lumo-primary-color)");
+			formTitleLabel.getStyle().set("border-bottom", "none");
+			formTitleLabel.getStyle().set("border-radius", "var(--lumo-border-radius)");
+			formTitleLabel.getStyle().set("border-bottom-right-radius", "0px");
+			formTitleLabel.getStyle().set("border-bottom-left-radius", "0px");
+			formTitleLabel.getStyle().set("padding-left", "0.5em");
+			formTitleLabel.getStyle().set("padding-right", "0.5em");
+			formTitleLabel.getStyle().set("padding-top", "0.25em");
+			formTitleLayout = new HorizontalLayout();
+			formTitleLayout.getStyle().set("border-bottom", "2px solid var(--lumo-primary-color-10pct)");
+			formTitleLayout.getStyle().set("padding-left", "0.5em");
+			formTitleLayout.getStyle().set("padding-top", "0.5em");
+			formTitleLayout.setWidthFull();
+			formTitleLayout.add(formTitleLabel);
+			addComponentAsFirst(formTitleLayout);
+		}
+	}
 
-    protected String formTitle() {
-        return null;
-    }
+	protected String defaultTabTitle() {
+		return "Details";
+	}
 
-    protected String formTitleProperty() {
-        return null;
-    }
+	protected void customizeSaveButton(Button saveButton) {
+	}
 
-    protected void preBinding(T entity) {
-    }
+	protected String formTitle() {
+		return null;
+	}
 
-    protected void postBinding(T entity) {
-    }
+	protected String formTitleProperty() {
+		return null;
+	}
 
-    protected void postBuild() {
-    }
+	protected void preBinding(T entity) {
+	}
 
-    protected abstract void decorateForm(HasComponents entityForm);
+	protected void postBinding(T entity) {
+	}
 
-    protected void decorateToolbar(HasComponents toolbar) {
+	protected void postBuild() {
+	}
 
-    }
+	protected abstract void decorateForm(HasComponents entityForm);
 
-    protected void bindFields(Binder<T> dataBinder) {
-    }
+	protected void decorateToolbar(HasComponents toolbar) {
 
-    protected Component getToolbarComponent() {
-        HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
-        toolbar.getStyle().set("border-top-right-radius", "0px");
-        toolbar.getStyle().set("border-top-left-radius", "0px");
-        toolbar.getStyle().set("background-color", "#F8F8F8");
-        toolbar.setWidthFull();
-        toolbar.setPadding(true);
-        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-        return toolbar;
-    }
+	}
 
-    protected Component getFormComponent() {
-        FormLayout formLayout = new FormLayout();
-        formLayout.setSizeFull();
-        return formLayout;
-    }
+	protected void bindFields(Binder<T> dataBinder) {
+	}
 
-    protected void setColspan(Component c, int colspan) {
-        Component fc = getFormComponent();
-        if (fc instanceof FormLayout) {
-            FormLayout form = (FormLayout) fc;
-            form.setColspan(c, colspan);
-        }
-    }
+	protected Component getToolbarComponent() {
+		HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
+		toolbar.getStyle().set("border-top-right-radius", "0px");
+		toolbar.getStyle().set("border-top-left-radius", "0px");
+		toolbar.getStyle().set("background-color", "#F8F8F8");
+		toolbar.setWidthFull();
+		toolbar.setPadding(true);
+		toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+		return toolbar;
+	}
 
-    public void setEditable(boolean editable) {
-        this.editable = editable;
-    }
+	protected Component getFormComponent() {
+		FormLayout formLayout = new FormLayout();
+		formLayout.setSizeFull();
+		return formLayout;
+	}
 
-    public boolean isEditable() {
-        return editable;
-    }
+	protected void setColspan(Component c, int colspan) {
+		Component fc = getFormComponent();
+		if (fc instanceof FormLayout) {
+			FormLayout form = (FormLayout) fc;
+			form.setColspan(c, colspan);
+		}
+	}
 
-    public void setEntity(T entity) {
-        this.entity = entity;
-        build();
-        entityBound = false;
-        preBinding(entity);
-        dataBinder.readBean(entity);
-        entityBound = true;
-        if (tabs != null) {
-            tabs.setSelectedTab((Tab) tabs.getComponentAt(0));
-        }
-        postBinding(entity);
-        String formTitle = formTitle();
-        if (formTitle == null) {
-            String keyPath = formTitleProperty();
-            if (keyPath != null && !keyPath.isBlank()) {
-                formTitle = new KeyValueWrapper(entity).stringForKeyPath(keyPath);
-            }
-        }
-        formTitleLabel.setText(formTitle);
-        if (shouldFocusFirstFieldOnShow()) {
-            focusFirst(this);
-        }
-        saveButton.setVisible(isEditable());
-        resetButton.setVisible(isEditable());
-    }
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
 
-    protected boolean shouldFocusFirstFieldOnShow() {
-        return false;
-    }
+	public boolean isEditable() {
+		return editable;
+	}
 
-    private boolean focusFirst(Component c) {
-        if (c instanceof Focusable) {
-            ((Focusable<?>) c).focus();
-            return true;
-        }
-        List<Component> children = c.getChildren().collect(Collectors.toList());
-        for (Component child : children) {
-            if (focusFirst(child))
-                return true;
-        }
-        return false;
-    }
+	public void setEntity(T entity) {
+		this.entity = entity;
+		build();
+		entityBound = false;
+		preBinding(entity);
+		dataBinder.readBean(entity);
+		entityBound = true;
+		if (tabs != null) {
+			tabs.setSelectedTab((Tab) tabs.getComponentAt(0));
+		}
+		postBinding(entity);
+		String formTitle = formTitle();
+		if (formTitle == null) {
+			String keyPath = formTitleProperty();
+			if (keyPath != null && !keyPath.isBlank()) {
+				formTitle = new KeyValueWrapper(entity).stringForKeyPath(keyPath);
+			}
+		}
+		formTitleLabel.setText(formTitle);
+		formTitleLabel.setVisible(formTitle != null);
+		formTitleLayout.setVisible(formTitle != null);
+		if (shouldFocusFirstFieldOnShow()) {
+			focusFirst(this);
+		}
+		saveButton.setVisible(isEditable());
+		resetButton.setVisible(isEditable());
+	}
 
-    public T getEntity() {
-        return entity;
-    }
+	protected boolean shouldFocusFirstFieldOnShow() {
+		return false;
+	}
 
-    public GxDialog showInDialog(T entity) {
-        return showInDialog(entity, dialogWidth(), dialogHeight());
-    }
+	private boolean focusFirst(Component c) {
+		if (c instanceof Focusable) {
+			((Focusable<?>) c).focus();
+			return true;
+		}
+		List<Component> children = c.getChildren().collect(Collectors.toList());
+		for (Component child : children) {
+			if (focusFirst(child))
+				return true;
+		}
+		return false;
+	}
 
-    protected String dialogHeight() {
-        return "800px";
-    }
+	public T getEntity() {
+		return entity;
+	}
 
-    protected String dialogWidth() {
-        return "600px";
-    }
+	public GxDialog showInDialog(T entity) {
+		return showInDialog(entity, dialogWidth(), dialogHeight());
+	}
 
-    public GxDialog showInDialog(T entity, String width, String height) {
-        setEntity(entity);
-        dialog = new GxDialog(GxAbstractEntityForm.this);
-        dialog.addThemeVariants(DialogVariant.NO_PADDING);
-        dialog.setWidth(width);
-        dialog.setHeight(height);
-        dialog.setResizable(true);
-        dialog.setModal(true);
-        dialog.setCloseOnEsc(true);
-        dialog.setDraggable(true);
-        dialog.setResizable(true);
-        dialog.open();
-        return dialog;
-    }
+	protected String dialogHeight() {
+		return "800px";
+	}
 
-    public void closeDialog() {
-        if (dialog != null) {
-            dialog.close();
-        }
-    }
+	protected String dialogWidth() {
+		return "600px";
+	}
 
-    public void setDelegate(EntityFormDelegate<T> delegate) {
-        this.delegate = delegate;
-    }
+	public GxDialog showInDialog(T entity, String width, String height) {
+		setEntity(entity);
+		dialog = new GxDialog(GxAbstractEntityForm.this);
+		dialog.addThemeVariants(DialogVariant.NO_PADDING);
+		dialog.setWidth(width);
+		dialog.setHeight(height);
+		dialog.setResizable(true);
+		dialog.setModal(true);
+		dialog.setCloseOnEsc(getDialogCloseOnEsc());
+		dialog.setCloseOnOutsideClick(getDialogCloseOnOutsideClick());
+		dialog.setDraggable(true);
+		dialog.open();
+		return dialog;
+	}
 
-    private void addTab(List<GxTabItem> tabItems) {
-        Div selectedTab = new Div();
-        selectedTab.setSizeFull();
-        selectedTab.getStyle().set("overflow-x", "hidden");
-        tabs = new Tabs();
-        tabs.setWidthFull();
-        Component[] tabComponents = new Component[tabItems.size()];
+	public void closeDialog() {
+		if (dialog != null) {
+			dialog.close();
+		}
+	}
 
-        tabItems.sort(Comparator.comparing(GxTabItem::getIndex));
-        for (int i = 0; i < tabItems.size(); i++) {
-            GxTabItem tabItem = tabItems.get(i);
-            Tab tab = new Tab(tabItem.getLabel());
-            tabs.add(tab);
-            Component component = tabItem.getComponent();
-            if (i != 0) {
-                component.getElement().getStyle().set("padding", "10px");
-            }
-            tabComponents[i] = component;
-            if (i == 0) {
-                selectedTab.add(tabComponents[i]);
-            }
-        }
+	public void setDelegate(EntityFormDelegate<T> delegate) {
+		this.delegate = delegate;
+	}
 
-        tabs.addSelectedChangeListener(event -> {
-            Integer selectedIndex = tabs.getSelectedIndex();
-            Component selectedComponent = tabComponents[selectedIndex];
-            selectedTab.removeAll();
-            selectedTab.add(selectedComponent);
-            onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), selectedComponent);
-        });
+	private void addTab(List<GxTabItem> tabItems) {
+		Div selectedTab = new Div();
+		selectedTab.setSizeFull();
+		selectedTab.getStyle().set("overflow-x", "hidden");
+		tabs = new Tabs();
+		tabs.setWidthFull();
+		Component[] tabComponents = new Component[tabItems.size()];
 
-        add(tabs, selectedTab);
-    }
+		tabItems.sort(Comparator.comparing(GxTabItem::getIndex));
+		for (int i = 0; i < tabItems.size(); i++) {
+			GxTabItem tabItem = tabItems.get(i);
+			Tab tab = new Tab(tabItem.getLabel());
+			tabs.add(tab);
+			Component component = tabItem.getComponent();
+			if (i != 0) {
+				component.getElement().getStyle().set("padding", "10px");
+			}
+			tabComponents[i] = component;
+			if (i == 0) {
+				selectedTab.add(tabComponents[i]);
+			}
+		}
 
-    protected void addTabsToForm(List<GxTabItem> tabItems) {
-    }
+		tabs.addSelectedChangeListener(event -> {
+			Integer selectedIndex = tabs.getSelectedIndex();
+			Component selectedComponent = tabComponents[selectedIndex];
+			selectedTab.removeAll();
+			selectedTab.add(selectedComponent);
+			onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), selectedComponent);
+		});
 
-    protected void onTabChange(Integer index, Tab tab, Component component) {
-    }
+		add(tabs, selectedTab);
+	}
 
-    protected void setTabEnabled(Integer index, Boolean value) {
-        Component c = tabs.getComponentAt(index);
-        if (c instanceof Tab) {
-            Tab tab = (Tab) c;
-            tab.setEnabled(value);
-        }
-    }
+	protected void addTabsToForm(List<GxTabItem> tabItems) {
+	}
 
-    public interface EntityFormDelegate<T> {
-        void onSave(T entity);
+	protected void onTabChange(Integer index, Tab tab, Component component) {
+	}
 
-        default void onDismiss(T entity) {
-        }
+	protected void setTabEnabled(Integer index, Boolean value) {
+		Component c = tabs.getComponentAt(index);
+		if (c instanceof Tab) {
+			Tab tab = (Tab) c;
+			tab.setEnabled(value);
+		}
+	}
 
-        default void onReset(T entity) {
-        }
-    }
+	public interface EntityFormDelegate<T> {
+		void onSave(T entity);
 
-    protected boolean isEntityBound() {
-        return entityBound;
-    }
+		default void onDismiss(T entity) {
+		}
+
+		default void onReset(T entity) {
+		}
+	}
+
+	protected boolean isEntityBound() {
+		return entityBound;
+	}
 
 }
