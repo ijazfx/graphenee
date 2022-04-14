@@ -42,15 +42,20 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
             protected Stream<T> fetchChildrenFromBackEnd(HierarchicalQuery<T, T> query) {
                 return getData(query.getParent(), query.getFilter().orElse(initializeSearchEntity()));
             }
+
+            @Override
+            public boolean isInMemory() {
+                return true;
+            }
         };
         return (DataProvider<T, T>) dataProvider.withConfigurableFilter();
     }
 
-    protected abstract int getChildCount(T parent, T probe);
+    protected abstract int getChildCount(T parent, T searchEntity);
 
     protected abstract boolean hasChildren(T parent);
 
-    protected abstract Stream<T> getData(T parent, T probe);
+    protected abstract Stream<T> getData(T parent, T searchEntity);
 
     @Override
     final protected Stream<T> getData() {
