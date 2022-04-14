@@ -178,6 +178,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
             formTitleLabel.getStyle().set("padding-right", "0.5em");
             formTitleLabel.getStyle().set("padding-top", "0.25em");
             formTitleLayout = new HorizontalLayout();
+            formTitleLayout.addClassName("draggable");
             formTitleLayout.getStyle().set("border-bottom", "2px solid var(--lumo-primary-color-10pct)");
             formTitleLayout.getStyle().set("padding-left", "0.5em");
             formTitleLayout.getStyle().set("padding-top", "0.5em");
@@ -320,12 +321,20 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
         dialog.setWidth(width);
         dialog.setHeight(height);
         dialog.setResizable(true);
-        dialog.setModal(true);
+        dialog.setModal(isModeless());
         dialog.setCloseOnEsc(true);
         dialog.setDraggable(true);
         dialog.setResizable(true);
         dialog.open();
         return dialog;
+    }
+
+    /**
+     * If returned false, the dialog will close when clicked outside the form. Default value is true.
+     * @return
+     */
+    protected boolean isModeless() {
+        return false;
     }
 
     public void closeDialog() {
