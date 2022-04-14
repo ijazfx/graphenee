@@ -113,7 +113,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
                 });
 
                 dismissButton = new Button("DISMISS");
-                dismissButton.addClickShortcut(Key.ESCAPE, KeyModifier.ALT);
+                dismissButton.addClickShortcut(Key.ESCAPE);
                 dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
                 dismissButton.addClickListener(cl -> {
                     if (dialog != null) {
