@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -81,6 +83,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
                 HasComponents c = (HasComponents) toolbar;
                 decorateToolbar(c);
                 saveButton = new Button("SAVE");
+                saveButton.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 saveButton.addClickListener(cl -> {
                     if (entity != null) {
@@ -101,6 +104,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
                 customizeSaveButton(saveButton);
 
                 resetButton = new Button("RESET");
+                resetButton.addClickShortcut(Key.KEY_R, KeyModifier.ALT);
                 resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
                 resetButton.addClickListener(cl -> {
                     dataBinder.readBean(entity);
@@ -109,6 +113,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
                 });
 
                 dismissButton = new Button("DISMISS");
+                dismissButton.addClickShortcut(Key.ESCAPE, KeyModifier.ALT);
                 dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
                 dismissButton.addClickListener(cl -> {
                     if (dialog != null) {

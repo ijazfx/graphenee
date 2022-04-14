@@ -19,10 +19,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.claspina.confirmdialog.ButtonOption;
+import org.claspina.confirmdialog.ConfirmDialog;
+
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.ShortcutRegistration;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -74,9 +79,6 @@ import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
-
-import org.claspina.confirmdialog.ButtonOption;
-import org.claspina.confirmdialog.ConfirmDialog;
 
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
@@ -150,6 +152,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     private TRParamCallback<T> onSingleItemSelect;
 
     private Binder<T> searchBinder;
+
+    private ShortcutRegistration addMenuItemShortcut;
+
+    private ShortcutRegistration editMenuItemShortcut;
+
+    private ShortcutRegistration deleteMenuItemShortcut;
 
     public GxAbstractEntityList(Class<T> entityClass) {
         this.entityClass = entityClass;
@@ -420,9 +428,22 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             }
 
             postBuild();
+            enableShortcuts();
             isBuilt = true;
         }
         return this;
+    }
+
+    protected void enableShortcuts() {
+        addMenuItemShortcut = addMenuItem.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        editMenuItemShortcut = editMenuItem.addClickShortcut(Key.KEY_O, KeyModifier.ALT);
+        deleteMenuItemShortcut = deleteMenuItem.addClickShortcut(Key.DELETE, KeyModifier.ALT);
+    }
+
+    protected void disableShortcuts() {
+        addMenuItemShortcut.remove();
+        editMenuItemShortcut.remove();
+        deleteMenuItemShortcut.remove();
     }
 
     protected boolean isGridInlineEditingEnabled() {
@@ -900,7 +921,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                 formLayout.add(entityForm);
                 mainLayout.getSecondaryComponent().setVisible(true);
             } else {
+                disableShortcuts();
                 dialog = entityForm.showInDialog(entity);
+                dialog.addOpenedChangeListener(l -> {
+                    enableShortcuts();
+                });
             }
         } else {
             if (mainLayout.getSecondaryComponent() != null)
