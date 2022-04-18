@@ -74,7 +74,7 @@
       "@webcomponents/webcomponentsjs": "^2.2.10",
       "apexcharts": "3.26.3",
       "construct-style-sheets-polyfill": "3.0.4",
-      "lit-element": "2.5.1",
+      "lit-element": "^2.2.1",
       "lit-html": "1.4.1",
       "multiselect-combo-box": "2.4.2",
       "onecolor": "3.1.0",
@@ -83,7 +83,7 @@
     },
     "devDependencies": {
       "babel-loader": "8.2.2",
-      "chokidar": "^3.5.0",
+      "chokidar": "^3.4.0",
       "compression-webpack-plugin": "4.0.1",
       "copy-webpack-plugin": "5.1.2",
       "css-loader": "4.2.1",
@@ -96,7 +96,7 @@
       "ts-loader": "8.0.12",
       "typescript": "4.0.3",
       "webpack": "4.42.0",
-      "webpack-babel-multi-target-plugin": "2.5.0",
+      "webpack-babel-multi-target-plugin": "2.3.3",
       "webpack-cli": "3.3.11",
       "webpack-dev-server": "3.11.0",
       "webpack-merge": "4.2.2"
@@ -174,7 +174,7 @@
     "@webcomponents/webcomponentsjs": "^2.2.10",
     "apexcharts": "3.33.1",
     "construct-style-sheets-polyfill": "3.0.4",
-    "lit-element": "2.5.1",
+    "lit-element": "^2.2.1",
     "lit-html": "1.4.1",
     "multiselect-combo-box": "2.4.2",
     "onecolor": "3.1.0",
@@ -183,7 +183,7 @@
   },
   "devDependencies": {
     "babel-loader": "8.2.2",
-    "chokidar": "^3.5.0",
+    "chokidar": "^3.4.0",
     "compression-webpack-plugin": "4.0.1",
     "copy-webpack-plugin": "5.1.2",
     "css-loader": "4.2.1",
@@ -196,7 +196,7 @@
     "ts-loader": "8.0.12",
     "typescript": "4.0.3",
     "webpack": "4.42.0",
-    "webpack-babel-multi-target-plugin": "2.5.0",
+    "webpack-babel-multi-target-plugin": "2.3.3",
     "webpack-cli": "3.3.11",
     "webpack-dev-server": "3.11.0",
     "webpack-merge": "4.2.2"
