@@ -17,13 +17,14 @@ package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
-public interface GxEmailTemplateRepository extends GxJpaRepository<GxEmailTemplate, Integer> {
+public interface GxEmailTemplateRepository extends GxJpaRepository<GxEmailTemplate, Integer>, JpaSpecificationExecutor<GxEmailTemplate> {
 
 	List<GxEmailTemplate> findAllByGxNamespaceOidOrderByTemplateName(Integer oidNamespace);
 

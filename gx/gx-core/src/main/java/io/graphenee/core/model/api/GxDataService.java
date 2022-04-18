@@ -230,20 +230,28 @@ public interface GxDataService {
 
 	GxSavedQueryBean save(GxSavedQueryBean bean);
 
+	@Deprecated
 	GxEmailTemplateBean findEmailTemplateByTemplateNameActive(String templateName);
 
+	@Deprecated
 	GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace);
 
+	@Deprecated
 	GxEmailTemplateBean findEmailTemplateByTemplateCodeActive(String templateCode);
 
+	@Deprecated
 	GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace);
 
+	@Deprecated
 	List<GxEmailTemplateBean> findEmailTemplate();
 
+	@Deprecated
 	List<GxEmailTemplateBean> findEmailTemplateByNamespace(GxNamespaceBean namespace);
 
+	@Deprecated
 	GxEmailTemplateBean save(GxEmailTemplateBean bean);
 
+	@Deprecated
 	void delete(GxEmailTemplateBean bean);
 
 	@Deprecated
@@ -251,14 +259,19 @@ public interface GxDataService {
 
 	GxNamespace findOrCreateNamespaceEntity(String namespace);
 
+	@Deprecated
 	GxEmailTemplateBean findEmailTemplate(Integer oid);
 
+	@Deprecated
 	List<GxEmailTemplateBean> findEmailTemplateByNamespaceActive(GxNamespaceBean namespace);
 
+	@Deprecated
 	List<GxEmailTemplateBean> findEmailTemplateByNamespaceInactive(GxNamespaceBean namespace);
 
+	@Deprecated
 	List<GxEmailTemplateBean> findEmailTemplateActive();
 
+	@Deprecated
 	List<GxEmailTemplateBean> findEmailTemplateInactive();
 
 	List<GxSecurityGroupBean> findSecurityGroupActive();

@@ -27,10 +27,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.EqualsAndHashCode.Include;
+
 /**
  * The persistent class for the gx_email_template database table.
  * 
  */
+@Data
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "gx_email_template")
 @NamedQuery(name = "GxEmailTemplate.findAll", query = "SELECT g FROM GxEmailTemplate g")
@@ -38,6 +44,7 @@ public class GxEmailTemplate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Include
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
@@ -56,7 +63,7 @@ public class GxEmailTemplate implements Serializable {
 	private Boolean isActive;
 
 	@Column(name = "is_protected")
-	private Boolean isProtected;
+	private Boolean isProtected = false;
 
 	private String subject;
 
@@ -73,104 +80,5 @@ public class GxEmailTemplate implements Serializable {
 
 	@Column(name = "sender_email_address")
 	private String senderEmailAddress;
-
-	public GxEmailTemplate() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public String getBccList() {
-		return this.bccList;
-	}
-
-	public void setBccList(String bccList) {
-		this.bccList = bccList;
-	}
-
-	public String getBody() {
-		return this.body;
-	}
-
-	public void setBody(String body) {
-		this.body = body;
-	}
-
-	public String getSmsBody() {
-		return smsBody;
-	}
-
-	public void setSmsBody(String smsBody) {
-		this.smsBody = smsBody;
-	}
-
-	public String getCcList() {
-		return this.ccList;
-	}
-
-	public void setCcList(String ccList) {
-		this.ccList = ccList;
-	}
-
-	public Boolean getIsActive() {
-		return this.isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Boolean getIsProtected() {
-		return this.isProtected;
-	}
-
-	public void setIsProtected(Boolean isProtected) {
-		this.isProtected = isProtected;
-	}
-
-	public String getSubject() {
-		return this.subject;
-	}
-
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
-	public String getTemplateName() {
-		return this.templateName;
-	}
-
-	public void setTemplateName(String templateName) {
-		this.templateName = templateName;
-	}
-
-	public String getTemplateCode() {
-		return templateCode;
-	}
-
-	public void setTemplateCode(String templateCode) {
-		this.templateCode = templateCode;
-	}
-
-	public GxNamespace getGxNamespace() {
-		return this.gxNamespace;
-	}
-
-	public void setGxNamespace(GxNamespace gxNamespace) {
-		this.gxNamespace = gxNamespace;
-	}
-
-	public String getSenderEmailAddress() {
-		return senderEmailAddress;
-	}
-
-	public void setSenderEmailAddress(String senderEmailAddress) {
-		this.senderEmailAddress = senderEmailAddress;
-	}
 
 }

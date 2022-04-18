@@ -4,6 +4,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 
 import io.graphenee.vaadin.flow.base.GxMenuItem;
 import io.graphenee.vaadin.flow.device_mgmt.GxRegisteredDeviceListView;
+import io.graphenee.vaadin.flow.email_template.GxEmailTemplateListView;
 import io.graphenee.vaadin.flow.i18n.GxSupportedLocaleView;
 import io.graphenee.vaadin.flow.i18n.GxTermView;
 import io.graphenee.vaadin.flow.namespace.GxNamespaceListView;
@@ -27,13 +28,18 @@ public class GxMenuItemFactory {
 		return menu;
 	}
 
-	public static GxMenuItem registerdDevicesMenuItem() {
+	public static GxMenuItem registeredDevicesMenuItem() {
 		GxMenuItem menu = GxMenuItem.create("Registered Devices", VaadinIcon.MOBILE.create(), GxRegisteredDeviceListView.class);
 		return menu;
 	}
 
 	public static GxMenuItem smsProvidersMenuItem() {
 		GxMenuItem menu = GxMenuItem.create("SMS Providers", VaadinIcon.CHAT.create(), GxSmsProviderListView.class);
+		return menu;
+	}
+
+	public static GxMenuItem messageTemplateMenuItem() {
+		GxMenuItem menu = GxMenuItem.create("Message Templates", VaadinIcon.ENVELOPE_OPEN_O.create(), GxEmailTemplateListView.class);
 		return menu;
 	}
 
@@ -49,7 +55,7 @@ public class GxMenuItemFactory {
 		menu.add(securityMenuItem());
 		menu.add(i18nMenuItem());
 		menu.add(namespaceMenuItem());
-		menu.add(registerdDevicesMenuItem());
+		menu.add(registeredDevicesMenuItem());
 		menu.add(smsProvidersMenuItem());
 		return menu;
 	}
