@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -25,7 +27,6 @@ import com.vaadin.flow.data.binder.ValidationException;
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,14 +61,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	@Setter
 	private Boolean dialogAutoClose = true;
 
-	@Setter
-	@Getter
-	private Boolean dialogCloseOnOutsideClick = false;
-
-	@Setter
-	@Getter
-	private Boolean dialogCloseOnEsc = true;
-
 	public GxAbstractEntityForm(Class<T> entityClass) {
 		this.entityClass = entityClass;
 		setSizeFull();
@@ -90,6 +83,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				HasComponents c = (HasComponents) toolbar;
 				decorateToolbar(c);
 				saveButton = new Button("SAVE");
+				saveButton.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
 				saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 				saveButton.addClickListener(cl -> {
 					if (entity != null) {
@@ -110,6 +104,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				customizeSaveButton(saveButton);
 
 				resetButton = new Button("RESET");
+				resetButton.addClickShortcut(Key.KEY_R, KeyModifier.ALT);
 				resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 				resetButton.addClickListener(cl -> {
 					dataBinder.readBean(entity);
@@ -118,6 +113,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 
 				dismissButton = new Button("DISMISS");
+				dismissButton.addClickShortcut(Key.ESCAPE);
 				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 				dismissButton.addClickListener(cl -> {
 					if (dialog != null) {
@@ -187,6 +183,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			formTitleLabel.getStyle().set("padding-right", "0.5em");
 			formTitleLabel.getStyle().set("padding-top", "0.25em");
 			formTitleLayout = new HorizontalLayout();
+			formTitleLayout.addClassName("draggable");
 			formTitleLayout.getStyle().set("border-bottom", "2px solid var(--lumo-primary-color-10pct)");
 			formTitleLayout.getStyle().set("padding-left", "0.5em");
 			formTitleLayout.getStyle().set("padding-top", "0.5em");
@@ -282,8 +279,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			}
 		}
 		formTitleLabel.setText(formTitle);
-		formTitleLabel.setVisible(formTitle != null);
-		formTitleLayout.setVisible(formTitle != null);
 		if (shouldFocusFirstFieldOnShow()) {
 			focusFirst(this);
 		}
@@ -331,12 +326,20 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		dialog.setWidth(width);
 		dialog.setHeight(height);
 		dialog.setResizable(true);
-		dialog.setModal(true);
-		dialog.setCloseOnEsc(getDialogCloseOnEsc());
-		dialog.setCloseOnOutsideClick(getDialogCloseOnOutsideClick());
+		dialog.setModal(isModeless());
+		dialog.setCloseOnEsc(true);
 		dialog.setDraggable(true);
+		dialog.setResizable(true);
 		dialog.open();
 		return dialog;
+	}
+
+	/**
+	 * If returned false, the dialog will close when clicked outside the form. Default value is true.
+	 * @return
+	 */
+	protected boolean isModeless() {
+		return false;
 	}
 
 	public void closeDialog() {
