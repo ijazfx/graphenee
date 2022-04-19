@@ -159,6 +159,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			List<GxDocument> docs = docRepo.findByOidFolder(folder.getOid());
 			items.addAll(docs);
 		}
+		items.sort((a, b) -> b.isFile().compareTo(a.isFile()));
 		return items;
 	}
 
