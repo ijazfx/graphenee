@@ -4,13 +4,13 @@
 	<name>Graphenee Util</name>
 	<description>Graphenee utilities</description>
 
-	<!-- Parent -->
-	<parent>
-		<groupId>io.graphenee</groupId>
-		<artifactId>gx</artifactId>
-		<version>3.6.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+  <!-- Parent -->
+  <parent>
+      <groupId>io.graphenee</groupId>
+      <artifactId>gx</artifactId>
+      <version>3.5.0</version>
+      <relativePath>..</relativePath>
+  </parent>
 
 	<!-- Dependencies -->
 	<dependencies>
