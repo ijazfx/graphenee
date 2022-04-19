@@ -5,13 +5,13 @@
 	<name>Graphenee jBPM Embedded</name>
 	<description>Embedded jBPM Module</description>
 
-	<!-- Parent -->
-	<parent>
-		<groupId>io.graphenee</groupId>
-		<version>3.6.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-		<artifactId>gx</artifactId>
-	</parent>
+    <!-- Parent -->
+  <parent>
+      <groupId>io.graphenee</groupId>
+      <version>3.6.0-SNAPSHOT</version>
+      <relativePath>..</relativePath>
+      <artifactId>gx</artifactId>
+  </parent>
 
 	<properties>
 		<version.jbpm>6.4.0.Final</version.jbpm>

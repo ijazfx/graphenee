@@ -4,13 +4,13 @@
 	<name>Graphenee UI (Vaadin 7)</name>
 	<description>UI components for Graphenee Framework</description>
 
-	<!-- Parent -->
-	<parent>
-		<groupId>io.graphenee</groupId>
-		<artifactId>gx</artifactId>
-		<version>3.6.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+  <!-- Parent -->
+  <parent>
+      <groupId>io.graphenee</groupId>
+      <artifactId>gx</artifactId>
+      <version>3.6.0-SNAPSHOT</version>
+      <relativePath>..</relativePath>
+  </parent>
 
 	<properties>
 		<version.vaadin>7.7.24</version.vaadin>
