@@ -94,7 +94,7 @@ public class GxEmailTemplateForm extends GxAbstractEntityForm<GxEmailTemplate> {
 		ccList.setMaxHeight("150px");
 		ccList.setWidthFull();
 
-		bccList = new TextArea("CC To");
+		bccList = new TextArea("BCC To");
 		bccList.setPlaceholder("Separate email addresses with , or;");
 		bccList.setClearButtonVisible(true);
 		bccList.setMinHeight("75px");
