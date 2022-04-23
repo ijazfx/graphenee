@@ -5,30 +5,34 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
 @GxSecuredView(GxRegisteredDeviceListView.VIEW_NAME)
 public class GxRegisteredDeviceListView extends GxVerticalLayoutView {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String VIEW_NAME = "registered-devices";
+	public static final String VIEW_NAME = "registered-devices";
 
-    @Autowired
-    private GxRegisteredDeviceList list;
+	@Autowired
+	private GxRegisteredDeviceList list;
 
-    @Override
-    protected void decorateLayout(HasComponents rootLayout) {
-        rootLayout.add(list);
-    }
+	@Autowired(required = false)
+	private GxNamespace namespace;
 
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-        list.refresh();
-    }
+	@Override
+	protected void decorateLayout(HasComponents rootLayout) {
+		rootLayout.add(list);
+	}
 
-    @Override
-    protected String getCaption() {
-        return "Registered Device";
-    }
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		list.initializeWithNamespace(namespace);
+	}
+
+	@Override
+	protected String getCaption() {
+		return "Registered Device";
+	}
 }

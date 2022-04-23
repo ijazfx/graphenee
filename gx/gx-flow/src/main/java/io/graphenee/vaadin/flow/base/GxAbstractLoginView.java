@@ -38,14 +38,19 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 		setClassName("gx-abstract-login-view");
 		getStyle().set("display", "flex");
 		getStyle().set("flex-flow", "initial");
-		getStyle().set("background", "var(--app-layout-bar-background-color)");
+		getStyle().set("background", "var(--app-layout-drawer-background-color)");
 		setJustifyContentMode(JustifyContentMode.CENTER);
 	}
 
 	@PostConstruct
 	private void postBuild() {
 		VerticalLayout loginLayout = new VerticalLayout();
+		loginLayout.setSpacing(false);
+		loginLayout.setPadding(false);
 		loginLayout.setWidth("-1px");
+		loginLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+		loginLayout.getElement().getStyle().set("background", "white");
+
 		LoginForm loginForm = new LoginForm();
 		loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
 		loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
@@ -71,11 +76,6 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 				registerRoutesOnSuccessfulAuthentication(rc, user);
 				flowSetup().menuItems().forEach(mi -> {
 					registerRoute(user, rc, mi);
-					if (mi.hasChildren()) {
-						mi.getChildren().forEach(cmi -> {
-							registerRoute(user, rc, cmi);
-						});
-					}
 				});
 				getUI().ifPresent(ui -> {
 					if (lastRoute != null && user.canDoAction(lastRoute, "view")) {
@@ -100,6 +100,7 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
 		appLogo = flowSetup().appLogo();
 		if (appLogo != null) {
+			appLogo.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
 			loginLayout.addComponentAsFirst(appLogo);
 		}
 	}
@@ -111,6 +112,11 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 			rc.removeRoute(navigationTarget);
 			rc.removeRoute(route);
 			rc.setRoute(route, navigationTarget, List.of(flowSetup().routerLayout()));
+		}
+		if (mi.hasChildren()) {
+			mi.getChildren().forEach(cmi -> {
+				registerRoute(user, rc, cmi);
+			});
 		}
 	}
 
