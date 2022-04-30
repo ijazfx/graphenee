@@ -21,7 +21,7 @@ import com.vaadin.flow.router.AfterNavigationEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
@@ -29,10 +29,10 @@ import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 @Scope("prototype")
 public class GxTermView extends GxVerticalLayoutView {
 
-	public static final String VIEW_NAME = "transalations";
+	public static final String VIEW_NAME = "translations";
 
 	@Autowired(required = false)
-	GxNamespaceBean appNamespace;
+	private GxNamespace namespace;
 
 	@Autowired
 	GxTermListPanel termListPanel;
@@ -44,12 +44,12 @@ public class GxTermView extends GxVerticalLayoutView {
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
-		add(termListPanel);
+		rootLayout.add(termListPanel);
 	}
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		termListPanel.initializeWithNamespace(appNamespace);
+		termListPanel.initializeWithNamespace(namespace);
 	}
 
 }

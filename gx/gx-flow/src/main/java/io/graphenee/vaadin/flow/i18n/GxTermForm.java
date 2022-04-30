@@ -71,7 +71,7 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 		isActive = new Checkbox("Is Active?", true);
 
 		gxTermTablePanel.initializeWithEntity(getEntity());
-		gxTermTablePanel.setHeight("300px");
+		gxTermTablePanel.setHeight("480px");
 
 		entityForm.add(termKey, isActive, gxTermTablePanel);
 		setColspan(gxTermTablePanel, 2);
@@ -107,7 +107,11 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 
 	@Override
 	protected String dialogHeight() {
-		return "500px";
+		return "650px";
 	}
 
+	@Override
+	protected String dialogWidth() {
+		return "650px";
+	}
 }

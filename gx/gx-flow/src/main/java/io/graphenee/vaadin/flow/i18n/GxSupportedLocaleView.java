@@ -45,7 +45,7 @@ public class GxSupportedLocaleView extends GxVerticalLayoutView {
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
-		add(supportedLocaleListPanel);
+		rootLayout.add(supportedLocaleListPanel);
 	}
 
 	@Override
