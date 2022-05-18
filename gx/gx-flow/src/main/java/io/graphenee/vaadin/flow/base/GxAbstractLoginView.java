@@ -36,9 +36,6 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 	public GxAbstractLoginView() {
 		setSizeFull();
 		setClassName("gx-abstract-login-view");
-		getStyle().set("display", "flex");
-		getStyle().set("flex-flow", "initial");
-		getStyle().set("background", "var(--app-layout-drawer-background-color)");
 		setJustifyContentMode(JustifyContentMode.CENTER);
 	}
 
