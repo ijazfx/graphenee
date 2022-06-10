@@ -25,11 +25,23 @@ import java.util.function.Function;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.vaadin.dialogs.ConfirmDialog;
+import org.vaadin.gridutil.cell.GridCellFilter;
+import org.vaadin.viritin.FilterableListContainer;
+import org.vaadin.viritin.button.MButton;
+import org.vaadin.viritin.fields.MTextField;
+import org.vaadin.viritin.grid.MGrid;
+import org.vaadin.viritin.label.MLabel;
+import org.vaadin.viritin.layouts.MHorizontalLayout;
+import org.vaadin.viritin.layouts.MPanel;
+import org.vaadin.viritin.layouts.MVerticalLayout;
+import org.vaadin.viritin.ui.MNotification;
+
 import com.google.common.base.Strings;
 import com.vaadin.addon.contextmenu.ContextMenu;
 import com.vaadin.addon.contextmenu.GridContextMenu;
-import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.converter.StringToIntegerConverter;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.event.ItemClickEvent;
@@ -53,19 +65,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.dialogs.ConfirmDialog;
-import org.vaadin.gridutil.cell.GridCellFilter;
-import org.vaadin.viritin.button.MButton;
-import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.grid.MGrid;
-import org.vaadin.viritin.label.MLabel;
-import org.vaadin.viritin.layouts.MHorizontalLayout;
-import org.vaadin.viritin.layouts.MPanel;
-import org.vaadin.viritin.layouts.MVerticalLayout;
-import org.vaadin.viritin.ui.MNotification;
-
 import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.vaadin.component.ExportDataSpreadSheetComponent;
@@ -81,7 +80,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
     private Class<T> entityClass;
     private boolean isBuilt;
     private MGrid<T> mainGrid;
-    private BeanItemContainer<T> mainGridContainer;
+    private FilterableListContainer<T> mainGridContainer;
     private AbstractLayout toolbar;
     private AbstractLayout secondaryToolbar;
     private MButton addButton;
@@ -295,7 +294,7 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
     private MGrid<T> buildMainGrid() {
         MGrid<T> grid = new MGrid<>(entityClass);
         grid.setStyleName("entity-grid");
-        mainGridContainer = new BeanItemContainer<>(entityClass);
+        mainGridContainer = new FilterableListContainer<>(entityClass);
         grid.setContainerDataSource(mainGridContainer);
         grid.setSizeFull();
         grid.setHeightMode(HeightMode.CSS);
@@ -303,7 +302,8 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
         if (visibleProperties != null) {
             for (String propertyId : visibleProperties()) {
                 if (propertyId.contains(".")) {
-                    mainGridContainer.addNestedContainerProperty(propertyId);
+                    //@TODO: no implementation available yet.
+                    //  mainGridContainer.addNestedContainerProperty(propertyId);
                 }
             }
             grid.withProperties(visibleProperties());
@@ -330,18 +330,36 @@ public abstract class AbstractEntityListPanel<T> extends MPanel {
         grid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
         grid.addItemClickListener(new TRItemClickListener() {
 
+            //            @Override
+            //            public void onItemClick(ItemClickEvent event) {
+            //                if (event.getPropertyId() != null) {
+            //                    Item  = mainGridContainer.getItem(event.getItemId());
+            //                    BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
+            //                    if (item != null) {
+            //                        if (onItemClick != null) {
+            //                            Boolean value = onItemClick.apply(item.getBean());
+            //                            if (value != null && value == true) {
+            //                                onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+            //                            }
+            //                        } else {
+            //                            onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+            //                        }
+            //                    }
+            //                }
+            //            }
+
             @Override
             public void onItemClick(ItemClickEvent event) {
                 if (event.getPropertyId() != null) {
-                    BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
+                    T item = (T) event.getItemId();
                     if (item != null) {
                         if (onItemClick != null) {
-                            Boolean value = onItemClick.apply(item.getBean());
+                            Boolean value = onItemClick.apply(item);
                             if (value != null && value == true) {
-                                onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+                                onGridItemClicked(item, event.getPropertyId() != null ? event.getPropertyId().toString() : "");
                             }
                         } else {
-                            onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+                            onGridItemClicked(item, event.getPropertyId() != null ? event.getPropertyId().toString() : "");
                         }
                     }
                 }

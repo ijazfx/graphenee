@@ -9,30 +9,32 @@ import io.graphenee.core.model.entity.GxNamespace;
 
 public interface GxDocumentExplorerService {
 
-	GxFolder findOrCreateNamespaceFolder(GxNamespace namespace);
+    GxFolder findOrCreateNamespaceFolder(GxNamespace namespace);
 
-	List<GxFolder> findFolder(GxFolder parent, String... sortKey);
+    List<GxFolder> findFolder(GxFolder parent, String... sortKey);
 
-	List<GxDocument> findDocument(GxFolder parent, String... sortKey);
+    List<GxDocument> findDocument(GxFolder parent, String... sortKey);
 
-	List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey);
+    List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey);
 
-	List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> item);
+    List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> item);
 
-	List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders);
+    List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders);
 
-	List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents);
+    List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents);
 
-	GxDocument createDocumentVersion(GxDocument parent, GxDocument newDocument);
+    GxDocument createDocumentVersion(GxDocument parent, GxDocument newDocument);
 
-	void deleteExplorerItem(List<GxDocumentExplorerItem> items);
+    void deleteExplorerItem(List<GxDocumentExplorerItem> items);
 
-	void deleteFolder(List<GxFolder> folders);
+    void deleteFolder(List<GxFolder> folders);
 
-	void deleteDocument(List<GxDocument> documents);
+    void deleteDocument(List<GxDocument> documents);
 
-	Long countChildren(GxDocumentExplorerItem parent);
+    Long countChildren(GxDocumentExplorerItem parent);
 
-	List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, String... sortKey);
+    List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, String... sortKey);
+
+    List<GxDocumentExplorerItem> search(GxDocumentExplorerItem parent, String searchTerm, String... sortKey);
 
 }
