@@ -4,8 +4,8 @@
 }
 
 * {
-	--lumo-space-xl: 1.875rem;
-	--lumo-space-l: 1.25rem;
+	--lumo-space-xl: 1.125rem;
+	--lumo-space-l: 0.625rem;
 	--lumo-space-m: 0.625rem;
 	--lumo-space-s: 0.3125rem;
 	--lumo-space-xs: 0.1875rem;
@@ -40,10 +40,16 @@
 	--app-layout-bar-font-color: #fff;
 }
 
-.gx-abstract-login-view {
+.gx-login-view {
 	display: flex;
-	flex-flow: initial;
-	background: #36454f;
+	flex-flow: column;
+	background: var(--app-layout-bar-background-color);
+}
+
+.gx-reset-password-view {
+	display: flex;
+	flex-flow: column;
+	background: var(--app-layout-bar-background-color);
 }
 
 ::-webkit-scrollbar {

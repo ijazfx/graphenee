@@ -37,4 +37,10 @@ public interface GxDocumentExplorerService {
 
     List<GxDocumentExplorerItem> search(GxDocumentExplorerItem parent, String searchTerm, String... sortKey);
 
+    void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
+
+    void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
+
+    void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem parent);
+
 }

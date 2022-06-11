@@ -22,6 +22,9 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
+import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
+import com.vaadin.flow.component.grid.dnd.GridDropEvent;
+import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -82,6 +85,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     private HorizontalLayout breadcrumbLayout;
 
     private GxDownloadButton downloadButton;
+
+    private List<GxDocumentExplorerItem> draggedItems;
 
     public GxDocumentExplorer() {
         super(GxDocumentExplorerItem.class);
@@ -144,12 +149,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
     @Override
     protected String[] visibleProperties() {
-        return new String[] { "extension", "name", "size", "version" };
+        return new String[] { "extension", "name", "version", "size" };
     }
 
     @Override
     protected void decorateColumn(String propertyName, Column<GxDocumentExplorerItem> column) {
-        if (propertyName.equals("extension")) {
+        if (propertyName.matches("(extension)")) {
             column.setHeader("");
             column.setAutoWidth(false);
             column.setWidth("50px");
@@ -253,6 +258,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
     @Override
     protected void postBuild() {
+        setRowDraggable(true);
         folderForm.setDelegate(folder -> {
             documentService.saveFolder(selectedFolder, List.of(folder));
             refresh();
@@ -407,6 +413,54 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         } else {
             downloadButton.setEnabled(false);
         }
+    }
+
+    @Override
+    protected void onDrop(GridDropEvent<GxDocumentExplorerItem> event) {
+        try {
+            if (event.getDropLocation() != GridDropLocation.EMPTY) {
+                GxDocumentExplorerItem targetItem = event.getDropTargetItem().orElse(null);
+                if (event.getDropLocation() == GridDropLocation.ON_TOP) {
+                    changeParent(draggedItems, targetItem);
+                } else if (event.getDropLocation() == GridDropLocation.ABOVE) {
+                    positionBefore(draggedItems, targetItem);
+                } else if (event.getDropLocation() == GridDropLocation.BELOW) {
+                    positionAfter(draggedItems, targetItem);
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            draggedItems = null;
+        }
+    }
+
+    private void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
+        System.out.println("Moving Before " + targetItem.getName());
+        documentService.positionBefore(items, targetItem);
+        refresh();
+    }
+
+    private void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
+        System.out.println("Moving After " + targetItem.getName());
+        documentService.positionAfter(items, targetItem);
+        refresh();
+    }
+
+    private void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
+        System.out.println("Moving In " + targetItem.getName());
+        documentService.changeParent(items, targetItem);
+        refresh();
+    }
+
+    @Override
+    protected void onDragStart(GridDragStartEvent<GxDocumentExplorerItem> event) {
+        draggedItems = event.getDraggedItems();
+    }
+
+    @Override
+    public boolean isDragAndDropEnabled() {
+        return true;
     }
 
 }

@@ -1,33 +1,50 @@
 package io.graphenee.core.model.entity;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface GxDocumentExplorerItem {
 
-	Boolean isFile();
+    Boolean isFile();
 
-	String getMimeType();
+    String getMimeType();
 
-	String getExtension();
+    String getExtension();
 
-	String getName();
+    String getName();
 
-	void setName(String name);
+    void setName(String name);
 
-	String getNote();
+    String getNote();
 
-	void setNote(String note);
+    void setNote(String note);
 
-	Integer getVersion();
+    Integer getVersion();
 
-	Long getSize();
+    Long getSize();
 
-	Boolean hasChildren();
+    Boolean hasChildren();
 
-	Integer getChildCount();
+    Integer getChildCount();
 
-	List<GxDocumentExplorerItem> getChildren();
+    List<GxDocumentExplorerItem> getChildren();
 
-	GxDocumentExplorerItem getParent();
+    GxDocumentExplorerItem getParent();
+
+    Integer getSortOrder();
+
+    Timestamp getIssueDate();
+
+    Timestamp getExpiryDate();
+
+    Integer getExpiryReminderInDays();
+
+    Timestamp getReminderDate();
+
+    void setIssueDate(Timestamp issueDate);
+
+    void setExpiryDate(Timestamp expiryDate);
+
+    void setExpiryReminderInDays(Integer expiryReminderInDays);
 
 }

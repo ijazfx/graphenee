@@ -19,7 +19,7 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
 
     public GxAbstractEntityTreeList(Class<T> entityClass) {
         super(entityClass);
-        addClassName("gx-abstract-entity-tree-list");
+        addClassName("gx-entity-tree-list");
     }
 
     @Override

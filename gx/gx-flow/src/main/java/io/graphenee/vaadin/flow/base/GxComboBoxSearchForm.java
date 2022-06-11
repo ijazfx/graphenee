@@ -31,7 +31,7 @@ public class GxComboBoxSearchForm<T> extends VerticalLayout {
         setMargin(false);
         setPadding(true);
         setSpacing(true);
-        addClassName("gx-abstract-entity-form");
+        addClassName("gx-entity-form");
     }
 
     public GxComboBoxSearchForm<T> build() {

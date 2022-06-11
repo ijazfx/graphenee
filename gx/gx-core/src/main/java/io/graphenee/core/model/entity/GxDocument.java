@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import org.json.JSONObject;
 
 import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
+import io.graphenee.util.TRCalendarUtil;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
@@ -31,96 +32,109 @@ import lombok.Setter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class GxDocument implements Serializable, GxDocumentExplorerItem {
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer oid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer oid;
 
-	UUID documentId = UUID.randomUUID();
-	
-	@Include
-	String name;
-	
-	String note;
-	String mimeType;
-	Long size;
-	
-	@Include
-	Integer versionNo = 0;
-	String path;
-	
-	@Convert(converter = GxStringToJsonConverter.class)
-	JSONObject tags;
-	
-	@Include
-	@ManyToOne
-	@JoinColumn(name = "oid_document")
-	GxDocument document;
-	
-	@Include
-	@ManyToOne
-	@JoinColumn(name = "oid_folder")
-	GxFolder folder;
-	
-	@Include
-	@ManyToOne
-	@JoinColumn(name = "oid_namespace")
-	GxNamespace namespace;
+    UUID documentId = UUID.randomUUID();
 
-	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
-	List<GxDocument> versions = new ArrayList<>();
+    @Include
+    String name;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "gx_document_audit_log_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
-	List<GxAuditLog> auditLogs = new ArrayList<>();
+    String note;
+    String mimeType;
+    Long size;
 
-	public void audit(GxUserAccount user, String event) {
-		GxAuditLog log = new GxAuditLog();
-		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
-		log.setAuditEvent(event);
-		log.setGxUserAccount(user);
-		auditLogs.add(log);
-	}
+    @Include
+    Integer versionNo = 0;
+    String path;
 
-	@Override
-	public Boolean isFile() {
-		return true;
-	}
+    Integer sortOrder = 0;
+    Integer expiryReminderInDays = 30;
+    Timestamp issueDate;
+    Timestamp expiryDate;
 
-	@Override
-	public List<GxDocumentExplorerItem> getChildren() {
-		return new ArrayList<>(getVersions());
-	}
+    @Convert(converter = GxStringToJsonConverter.class)
+    JSONObject tags;
 
-	@Override
-	public Boolean hasChildren() {
-		return !getVersions().isEmpty();
-	}
+    @Include
+    @ManyToOne
+    @JoinColumn(name = "oid_document")
+    GxDocument document;
 
-	@Override
-	public Integer getChildCount() {
-		return hasChildren() ? getVersions().size() : 0;
-	}
+    @Include
+    @ManyToOne
+    @JoinColumn(name = "oid_folder")
+    GxFolder folder;
 
-	@Override
-	public Integer getVersion() {
-		return versionNo;
-	}
+    @Include
+    @ManyToOne
+    @JoinColumn(name = "oid_namespace")
+    GxNamespace namespace;
 
-	@Override
-	public String getExtension() {
-		if (path != null) {
-			String[] parts = path.trim().split("\\.");
-			if (parts.length > 0) {
-				return parts[parts.length - 1].toLowerCase();
-			}
-		}
-		return null;
-	}
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<GxDocument> versions = new ArrayList<>();
 
-	@Override
-	public GxDocumentExplorerItem getParent() {
-		return getFolder();
-	}
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "gx_document_audit_log_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
+    List<GxAuditLog> auditLogs = new ArrayList<>();
+
+    public void audit(GxUserAccount user, String event) {
+        GxAuditLog log = new GxAuditLog();
+        log.setAuditDate(new Timestamp(System.currentTimeMillis()));
+        log.setAuditEvent(event);
+        log.setGxUserAccount(user);
+        auditLogs.add(log);
+    }
+
+    @Override
+    public Boolean isFile() {
+        return true;
+    }
+
+    @Override
+    public List<GxDocumentExplorerItem> getChildren() {
+        return new ArrayList<>(getVersions());
+    }
+
+    @Override
+    public Boolean hasChildren() {
+        return !getVersions().isEmpty();
+    }
+
+    @Override
+    public Integer getChildCount() {
+        return hasChildren() ? getVersions().size() : 0;
+    }
+
+    @Override
+    public Integer getVersion() {
+        return versionNo;
+    }
+
+    @Override
+    public String getExtension() {
+        if (path != null) {
+            String[] parts = path.trim().split("\\.");
+            if (parts.length > 0) {
+                return parts[parts.length - 1].toLowerCase();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public GxDocumentExplorerItem getParent() {
+        return getFolder();
+    }
+
+    public Timestamp getReminderDate() {
+        if (expiryDate != null) {
+            return new Timestamp(TRCalendarUtil.minusDaysToDate(expiryDate, expiryReminderInDays).getTime());
+        }
+        return null;
+    }
 
 }

@@ -722,14 +722,11 @@ public class TRCalendarUtil {
     }
 
     public static Date toDateFromLocalDate(LocalDate localDate) {
-
         return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-
     }
 
     public static Date toDateFromLocalDateTime(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-
     }
 
     public static LocalDate toLocalDateFromDate(Date date) {

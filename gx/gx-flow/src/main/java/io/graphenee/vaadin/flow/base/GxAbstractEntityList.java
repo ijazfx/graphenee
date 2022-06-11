@@ -116,8 +116,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     private MenuItem addMenuItem;
 
-    private MenuItem editMenuItem;
-
     private MenuItem deleteMenuItem;
 
     private MenuItem columnsMenuItem;
@@ -155,8 +153,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     private ShortcutRegistration addMenuItemShortcut;
 
-    private ShortcutRegistration editMenuItemShortcut;
-
     private ShortcutRegistration deleteMenuItemShortcut;
 
     public GxAbstractEntityList(Class<T> entityClass) {
@@ -166,7 +162,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         setMargin(false);
         setPadding(false);
         setSpacing(false);
-        addClassName("gx-abstract-entity-list");
+        addClassName("gx-entity-list");
     }
 
     protected T initializeSearchEntity() {
@@ -197,6 +193,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             if (dataProvider != null) {
                 dataGrid.setDataProvider(dataProvider);
             }
+
+            dataGrid.setDropFilter(this::onDropFilter);
 
             dataGrid.addDragStartListener(event -> {
                 onDragStart(event);
@@ -239,9 +237,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             addMenuItem = crudMenuBar.addItem(VaadinIcon.PLUS.create());
             customizeAddMenuItem(addMenuItem);
 
-            editMenuItem = crudMenuBar.addItem(VaadinIcon.EDIT.create());
-            customizeEditMenuItem(editMenuItem);
-
             deleteMenuItem = crudMenuBar.addItem(VaadinIcon.TRASH.create());
             customizeDeleteMenuItem(deleteMenuItem);
 
@@ -283,7 +278,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
             columnsMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
 
-            editMenuItem.setEnabled(false);
             deleteMenuItem.setEnabled(false);
 
             FormLayout searchForm = new FormLayout();
@@ -392,7 +386,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
             dataGrid.addSelectionListener(sl -> {
                 int selected = sl.getAllSelectedItems().size();
-                editMenuItem.setEnabled(selected == 1);
                 deleteMenuItem.setEnabled(selected > 0);
                 if (onSelection != null) {
                     Boolean value = onSelection.apply(sl.getAllSelectedItems());
@@ -436,13 +429,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     protected void enableShortcuts() {
         addMenuItemShortcut = addMenuItem.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
-        editMenuItemShortcut = editMenuItem.addClickShortcut(Key.KEY_O, KeyModifier.ALT);
         deleteMenuItemShortcut = deleteMenuItem.addClickShortcut(Key.DELETE, KeyModifier.ALT);
     }
 
     protected void disableShortcuts() {
         addMenuItemShortcut.remove();
-        editMenuItemShortcut.remove();
         deleteMenuItemShortcut.remove();
     }
 
@@ -557,6 +548,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     protected void onDragStart(GridDragStartEvent<T> event) {
     }
 
+    protected boolean onDropFilter(T item) {
+        return true;
+    }
+
     protected void setColumnVisibility(String propertyName, boolean isVisible) {
         MenuItem mi = hidingColumnMap.get(propertyName);
         if (mi != null) {
@@ -615,7 +610,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
                     try {
                         onDelete(dataGrid.getSelectedItems());
                         refresh();
-                        editMenuItem.setEnabled(false);
                         deleteMenuItem.setEnabled(false);
                         dataGrid.deselectAll();
                     } catch (Exception e) {
@@ -640,6 +634,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         if (searchEntity == null) {
             searchEntity = initializeSearchEntity();
         }
+        if (column.getKey().matches("(extension|download)"))
+            return;
         AbstractField<?, ?> columnFilter = defaultColumnFilterForProperty(column.getKey(), propertyDefinition);
         columnFilter.addValueChangeListener(event -> {
             if (entityGrid().getDataProvider() instanceof InMemoryDataProvider) {
@@ -959,7 +955,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__gxEditColumn")).forEach(c -> c.setVisible(isEditable()));
         if (isDragAndDropEnabled()) {
             dataGrid.setRowsDraggable(isRowDraggable());
-            dataGrid.setDropMode(GridDropMode.ON_GRID);
+            dataGrid.setDropMode(GridDropMode.ON_TOP_OR_BETWEEN);
         } else {
             dataGrid.setRowsDraggable(false);
             dataGrid.setDropMode(null);

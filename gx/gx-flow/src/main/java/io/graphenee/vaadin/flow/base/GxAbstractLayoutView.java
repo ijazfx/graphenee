@@ -25,7 +25,7 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
         setSizeFull();
         getElement().getStyle().set("margin", "0");
         getElement().getStyle().set("padding", "0");
-        addClassName("gx-abstract-layout-view");
+        addClassName("gx-layout-view");
     }
 
     @PostConstruct

@@ -16,7 +16,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 
     public GxAbstractEntityLazyList(Class<T> entityClass) {
         super(entityClass);
-        addClassName("gx-abstract-entity-lazy-list");
+        addClassName("gx-entity-lazy-list");
     }
 
     @Override

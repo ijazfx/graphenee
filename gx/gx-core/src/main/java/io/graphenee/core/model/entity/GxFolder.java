@@ -31,102 +31,137 @@ import lombok.Setter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class GxFolder implements Serializable, GxDocumentExplorerItem {
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer oid;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer oid;
 
-	UUID folderId = UUID.randomUUID();
-	
-	@Include
-	String name;
-	
-	String note;
-	
-	@Convert(converter = GxStringToJsonConverter.class)
-	JSONObject tags;
-	
-	@Include
-	@ManyToOne
-	@JoinColumn(name = "oid_folder")
-	GxFolder folder;
-	
-	@Include
-	@ManyToOne
-	@JoinColumn(name = "oid_namespace")
-	GxNamespace namespace;
+    UUID folderId = UUID.randomUUID();
 
-	@OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-	List<GxFolder> folders = new ArrayList<>();
+    @Include
+    String name;
 
-	@OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-	List<GxDocument> documents = new ArrayList<>();
+    String note;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "gx_folder_audit_log_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
-	List<GxAuditLog> auditLogs = new ArrayList<>();
+    @Convert(converter = GxStringToJsonConverter.class)
+    JSONObject tags;
 
-	public void audit(GxUserAccount user, String event) {
-		GxAuditLog log = new GxAuditLog();
-		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
-		log.setAuditEvent(event);
-		log.setGxUserAccount(user);
-		auditLogs.add(log);
-	}
+    Integer sortOrder = 0;
 
-	@Override
-	public Boolean isFile() {
-		return false;
-	}
+    @Include
+    @ManyToOne
+    @JoinColumn(name = "oid_folder")
+    GxFolder folder;
 
-	@Override
-	public String getMimeType() {
-		return null;
-	}
+    @Include
+    @ManyToOne
+    @JoinColumn(name = "oid_namespace")
+    GxNamespace namespace;
 
-	@Override
-	public Long getSize() {
-		return 0L;
-	}
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<GxFolder> folders = new ArrayList<>();
 
-	@Override
-	public List<GxDocumentExplorerItem> getChildren() {
-		List<GxDocumentExplorerItem> items = new ArrayList<>(getFolders());
-		items.addAll(getDocuments());
-		return items;
-	}
+    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<GxDocument> documents = new ArrayList<>();
 
-	@Override
-	public Boolean hasChildren() {
-		return !getFolders().isEmpty() || !getDocuments().isEmpty();
-	}
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "gx_folder_audit_log_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
+    List<GxAuditLog> auditLogs = new ArrayList<>();
 
-	@Override
-	public Integer getChildCount() {
-		return hasChildren() ? getFolders().size() + getDocuments().size() : 0;
-	}
+    public void audit(GxUserAccount user, String event) {
+        GxAuditLog log = new GxAuditLog();
+        log.setAuditDate(new Timestamp(System.currentTimeMillis()));
+        log.setAuditEvent(event);
+        log.setGxUserAccount(user);
+        auditLogs.add(log);
+    }
 
-	@Override
-	public Integer getVersion() {
-		return null;
-	}
+    @Override
+    public Boolean isFile() {
+        return false;
+    }
 
-	@Override
-	public String getExtension() {
-		return null;
-	}
+    @Override
+    public String getMimeType() {
+        return null;
+    }
 
-	@Override
-	public GxDocumentExplorerItem getParent() {
-		return getFolder();
-	}
+    @Override
+    public Long getSize() {
+        return 0L;
+    }
 
-	public GxDocument addDocument(GxDocument document) {
-		if (!documents.contains(document)) {
-			documents.add(document);
-			document.setFolder(this);
-		}
-		return document;
-	}
+    @Override
+    public List<GxDocumentExplorerItem> getChildren() {
+        List<GxDocumentExplorerItem> items = new ArrayList<>(getFolders());
+        items.addAll(getDocuments());
+        return items;
+    }
+
+    @Override
+    public Boolean hasChildren() {
+        return !getFolders().isEmpty() || !getDocuments().isEmpty();
+    }
+
+    @Override
+    public Integer getChildCount() {
+        return hasChildren() ? getFolders().size() + getDocuments().size() : 0;
+    }
+
+    @Override
+    public Integer getVersion() {
+        return null;
+    }
+
+    @Override
+    public String getExtension() {
+        return null;
+    }
+
+    @Override
+    public GxDocumentExplorerItem getParent() {
+        return getFolder();
+    }
+
+    public GxDocument addDocument(GxDocument document) {
+        if (!documents.contains(document)) {
+            documents.add(document);
+            document.setFolder(this);
+        }
+        return document;
+    }
+
+    @Override
+    public Timestamp getIssueDate() {
+        return null;
+    }
+
+    @Override
+    public Timestamp getExpiryDate() {
+        return null;
+    }
+
+    @Override
+    public Integer getExpiryReminderInDays() {
+        return null;
+    }
+
+    @Override
+    public Timestamp getReminderDate() {
+        return null;
+    }
+
+    @Override
+    public void setIssueDate(Timestamp issueDate) {
+    }
+
+    @Override
+    public void setExpiryDate(Timestamp expiryDate) {
+    }
+
+    @Override
+    public void setExpiryReminderInDays(Integer expiryReminderInDays) {
+    }
 
 }

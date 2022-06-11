@@ -16,8 +16,11 @@ import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigatio
 import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.VaadinSession;
 
@@ -35,7 +38,7 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
     @PostConstruct
     private void postBuild() {
         AppLayoutBuilder<LeftHybrid> builder = AppLayoutBuilder.get(LeftLayouts.LeftHybrid.class);
-        builder = builder.withTitle(buildTitle());
+        builder = builder.withTitle(buildTitleComponent());
         builder.withAppMenu(buildAppMenu());
         if (flowSetup().loggedInUser() != null) {
             builder.withAppBar(AppBarBuilder.get().add(buildProfileMenu()).build());
@@ -103,8 +106,17 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
         }
     }
 
-    private String buildTitle() {
-        return flowSetup().appTitleWithVersion();
+    private Component buildTitleComponent() {
+        HorizontalLayout headingLayout = new HorizontalLayout();
+        headingLayout.setAlignItems(Alignment.BASELINE);
+        Span heading = new Span(flowSetup().appTitle());
+        heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
+        heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+        Span version = new Span(flowSetup().appVersion());
+        version.getStyle().set("color", "var(--app-layout-bar-font-color)");
+        version.getStyle().set("font-size", "var(--lumo-font-size-s)");
+        headingLayout.add(heading, version);
+        return headingLayout;
     }
 
     private Component buildProfileMenu() {
