@@ -40,6 +40,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.FooterRow;
+import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -155,6 +157,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     private ShortcutRegistration deleteMenuItemShortcut;
 
+    private FooterCell totalCountFooterCell;
+
     public GxAbstractEntityList(Class<T> entityClass) {
         this.entityClass = entityClass;
         this.searchBinder = new Binder<>(entityClass);
@@ -167,18 +171,22 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
     protected T initializeSearchEntity() {
         try {
-            if (searchEntity == null) {
-                searchEntity = entityClass.getDeclaredConstructor().newInstance();
-                searchBinder.setBean(searchEntity);
-            }
-            return searchEntity;
+            return entityClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             return null;
         }
     }
 
     protected T getSearchEntity() {
-        return initializeSearchEntity();
+        try {
+            if (searchEntity == null) {
+                searchEntity = initializeSearchEntity();
+                searchBinder.setBean(searchEntity);
+            }
+            return searchEntity;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -421,6 +429,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             }
 
             postBuild();
+
+            FooterRow footer1 = dataGrid.appendFooterRow();
+            FooterRow footer2 = dataGrid.appendFooterRow();
+            totalCountFooterCell = footer2.join(footer2.getCells());
+
             enableShortcuts();
             isBuilt = true;
         }
@@ -968,12 +981,23 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
         if (dataProvider instanceof InMemoryDataProvider) {
             items.clear();
             items.addAll(getData().collect(Collectors.toList()));
+            updateTotalCountFooter(items.size());
             dataProvider.refreshAll();
         } else {
             dataProvider.refreshAll();
         }
         if (entityGrid() instanceof TreeGrid) {
-            ((TreeGrid<T>) entityGrid()).collapse(entityGrid().getSelectedItems());
+            ((TreeGrid<T>) entityGrid()).expand(entityGrid().getSelectedItems());
+        }
+    }
+
+    protected final void updateTotalCountFooter(int count) {
+        if (count == 0) {
+            totalCountFooterCell.setText("No records");
+        } else if (count == 1) {
+            totalCountFooterCell.setText("1 record");
+        } else {
+            totalCountFooterCell.setText(count + " records");
         }
     }
 

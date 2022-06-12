@@ -30,7 +30,7 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
 
             @Override
             public int getChildCount(HierarchicalQuery<T, T> query) {
-                return GxAbstractEntityTreeList.this.getChildCount(query.getParent(), query.getFilter().orElse(initializeSearchEntity()));
+                return GxAbstractEntityTreeList.this.getChildCount(query.getParent());
             }
 
             @Override
@@ -57,19 +57,19 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
         int pageNumber = offset / limit;
         int remainder = offset % limit == 0 ? 0 : offset - (pageNumber * limit);
         int pageSize = limit;
-        Stream<T> stream = getData(pageNumber, pageSize, query.getParent(), query.getFilter().orElse(initializeSearchEntity()));
+        Stream<T> stream = getData(pageNumber, pageSize, query.getParent());
         if (remainder != 0) {
-            Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getParent(), query.getFilter().orElse(initializeSearchEntity()));
+            Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getParent());
             stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
         }
         return stream;
     }
 
-    protected abstract int getChildCount(T parent, T searchEntity);
+    protected abstract int getChildCount(T parent);
 
     protected abstract boolean hasChildren(T parent);
 
-    protected abstract Stream<T> getData(int pageNumber, int pageSize, T parent, T searchEntity);
+    protected abstract Stream<T> getData(int pageNumber, int pageSize, T parent);
 
     @Override
     final protected Stream<T> getData() {

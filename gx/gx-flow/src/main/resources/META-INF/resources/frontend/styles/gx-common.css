@@ -96,6 +96,10 @@ div[slot="application-content"] {
   white-space: normal;
 }
 
+[part~="row"][last] {
+	border-bottom: 2px solid var(--lumo-contrast-10pct);
+}
+
 :host([theme~="no-padding"]) [part="content"] {
     padding:0;
 }

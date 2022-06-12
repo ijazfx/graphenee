@@ -22,8 +22,11 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
     @Override
     @SuppressWarnings("unchecked")
     protected DataProvider<T, T> dataProvider(Class<T> entityClass) {
-        CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query),
-                query -> getTotalCount(query.getFilter().orElse(initializeSearchEntity())));
+        CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query), query -> {
+            int count = getTotalCount(query.getFilter().orElse(initializeSearchEntity()));
+            updateTotalCountFooter(count);
+            return count;
+        });
         return (DataProvider<T, T>) fromFilteringCallbacks.withConfigurableFilter();
     }
 

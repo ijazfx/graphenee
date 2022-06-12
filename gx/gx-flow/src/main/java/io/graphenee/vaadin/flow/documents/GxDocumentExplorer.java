@@ -28,7 +28,6 @@ import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -51,6 +50,7 @@ import io.graphenee.vaadin.flow.component.GxNotification;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplorerItem> {
@@ -93,27 +93,27 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     }
 
     @Override
-    protected int getChildCount(GxDocumentExplorerItem parent, GxDocumentExplorerItem probe) {
+    protected int getChildCount(GxDocumentExplorerItem parent) {
         if (parent != null) {
-            return documentService.countChildren(parent).intValue();
+            return documentService.countChildren(parent, getSearchEntity()).intValue();
         }
-        return documentService.countChildren(selectedFolder).intValue();
+        return documentService.countChildren(selectedFolder, getSearchEntity()).intValue();
     }
 
     @Override
     protected boolean hasChildren(GxDocumentExplorerItem parent) {
         if (parent != null) {
-            return documentService.countChildren(parent) > 0;
+            return documentService.countChildren(parent, getSearchEntity()) > 0;
         }
-        return documentService.countChildren(selectedFolder) > 0;
+        return documentService.countChildren(selectedFolder, getSearchEntity()) > 0;
     }
 
     @Override
-    protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem parent, GxDocumentExplorerItem probe) {
+    protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem parent) {
         if (parent != null) {
-            return documentService.findExplorerItem(parent, "name").stream();
+            return documentService.findExplorerItem(parent, getSearchEntity(), "name").stream();
         }
-        return documentService.findExplorerItem(selectedFolder, "name").stream();
+        return documentService.findExplorerItem(selectedFolder, getSearchEntity(), "name").stream();
     }
 
     private void generateBreadcrumb(GxDocumentExplorerItem parent) {
@@ -366,13 +366,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
     protected void decorateSearchForm(FormLayout searchForm, Binder<GxDocumentExplorerItem> searchBinder) {
         breadcrumbLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         searchForm.add(breadcrumbLayout, 10);
-
-        TextField searchField = new TextField();
-        searchField.setPlaceholder("Type here to search for documents...");
-        searchForm.add(searchField, 10);
-
-        searchBinder.bind(searchField, "name");
-        searchBinder.addValueChangeListener(vcl -> refresh());
     }
 
     @Override
@@ -382,6 +375,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
         downloadButton.setInputStreamFactory(this::downloadFile);
         downloadButton.setEnabled(false);
         toolbarLayout.add(downloadButton);
+        super.decorateToolbarLayout(toolbarLayout);
     }
 
     public InputStream downloadFile() {

@@ -164,4 +164,12 @@ public class GxFolder implements Serializable, GxDocumentExplorerItem {
     public void setExpiryReminderInDays(Integer expiryReminderInDays) {
     }
 
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

@@ -31,11 +31,9 @@ public interface GxDocumentExplorerService {
 
     void deleteDocument(List<GxDocument> documents);
 
-    Long countChildren(GxDocumentExplorerItem parent);
+    Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity);
 
-    List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, String... sortKey);
-
-    List<GxDocumentExplorerItem> search(GxDocumentExplorerItem parent, String searchTerm, String... sortKey);
+    List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, String... sortKey);
 
     void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
 

@@ -2,6 +2,10 @@ package io.graphenee.vaadin.flow.security;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.flowingcode.vaadin.addons.twincolgrid.TwinColGrid;
 //import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
@@ -13,10 +17,7 @@ import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.validator.EmailValidator;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import com.vaadin.flow.data.value.ValueChangeMode;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
@@ -85,11 +86,12 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
         // System.err.println(GenderEnum.valueOf("M"));
 
         newPassword = new PasswordField("New Password");
-        password = new PasswordField("Confirm Password");
+        newPassword.setValueChangeMode(ValueChangeMode.EAGER);
 
+        password = new PasswordField("Confirm Password");
         newPassword.addValueChangeListener(vcl -> {
             password.clear();
-            password.setEnabled(vcl.getValue().length() > 1);
+            password.setEnabled(vcl.getValue().length() > 0);
         });
 
         imageUploader = new FileUploader("Profile Image");
@@ -99,9 +101,12 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
             System.err.println(event.getValue());
         });
 
-        entityForm.add(username, firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, newPassword, password, imageUploader);
+        entityForm.add(firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, username, newPassword, password, imageUploader);
 
+        setColspan(email, 2);
+        setColspan(username, 2);
         setColspan(isPasswordChangeRequired, 2);
+        setColspan(imageUploader, 2);
     }
 
     @Override
