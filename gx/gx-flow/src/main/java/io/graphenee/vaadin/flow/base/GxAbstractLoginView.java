@@ -67,17 +67,17 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
         appLogo = flowSetup().appLogo();
         if (appLogo != null) {
-            appLogo.getElement().getStyle().set("padding-left", "var(--lumo-space-l)");
             appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-            appLogo.setHeight("72px");
+            appLogo.setWidth("100px");
             rootLayout.add(appLogo);
+            rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
         }
 
         add(rootLayout);
 
         LoginForm loginForm = new LoginForm();
         loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-        loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
+        // loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
         loginForm.getElement().getStyle().set("background", "white");
         loginForm.setForgotPasswordButtonVisible(true);
         LoginI18n loginI18n = LoginI18n.createDefault();

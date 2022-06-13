@@ -100,4 +100,9 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
         return visibleProperties()[0];
     }
 
+    @Override
+    protected boolean shouldDisplayGridFooter() {
+        return false;
+    }
+
 }

@@ -430,14 +430,20 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
             postBuild();
 
-            FooterRow footer1 = dataGrid.appendFooterRow();
-            FooterRow footer2 = dataGrid.appendFooterRow();
-            totalCountFooterCell = footer2.join(footer2.getCells());
+            if (shouldDisplayGridFooter()) {
+                FooterRow footer1 = dataGrid.appendFooterRow();
+                FooterRow footer2 = dataGrid.appendFooterRow();
+                totalCountFooterCell = footer2.join(footer2.getCells());
+            }
 
             enableShortcuts();
             isBuilt = true;
         }
         return this;
+    }
+
+    protected boolean shouldDisplayGridFooter() {
+        return true;
     }
 
     protected void enableShortcuts() {
@@ -992,12 +998,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
     }
 
     protected final void updateTotalCountFooter(int count) {
-        if (count == 0) {
-            totalCountFooterCell.setText("No records");
-        } else if (count == 1) {
-            totalCountFooterCell.setText("1 record");
-        } else {
-            totalCountFooterCell.setText(count + " records");
+        if (shouldDisplayGridFooter()) {
+            if (count == 0) {
+                totalCountFooterCell.setText("No records");
+            } else if (count == 1) {
+                totalCountFooterCell.setText("1 record");
+            } else {
+                totalCountFooterCell.setText(count + " records");
+            }
         }
     }
 

@@ -67,10 +67,10 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 
         appLogo = flowSetup().appLogo();
         if (appLogo != null) {
-            appLogo.getElement().getStyle().set("padding-left", "var(--lumo-space-l)");
             appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-            appLogo.setHeight("72px");
+            appLogo.setWidth("100px");
             rootLayout.add(appLogo);
+            rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
         }
 
         // add content to loginForm
