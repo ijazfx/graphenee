@@ -23,7 +23,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
     @SuppressWarnings("unchecked")
     protected DataProvider<T, T> dataProvider(Class<T> entityClass) {
         CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query), query -> {
-            int count = getTotalCount(query.getFilter().orElse(initializeSearchEntity()));
+            int count = getTotalCount(query.getFilter().orElse(getSearchEntity()));
             updateTotalCountFooter(count);
             return count;
         });
@@ -38,9 +38,9 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
         int pageNumber = offset / limit;
         int remainder = offset % limit == 0 ? 0 : offset - (pageNumber * limit);
         int pageSize = limit;
-        Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(initializeSearchEntity()));
+        Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(getSearchEntity()));
         if (remainder != 0) {
-            Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(initializeSearchEntity()));
+            Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()));
             stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
         }
         return stream;
