@@ -1004,7 +1004,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
             } else if (count == 1) {
                 totalCountFooterCell.setText("1 record");
             } else {
-                totalCountFooterCell.setText(count + " records");
+                totalCountFooterCell.setText(DecimalFormat.getNumberInstance().format(count) + " records");
             }
         }
     }

@@ -13,7 +13,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 
-import io.graphenee.util.callback.TRErrorCallback;
+import io.graphenee.util.callback.TRBiParamCallback;
 import io.graphenee.util.callback.TRParamCallback;
 
 public class LongRunningTask {
@@ -22,19 +22,19 @@ public class LongRunningTask {
     private String successMessage;
     private String errorMessage;
 
-    private TRParamCallback<UI> actionCallback;
-    private TRErrorCallback errorCallback;
+    private TRParamCallback<UI> doneCallback;
+    private TRBiParamCallback<UI, Exception> errorCallback;
     private String doneCaption;
     private Button doneButton;
-    private Runnable task;
+    private TRParamCallback<UI> task;
     private UI ui;
 
-    private LongRunningTask(UI ui, Runnable task) {
+    private LongRunningTask(UI ui, TRParamCallback<UI> task) {
         this.ui = ui;
         this.task = task;
     }
 
-    public static LongRunningTask newTask(UI ui, Runnable task) {
+    public static LongRunningTask newTask(UI ui, TRParamCallback<UI> task) {
         return new LongRunningTask(ui, task);
     }
 
@@ -59,11 +59,11 @@ public class LongRunningTask {
     }
 
     public LongRunningTask withDoneCallback(TRParamCallback<UI> actionCallback) {
-        this.actionCallback = actionCallback;
+        this.doneCallback = actionCallback;
         return this;
     }
 
-    public LongRunningTask withErrorCallback(TRErrorCallback errorCallback) {
+    public LongRunningTask withErrorCallback(TRBiParamCallback<UI, Exception> errorCallback) {
         this.errorCallback = errorCallback;
         return this;
     }
@@ -78,11 +78,11 @@ public class LongRunningTask {
         VerticalLayout notificationLoadingLayout = new VerticalLayout(new Text(progressMessage != null ? progressMessage : "Task is in progress..."), progressBar);
         notification.add(notificationLoadingLayout);
 
-        if (actionCallback != null) {
+        if (doneCallback != null) {
             doneButton = new Button(doneCaption != null ? doneCaption : "Done");
             doneButton.addClickListener(cl -> {
                 notification.close();
-                actionCallback.execute(ui);
+                doneCallback.execute(ui);
             });
             doneButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         }
@@ -91,7 +91,7 @@ public class LongRunningTask {
         ui.push();
         Executors.newCachedThreadPool().execute(() -> {
             try {
-                task.run();
+                task.execute(ui);
                 ui.access(() -> {
                     notification.remove(notificationLoadingLayout);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
@@ -107,7 +107,7 @@ public class LongRunningTask {
                 Exception cause = cause(ex);
                 cause.printStackTrace();
                 if (errorCallback != null) {
-                    errorCallback.execute(cause);
+                    errorCallback.execute(ui, cause);
                 }
                 ui.access(() -> {
                     notification.remove(notificationLoadingLayout);
