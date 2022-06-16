@@ -28,12 +28,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.server.InputStreamFactory;
-import com.vaadin.flow.server.StreamRegistration;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinSession;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,6 +35,12 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.InputStreamFactory;
+import com.vaadin.flow.server.StreamRegistration;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.util.TRCalendarUtil;
@@ -94,7 +94,7 @@ public class GxExportDataComponent<T> {
     public void prepareDownload() {
         try {
             File file = File.createTempFile(UUID.randomUUID().toString(), "xls");
-            LongRunningTask task = LongRunningTask.newTask(UI.getCurrent(), () -> {
+            LongRunningTask task = LongRunningTask.newTask(UI.getCurrent(), ui -> {
                 try {
                     FileOutputStream fos = new FileOutputStream(file);
                     writeToOutputStream(fos);
