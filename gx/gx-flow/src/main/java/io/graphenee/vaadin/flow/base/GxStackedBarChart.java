@@ -28,30 +28,30 @@ import io.graphenee.util.TRCalendarUtil;
 
 public class GxStackedBarChart extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
-    private ApexCharts chart;
+	private static final long serialVersionUID = 1L;
+	private ApexCharts chart;
 
-    public GxStackedBarChart() {
-        String[] colors = new String[] { "#F3B415", "#F27036", "#4E88B4", "#46AF78", "#A93F55", "#2176FF", "#33A1FD", "#BAEE29" };
-        chart = ApexChartsBuilder.get().withColors(colors).withFill(FillBuilder.get().withColors(Arrays.asList(colors)).build())
-                .withChart(ChartBuilder.get().withType(Type.bar).withStacked(true).withStackType(StackType.normal).build())
-                .withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(false).withColumnWidth("80%").build()).build())
-                .withDataLabels(DataLabelsBuilder.get().withEnabled(false).build())
-                .withLegend(LegendBuilder.get().withShow(false).withPosition(Position.top).withHorizontalAlign(HorizontalAlign.left).build()).build();
-        add(chart);
-        chart.setHeight("200px");
-        setWidthFull();
-    }
+	public GxStackedBarChart() {
+		String[] colors = new String[] { "#F3B415", "#F27036", "#4E88B4", "#46AF78", "#A93F55", "#2176FF", "#33A1FD", "#BAEE29" };
+		chart = ApexChartsBuilder.get().withColors(colors).withFill(FillBuilder.get().withColors(Arrays.asList(colors)).build())
+				.withChart(ChartBuilder.get().withType(Type.bar).withStacked(true).withStackType(StackType.normal).build())
+				.withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(false).withColumnWidth("80%").build()).build())
+				.withDataLabels(DataLabelsBuilder.get().withEnabled(false).build())
+				.withLegend(LegendBuilder.get().withShow(false).withPosition(Position.top).withHorizontalAlign(HorizontalAlign.left).build()).build();
+		add(chart);
+		chart.setHeight("200px");
+		setWidthFull();
+	}
 
-    public void initializeWithTitleAndMaxYAndSeries(String verticalTitle, Double maxY, Date fromDate, Date toDate, List<Series<Double>> series) {
-        List<String> dateList = new ArrayList<>();
-        for (Date date = fromDate; date.before(toDate); date = TRCalendarUtil.addDaysToDate(date, 1)) {
-            dateList.add(TRCalendarUtil.getFormattedDate(date, "dd.MM"));
-        }
-        if (series != null && !series.isEmpty()) {
-            chart.updateSeries(series.toArray(new Series[series.size()]));
-            chart.setXaxis(XAxisBuilder.get().withLabels(LabelsBuilder.get().withRotate(-90.0).build()).withCategories(dateList).build());
-        }
-        chart.setYaxis(YAxisBuilder.get().withMax(maxY).withTitle(TitleBuilder.get().withText(verticalTitle).build()).build());
-    }
+	public void initializeWithTitleAndMaxYAndSeries(String verticalTitle, Double maxY, Date fromDate, Date toDate, List<Series<Double>> series) {
+		List<String> dateList = new ArrayList<>();
+		for (Date date = fromDate; date.before(toDate); date = TRCalendarUtil.addDaysToDate(date, 1)) {
+			dateList.add(TRCalendarUtil.getFormattedDate(date, "dd.MM"));
+		}
+		if (series != null && !series.isEmpty()) {
+			chart.updateSeries(series.toArray(new Series[series.size()]));
+			chart.setXaxis(XAxisBuilder.get().withLabels(LabelsBuilder.get().withRotate(-90.0).build()).withCategories(dateList).build());
+		}
+		chart.setYaxis(YAxisBuilder.get().withMax(maxY).withTitle(TitleBuilder.get().withText(verticalTitle).build()).build());
+	}
 }

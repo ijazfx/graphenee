@@ -26,179 +26,179 @@ import io.graphenee.util.callback.TRVoidCallback;
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
-    private Image appLogo;
+	private static final long serialVersionUID = 1L;
+	private Image appLogo;
 
-    private TextField usernameTextField;
-    private PasswordField passwordField;
-    private PasswordField retypePasswordField;
+	private TextField usernameTextField;
+	private PasswordField passwordField;
+	private PasswordField retypePasswordField;
 
-    public GxAbstractResetPasswordView() {
-        setSizeFull();
-        setClassName("gx-login-view");
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setAlignItems(Alignment.CENTER);
-    }
+	public GxAbstractResetPasswordView() {
+		setSizeFull();
+		setClassName("gx-login-view");
+		setJustifyContentMode(JustifyContentMode.CENTER);
+		setAlignItems(Alignment.CENTER);
+	}
 
-    @PostConstruct
-    private void postBuild() {
-        FlexLayout headingLayout = new FlexLayout();
-        headingLayout.setAlignItems(Alignment.BASELINE);
-        headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        headingLayout.setWidth("328px");
-        Span heading = new Span(flowSetup().appTitle());
-        heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-        heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
-        Span version = new Span(flowSetup().appVersion());
-        version.getStyle().set("color", "var(--app-layout-bar-font-color)");
-        version.getStyle().set("font-size", "var(--lumo-font-size-s)");
-        headingLayout.add(heading, version);
+	@PostConstruct
+	private void postBuild() {
+		FlexLayout headingLayout = new FlexLayout();
+		headingLayout.setAlignItems(Alignment.BASELINE);
+		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+		headingLayout.setWidth("328px");
+		Span heading = new Span(flowSetup().appTitle());
+		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
+		heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+		Span version = new Span(flowSetup().appVersion());
+		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
+		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
+		headingLayout.add(heading, version);
 
-        add(headingLayout);
+		add(headingLayout);
 
-        VerticalLayout rootLayout = new VerticalLayout();
-        rootLayout.setWidth("328px");
-        rootLayout.setSpacing(false);
-        rootLayout.setPadding(false);
-        rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-        rootLayout.getElement().getStyle().set("background", "white");
+		VerticalLayout rootLayout = new VerticalLayout();
+		rootLayout.setWidth("328px");
+		rootLayout.setSpacing(false);
+		rootLayout.setPadding(false);
+		rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+		rootLayout.getElement().getStyle().set("background", "white");
 
-        add(rootLayout);
+		add(rootLayout);
 
-        appLogo = flowSetup().appLogo();
-        if (appLogo != null) {
-            appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-            appLogo.setWidth("100px");
-            rootLayout.add(appLogo);
-            rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
-        }
+		appLogo = flowSetup().appLogo();
+		if (appLogo != null) {
+			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
+			appLogo.setWidth("100px");
+			rootLayout.add(appLogo);
+			rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
+		}
 
-        // add content to loginForm
-        FormLayout form1 = new FormLayout();
-        usernameTextField = new TextField("Username");
-        usernameTextField.setAutoselect(true);
+		// add content to loginForm
+		FormLayout form1 = new FormLayout();
+		usernameTextField = new TextField("Username");
+		usernameTextField.setAutoselect(true);
 
-        Button sendResetKeyButton = new Button("Send Security Pin");
-        sendResetKeyButton.setEnabled(false);
+		Button sendResetKeyButton = new Button("Send Security Pin");
+		sendResetKeyButton.setEnabled(false);
 
-        form1.add(usernameTextField, sendResetKeyButton);
+		form1.add(usernameTextField, sendResetKeyButton);
 
-        FormLayout form2 = new FormLayout();
-        TextField resetKeyTextField = new TextField("Enter Security Pin");
-        resetKeyTextField.setMaxLength(6);
-        resetKeyTextField.setEnabled(false);
+		FormLayout form2 = new FormLayout();
+		TextField resetKeyTextField = new TextField("Enter Security Pin");
+		resetKeyTextField.setMaxLength(6);
+		resetKeyTextField.setEnabled(false);
 
-        Button nextButton = new Button("Next");
-        nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        nextButton.setEnabled(false);
+		Button nextButton = new Button("Next");
+		nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		nextButton.setEnabled(false);
 
-        form2.add(resetKeyTextField, nextButton);
+		form2.add(resetKeyTextField, nextButton);
 
-        passwordField = new PasswordField("New Password");
-        retypePasswordField = new PasswordField("Re-type Password");
-        retypePasswordField.setEnabled(false);
-        Button changeButton = new Button("Change");
-        changeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        changeButton.setEnabled(false);
+		passwordField = new PasswordField("New Password");
+		retypePasswordField = new PasswordField("Re-type Password");
+		retypePasswordField.setEnabled(false);
+		Button changeButton = new Button("Change");
+		changeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		changeButton.setEnabled(false);
 
-        FormLayout form3 = new FormLayout();
-        form3.add(passwordField, retypePasswordField, changeButton);
+		FormLayout form3 = new FormLayout();
+		form3.add(passwordField, retypePasswordField, changeButton);
 
-        VerticalLayout formLayout = new VerticalLayout();
-        formLayout.getElement().getStyle().set("padding", "var(--lumo-space-l)");
-        form1.getElement().getStyle().set("padding", "var(--lumo-space-s)");
-        form2.getElement().getStyle().set("padding", "var(--lumo-space-s)");
-        form3.getElement().getStyle().set("padding", "var(--lumo-space-s)");
-        formLayout.add(form1, form2, form3);
-        rootLayout.add(formLayout);
+		VerticalLayout formLayout = new VerticalLayout();
+		formLayout.getElement().getStyle().set("padding", "var(--lumo-space-l)");
+		form1.getElement().getStyle().set("padding", "var(--lumo-space-s)");
+		form2.getElement().getStyle().set("padding", "var(--lumo-space-s)");
+		form3.getElement().getStyle().set("padding", "var(--lumo-space-s)");
+		formLayout.add(form1, form2, form3);
+		rootLayout.add(formLayout);
 
-        form3.setVisible(false);
+		form3.setVisible(false);
 
-        AtomicReference<String> securityPin = new AtomicReference<>();
+		AtomicReference<String> securityPin = new AtomicReference<>();
 
-        // register listeners...
-        usernameTextField.addValueChangeListener(event -> {
-            sendResetKeyButton.setEnabled(event.getValue().length() > 0);
-        });
-        usernameTextField.setValueChangeMode(ValueChangeMode.EAGER);
-        sendResetKeyButton.addClickListener(event -> {
-            securityPin.set(RandomStringUtils.randomAlphanumeric(6));
-            sendSecurityPinToUser(securityPin.get(), usernameTextField.getValue(), () -> {
-                boolean shouldEnable = true;
-                resetKeyTextField.clear();
-                resetKeyTextField.setEnabled(shouldEnable);
-                resetKeyTextField.focus();
-                Notification.show("The reset pin has been sent to your registered email/phone.", 5000, Position.BOTTOM_CENTER);
-            }, error -> {
-                usernameTextField.focus();
-                StringBuilder sb = new StringBuilder();
-                sb.append(error.getMessage());
-                Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
-            });
-        });
+		// register listeners...
+		usernameTextField.addValueChangeListener(event -> {
+			sendResetKeyButton.setEnabled(event.getValue().length() > 0);
+		});
+		usernameTextField.setValueChangeMode(ValueChangeMode.EAGER);
+		sendResetKeyButton.addClickListener(event -> {
+			securityPin.set(RandomStringUtils.randomAlphanumeric(6));
+			sendSecurityPinToUser(securityPin.get(), usernameTextField.getValue(), () -> {
+				boolean shouldEnable = true;
+				resetKeyTextField.clear();
+				resetKeyTextField.setEnabled(shouldEnable);
+				resetKeyTextField.focus();
+				Notification.show("The reset pin has been sent to your registered email/phone.", 5000, Position.BOTTOM_CENTER);
+			}, error -> {
+				usernameTextField.focus();
+				StringBuilder sb = new StringBuilder();
+				sb.append(error.getMessage());
+				Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
+			});
+		});
 
-        resetKeyTextField.addValueChangeListener(event -> {
-            String key = event.getValue();
-            if (key.length() == 6) {
-                if (key.equals(securityPin.get()))
-                    nextButton.setEnabled(true);
-                else {
-                    nextButton.setEnabled(false);
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("The reset pin is not valid, please try again.");
-                    Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
-                }
-            } else {
-                nextButton.setEnabled(false);
-            }
-        });
-        nextButton.addClickListener(event -> {
-            form1.setVisible(false);
-            form2.setVisible(false);
-            form3.setVisible(true);
-        });
+		resetKeyTextField.addValueChangeListener(event -> {
+			String key = event.getValue();
+			if (key.length() == 6) {
+				if (key.equals(securityPin.get()))
+					nextButton.setEnabled(true);
+				else {
+					nextButton.setEnabled(false);
+					StringBuilder sb = new StringBuilder();
+					sb.append("The reset pin is not valid, please try again.");
+					Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
+				}
+			} else {
+				nextButton.setEnabled(false);
+			}
+		});
+		nextButton.addClickListener(event -> {
+			form1.setVisible(false);
+			form2.setVisible(false);
+			form3.setVisible(true);
+		});
 
-        passwordField.setValueChangeMode(ValueChangeMode.EAGER);
-        passwordField.addValueChangeListener(event -> {
-            retypePasswordField.setEnabled(event.getValue().length() > 0);
-        });
+		passwordField.setValueChangeMode(ValueChangeMode.EAGER);
+		passwordField.addValueChangeListener(event -> {
+			retypePasswordField.setEnabled(event.getValue().length() > 0);
+		});
 
-        retypePasswordField.addValueChangeListener(event -> {
-            String password = passwordField.getValue();
-            String retypedPassword = event.getValue();
-            if (retypedPassword.length() == password.length()) {
-                if (retypedPassword.equals(password))
-                    changeButton.setEnabled(true);
-                else {
-                    changeButton.setEnabled(false);
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("New password and re-typed password must match, please try again.");
-                    Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
-                }
-            } else {
-                changeButton.setEnabled(false);
-            }
-        });
+		retypePasswordField.addValueChangeListener(event -> {
+			String password = passwordField.getValue();
+			String retypedPassword = event.getValue();
+			if (retypedPassword.length() == password.length()) {
+				if (retypedPassword.equals(password))
+					changeButton.setEnabled(true);
+				else {
+					changeButton.setEnabled(false);
+					StringBuilder sb = new StringBuilder();
+					sb.append("New password and re-typed password must match, please try again.");
+					Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
+				}
+			} else {
+				changeButton.setEnabled(false);
+			}
+		});
 
-        changeButton.addClickListener(event -> {
-            changePassword(usernameTextField.getValue(), retypePasswordField.getValue(), () -> {
-                getUI().ifPresent(ui -> {
-                    ui.navigate("login");
-                });
-            }, error -> {
-                Notification.show(error.getMessage(), 5000, Position.BOTTOM_CENTER);
-            });
-        });
+		changeButton.addClickListener(event -> {
+			changePassword(usernameTextField.getValue(), retypePasswordField.getValue(), () -> {
+				getUI().ifPresent(ui -> {
+					ui.navigate("login");
+				});
+			}, error -> {
+				Notification.show(error.getMessage(), 5000, Position.BOTTOM_CENTER);
+			});
+		});
 
-        usernameTextField.focus();
-        // end content addition
+		usernameTextField.focus();
+		// end content addition
 
-    }
+	}
 
-    protected abstract GxAbstractFlowSetup flowSetup();
+	protected abstract GxAbstractFlowSetup flowSetup();
 
-    protected abstract void sendSecurityPinToUser(String securityPin, String username, TRVoidCallback success, TRErrorCallback error);
+	protected abstract void sendSecurityPinToUser(String securityPin, String username, TRVoidCallback success, TRErrorCallback error);
 
-    protected abstract void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error);
+	protected abstract void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error);
 
 }

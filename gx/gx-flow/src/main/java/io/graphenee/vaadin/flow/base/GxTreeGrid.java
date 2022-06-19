@@ -5,25 +5,24 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
 
 public class GxTreeGrid<T> extends TreeGrid<T> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public GxTreeGrid(HierarchicalDataProvider<T, ?> dataProvider) {
-        super(dataProvider);
-    }
+	public GxTreeGrid(HierarchicalDataProvider<T, ?> dataProvider) {
+		super(dataProvider);
+	}
 
-    public GxTreeGrid() {
-    }
+	public GxTreeGrid() {
+	}
 
-    public GxTreeGrid(Class<T> beanType) {
-        super(beanType);
-    }
-    
-    public GxTreeGrid(Class<T> beanType, boolean autoCreateColumns) {
-        super(beanType);
-        if(!autoCreateColumns) {
-            removeAllColumns();
-        }
-    }
-    
+	public GxTreeGrid(Class<T> beanType) {
+		super(beanType);
+	}
+
+	public GxTreeGrid(Class<T> beanType, boolean autoCreateColumns) {
+		super(beanType);
+		if (!autoCreateColumns) {
+			removeAllColumns();
+		}
+	}
 
 }

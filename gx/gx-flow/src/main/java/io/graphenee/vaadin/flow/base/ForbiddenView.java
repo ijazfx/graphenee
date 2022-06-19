@@ -12,22 +12,22 @@ import io.graphenee.vaadin.flow.base.ForbiddenView.ForbiddenException;
 
 public class ForbiddenView extends VerticalLayout implements HasErrorParameter<ForbiddenException> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final Label error = new Label();
+	private final Label error = new Label();
 
-    public ForbiddenView() {
-        add(error);
-    }
+	public ForbiddenView() {
+		add(error);
+	}
 
-    @Override
-    public int setErrorParameter(BeforeEnterEvent event, ErrorParameter<ForbiddenException> parameter) {
-        error.setText(parameter.getCustomMessage());
-        return HttpServletResponse.SC_FORBIDDEN;
-    }
+	@Override
+	public int setErrorParameter(BeforeEnterEvent event, ErrorParameter<ForbiddenException> parameter) {
+		error.setText(parameter.getCustomMessage());
+		return HttpServletResponse.SC_FORBIDDEN;
+	}
 
-    public static class ForbiddenException extends RuntimeException {
+	public static class ForbiddenException extends RuntimeException {
 
-    }
+	}
 
 }
