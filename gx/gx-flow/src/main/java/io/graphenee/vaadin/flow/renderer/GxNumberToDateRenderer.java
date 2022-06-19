@@ -11,46 +11,46 @@ import io.graphenee.util.TRCalendarUtil;
 
 public class GxNumberToDateRenderer<T> extends BasicRenderer<T, Number> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static enum GxDateResolution {
-        Date,
-        Time,
-        DateTime;
-    }
+	public static enum GxDateResolution {
+		Date,
+		Time,
+		DateTime;
+	}
 
-    private String datePattern;
-    private DateFormat dateFormat;
+	private String datePattern;
+	private DateFormat dateFormat;
 
-    public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, String datePattern) {
-        super(valueProvider);
-        this.datePattern = datePattern;
-    }
+	public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, String datePattern) {
+		super(valueProvider);
+		this.datePattern = datePattern;
+	}
 
-    public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, GxDateResolution resolution) {
-        super(valueProvider);
-        switch (resolution) {
-        case Date:
-            dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
-        break;
-        case Time:
-            dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
-        break;
-        case DateTime:
-            dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
-        break;
-        }
-    }
+	public GxNumberToDateRenderer(ValueProvider<T, Number> valueProvider, GxDateResolution resolution) {
+		super(valueProvider);
+		switch (resolution) {
+		case Date:
+			dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+		break;
+		case Time:
+			dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
+		break;
+		case DateTime:
+			dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
+		break;
+		}
+	}
 
-    @Override
-    protected String getFormattedValue(Number value) {
-        if (value != null) {
-            if (datePattern != null) {
-                return TRCalendarUtil.getFormattedDate(new Date(value.longValue()), datePattern);
-            }
-            return dateFormat.format(new Date(value.longValue()));
-        }
-        return null;
-    }
+	@Override
+	protected String getFormattedValue(Number value) {
+		if (value != null) {
+			if (datePattern != null) {
+				return TRCalendarUtil.getFormattedDate(new Date(value.longValue()), datePattern);
+			}
+			return dateFormat.format(new Date(value.longValue()));
+		}
+		return null;
+	}
 
 }

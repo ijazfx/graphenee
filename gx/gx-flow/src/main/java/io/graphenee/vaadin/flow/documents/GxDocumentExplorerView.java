@@ -31,31 +31,31 @@ import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 @Scope("prototype")
 public class GxDocumentExplorerView extends GxVerticalLayoutView {
 
-    public static final String VIEW_NAME = "documents";
+	public static final String VIEW_NAME = "documents";
 
-    @Autowired
-    GxDocumentExplorer list;
+	@Autowired
+	GxDocumentExplorer list;
 
-    @Autowired(required = false)
-    FileStorage storage;
+	@Autowired(required = false)
+	FileStorage storage;
 
-    @Autowired
-    GxNamespaceService namespaceService;
+	@Autowired
+	GxNamespaceService namespaceService;
 
-    @Override
-    protected String getCaption() {
-        return "Documents";
-    }
+	@Override
+	protected String getCaption() {
+		return "Documents";
+	}
 
-    @Override
-    protected void decorateLayout(HasComponents rootLayout) {
-        rootLayout.add(list);
-    }
+	@Override
+	protected void decorateLayout(HasComponents rootLayout) {
+		rootLayout.add(list);
+	}
 
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-        GxNamespace namespace = namespaceService.systemNamespaceEntity();
-        list.initializeWithNamespaceAndStorage(namespace, storage);
-    }
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		GxNamespace namespace = namespaceService.systemNamespaceEntity();
+		list.initializeWithNamespaceAndStorage(namespace, storage);
+	}
 
 }

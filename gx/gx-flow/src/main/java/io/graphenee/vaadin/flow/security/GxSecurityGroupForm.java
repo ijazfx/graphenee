@@ -24,56 +24,56 @@ import io.graphenee.vaadin.flow.converter.BeanCollectionFaultToSetConverter;
 @Component
 @Scope("prototype")
 public class GxSecurityGroupForm extends GxAbstractEntityForm<GxSecurityGroupBean> {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private TextField securityGroupName;
-    private TextField securityGroupDescription;
-    private TextField priority;
-    private Checkbox isActive;
-    private TwinColGrid<GxSecurityPolicyBean> securityPolicyCollectionFault;
-    private TwinColGrid<GxUserAccountBean> userAccountCollectionFault;
+	private TextField securityGroupName;
+	private TextField securityGroupDescription;
+	private TextField priority;
+	private Checkbox isActive;
+	private TwinColGrid<GxSecurityPolicyBean> securityPolicyCollectionFault;
+	private TwinColGrid<GxUserAccountBean> userAccountCollectionFault;
 
-    @Autowired
-    GxDataService gxDataService;
+	@Autowired
+	GxDataService gxDataService;
 
-    public GxSecurityGroupForm() {
-        super(GxSecurityGroupBean.class);
-    }
+	public GxSecurityGroupForm() {
+		super(GxSecurityGroupBean.class);
+	}
 
-    @Override
-    protected void decorateForm(HasComponents entityForm) {
-        securityGroupName = new TextField("Group Name");
-        securityGroupDescription = new TextField("Group Description");
-        priority = new TextField("Priority");
-        isActive = new Checkbox("Is Active?");
-        securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
-                .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-        securityPolicyCollectionFault.setSizeFull();
+	@Override
+	protected void decorateForm(HasComponents entityForm) {
+		securityGroupName = new TextField("Group Name");
+		securityGroupDescription = new TextField("Group Description");
+		priority = new TextField("Priority");
+		isActive = new Checkbox("Is Active?");
+		securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
+				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+		securityPolicyCollectionFault.setSizeFull();
 
-        userAccountCollectionFault = new TwinColGrid<GxUserAccountBean>().addFilterableColumn(GxUserAccountBean::getUsername, "User Name", "User Name", true)
-                .withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-        userAccountCollectionFault.setSizeFull();
+		userAccountCollectionFault = new TwinColGrid<GxUserAccountBean>().addFilterableColumn(GxUserAccountBean::getUsername, "User Name", "User Name", true)
+				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
+		userAccountCollectionFault.setSizeFull();
 
-        entityForm.add(securityGroupName, securityGroupDescription, priority, isActive);
-    }
+		entityForm.add(securityGroupName, securityGroupDescription, priority, isActive);
+	}
 
-    @Override
-    protected void bindFields(Binder<GxSecurityGroupBean> dataBinder) {
-        dataBinder.forMemberField(priority).withConverter(new StringToIntegerConverter("value must be integer"));
-        dataBinder.forMemberField(securityPolicyCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
-        dataBinder.forMemberField(userAccountCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxUserAccountBean>());
-    }
+	@Override
+	protected void bindFields(Binder<GxSecurityGroupBean> dataBinder) {
+		dataBinder.forMemberField(priority).withConverter(new StringToIntegerConverter("value must be integer"));
+		dataBinder.forMemberField(securityPolicyCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
+		dataBinder.forMemberField(userAccountCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxUserAccountBean>());
+	}
 
-    @Override
-    protected void addTabsToForm(List<GxTabItem> tabItems) {
-        tabItems.add(GxTabItem.create(1, "Users", userAccountCollectionFault));
-        tabItems.add(GxTabItem.create(2, "Policies", securityPolicyCollectionFault));
-    }
+	@Override
+	protected void addTabsToForm(List<GxTabItem> tabItems) {
+		tabItems.add(GxTabItem.create(1, "Users", userAccountCollectionFault));
+		tabItems.add(GxTabItem.create(2, "Policies", securityPolicyCollectionFault));
+	}
 
-    @Override
-    protected void preBinding(GxSecurityGroupBean entity) {
-        securityPolicyCollectionFault.setItems(gxDataService.findSecurityPolicyByNamespaceActive(entity.getNamespaceFault().getBean()));
-        userAccountCollectionFault.setItems(gxDataService.findUserAccountByNamespace(entity.getNamespaceFault().getBean()));
-    }
+	@Override
+	protected void preBinding(GxSecurityGroupBean entity) {
+		securityPolicyCollectionFault.setItems(gxDataService.findSecurityPolicyByNamespaceActive(entity.getNamespaceFault().getBean()));
+		userAccountCollectionFault.setItems(gxDataService.findUserAccountByNamespace(entity.getNamespaceFault().getBean()));
+	}
 
 }

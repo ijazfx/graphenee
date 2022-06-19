@@ -19,52 +19,52 @@ import io.graphenee.vaadin.flow.converter.LocalDateTimeToSqlTimestampConverter;
 @Scope("prototype")
 public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
-    TextField name;
-    TextArea note;
-    DateTimePicker issueDate;
-    DateTimePicker expiryDate;
-    IntegerField expiryReminderInDays;
-    DateTimePicker reminderDate;
+	TextField name;
+	TextArea note;
+	DateTimePicker issueDate;
+	DateTimePicker expiryDate;
+	IntegerField expiryReminderInDays;
+	DateTimePicker reminderDate;
 
-    public GxDocumentForm() {
-        super(GxDocument.class);
-    }
+	public GxDocumentForm() {
+		super(GxDocument.class);
+	}
 
-    @Override
-    protected void decorateForm(HasComponents entityForm) {
-        name = new TextField("Name");
+	@Override
+	protected void decorateForm(HasComponents entityForm) {
+		name = new TextField("Name");
 
-        note = new TextArea("Note");
-        note.setHeight("100px");
+		note = new TextArea("Note");
+		note.setHeight("100px");
 
-        issueDate = new DateTimePicker("Issue Date");
-        expiryDate = new DateTimePicker("Expiry Date");
-        expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
-        expiryReminderInDays.setMin(0);
+		issueDate = new DateTimePicker("Issue Date");
+		expiryDate = new DateTimePicker("Expiry Date");
+		expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
+		expiryReminderInDays.setMin(0);
 
-        reminderDate = new DateTimePicker("Reminder Date");
+		reminderDate = new DateTimePicker("Reminder Date");
 
-        entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate);
+		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate);
 
-        setColspan(name, 2);
-        setColspan(note, 2);
-    }
+		setColspan(name, 2);
+		setColspan(note, 2);
+	}
 
-    @Override
-    protected void bindFields(Binder<GxDocument> dataBinder) {
-        dataBinder.forMemberField(issueDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
-        dataBinder.forMemberField(expiryDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
-        dataBinder.forMemberField(reminderDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
-    }
+	@Override
+	protected void bindFields(Binder<GxDocument> dataBinder) {
+		dataBinder.forMemberField(issueDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
+		dataBinder.forMemberField(expiryDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
+		dataBinder.forMemberField(reminderDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
+	}
 
-    @Override
-    protected String formTitleProperty() {
-        return "name";
-    }
+	@Override
+	protected String formTitleProperty() {
+		return "name";
+	}
 
-    @Override
-    protected String dialogHeight() {
-        return "450px";
-    }
+	@Override
+	protected String dialogHeight() {
+		return "450px";
+	}
 
 }

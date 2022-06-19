@@ -105,7 +105,7 @@ public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 			}
 		});
 		form.add(accountSid, authToken, senderId, isPrimary);
-		
+
 		setColspan(isPrimary, 2);
 	}
 

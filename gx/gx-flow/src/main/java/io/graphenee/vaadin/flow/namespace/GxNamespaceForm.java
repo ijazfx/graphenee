@@ -16,37 +16,37 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 @Scope("prototype")
 public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
 
-    TextField namespace;
-    TextArea namespaceDescription;
-    Checkbox isActive;
+	TextField namespace;
+	TextArea namespaceDescription;
+	Checkbox isActive;
 
-    public GxNamespaceForm() {
-        super(GxNamespace.class);
-    }
+	public GxNamespaceForm() {
+		super(GxNamespace.class);
+	}
 
-    @Override
-    protected void decorateForm(HasComponents form) {
-        namespace = new TextField("Namespace");
-        namespaceDescription = new TextArea("Description");
-        isActive = new Checkbox("Is Active?");
-        form.add(namespace, namespaceDescription, isActive);
-        setColspan(namespace, 2);
-        setColspan(namespaceDescription, 2);
-    }
+	@Override
+	protected void decorateForm(HasComponents form) {
+		namespace = new TextField("Namespace");
+		namespaceDescription = new TextArea("Description");
+		isActive = new Checkbox("Is Active?");
+		form.add(namespace, namespaceDescription, isActive);
+		setColspan(namespace, 2);
+		setColspan(namespaceDescription, 2);
+	}
 
-    @Override
-    protected void bindFields(Binder<GxNamespace> dataBinder) {
-        dataBinder.forMemberField(namespace).asRequired("Device token is required");
-    }
+	@Override
+	protected void bindFields(Binder<GxNamespace> dataBinder) {
+		dataBinder.forMemberField(namespace).asRequired("Device token is required");
+	}
 
-    @Override
-    protected String formTitle() {
-        return "Namespace";
-    }
+	@Override
+	protected String formTitle() {
+		return "Namespace";
+	}
 
-    @Override
-    protected String dialogHeight() {
-        return "400px";
-    }
+	@Override
+	protected String dialogHeight() {
+		return "400px";
+	}
 
 }

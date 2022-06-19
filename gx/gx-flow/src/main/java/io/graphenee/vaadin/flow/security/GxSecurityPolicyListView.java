@@ -11,29 +11,29 @@ import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
 @GxSecuredView(GxSecurityPolicyListView.VIEW_NAME)
 public class GxSecurityPolicyListView extends GxVerticalLayoutView {
-    public static final String VIEW_NAME = "security-policies";
+	public static final String VIEW_NAME = "security-policies";
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Autowired
-    GxSecurityPolicyList list;
+	@Autowired
+	GxSecurityPolicyList list;
 
-    @Autowired(required = false)
-    GxNamespaceBean namespace;
+	@Autowired(required = false)
+	GxNamespaceBean namespace;
 
-    @Override
-    protected void decorateLayout(HasComponents rootLayout) {
-        rootLayout.add(list);
-    }
+	@Override
+	protected void decorateLayout(HasComponents rootLayout) {
+		rootLayout.add(list);
+	}
 
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-        list.initializeWithNamespace(namespace);
-    }
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		list.initializeWithNamespace(namespace);
+	}
 
-    @Override
-    protected String getCaption() {
-        return "Security Policies";
-    }
+	@Override
+	protected String getCaption() {
+		return "Security Policies";
+	}
 
 }
