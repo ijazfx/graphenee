@@ -22,78 +22,78 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 @Scope("prototype")
 public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Autowired
-    GxDataService dataService;
+	@Autowired
+	GxDataService dataService;
 
-    @Autowired
-    GxUserAccountForm entityForm;
+	@Autowired
+	GxUserAccountForm entityForm;
 
-    private GxNamespaceBean namespace;
+	private GxNamespaceBean namespace;
 
-    public GxUserAccountList() {
-        super(GxUserAccountBean.class);
-    }
+	public GxUserAccountList() {
+		super(GxUserAccountBean.class);
+	}
 
-    @Override
-    protected String[] visibleProperties() {
-        return new String[] { "firstName", "lastName", "username", "email", "isActive" };
-    }
+	@Override
+	protected String[] visibleProperties() {
+		return new String[] { "firstName", "lastName", "username", "email", "isActive" };
+	}
 
-    @Override
-    protected Stream<GxUserAccountBean> getData() {
-        if (namespace == null)
-            return dataService.findUserAccount().stream();
-        return dataService.findUserAccountByNamespace(namespace).stream();
-    }
+	@Override
+	protected Stream<GxUserAccountBean> getData() {
+		if (namespace == null)
+			return dataService.findUserAccount().stream();
+		return dataService.findUserAccountByNamespace(namespace).stream();
+	}
 
-    @Override
-    protected GxAbstractEntityForm<GxUserAccountBean> getEntityForm(GxUserAccountBean entity) {
-        return entityForm;
-    }
+	@Override
+	protected GxAbstractEntityForm<GxUserAccountBean> getEntityForm(GxUserAccountBean entity) {
+		return entityForm;
+	}
 
-    @Override
-    public void onSave(GxUserAccountBean entity) {
-        dataService.save(entity);
-    }
+	@Override
+	public void onSave(GxUserAccountBean entity) {
+		dataService.save(entity);
+	}
 
-    @Override
-    protected void onDelete(Collection<GxUserAccountBean> entities) {
-        for (GxUserAccountBean entity : entities) {
-            dataService.delete(entity);
-        }
-    }
+	@Override
+	protected void onDelete(Collection<GxUserAccountBean> entities) {
+		for (GxUserAccountBean entity : entities) {
+			dataService.delete(entity);
+		}
+	}
 
-    @Override
-    protected void preEdit(GxUserAccountBean entity) {
-        if (entity.getOid() == null) {
-            if (namespace == null) {
-                namespace = dataService.findSystemNamespace();
-            }
-            entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
-        }
-    }
+	@Override
+	protected void preEdit(GxUserAccountBean entity) {
+		if (entity.getOid() == null) {
+			if (namespace == null) {
+				namespace = dataService.findSystemNamespace();
+			}
+			entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
+		}
+	}
 
-    @Override
-    protected void decorateSearchForm(FormLayout searchForm, Binder<GxUserAccountBean> searchBinder) {
-        ComboBox<GxNamespaceBean> namespaceComboBox = new ComboBox<>("Namespace");
-        namespaceComboBox.setItemLabelGenerator(GxNamespaceBean::getNamespace);
-        namespaceComboBox.setClearButtonVisible(true);
-        namespaceComboBox.setItems(dataService.findNamespace());
-        namespaceComboBox.setValue(namespace);
+	@Override
+	protected void decorateSearchForm(FormLayout searchForm, Binder<GxUserAccountBean> searchBinder) {
+		ComboBox<GxNamespaceBean> namespaceComboBox = new ComboBox<>("Namespace");
+		namespaceComboBox.setItemLabelGenerator(GxNamespaceBean::getNamespace);
+		namespaceComboBox.setClearButtonVisible(true);
+		namespaceComboBox.setItems(dataService.findNamespace());
+		namespaceComboBox.setValue(namespace);
 
-        namespaceComboBox.addValueChangeListener(vcl -> {
-            namespace = vcl.getValue();
-            refresh();
-        });
+		namespaceComboBox.addValueChangeListener(vcl -> {
+			namespace = vcl.getValue();
+			refresh();
+		});
 
-        searchForm.add(namespaceComboBox);
-    }
+		searchForm.add(namespaceComboBox);
+	}
 
-    public void initializeWithNamespace(GxNamespaceBean namespace) {
-        this.namespace = namespace;
-        refresh();
-    }
+	public void initializeWithNamespace(GxNamespaceBean namespace) {
+		this.namespace = namespace;
+		refresh();
+	}
 
 }

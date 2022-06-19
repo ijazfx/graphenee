@@ -11,7 +11,7 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 
 public class DashboardUtils {
 
-    private static final Map<GxAuthenticatedUser, UI> UI_MAP = new ConcurrentHashMap<>(new HashMap<>());
+	private static final Map<GxAuthenticatedUser, UI> UI_MAP = new ConcurrentHashMap<>(new HashMap<>());
 
 	public static void setCurrentUI(GxAuthenticatedUser user, UI ui) {
 		UI_MAP.put(user, ui);

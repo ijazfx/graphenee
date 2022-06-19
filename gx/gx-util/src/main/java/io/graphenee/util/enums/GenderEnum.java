@@ -16,18 +16,18 @@
 package io.graphenee.util.enums;
 
 public enum GenderEnum {
-    Male("M"),
-    Female("F"),
-    Undisclosed("X");
+	Male("M"),
+	Female("F"),
+	Undisclosed("X");
 
-    private String genderCode;
+	private String genderCode;
 
-    private GenderEnum(String genderCode) {
-        this.genderCode = genderCode;
-    }
+	private GenderEnum(String genderCode) {
+		this.genderCode = genderCode;
+	}
 
-    public String getGenderCode() {
-        return genderCode;
-    }
+	public String getGenderCode() {
+		return genderCode;
+	}
 
 }

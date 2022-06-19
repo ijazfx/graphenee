@@ -20,68 +20,68 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 @Scope("prototype")
 public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 
-    Upload upload;
+	Upload upload;
 
-    List<GxUploadedFile> uploadedFiles = new ArrayList<>();
+	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
 
-    public GxFileUploadForm() {
-        super(GxFolder.class);
-    }
+	public GxFileUploadForm() {
+		super(GxFolder.class);
+	}
 
-    @Override
-    protected void decorateForm(HasComponents entityForm) {
-        upload = new Upload(new Receiver() {
+	@Override
+	protected void decorateForm(HasComponents entityForm) {
+		upload = new Upload(new Receiver() {
 
-            @Override
-            public OutputStream receiveUpload(String fileName, String mimeType) {
-                try {
-                    File file = File.createTempFile("uploaded", fileName);
-                    GxUploadedFile uploadedFile = new GxUploadedFile();
-                    uploadedFile.setFile(file);
-                    uploadedFile.setFileName(fileName);
-                    uploadedFile.setMimeType(mimeType);
-                    uploadedFiles.add(uploadedFile);
-                    FileOutputStream fos = new FileOutputStream(file);
-                    return fos;
-                } catch (Exception e) {
-                    return null;
-                }
-            }
+			@Override
+			public OutputStream receiveUpload(String fileName, String mimeType) {
+				try {
+					File file = File.createTempFile("uploaded", fileName);
+					GxUploadedFile uploadedFile = new GxUploadedFile();
+					uploadedFile.setFile(file);
+					uploadedFile.setFileName(fileName);
+					uploadedFile.setMimeType(mimeType);
+					uploadedFiles.add(uploadedFile);
+					FileOutputStream fos = new FileOutputStream(file);
+					return fos;
+				} catch (Exception e) {
+					return null;
+				}
+			}
 
-        });
-        upload.setMaxFiles(10);
-        upload.setMaxFileSize(1024000000);
-        entityForm.add(upload);
-    }
+		});
+		upload.setMaxFiles(10);
+		upload.setMaxFileSize(1024000000);
+		entityForm.add(upload);
+	}
 
-    public void initializeWithFileUploadHandler(GxFileUploadHandler handler) {
-        setDelegate(dlg -> {
-            handler.onSave(dlg, uploadedFiles);
-        });
-    }
+	public void initializeWithFileUploadHandler(GxFileUploadHandler handler) {
+		setDelegate(dlg -> {
+			handler.onSave(dlg, uploadedFiles);
+		});
+	}
 
-    @Override
-    protected void preBinding(GxFolder entity) {
-        uploadedFiles.clear();
-    }
+	@Override
+	protected void preBinding(GxFolder entity) {
+		uploadedFiles.clear();
+	}
 
-    @Override
-    protected String dialogHeight() {
-        return "100%";
-    }
+	@Override
+	protected String dialogHeight() {
+		return "100%";
+	}
 
-    @Override
-    protected String dialogWidth() {
-        return "100%";
-    }
+	@Override
+	protected String dialogWidth() {
+		return "100%";
+	}
 
-    @Override
-    protected String formTitleProperty() {
-        return "name";
-    }
+	@Override
+	protected String formTitleProperty() {
+		return "name";
+	}
 
-    public static interface GxFileUploadHandler {
-        void onSave(GxFolder parentFolder, List<GxUploadedFile> uploadedFiles);
-    }
+	public static interface GxFileUploadHandler {
+		void onSave(GxFolder parentFolder, List<GxUploadedFile> uploadedFiles);
+	}
 
 }

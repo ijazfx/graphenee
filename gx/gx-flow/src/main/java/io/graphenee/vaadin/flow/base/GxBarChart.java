@@ -16,18 +16,18 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class GxBarChart extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private ApexCharts barChart;
+	private ApexCharts barChart;
 
-    public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
-        barChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.bar).build())
-                .withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(false).withColumnWidth("55%").build()).build())
-                .withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withStroke(StrokeBuilder.get().withShow(true).withWidth(2.0).withColors("transparent").build())
-                .withYaxis(YAxisBuilder.get().build()).withXaxis(XAxisBuilder.get().withCategories(xAxisLabel).build()).withFill(FillBuilder.get().withOpacity(1.0).build())
-                .withSeries(series).build();
-        removeAll();
-        add(barChart);
-        barChart.setWidth("100%");
-    }
+	public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
+		barChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.bar).build())
+				.withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(false).withColumnWidth("55%").build()).build())
+				.withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withStroke(StrokeBuilder.get().withShow(true).withWidth(2.0).withColors("transparent").build())
+				.withYaxis(YAxisBuilder.get().build()).withXaxis(XAxisBuilder.get().withCategories(xAxisLabel).build()).withFill(FillBuilder.get().withOpacity(1.0).build())
+				.withSeries(series).build();
+		removeAll();
+		add(barChart);
+		barChart.setWidth("100%");
+	}
 }

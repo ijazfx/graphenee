@@ -20,162 +20,158 @@ import java.util.List;
  */
 public class GridUtils {
 
-    private static final String COLOMN_DELIMITER = ":";
-    private static final String SEMI_COLOMN_DELIMITER = ";";
-    private final String HIDDEN_SETTINGS_NAME;
-    private final String SORT_ORDER_SETTINGS_NAME;
-    private final String COLUMNS_ORDER_SETTINGS_NAME;
-    private final Grid grid;
+	private static final String COLOMN_DELIMITER = ":";
+	private static final String SEMI_COLOMN_DELIMITER = ";";
+	private final String HIDDEN_SETTINGS_NAME;
+	private final String SORT_ORDER_SETTINGS_NAME;
+	private final String COLUMNS_ORDER_SETTINGS_NAME;
+	private final Grid grid;
 
-    /**
-     * Set specified grid to save hidden columns in cookies.
-     *
-     * @param grid - grid which columns would be used
-     * @param cookieName - name of the cookie. Should be unique for every grid.
-     */
-    static public void attachToGrid(Grid grid, String cookieName) {
-        GridUtils utils = new GridUtils(grid, cookieName);
-    }
+	/**
+	 * Set specified grid to save hidden columns in cookies.
+	 *
+	 * @param grid - grid which columns would be used
+	 * @param cookieName - name of the cookie. Should be unique for every grid.
+	 */
+	static public void attachToGrid(Grid grid, String cookieName) {
+		GridUtils utils = new GridUtils(grid, cookieName);
+	}
 
-    private GridUtils(Grid grid, String cookieName) {
-        super();
-        this.grid = grid;
-        HIDDEN_SETTINGS_NAME = cookieName + "hiddenCols";
-        SORT_ORDER_SETTINGS_NAME = cookieName + "sortOrder";
-        COLUMNS_ORDER_SETTINGS_NAME = cookieName + "columnOrder";
-        loadSettings();
-        
-        grid.addColumnVisibilityChangeListener(
-                new Grid.ColumnVisibilityChangeListener() {
+	private GridUtils(Grid grid, String cookieName) {
+		super();
+		this.grid = grid;
+		HIDDEN_SETTINGS_NAME = cookieName + "hiddenCols";
+		SORT_ORDER_SETTINGS_NAME = cookieName + "sortOrder";
+		COLUMNS_ORDER_SETTINGS_NAME = cookieName + "columnOrder";
+		loadSettings();
 
-            @Override
-            public void columnVisibilityChanged(
-                    Grid.ColumnVisibilityChangeEvent event) {
-                saveHidden();
-            }
-        });
-        
-        grid.addSortListener(new SortEvent.SortListener() {
+		grid.addColumnVisibilityChangeListener(new Grid.ColumnVisibilityChangeListener() {
 
-            @Override
-            public void sort(SortEvent event) {
-                saveSortOrder();
-            }
-        });
-        grid.addColumnReorderListener(new Grid.ColumnReorderListener() {
+			@Override
+			public void columnVisibilityChanged(Grid.ColumnVisibilityChangeEvent event) {
+				saveHidden();
+			}
+		});
 
-            @Override
-            public void columnReorder(ColumnReorderEvent event) {
-                saveColumnOrder();
-            }
-        });
-    }
+		grid.addSortListener(new SortEvent.SortListener() {
 
-    private void saveColumnOrder() {
-        //Number of columns not more than 1000, hopefully :)
-        //This operation don't need to be fast, that's why were recreate the cookie value
-        //every time.
+			@Override
+			public void sort(SortEvent event) {
+				saveSortOrder();
+			}
+		});
+		grid.addColumnReorderListener(new Grid.ColumnReorderListener() {
 
-        StringBuilder sb = new StringBuilder();
-        for (Column c : grid.getColumns()) {
-            sb.append(c.getPropertyId().toString());
-            sb.append(COLOMN_DELIMITER);
-        }
-        if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length() - 1);
-        }
+			@Override
+			public void columnReorder(ColumnReorderEvent event) {
+				saveColumnOrder();
+			}
+		});
+	}
 
-        BrowserCookie.setCookie(COLUMNS_ORDER_SETTINGS_NAME, sb.toString());
-    }
+	private void saveColumnOrder() {
+		//Number of columns not more than 1000, hopefully :)
+		//This operation don't need to be fast, that's why were recreate the cookie value
+		//every time.
 
-    private void loadSettings() {
-        loadHidden();
-        loadSortOrder();
-        loadColumnOrder();
-    }
+		StringBuilder sb = new StringBuilder();
+		for (Column c : grid.getColumns()) {
+			sb.append(c.getPropertyId().toString());
+			sb.append(COLOMN_DELIMITER);
+		}
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
 
-    private void loadColumnOrder() {
-        Callback saveFunc = new Callback() {
-            @Override
-            public void onValueDetected(String value) {
-                if (value != null) {
-                    String[] columnsOrder = value.split(COLOMN_DELIMITER);
-                    grid.setColumnOrder(columnsOrder);
-                }
-            }
-        };
-        BrowserCookie.detectCookieValue(COLUMNS_ORDER_SETTINGS_NAME, saveFunc);
+		BrowserCookie.setCookie(COLUMNS_ORDER_SETTINGS_NAME, sb.toString());
+	}
 
-    }
+	private void loadSettings() {
+		loadHidden();
+		loadSortOrder();
+		loadColumnOrder();
+	}
 
-    private void loadSortOrder() {
-        Callback saveFunc = new Callback() {
-            @Override
-            public void onValueDetected(String value) {
-                List<SortOrder> sortOrderList = new ArrayList<>();
-                if (!StringUtils.isEmpty(value)) {
-                    String[] sortOrder = value.split(SEMI_COLOMN_DELIMITER);
-                    for (String so : sortOrder) {
-                        String[] colIdWithSort = so.split(COLOMN_DELIMITER);
-                        Object propertyId = colIdWithSort[0];
-                        SortDirection direction = SortDirection.valueOf(
-                                colIdWithSort[1]);
-                        SortOrder soCreated = new SortOrder(propertyId,
-                                direction);
-                        sortOrderList.add(soCreated);
-                    }
-                }
-                grid.setSortOrder(sortOrderList);
-            }
-        };
-        BrowserCookie.detectCookieValue(SORT_ORDER_SETTINGS_NAME, saveFunc);
-    }
+	private void loadColumnOrder() {
+		Callback saveFunc = new Callback() {
+			@Override
+			public void onValueDetected(String value) {
+				if (value != null) {
+					String[] columnsOrder = value.split(COLOMN_DELIMITER);
+					grid.setColumnOrder(columnsOrder);
+				}
+			}
+		};
+		BrowserCookie.detectCookieValue(COLUMNS_ORDER_SETTINGS_NAME, saveFunc);
 
-    private void loadHidden() {
-        Callback saveFunc = new Callback() {
-            @Override
-            public void onValueDetected(String value) {
-                if (value != null) {
-                    for (String col : value.split(COLOMN_DELIMITER)) {
-                        Column column = grid.getColumn(col);
-                        if (column != null) {
-                            column.setHidden(true);
-                        }
-                    }
-                }
-            }
-        };
-        BrowserCookie.detectCookieValue(HIDDEN_SETTINGS_NAME, saveFunc);
-    }
+	}
 
-    private void saveSortOrder() {
-        final List<SortOrder> sortOrder = grid.getSortOrder();
-        StringBuilder sb = new StringBuilder();
-        for (SortOrder o : sortOrder) {
-            sb.append(o.getPropertyId());
-            sb.append(COLOMN_DELIMITER);
-            sb.append(o.getDirection());
-            sb.append(SEMI_COLOMN_DELIMITER);
-        }
-        if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        BrowserCookie.setCookie(SORT_ORDER_SETTINGS_NAME, sb.toString());
-    }
+	private void loadSortOrder() {
+		Callback saveFunc = new Callback() {
+			@Override
+			public void onValueDetected(String value) {
+				List<SortOrder> sortOrderList = new ArrayList<>();
+				if (!StringUtils.isEmpty(value)) {
+					String[] sortOrder = value.split(SEMI_COLOMN_DELIMITER);
+					for (String so : sortOrder) {
+						String[] colIdWithSort = so.split(COLOMN_DELIMITER);
+						Object propertyId = colIdWithSort[0];
+						SortDirection direction = SortDirection.valueOf(colIdWithSort[1]);
+						SortOrder soCreated = new SortOrder(propertyId, direction);
+						sortOrderList.add(soCreated);
+					}
+				}
+				grid.setSortOrder(sortOrderList);
+			}
+		};
+		BrowserCookie.detectCookieValue(SORT_ORDER_SETTINGS_NAME, saveFunc);
+	}
 
-    private void saveHidden() {
-        StringBuilder sb = new StringBuilder();
-        for (Column c : grid.getColumns()) {
-            if (c.isHidden()) {
-                sb.append(c.getPropertyId());
-                sb.append(COLOMN_DELIMITER);
-            }
-        }
-        if (sb.length() > 0) {
-            sb.deleteCharAt(sb.length() - 1);
-        }
+	private void loadHidden() {
+		Callback saveFunc = new Callback() {
+			@Override
+			public void onValueDetected(String value) {
+				if (value != null) {
+					for (String col : value.split(COLOMN_DELIMITER)) {
+						Column column = grid.getColumn(col);
+						if (column != null) {
+							column.setHidden(true);
+						}
+					}
+				}
+			}
+		};
+		BrowserCookie.detectCookieValue(HIDDEN_SETTINGS_NAME, saveFunc);
+	}
 
-        BrowserCookie.setCookie(HIDDEN_SETTINGS_NAME, sb.toString());
-    }
+	private void saveSortOrder() {
+		final List<SortOrder> sortOrder = grid.getSortOrder();
+		StringBuilder sb = new StringBuilder();
+		for (SortOrder o : sortOrder) {
+			sb.append(o.getPropertyId());
+			sb.append(COLOMN_DELIMITER);
+			sb.append(o.getDirection());
+			sb.append(SEMI_COLOMN_DELIMITER);
+		}
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+		BrowserCookie.setCookie(SORT_ORDER_SETTINGS_NAME, sb.toString());
+	}
+
+	private void saveHidden() {
+		StringBuilder sb = new StringBuilder();
+		for (Column c : grid.getColumns()) {
+			if (c.isHidden()) {
+				sb.append(c.getPropertyId());
+				sb.append(COLOMN_DELIMITER);
+			}
+		}
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+
+		BrowserCookie.setCookie(HIDDEN_SETTINGS_NAME, sb.toString());
+	}
 
 }

@@ -18,23 +18,23 @@ package io.graphenee.util.storage;
 @SuppressWarnings("serial")
 public class SaveFailedException extends Exception {
 
-    public SaveFailedException() {
-    }
+	public SaveFailedException() {
+	}
 
-    public SaveFailedException(String message) {
-        super(message);
-    }
+	public SaveFailedException(String message) {
+		super(message);
+	}
 
-    public SaveFailedException(Throwable cause) {
-        super(cause);
-    }
+	public SaveFailedException(Throwable cause) {
+		super(cause);
+	}
 
-    public SaveFailedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public SaveFailedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public SaveFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+	public SaveFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 
 }

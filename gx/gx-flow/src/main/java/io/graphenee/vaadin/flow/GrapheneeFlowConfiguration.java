@@ -26,10 +26,10 @@ import io.graphenee.sms.GrapheneeSmsConfiguration;
 
 @Configuration
 @ComponentScan(basePackages = { GrapheneeFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
-        GrapheneeI18nConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSecurityConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
-        GrapheneeDocumentsConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
+		GrapheneeI18nConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSecurityConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
+		GrapheneeDocumentsConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
 public class GrapheneeFlowConfiguration {
 
-    public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.vaadin.flow";
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.vaadin.flow";
 
 }

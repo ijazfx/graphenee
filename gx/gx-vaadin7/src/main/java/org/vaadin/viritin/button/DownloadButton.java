@@ -31,172 +31,172 @@ import java.io.Serializable;
  */
 public class DownloadButton extends MButton {
 
-    private static final long serialVersionUID = 356223526447669958L;
+	private static final long serialVersionUID = 356223526447669958L;
 
-    public interface ContentWriter {
+	public interface ContentWriter {
 
-        void write(OutputStream stream);
-    }
+		void write(OutputStream stream);
+	}
 
-    private ContentWriter writer;
-    private MimeTypeProvider mimeTypeProvider;
-    private FileNameProvider fileNameProvider;
+	private ContentWriter writer;
+	private MimeTypeProvider mimeTypeProvider;
+	private FileNameProvider fileNameProvider;
 
-    private final StreamResource streamResource = new StreamResource(new StreamResource.StreamSource() {
+	private final StreamResource streamResource = new StreamResource(new StreamResource.StreamSource() {
 
-        private static final long serialVersionUID = 3641967669172064511L;
+		private static final long serialVersionUID = 3641967669172064511L;
 
-        @Override
-        public InputStream getStream() {
-            try {
-                final PipedOutputStream out = new PipedOutputStream();
-                final PipedInputStream in = new PipedInputStream(out);
-                writeResponce(out);
-                return in;
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }, "") {
+		@Override
+		public InputStream getStream() {
+			try {
+				final PipedOutputStream out = new PipedOutputStream();
+				final PipedInputStream in = new PipedInputStream(out);
+				writeResponce(out);
+				return in;
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+	}, "") {
 
-        private static final long serialVersionUID = -8221900203840804581L;
+		private static final long serialVersionUID = -8221900203840804581L;
 
-        @Override
-        public String getFilename() {
-            if (fileNameProvider != null) {
-                return fileNameProvider.getFileName();
-            }
-            return DownloadButton.this.getFileName();
-        }
+		@Override
+		public String getFilename() {
+			if (fileNameProvider != null) {
+				return fileNameProvider.getFileName();
+			}
+			return DownloadButton.this.getFileName();
+		}
 
-        @Override
-        public String getMIMEType() {
-            if (mimeTypeProvider != null) {
-                return mimeTypeProvider.getMimeType();
-            }
-            return super.getMIMEType();
-        }
+		@Override
+		public String getMIMEType() {
+			if (mimeTypeProvider != null) {
+				return mimeTypeProvider.getMimeType();
+			}
+			return super.getMIMEType();
+		}
 
-    };
+	};
 
-    /**
-     * Constructs a new Download button without ContentWriter. Be sure to set
-     * the ContentWriter or override its getter, before instance is actually
-     * used.
-     */
-    public DownloadButton() {
-        new FileDownloader(streamResource).extend(this);
+	/**
+	 * Constructs a new Download button without ContentWriter. Be sure to set
+	 * the ContentWriter or override its getter, before instance is actually
+	 * used.
+	 */
+	public DownloadButton() {
+		new FileDownloader(streamResource).extend(this);
 
-    }
+	}
 
-    public DownloadButton(ContentWriter writer) {
-        this();
-        this.writer = writer;
-    }
+	public DownloadButton(ContentWriter writer) {
+		this();
+		this.writer = writer;
+	}
 
-    /**
-     * By default just spans a new raw thread to get the input. For strict Java
-     * EE fellows, this might not suite, so override and use executor service.
-     *
-     * @param out the output stream where the output is targeted
-     */
-    protected void writeResponce(final PipedOutputStream out) {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    getWriter().write(out);
-                    out.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }.start();
-    }
+	/**
+	 * By default just spans a new raw thread to get the input. For strict Java
+	 * EE fellows, this might not suite, so override and use executor service.
+	 *
+	 * @param out the output stream where the output is targeted
+	 */
+	protected void writeResponce(final PipedOutputStream out) {
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					getWriter().write(out);
+					out.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}.start();
+	}
 
-    public ContentWriter getWriter() {
-        return writer;
-    }
+	public ContentWriter getWriter() {
+		return writer;
+	}
 
-    public String getMimeType() {
-        return streamResource.getMIMEType();
-    }
+	public String getMimeType() {
+		return streamResource.getMIMEType();
+	}
 
-    public DownloadButton setMimeType(String mimeType) {
-        streamResource.setMIMEType(mimeType);
-        return this;
-    }
+	public DownloadButton setMimeType(String mimeType) {
+		streamResource.setMIMEType(mimeType);
+		return this;
+	}
 
-    public DownloadButton setCacheTime(long cacheTime) {
-        streamResource.setCacheTime(cacheTime);
-        return this;
-    }
+	public DownloadButton setCacheTime(long cacheTime) {
+		streamResource.setCacheTime(cacheTime);
+		return this;
+	}
 
-    public DownloadButton setWriter(ContentWriter writer) {
-        this.writer = writer;
-        return this;
-    }
+	public DownloadButton setWriter(ContentWriter writer) {
+		this.writer = writer;
+		return this;
+	}
 
-    public String getFileName() {
-        return fileNameProvider != null ? fileNameProvider.getFileName() : "file";
-    }
+	public String getFileName() {
+		return fileNameProvider != null ? fileNameProvider.getFileName() : "file";
+	}
 
-    public DownloadButton setFileName(final String fileName) {
-        this.fileNameProvider = new FileNameProvider() {
+	public DownloadButton setFileName(final String fileName) {
+		this.fileNameProvider = new FileNameProvider() {
 
-            private static final long serialVersionUID = -3449552786114328636L;
+			private static final long serialVersionUID = -3449552786114328636L;
 
-            @Override
-            public String getFileName() {
-                return fileName;
-            }
-        };
-        return this;
-    }
+			@Override
+			public String getFileName() {
+				return fileName;
+			}
+		};
+		return this;
+	}
 
-    @Override
-    public DownloadButton withIcon(Resource icon) {
-        setIcon(icon);
-        return this;
-    }
+	@Override
+	public DownloadButton withIcon(Resource icon) {
+		setIcon(icon);
+		return this;
+	}
 
-    @Override
-    public DownloadButton withClickShortcut(int keycode, int... modifiers) {
-        setClickShortcut(keycode, modifiers);
-        return this;
-    }
+	@Override
+	public DownloadButton withClickShortcut(int keycode, int... modifiers) {
+		setClickShortcut(keycode, modifiers);
+		return this;
+	}
 
-    public MimeTypeProvider getMimeTypeProvider() {
-        return mimeTypeProvider;
-    }
+	public MimeTypeProvider getMimeTypeProvider() {
+		return mimeTypeProvider;
+	}
 
-    public FileNameProvider getFileNameProvider() {
-        return fileNameProvider;
-    }
+	public FileNameProvider getFileNameProvider() {
+		return fileNameProvider;
+	}
 
-    @Override
-    public DownloadButton withCaption(String caption) {
-        return (DownloadButton) super.withCaption(caption);
-    }
+	@Override
+	public DownloadButton withCaption(String caption) {
+		return (DownloadButton) super.withCaption(caption);
+	}
 
-    public DownloadButton setFileNameProvider(FileNameProvider fileNameProvider) {
-        this.fileNameProvider = fileNameProvider;
-        return this;
-    }
+	public DownloadButton setFileNameProvider(FileNameProvider fileNameProvider) {
+		this.fileNameProvider = fileNameProvider;
+		return this;
+	}
 
-    public DownloadButton setMimeTypeProvider(MimeTypeProvider mimeTypeProvider) {
-        this.mimeTypeProvider = mimeTypeProvider;
-        return this;
-    }
+	public DownloadButton setMimeTypeProvider(MimeTypeProvider mimeTypeProvider) {
+		this.mimeTypeProvider = mimeTypeProvider;
+		return this;
+	}
 
-    public interface FileNameProvider extends Serializable {
+	public interface FileNameProvider extends Serializable {
 
-        String getFileName();
-    }
+		String getFileName();
+	}
 
-    public interface MimeTypeProvider extends Serializable {
+	public interface MimeTypeProvider extends Serializable {
 
-        String getMimeType();
-    }
+		String getMimeType();
+	}
 
 }

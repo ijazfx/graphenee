@@ -29,50 +29,50 @@ import com.lambdaworks.crypto.SCryptUtil;
  */
 public class SCryptHashProvider extends AbstractHashProvider {
 
-    public static final String ENCRYPTION = "scrypt";
+	public static final String ENCRYPTION = "scrypt";
 
-    private String scryptSalt;
+	private String scryptSalt;
 
-    public SCryptHashProvider(String salt) {
-        this.scryptSalt = salt;
-    }
+	public SCryptHashProvider(String salt) {
+		this.scryptSalt = salt;
+	}
 
-    @Override
-    public String createHash(String prefix, String input, String signingKey) {
-        try {
-            Encoder encoder = Base64.getEncoder();
-            byte[] temp = (prefix + input).getBytes();
-            byte[] hash = SCrypt.scryptJ(temp, signingKey.getBytes(), 1024, 32, 16, 48);
-            // byte[] hash = SCrypt.scryptJ(temp, signingKey.getBytes(), 16, 4, 2, 32);
-            return encoder.encodeToString(hash);
-        } catch (Exception e) {
-            log.warning(e.getMessage());
-            return super.createHash(prefix, input, signingKey);
-        }
-    }
+	@Override
+	public String createHash(String prefix, String input, String signingKey) {
+		try {
+			Encoder encoder = Base64.getEncoder();
+			byte[] temp = (prefix + input).getBytes();
+			byte[] hash = SCrypt.scryptJ(temp, signingKey.getBytes(), 1024, 32, 16, 48);
+			// byte[] hash = SCrypt.scryptJ(temp, signingKey.getBytes(), 16, 4, 2, 32);
+			return encoder.encodeToString(hash);
+		} catch (Exception e) {
+			log.warning(e.getMessage());
+			return super.createHash(prefix, input, signingKey);
+		}
+	}
 
-    @Override
-    public String createPasswordHash(String input) {
-        return createHash(PASSWORD_PREFIX, input, scryptSalt);
-    }
+	@Override
+	public String createPasswordHash(String input) {
+		return createHash(PASSWORD_PREFIX, input, scryptSalt);
+	}
 
-    @Override
-    public String encryption() {
-        return ENCRYPTION;
-    }
+	@Override
+	public String encryption() {
+		return ENCRYPTION;
+	}
 
-    @Override
-    public boolean checkPasswordHash(String input, String hashed) {
-        Decoder decoder = Base64.getDecoder();
-        byte[] decodedHash = decoder.decode(hashed);
-        String inputHash;
-        try {
-            inputHash = new String(decodedHash, "UTF-8");
-            return SCryptUtil.check(input, inputHash);
-        } catch (Exception e) {
-            log.warning(e.getMessage());
-        }
-        return false;
-    }
+	@Override
+	public boolean checkPasswordHash(String input, String hashed) {
+		Decoder decoder = Base64.getDecoder();
+		byte[] decodedHash = decoder.decode(hashed);
+		String inputHash;
+		try {
+			inputHash = new String(decodedHash, "UTF-8");
+			return SCryptUtil.check(input, inputHash);
+		} catch (Exception e) {
+			log.warning(e.getMessage());
+		}
+		return false;
+	}
 
 }

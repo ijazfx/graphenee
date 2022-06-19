@@ -30,135 +30,135 @@ import java.util.List;
  */
 public class FilterableTable<T> extends MTable<T> {
 
-    private static final long serialVersionUID = -8345842706524882553L;
+	private static final long serialVersionUID = -8345842706524882553L;
 
-    private final List<Filter> pendingFilters = new ArrayList<>();
+	private final List<Filter> pendingFilters = new ArrayList<>();
 
-    public FilterableTable() {
+	public FilterableTable() {
 
-    }
+	}
 
-    public FilterableTable(Class<T> type) {
-        super(type);
-    }
+	public FilterableTable(Class<T> type) {
+		super(type);
+	}
 
-    public FilterableTable(T... beans) {
-        super(beans);
-    }
+	public FilterableTable(T... beans) {
+		super(beans);
+	}
 
-    public FilterableTable(Collection<T> beans) {
-        super(beans);
-    }
+	public FilterableTable(Collection<T> beans) {
+		super(beans);
+	}
 
-    @Override
-    protected FilterableListContainer<T> createContainer(Class<? extends T> type) {
-        return new FilterableListContainer<T>(type); // Type parameter just to keep NB happy
-    }
+	@Override
+	protected FilterableListContainer<T> createContainer(Class<? extends T> type) {
+		return new FilterableListContainer<T>(type); // Type parameter just to keep NB happy
+	}
 
-    @Override
-    protected FilterableListContainer<T> createContainer(Collection<T> beans) {
-        return new FilterableListContainer<>(beans);
-    }
+	@Override
+	protected FilterableListContainer<T> createContainer(Collection<T> beans) {
+		return new FilterableListContainer<>(beans);
+	}
 
-    @Override
-    protected FilterableListContainer<T> getContainer() {
-        return (FilterableListContainer<T>) super.getContainer();
-    }
+	@Override
+	protected FilterableListContainer<T> getContainer() {
+		return (FilterableListContainer<T>) super.getContainer();
+	}
 
-    @Override
-    protected void ensureBeanItemContainer(Collection<T> beans) {
-        super.ensureBeanItemContainer(beans);
+	@Override
+	protected void ensureBeanItemContainer(Collection<T> beans) {
+		super.ensureBeanItemContainer(beans);
 
-        for (Filter filter : pendingFilters) {
-            getContainer().addContainerFilter(filter);
-        }
-        pendingFilters.clear();
-    }
+		for (Filter filter : pendingFilters) {
+			getContainer().addContainerFilter(filter);
+		}
+		pendingFilters.clear();
+	}
 
-    public void addFilter(Filter filter) {
-        if (isContainerInitialized()) {
-            getContainer().addContainerFilter(filter);
-        } else {
-            pendingFilters.add(filter);
-        }
-    }
+	public void addFilter(Filter filter) {
+		if (isContainerInitialized()) {
+			getContainer().addContainerFilter(filter);
+		} else {
+			pendingFilters.add(filter);
+		}
+	}
 
-    public void removeFilter(Filter filter) {
-        if (isContainerInitialized()) {
-            getContainer().removeContainerFilter(filter);
-        } else {
-            pendingFilters.remove(filter);
-        }
-    }
+	public void removeFilter(Filter filter) {
+		if (isContainerInitialized()) {
+			getContainer().removeContainerFilter(filter);
+		} else {
+			pendingFilters.remove(filter);
+		}
+	}
 
-    public void removeAllFilters() {
-        if (isContainerInitialized()) {
-            getContainer().removeAllContainerFilters();
-        } else {
-            pendingFilters.clear();
-        }
-    }
+	public void removeAllFilters() {
+		if (isContainerInitialized()) {
+			getContainer().removeAllContainerFilters();
+		} else {
+			pendingFilters.clear();
+		}
+	}
 
-    public Collection<Filter> getFilters() {
-        if (isContainerInitialized()) {
-            return getContainer().getContainerFilters();
-        } else {
-            return Collections.unmodifiableList(pendingFilters);
-        }
-    }
+	public Collection<Filter> getFilters() {
+		if (isContainerInitialized()) {
+			return getContainer().getContainerFilters();
+		} else {
+			return Collections.unmodifiableList(pendingFilters);
+		}
+	}
 
-    public FilterableTable<T> withFilter(Filter filter) {
-        addFilter(filter);
-        return this;
-    }
+	public FilterableTable<T> withFilter(Filter filter) {
+		addFilter(filter);
+		return this;
+	}
 
-    @Override
-    public FilterableTable<T> addBeans(Collection<T> beans) {
-        return (FilterableTable<T>) super.addBeans(beans);
-    }
+	@Override
+	public FilterableTable<T> addBeans(Collection<T> beans) {
+		return (FilterableTable<T>) super.addBeans(beans);
+	}
 
-    @Override
-    public FilterableTable<T> setBeans(T... beans) {
-        return (FilterableTable<T>) super.setBeans(beans);
-    }
+	@Override
+	public FilterableTable<T> setBeans(T... beans) {
+		return (FilterableTable<T>) super.setBeans(beans);
+	}
 
-    @Override
-    public FilterableTable<T> setBeans(Collection<T> beans) {
-        return (FilterableTable<T>) super.setBeans(beans);
-    }
+	@Override
+	public FilterableTable<T> setBeans(Collection<T> beans) {
+		return (FilterableTable<T>) super.setBeans(beans);
+	}
 
-    @Override
-    public FilterableTable<T> withFullWidth() {
-        return (FilterableTable<T>) super.withFullWidth();
-    }
+	@Override
+	public FilterableTable<T> withFullWidth() {
+		return (FilterableTable<T>) super.withFullWidth();
+	}
 
-    @Override
-    public FilterableTable<T> withHeight(String height) {
-        return (FilterableTable<T>) super.withHeight(height);
-    }
+	@Override
+	public FilterableTable<T> withHeight(String height) {
+		return (FilterableTable<T>) super.withHeight(height);
+	}
 
-    @Override
-    public FilterableTable<T> withFullHeight() {
-        return (FilterableTable<T>) super.withFullHeight();
-    }
+	@Override
+	public FilterableTable<T> withFullHeight() {
+		return (FilterableTable<T>) super.withFullHeight();
+	}
 
-    @Override
-    public FilterableTable<T> withWidth(String width) {
-        return (FilterableTable<T>) super.withWidth(width);
-    }
+	@Override
+	public FilterableTable<T> withWidth(String width) {
+		return (FilterableTable<T>) super.withWidth(width);
+	}
 
-    @Override
-    public FilterableTable<T> withCaption(String caption) {
-        return (FilterableTable<T>) super.withCaption(caption);
-    }
+	@Override
+	public FilterableTable<T> withCaption(String caption) {
+		return (FilterableTable<T>) super.withCaption(caption);
+	}
 
-    @Override
-    public FilterableTable<T> expand(String... propertiesToExpand) {
-        return (FilterableTable<T>) super.expand(propertiesToExpand);
-    }
+	@Override
+	public FilterableTable<T> expand(String... propertiesToExpand) {
+		return (FilterableTable<T>) super.expand(propertiesToExpand);
+	}
 
-    @Override
-    public FilterableTable<T> withGeneratedColumn(String columnId, final SimpleColumnGenerator<T> columnGenerator) {
-        return (FilterableTable<T>) super.withGeneratedColumn(columnId, columnGenerator);
-    }
+	@Override
+	public FilterableTable<T> withGeneratedColumn(String columnId, final SimpleColumnGenerator<T> columnGenerator) {
+		return (FilterableTable<T>) super.withGeneratedColumn(columnId, columnGenerator);
+	}
 }

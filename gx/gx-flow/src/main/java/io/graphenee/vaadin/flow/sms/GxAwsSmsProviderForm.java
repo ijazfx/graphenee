@@ -121,7 +121,7 @@ public class GxAwsSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderBean
 			}
 		});
 		form.add(awsAccessKeyId, awsSecretKey, awsRegion, senderId, isPrimary);
-		
+
 		setColspan(isPrimary, 2);
 	}
 

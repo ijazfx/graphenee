@@ -72,370 +72,349 @@ import java.util.logging.Logger;
  */
 public class ElementCollectionField<ET> extends AbstractElementCollection<ET> {
 
-    private static final long serialVersionUID = 8573373104105052804L;
+	private static final long serialVersionUID = 8573373104105052804L;
 
-    List<ET> items = new ArrayList<>();
+	List<ET> items = new ArrayList<>();
 
-    boolean inited = false;
+	boolean inited = false;
 
-    MGridLayout layout = new MGridLayout();
+	MGridLayout layout = new MGridLayout();
 
-    private boolean visibleHeaders = true;
-    private boolean requireVerificationForRemoval;
-    private AbstractForm<ET> popupEditor;
+	private boolean visibleHeaders = true;
+	private boolean requireVerificationForRemoval;
+	private AbstractForm<ET> popupEditor;
 
-    public ElementCollectionField(Class<ET> elementType,
-            Class<?> formType) {
-        super(elementType, formType);
-    }
+	public ElementCollectionField(Class<ET> elementType, Class<?> formType) {
+		super(elementType, formType);
+	}
 
-    public ElementCollectionField(Class<ET> elementType, Instantiator i,
-            Class<?> formType) {
-        super(elementType, i, formType);
-    }
+	public ElementCollectionField(Class<ET> elementType, Instantiator i, Class<?> formType) {
+		super(elementType, i, formType);
+	}
 
-    @Override
-    public void addInternalElement(final ET v) {
-        ensureInited();
-        items.add(v);
-        MBeanFieldGroup<ET> fg = getFieldGroupFor(v);
-        for (Object property : getVisibleProperties()) {
-            Component c = fg.getField(property);
-            if (c == null) {
-                c = getComponentFor(v, property.toString());
-                Logger.getLogger(ElementCollectionField.class.getName())
-                        .log(Level.WARNING, "No editor field for{0}", property);
-            }
-            layout.addComponent(c);
-            layout.setComponentAlignment(c, Alignment.MIDDLE_LEFT);
-        }
-        if (getPopupEditor() != null) {
-            MButton b = new MButton(FontAwesome.EDIT)
-                    .withStyleName(ValoTheme.BUTTON_ICON_ONLY)
-                    .withListener(new Button.ClickListener() {
-                private static final long serialVersionUID = 5019806363620874205L;
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    editInPopup(v);
-                }
-            });
-            layout.add(b);
-        }
-        if (isAllowRemovingItems()) {
-            layout.add(createRemoveButton(v));
-        }
-        if (!isAllowEditItems()) {
-            fg.setReadOnly(true);
-        }
-    }
+	@Override
+	public void addInternalElement(final ET v) {
+		ensureInited();
+		items.add(v);
+		MBeanFieldGroup<ET> fg = getFieldGroupFor(v);
+		for (Object property : getVisibleProperties()) {
+			Component c = fg.getField(property);
+			if (c == null) {
+				c = getComponentFor(v, property.toString());
+				Logger.getLogger(ElementCollectionField.class.getName()).log(Level.WARNING, "No editor field for{0}", property);
+			}
+			layout.addComponent(c);
+			layout.setComponentAlignment(c, Alignment.MIDDLE_LEFT);
+		}
+		if (getPopupEditor() != null) {
+			MButton b = new MButton(FontAwesome.EDIT).withStyleName(ValoTheme.BUTTON_ICON_ONLY).withListener(new Button.ClickListener() {
+				private static final long serialVersionUID = 5019806363620874205L;
 
-    protected Component createRemoveButton(final ET v) {
-        MButton b;
-        if (requireVerificationForRemoval) {
-            b = new ConfirmButton();
-        } else {
-            b = new MButton();
-        }
-        b.withIcon(FontAwesome.TRASH_O)
-                .withStyleName(ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_DANGER)
-                .withListener(new Button.ClickListener() {
-            private static final long serialVersionUID = 5019806363620874205L;
-                    @Override
-                    public void buttonClick(Button.ClickEvent event) {
-                        removeElement(v);
-                    }
-                });
-        return b;
-    }
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
+					editInPopup(v);
+				}
+			});
+			layout.add(b);
+		}
+		if (isAllowRemovingItems()) {
+			layout.add(createRemoveButton(v));
+		}
+		if (!isAllowEditItems()) {
+			fg.setReadOnly(true);
+		}
+	}
 
-    @Override
-    public void removeInternalElement(ET v) {
-        int index = itemsIdentityIndexOf(v);
-        items.remove(index);
-        int row = index + 1;
-        layout.removeRow(row);
-    }
+	protected Component createRemoveButton(final ET v) {
+		MButton b;
+		if (requireVerificationForRemoval) {
+			b = new ConfirmButton();
+		} else {
+			b = new MButton();
+		}
+		b.withIcon(FontAwesome.TRASH_O).withStyleName(ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_DANGER).withListener(new Button.ClickListener() {
+			private static final long serialVersionUID = 5019806363620874205L;
 
-    @Override
-    public GridLayout getLayout() {
-        return layout;
-    }
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				removeElement(v);
+			}
+		});
+		return b;
+	}
 
-    @Override
-    public void setPersisted(ET v, boolean persisted) {
-        int row = itemsIdentityIndexOf(v) + 1;
-        if (isAllowRemovingItems()) {
-            Button c = (Button) layout.getComponent(layout.getColumns() - 1, row);
-            if (persisted) {
-                c.setDescription(getDeleteElementDescription());
-            } else {
-                for (int i = 0; i < getVisibleProperties().size(); i++) {
-                    try {
-                        AbstractField f = (AbstractField) (Field) layout.
-                                getComponent(i,
-                                        row);
-                        f.setValidationVisible(false);
-                    } catch (Exception e) {
+	@Override
+	public void removeInternalElement(ET v) {
+		int index = itemsIdentityIndexOf(v);
+		items.remove(index);
+		int row = index + 1;
+		layout.removeRow(row);
+	}
 
-                    }
-                }
-                c.setDescription(getDisabledDeleteElementDescription());
-            }
-            c.setEnabled(persisted);
-        }
-    }
+	@Override
+	public GridLayout getLayout() {
+		return layout;
+	}
 
-    private int itemsIdentityIndexOf(Object o) {
-        for (int index = 0; index < items.size(); index++) {
-            if (items.get(index) == o) {
-                return index;
-            }
-        }
-        return -1;
-    }
+	@Override
+	public void setPersisted(ET v, boolean persisted) {
+		int row = itemsIdentityIndexOf(v) + 1;
+		if (isAllowRemovingItems()) {
+			Button c = (Button) layout.getComponent(layout.getColumns() - 1, row);
+			if (persisted) {
+				c.setDescription(getDeleteElementDescription());
+			} else {
+				for (int i = 0; i < getVisibleProperties().size(); i++) {
+					try {
+						AbstractField f = (AbstractField) (Field) layout.getComponent(i, row);
+						f.setValidationVisible(false);
+					} catch (Exception e) {
 
-    private void ensureInited() {
-        if (!inited) {
-            int columns = getVisibleProperties().size();
-            if (isAllowRemovingItems()) {
-                columns++;
-            }
-            if(getPopupEditor() != null) {
-                columns++;
-            }
-            layout.setColumns(columns);
+					}
+				}
+				c.setDescription(getDisabledDeleteElementDescription());
+			}
+			c.setEnabled(persisted);
+		}
+	}
 
-            if (visibleHeaders) {
-                for (Object property : getVisibleProperties()) {
-                    Component header = createHeader(property);
-                    layout.addComponent(header);
-                }
-                if (isAllowRemovingItems()) {
-                    // leave last header slot empty, "actions" colunn
-                    layout.newLine();
-                }
-            }
-            inited = true;
-        }
-    }
+	private int itemsIdentityIndexOf(Object o) {
+		for (int index = 0; index < items.size(); index++) {
+			if (items.get(index) == o) {
+				return index;
+			}
+		}
+		return -1;
+	}
 
-    /**
-     * Creates the header for given property. By default a simple Label is used.
-     * Override this method to style it or to replace it with something more
-     * complex.
-     *
-     * @param property the property for which header is to be created.
-     * @return the component used for header
-     */
-    protected Component createHeader(Object property) {
-        Label header = new Label(getPropertyHeader(property.
-                toString()));
-        header.setWidthUndefined();
-        return header;
-    }
+	private void ensureInited() {
+		if (!inited) {
+			int columns = getVisibleProperties().size();
+			if (isAllowRemovingItems()) {
+				columns++;
+			}
+			if (getPopupEditor() != null) {
+				columns++;
+			}
+			layout.setColumns(columns);
 
-    public ElementCollectionField<ET> withEditorInstantiator(
-            Instantiator instantiator) {
-        setEditorInstantiator(instantiator);
-        return this;
-    }
+			if (visibleHeaders) {
+				for (Object property : getVisibleProperties()) {
+					Component header = createHeader(property);
+					layout.addComponent(header);
+				}
+				if (isAllowRemovingItems()) {
+					// leave last header slot empty, "actions" colunn
+					layout.newLine();
+				}
+			}
+			inited = true;
+		}
+	}
 
-    public ElementCollectionField<ET> withNewEditorInstantiator(
-            EditorInstantiator<?, ET> instantiator) {
-        setNewEditorInstantiator(instantiator);
-        return this;
-    }
+	/**
+	 * Creates the header for given property. By default a simple Label is used.
+	 * Override this method to style it or to replace it with something more
+	 * complex.
+	 *
+	 * @param property the property for which header is to be created.
+	 * @return the component used for header
+	 */
+	protected Component createHeader(Object property) {
+		Label header = new Label(getPropertyHeader(property.toString()));
+		header.setWidthUndefined();
+		return header;
+	}
 
-    public ElementCollectionField<ET> withVisibleHeaders(boolean visibleHeaders) {
-        this.visibleHeaders = visibleHeaders;
-        return this;
-    }
+	public ElementCollectionField<ET> withEditorInstantiator(Instantiator instantiator) {
+		setEditorInstantiator(instantiator);
+		return this;
+	}
 
-    @Override
-    public void clear() {
-        if (inited) {
-            items.clear();
-            int rows = inited ? 1 : 0;
-            while (layout.getRows() > rows) {
-                layout.removeRow(rows);
-            }
-        }
+	public ElementCollectionField<ET> withNewEditorInstantiator(EditorInstantiator<?, ET> instantiator) {
+		setNewEditorInstantiator(instantiator);
+		return this;
+	}
 
-    }
+	public ElementCollectionField<ET> withVisibleHeaders(boolean visibleHeaders) {
+		this.visibleHeaders = visibleHeaders;
+		return this;
+	}
 
-    public String getDisabledDeleteElementDescription() {
-        return disabledDeleteThisElementDescription;
-    }
+	@Override
+	public void clear() {
+		if (inited) {
+			items.clear();
+			int rows = inited ? 1 : 0;
+			while (layout.getRows() > rows) {
+				layout.removeRow(rows);
+			}
+		}
 
-    public void setDisabledDeleteThisElementDescription(
-            String disabledDeleteThisElementDescription) {
-        this.disabledDeleteThisElementDescription = disabledDeleteThisElementDescription;
-    }
+	}
 
-    private String disabledDeleteThisElementDescription = "Fill this row to add a new element, currently ignored";
+	public String getDisabledDeleteElementDescription() {
+		return disabledDeleteThisElementDescription;
+	}
 
-    public String getDeleteElementDescription() {
-        return deleteThisElementDescription;
-    }
+	public void setDisabledDeleteThisElementDescription(String disabledDeleteThisElementDescription) {
+		this.disabledDeleteThisElementDescription = disabledDeleteThisElementDescription;
+	}
 
-    private String deleteThisElementDescription = "Delete this element";
+	private String disabledDeleteThisElementDescription = "Fill this row to add a new element, currently ignored";
 
-    public void setDeleteThisElementDescription(
-            String deleteThisElementDescription) {
-        this.deleteThisElementDescription = deleteThisElementDescription;
-    }
+	public String getDeleteElementDescription() {
+		return deleteThisElementDescription;
+	}
 
-    @Override
-    public void onElementAdded() {
-        if (isAllowNewItems()) {
-            newInstance = createInstance();
-            addInternalElement(newInstance);
-            setPersisted(newInstance, false);
-        }
-    }
+	private String deleteThisElementDescription = "Delete this element";
 
-    @Override
-    public ElementCollectionField<ET> setPropertyHeader(String propertyName,
-            String propertyHeader) {
-        super.setPropertyHeader(propertyName, propertyHeader);
-        return this;
-    }
+	public void setDeleteThisElementDescription(String deleteThisElementDescription) {
+		this.deleteThisElementDescription = deleteThisElementDescription;
+	}
 
-    @Override
-    public ElementCollectionField<ET> setVisibleProperties(
-            List<String> properties, List<String> propertyHeaders) {
-        super.setVisibleProperties(properties, propertyHeaders);
-        return this;
-    }
+	@Override
+	public void onElementAdded() {
+		if (isAllowNewItems()) {
+			newInstance = createInstance();
+			addInternalElement(newInstance);
+			setPersisted(newInstance, false);
+		}
+	}
 
-    @Override
-    public ElementCollectionField<ET> setVisibleProperties(
-            List<String> properties) {
-        super.setVisibleProperties(properties);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> setPropertyHeader(String propertyName, String propertyHeader) {
+		super.setPropertyHeader(propertyName, propertyHeader);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> setAllowNewElements(
-            boolean allowNewItems) {
-        super.setAllowNewElements(allowNewItems);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> setVisibleProperties(List<String> properties, List<String> propertyHeaders) {
+		super.setVisibleProperties(properties, propertyHeaders);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> setAllowRemovingItems(
-            boolean allowRemovingItems) {
-        super.setAllowRemovingItems(allowRemovingItems);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> setVisibleProperties(List<String> properties) {
+		super.setVisibleProperties(properties);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> withCaption(String caption) {
-        super.withCaption(caption);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> setAllowNewElements(boolean allowNewItems) {
+		super.setAllowNewElements(allowNewItems);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> removeElementRemovedListener(
-            ElementRemovedListener listener) {
-        super.removeElementRemovedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> setAllowRemovingItems(boolean allowRemovingItems) {
+		super.setAllowRemovingItems(allowRemovingItems);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> addElementRemovedListener(
-            ElementRemovedListener<ET> listener) {
-        super.addElementRemovedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> withCaption(String caption) {
+		super.withCaption(caption);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> removeElementAddedListener(
-            ElementAddedListener listener) {
-        super.removeElementAddedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> removeElementRemovedListener(ElementRemovedListener listener) {
+		super.removeElementRemovedListener(listener);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionField<ET> addElementAddedListener(
-            ElementAddedListener<ET> listener) {
-        super.addElementAddedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> addElementRemovedListener(ElementRemovedListener<ET> listener) {
+		super.addElementRemovedListener(listener);
+		return this;
+	}
 
-    /**
-     * Expands the column with given property id
-     *
-     * @param propertyId the id of column that should be expanded in the UI
-     * @return the element collection field
-     */
-    public ElementCollectionField<ET> expand(String... propertyId) {
-        for (String propertyId1 : propertyId) {
-            int index = getVisibleProperties().indexOf(propertyId1);
-            if (index == -1) {
-                throw new IllegalArgumentException(
-                        "The expanded property must available");
-            }
-            layout.setColumnExpandRatio(index, 1);
-        }
-        if (layout.getWidth() == -1) {
-            layout.setWidth(100, Unit.PERCENTAGE);
-        }
-        // TODO should also make width of elements automatically 100%, both
-        // existing and added, now obsolete config needed for row model
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> removeElementAddedListener(ElementAddedListener listener) {
+		super.removeElementAddedListener(listener);
+		return this;
+	}
 
-    public ElementCollectionField<ET> withFullWidth() {
-        setWidth(100, Unit.PERCENTAGE);
-        return this;
-    }
+	@Override
+	public ElementCollectionField<ET> addElementAddedListener(ElementAddedListener<ET> listener) {
+		super.addElementAddedListener(listener);
+		return this;
+	}
 
-    public ElementCollectionField<ET> withId(String id) {
-        setId(id);
-        return this;
-    }
+	/**
+	 * Expands the column with given property id
+	 *
+	 * @param propertyId the id of column that should be expanded in the UI
+	 * @return the element collection field
+	 */
+	public ElementCollectionField<ET> expand(String... propertyId) {
+		for (String propertyId1 : propertyId) {
+			int index = getVisibleProperties().indexOf(propertyId1);
+			if (index == -1) {
+				throw new IllegalArgumentException("The expanded property must available");
+			}
+			layout.setColumnExpandRatio(index, 1);
+		}
+		if (layout.getWidth() == -1) {
+			layout.setWidth(100, Unit.PERCENTAGE);
+		}
+		// TODO should also make width of elements automatically 100%, both
+		// existing and added, now obsolete config needed for row model
+		return this;
+	}
 
-    public ElementCollectionField<ET> setRequireVerificationForRemoving(boolean requireVerification) {
-        requireVerificationForRemoval = requireVerification;
-        return this;
-    }
+	public ElementCollectionField<ET> withFullWidth() {
+		setWidth(100, Unit.PERCENTAGE);
+		return this;
+	}
 
-    public AbstractForm<ET> getPopupEditor() {
-        return popupEditor;
-    }
+	public ElementCollectionField<ET> withId(String id) {
+		setId(id);
+		return this;
+	}
 
-    /**
-     * Method to set form to allow editing more properties than it would be
-     * convenient inline.
-     *
-     * @param newPopupEditor the popup editor to be used to edit instances
-     */
-    public void setPopupEditor(AbstractForm<ET> newPopupEditor) {
-        this.popupEditor = newPopupEditor;
-        if (newPopupEditor != null) {
-            newPopupEditor.setSavedHandler(new AbstractForm.SavedHandler<ET>() {
-                private static final long serialVersionUID = 389618696563816566L;
-                @Override
-                public void onSave(ET entity) {
-                    MBeanFieldGroup<ET> fg = getFieldGroupFor(entity);
-                    fg.setItemDataSource(entity);
-                    fg.setBeanModified(true);
-                    // TODO refresh binding
-                    popupEditor.getPopup().close();
-                }
-            });
-        }
-    }
+	public ElementCollectionField<ET> setRequireVerificationForRemoving(boolean requireVerification) {
+		requireVerificationForRemoval = requireVerification;
+		return this;
+	}
 
-    /**
-     * Opens a (possibly configured) popup editor to edit given entity.
-     * 
-     * @param entity the entity to be edited
-     */
-    public void editInPopup(ET entity) {
-        getPopupEditor().setEntity(entity);
-        getPopupEditor().openInModalPopup();
-    }
+	public AbstractForm<ET> getPopupEditor() {
+		return popupEditor;
+	}
+
+	/**
+	 * Method to set form to allow editing more properties than it would be
+	 * convenient inline.
+	 *
+	 * @param newPopupEditor the popup editor to be used to edit instances
+	 */
+	public void setPopupEditor(AbstractForm<ET> newPopupEditor) {
+		this.popupEditor = newPopupEditor;
+		if (newPopupEditor != null) {
+			newPopupEditor.setSavedHandler(new AbstractForm.SavedHandler<ET>() {
+				private static final long serialVersionUID = 389618696563816566L;
+
+				@Override
+				public void onSave(ET entity) {
+					MBeanFieldGroup<ET> fg = getFieldGroupFor(entity);
+					fg.setItemDataSource(entity);
+					fg.setBeanModified(true);
+					// TODO refresh binding
+					popupEditor.getPopup().close();
+				}
+			});
+		}
+	}
+
+	/**
+	 * Opens a (possibly configured) popup editor to edit given entity.
+	 * 
+	 * @param entity the entity to be edited
+	 */
+	public void editInPopup(ET entity) {
+		getPopupEditor().setEntity(entity);
+		getPopupEditor().openInModalPopup();
+	}
 
 }

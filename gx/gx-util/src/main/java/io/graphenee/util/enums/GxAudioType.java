@@ -16,50 +16,50 @@
 package io.graphenee.util.enums;
 
 public enum GxAudioType {
-    WEBM_AUDIO("audio/webm", "webm"),
-    MP3("audio/mpeg", "mp3"),
-    WAV("audio/wav", "wav"),
-    M4A("audio/m4a", "m4a"),
-    OGG_AUDIO("audio/ogg", "ogg");
+	WEBM_AUDIO("audio/webm", "webm"),
+	MP3("audio/mpeg", "mp3"),
+	WAV("audio/wav", "wav"),
+	M4A("audio/m4a", "m4a"),
+	OGG_AUDIO("audio/ogg", "ogg");
 
-    private String mimeType;
+	private String mimeType;
 
-    private String extension;
+	private String extension;
 
-    private GxAudioType(String mimeType, String extension) {
-        this.mimeType = mimeType;
-        this.extension = extension;
-    }
+	private GxAudioType(String mimeType, String extension) {
+		this.mimeType = mimeType;
+		this.extension = extension;
+	}
 
-    public String getMimeType() {
-        return mimeType;
-    }
+	public String getMimeType() {
+		return mimeType;
+	}
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
 
-    public String getExtension() {
-        return this.extension;
-    }
+	public String getExtension() {
+		return this.extension;
+	}
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
 
-    public static GxAudioType findByMimeType(String mimeType) {
-        if (mimeType.equals(GxAudioType.WEBM_AUDIO.mimeType))
-            return GxAudioType.WEBM_AUDIO;
-        if (mimeType.equals(GxAudioType.MP3.mimeType))
-            return GxAudioType.MP3;
-        if (mimeType.equals(GxAudioType.WAV.mimeType))
-            return GxAudioType.WAV;
-        if (mimeType.equals(GxAudioType.M4A.mimeType))
-            return GxAudioType.M4A;
-        if (mimeType.equals(GxAudioType.OGG_AUDIO.mimeType))
-            return GxAudioType.OGG_AUDIO;
+	public static GxAudioType findByMimeType(String mimeType) {
+		if (mimeType.equals(GxAudioType.WEBM_AUDIO.mimeType))
+			return GxAudioType.WEBM_AUDIO;
+		if (mimeType.equals(GxAudioType.MP3.mimeType))
+			return GxAudioType.MP3;
+		if (mimeType.equals(GxAudioType.WAV.mimeType))
+			return GxAudioType.WAV;
+		if (mimeType.equals(GxAudioType.M4A.mimeType))
+			return GxAudioType.M4A;
+		if (mimeType.equals(GxAudioType.OGG_AUDIO.mimeType))
+			return GxAudioType.OGG_AUDIO;
 
-        return null;
-    }
+		return null;
+	}
 
 }

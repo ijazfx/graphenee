@@ -33,109 +33,109 @@ import lombok.extern.slf4j.Slf4j;
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @PostConstruct
-    private void postBuild() {
-        AppLayoutBuilder<LeftHybrid> builder = AppLayoutBuilder.get(LeftLayouts.LeftHybrid.class);
-        builder = builder.withTitle(buildTitleComponent());
-        builder.withAppMenu(buildAppMenu());
-        if (flowSetup().loggedInUser() != null) {
-            builder.withAppBar(AppBarBuilder.get().add(buildProfileMenu()).build());
-        }
-        LeftHybrid layout = builder.build();
-        init(layout);
-    }
+	@PostConstruct
+	private void postBuild() {
+		AppLayoutBuilder<LeftHybrid> builder = AppLayoutBuilder.get(LeftLayouts.LeftHybrid.class);
+		builder = builder.withTitle(buildTitleComponent());
+		builder.withAppMenu(buildAppMenu());
+		if (flowSetup().loggedInUser() != null) {
+			builder.withAppBar(AppBarBuilder.get().add(buildProfileMenu()).build());
+		}
+		LeftHybrid layout = builder.build();
+		init(layout);
+	}
 
-    private Component buildAppMenu() {
-        LeftAppMenuBuilder builder = LeftAppMenuBuilder.get();
-        List<GxMenuItem> menuItems = flowSetup().menuItems();
-        if (menuItems != null && !menuItems.isEmpty()) {
-            menuItems.forEach(mi -> {
-                addMenuItemToAppMenu(mi, builder);
-            });
-        }
-        return builder.build();
-    }
+	private Component buildAppMenu() {
+		LeftAppMenuBuilder builder = LeftAppMenuBuilder.get();
+		List<GxMenuItem> menuItems = flowSetup().menuItems();
+		if (menuItems != null && !menuItems.isEmpty()) {
+			menuItems.forEach(mi -> {
+				addMenuItemToAppMenu(mi, builder);
+			});
+		}
+		return builder.build();
+	}
 
-    private void addMenuItemToAppMenu(GxMenuItem mi, LeftAppMenuBuilder builder) {
-        GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
-        if (mi.hasChildren()) {
-            LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
+	private void addMenuItemToAppMenu(GxMenuItem mi, LeftAppMenuBuilder builder) {
+		GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
+		if (mi.hasChildren()) {
+			LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
 
-            AtomicBoolean anyMenu = new AtomicBoolean(false);
-            mi.getChildren().forEach(smi -> {
-                if (smi.getRoute() == null || user != null && user.canDoAction(smi.getRoute(), "view")) {
-                    addMenuItemToSubMenu(smi, smb);
-                    anyMenu.set(true);
-                }
-            });
-            if (anyMenu.get()) {
-                LeftSubmenu sm = smb.build();
-                builder.add(sm);
-            }
-        } else {
-            try {
-                if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
-                    LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
-                    builder.add(item);
-                }
-            } catch (Exception ex) {
-                log.warn(ex.getMessage());
-            }
-        }
-    }
+			AtomicBoolean anyMenu = new AtomicBoolean(false);
+			mi.getChildren().forEach(smi -> {
+				if (smi.getRoute() == null || user != null && user.canDoAction(smi.getRoute(), "view")) {
+					addMenuItemToSubMenu(smi, smb);
+					anyMenu.set(true);
+				}
+			});
+			if (anyMenu.get()) {
+				LeftSubmenu sm = smb.build();
+				builder.add(sm);
+			}
+		} else {
+			try {
+				if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
+					LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+					builder.add(item);
+				}
+			} catch (Exception ex) {
+				log.warn(ex.getMessage());
+			}
+		}
+	}
 
-    private void addMenuItemToSubMenu(GxMenuItem mi, LeftSubMenuBuilder builder) {
-        GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
-        if (mi.hasChildren()) {
-            LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
-            mi.getChildren().forEach(smi -> {
-                addMenuItemToSubMenu(smi, smb);
-            });
-            builder.add(smb.build());
-        } else {
-            try {
-                if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
-                    LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
-                    builder.add(item);
-                }
-            } catch (Exception ex) {
-                log.warn(ex.getMessage());
-            }
-        }
-    }
+	private void addMenuItemToSubMenu(GxMenuItem mi, LeftSubMenuBuilder builder) {
+		GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
+		if (mi.hasChildren()) {
+			LeftSubMenuBuilder smb = LeftSubMenuBuilder.get(mi.getLabel(), mi.getIcon());
+			mi.getChildren().forEach(smi -> {
+				addMenuItemToSubMenu(smi, smb);
+			});
+			builder.add(smb.build());
+		} else {
+			try {
+				if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
+					LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+					builder.add(item);
+				}
+			} catch (Exception ex) {
+				log.warn(ex.getMessage());
+			}
+		}
+	}
 
-    private Component buildTitleComponent() {
-        HorizontalLayout headingLayout = new HorizontalLayout();
-        headingLayout.setAlignItems(Alignment.BASELINE);
-        Span heading = new Span(flowSetup().appTitle());
-        heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-        heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
-        Span version = new Span(flowSetup().appVersion());
-        version.getStyle().set("color", "var(--app-layout-bar-font-color)");
-        version.getStyle().set("font-size", "var(--lumo-font-size-s)");
-        headingLayout.add(heading, version);
-        return headingLayout;
-    }
+	private Component buildTitleComponent() {
+		HorizontalLayout headingLayout = new HorizontalLayout();
+		headingLayout.setAlignItems(Alignment.BASELINE);
+		Span heading = new Span(flowSetup().appTitle());
+		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
+		heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+		Span version = new Span(flowSetup().appVersion());
+		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
+		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
+		headingLayout.add(heading, version);
+		return headingLayout;
+	}
 
-    private Component buildProfileMenu() {
-        GxAuthenticatedUser user = flowSetup().loggedInUser();
+	private Component buildProfileMenu() {
+		GxAuthenticatedUser user = flowSetup().loggedInUser();
 
-        MenuBar profileMenuBar = new MenuBar();
-        profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
-        profileMenuBar.addItem(user.getFirstNameLastName());
-        profileMenuBar.addItem("|");
-        profileMenuBar.addItem("Sign Out", event -> {
-            getUI().ifPresent(ui -> {
-                ui.navigate("login");
-                VaadinSession.getCurrent().close();
-            });
-        });
+		MenuBar profileMenuBar = new MenuBar();
+		profileMenuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
+		profileMenuBar.addItem(user.getFirstNameLastName());
+		profileMenuBar.addItem("|");
+		profileMenuBar.addItem("Sign Out", event -> {
+			getUI().ifPresent(ui -> {
+				ui.navigate("login");
+				VaadinSession.getCurrent().close();
+			});
+		});
 
-        return profileMenuBar;
-    }
+		return profileMenuBar;
+	}
 
-    protected abstract GxAbstractFlowSetup flowSetup();
+	protected abstract GxAbstractFlowSetup flowSetup();
 
 }

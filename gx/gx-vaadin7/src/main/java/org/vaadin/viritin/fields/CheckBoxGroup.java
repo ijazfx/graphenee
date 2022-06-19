@@ -33,208 +33,204 @@ import com.vaadin.ui.OptionGroup;
  * @param <ET> The type in the entity collection
  */
 public class CheckBoxGroup<ET> extends CustomField<Collection> {
-    
-    private CaptionGenerator<ET> captionGenerator;
 
-    OptionGroup optionGroup = new OptionGroup() {
+	private CaptionGenerator<ET> captionGenerator;
 
-        {
-            setMultiSelect(true);
-            setSizeFull();
-            setImmediate(true);
-        }
+	OptionGroup optionGroup = new OptionGroup() {
 
-        private boolean clientSideChange;
+		{
+			setMultiSelect(true);
+			setSizeFull();
+			setImmediate(true);
+		}
 
-        @Override
-        public void changeVariables(Object source,
-                Map<String, Object> variables) {
-            clientSideChange = true;
-            super.changeVariables(source, variables);
-            clientSideChange = false;
-        }
+		private boolean clientSideChange;
 
-        @Override
-        protected void setValue(Object newValue, boolean repaintIsNotNeeded) throws ReadOnlyException {
-            Set oldvalue = (Set) getValue();
-            super.setValue(newValue, repaintIsNotNeeded);
-            if (clientSideChange) {
-                // TODO add strategies for maintaining the order in case of List
-                // e.g. same as listing, selection order ...
-                Collection collection = getEditedCollection();
-                Set newvalue = (Set) getValue();
-                Set orphaned = new HashSet(oldvalue);
-                orphaned.removeAll(newvalue);
-                collection.removeAll(orphaned);
-                Set newValues = new LinkedHashSet(newvalue);
-                newValues.removeAll(oldvalue);
-                collection.addAll(newValues);
-                CheckBoxGroup.this.fireValueChange(true);
-            }
-        }
+		@Override
+		public void changeVariables(Object source, Map<String, Object> variables) {
+			clientSideChange = true;
+			super.changeVariables(source, variables);
+			clientSideChange = false;
+		}
 
-        @Override
-        public String getItemCaption(Object itemId) {
-            if(captionGenerator != null) {
-                return captionGenerator.getCaption((ET) itemId);
-            }
-            return super.getCaption();
-        }
+		@Override
+		protected void setValue(Object newValue, boolean repaintIsNotNeeded) throws ReadOnlyException {
+			Set oldvalue = (Set) getValue();
+			super.setValue(newValue, repaintIsNotNeeded);
+			if (clientSideChange) {
+				// TODO add strategies for maintaining the order in case of List
+				// e.g. same as listing, selection order ...
+				Collection collection = getEditedCollection();
+				Set newvalue = (Set) getValue();
+				Set orphaned = new HashSet(oldvalue);
+				orphaned.removeAll(newvalue);
+				collection.removeAll(orphaned);
+				Set newValues = new LinkedHashSet(newvalue);
+				newValues.removeAll(oldvalue);
+				collection.addAll(newValues);
+				CheckBoxGroup.this.fireValueChange(true);
+			}
+		}
 
-    };
+		@Override
+		public String getItemCaption(Object itemId) {
+			if (captionGenerator != null) {
+				return captionGenerator.getCaption((ET) itemId);
+			}
+			return super.getCaption();
+		}
 
-    public CheckBoxGroup(String caption) {
-        this();
-        setCaption(caption);
-    }
-    
-    public CheckBoxGroup<ET> setCaptionGenerator(CaptionGenerator<ET> captionGenerator) {
-        this.captionGenerator = captionGenerator;
-        return this;
-    }
+	};
 
-    private Collection<ET> getEditedCollection() {
-        Collection c = getValue();
-        if (c == null) {
-            if (getPropertyDataSource() == null) {
-                // this should never happen :-)
-                return new HashSet();
-            }
-            Class fieldType = getPropertyDataSource().getType();
-            if (fieldType.isInterface()) {
-                if (fieldType == List.class) {
-                    c = new ArrayList();
-                } else { // Set
-                    c = new HashSet();
-                }
-            } else {
-                try {
-                    c = (Collection) fieldType.newInstance();
-                } catch (IllegalAccessException | InstantiationException ex) {
-                    throw new RuntimeException(
-                            "Could not instantiate the used colleciton type", ex);
-                }
-            }
-        }
-        return c;
-    }
+	public CheckBoxGroup(String caption) {
+		this();
+		setCaption(caption);
+	}
 
-    @Override
-    protected Component initContent() {
-        return optionGroup;
-    }
+	public CheckBoxGroup<ET> setCaptionGenerator(CaptionGenerator<ET> captionGenerator) {
+		this.captionGenerator = captionGenerator;
+		return this;
+	}
 
-    @Override
-    public Class<? extends Collection> getType() {
-        return Collection.class;
-    }
+	private Collection<ET> getEditedCollection() {
+		Collection c = getValue();
+		if (c == null) {
+			if (getPropertyDataSource() == null) {
+				// this should never happen :-)
+				return new HashSet();
+			}
+			Class fieldType = getPropertyDataSource().getType();
+			if (fieldType.isInterface()) {
+				if (fieldType == List.class) {
+					c = new ArrayList();
+				} else { // Set
+					c = new HashSet();
+				}
+			} else {
+				try {
+					c = (Collection) fieldType.newInstance();
+				} catch (IllegalAccessException | InstantiationException ex) {
+					throw new RuntimeException("Could not instantiate the used colleciton type", ex);
+				}
+			}
+		}
+		return c;
+	}
 
-    @Override
-    protected void setInternalValue(Collection newValue) {
-        super.setInternalValue(newValue);
-        optionGroup.setValue(newValue);
-    }
+	@Override
+	protected Component initContent() {
+		return optionGroup;
+	}
 
-    /**
-     * Sets the list of options available.
-     *
-     * @param list the list of available options
-     * @return this for fluent configuration
-     */
-    public CheckBoxGroup<ET> setOptions(List<ET> list) {
-        optionGroup.setContainerDataSource(new ListContainer(list));
-        return this;
-    }
+	@Override
+	public Class<? extends Collection> getType() {
+		return Collection.class;
+	}
 
-    /**
-     * Sets the list of options available.
-     *
-     * @param list the list of available options
-     * @return this for fluent configuration
-     */
-    public CheckBoxGroup<ET> setOptions(ET... list) {
-        return setOptions(Arrays.asList(list));
-    }
+	@Override
+	protected void setInternalValue(Collection newValue) {
+		super.setInternalValue(newValue);
+		optionGroup.setValue(newValue);
+	}
 
-    public CheckBoxGroup() {
-        setHeight("230px");
-        // TODO verify if this is needed in real usage, but at least to pass the test
-        setConverter(new Converter<Collection, Collection>() {
+	/**
+	 * Sets the list of options available.
+	 *
+	 * @param list the list of available options
+	 * @return this for fluent configuration
+	 */
+	public CheckBoxGroup<ET> setOptions(List<ET> list) {
+		optionGroup.setContainerDataSource(new ListContainer(list));
+		return this;
+	}
 
-            @Override
-            public Collection convertToModel(Collection value,
-                    Class<? extends Collection> targetType, Locale locale) throws Converter.ConversionException {
-                return value;
-            }
+	/**
+	 * Sets the list of options available.
+	 *
+	 * @param list the list of available options
+	 * @return this for fluent configuration
+	 */
+	public CheckBoxGroup<ET> setOptions(ET... list) {
+		return setOptions(Arrays.asList(list));
+	}
 
-            @Override
-            public Collection convertToPresentation(Collection value,
-                    Class<? extends Collection> targetType, Locale locale) throws Converter.ConversionException {
-                return value;
-            }
+	public CheckBoxGroup() {
+		setHeight("230px");
+		// TODO verify if this is needed in real usage, but at least to pass the test
+		setConverter(new Converter<Collection, Collection>() {
 
-            @Override
-            public Class<Collection> getModelType() {
-                return (Class<Collection>) getEditedCollection().getClass();
-            }
+			@Override
+			public Collection convertToModel(Collection value, Class<? extends Collection> targetType, Locale locale) throws Converter.ConversionException {
+				return value;
+			}
 
-            @Override
-            public Class<Collection> getPresentationType() {
-                return Collection.class;
-            }
+			@Override
+			public Collection convertToPresentation(Collection value, Class<? extends Collection> targetType, Locale locale) throws Converter.ConversionException {
+				return value;
+			}
 
-        });
-    }
+			@Override
+			public Class<Collection> getModelType() {
+				return (Class<Collection>) getEditedCollection().getClass();
+			}
 
-    public void select(ET objectToSelect) {
-        if (!optionGroup.isSelected(objectToSelect)) {
-            optionGroup.select(objectToSelect);
-            getEditedCollection().add(objectToSelect);
-        }
-    }
+			@Override
+			public Class<Collection> getPresentationType() {
+				return Collection.class;
+			}
 
-    public void unSelect(ET objectToDeselect) {
-        if (optionGroup.isSelected(objectToDeselect)) {
-            optionGroup.unselect(objectToDeselect);
-            getEditedCollection().remove(objectToDeselect);
-        }
-    }
+		});
+	}
 
-    /**
-     * @return the underlaying table implementation. Protected as one should
-     * expect odd behavior if it configured in unsupported manner.
-     */
-    protected OptionGroup getUndelayingTable() {
-        return optionGroup;
-    }
+	public void select(ET objectToSelect) {
+		if (!optionGroup.isSelected(objectToSelect)) {
+			optionGroup.select(objectToSelect);
+			getEditedCollection().add(objectToSelect);
+		}
+	}
 
-    public CheckBoxGroup<ET> withFullWidth() {
-        setWidth(100, Unit.PERCENTAGE);
-        return this;
-    }
+	public void unSelect(ET objectToDeselect) {
+		if (optionGroup.isSelected(objectToDeselect)) {
+			optionGroup.unselect(objectToDeselect);
+			getEditedCollection().remove(objectToDeselect);
+		}
+	}
 
-    public CheckBoxGroup<ET> withHeight(String height) {
-        setHeight(height);
-        return this;
-    }
+	/**
+	 * @return the underlaying table implementation. Protected as one should
+	 * expect odd behavior if it configured in unsupported manner.
+	 */
+	protected OptionGroup getUndelayingTable() {
+		return optionGroup;
+	}
 
-    public CheckBoxGroup<ET> withFullHeight() {
-        return withHeight("100%");
-    }
+	public CheckBoxGroup<ET> withFullWidth() {
+		setWidth(100, Unit.PERCENTAGE);
+		return this;
+	}
 
-    public CheckBoxGroup<ET> withWidth(String width) {
-        setWidth(width);
-        return this;
-    }
+	public CheckBoxGroup<ET> withHeight(String height) {
+		setHeight(height);
+		return this;
+	}
 
-    public CheckBoxGroup<ET> withCaption(String caption) {
-        setCaption(caption);
-        return this;
-    }
+	public CheckBoxGroup<ET> withFullHeight() {
+		return withHeight("100%");
+	}
 
-    public CheckBoxGroup<ET> withId(String id) {
-        setId(id);
-        return this;
-    }
+	public CheckBoxGroup<ET> withWidth(String width) {
+		setWidth(width);
+		return this;
+	}
+
+	public CheckBoxGroup<ET> withCaption(String caption) {
+		setCaption(caption);
+		return this;
+	}
+
+	public CheckBoxGroup<ET> withId(String id) {
+		setId(id);
+		return this;
+	}
 
 }

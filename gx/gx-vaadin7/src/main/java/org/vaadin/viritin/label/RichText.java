@@ -35,193 +35,193 @@ import com.vaadin.shared.ui.label.ContentMode;
  */
 public class RichText extends MLabel {
 
-    private static final long serialVersionUID = -6926829115110918731L;
+	private static final long serialVersionUID = -6926829115110918731L;
 
-    transient private Whitelist whitelist;
-    private String richText;
+	transient private Whitelist whitelist;
+	private String richText;
 
-    public RichText() {
-    }
+	public RichText() {
+	}
 
-    public RichText(String content) {
-        setRichText(content);
-    }
+	public RichText(String content) {
+		setRichText(content);
+	}
 
-    public RichText withMarkDown(String markdown) {
-        try {
-            return setRichText(new Markdown4jProcessor().process(markdown));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+	public RichText withMarkDown(String markdown) {
+		try {
+			return setRichText(new Markdown4jProcessor().process(markdown));
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
-    public RichText withMarkDown(InputStream markdown) {
-        try {
-            return setRichText(new Markdown4jProcessor().process(markdown));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
+	public RichText withMarkDown(InputStream markdown) {
+		try {
+			return setRichText(new Markdown4jProcessor().process(markdown));
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
-    public RichText withSafeHtml(String html) {
-        return setRichText(html);
-    }
+	public RichText withSafeHtml(String html) {
+		return setRichText(html);
+	}
 
-    public RichText withSafeHtml(InputStream markdown) {
-        try {
-            return setRichText(IOUtils.toString(markdown, "UTF-8"));
-        } catch (IOException ex) {
-            throw new RuntimeException("Input stream coulnd't be read!", ex);
-        }
-    }
+	public RichText withSafeHtml(InputStream markdown) {
+		try {
+			return setRichText(IOUtils.toString(markdown, "UTF-8"));
+		} catch (IOException ex) {
+			throw new RuntimeException("Input stream coulnd't be read!", ex);
+		}
+	}
 
-    /**
-     * Only replaces all new line characters with &lt;br /&gt;, but no Markdown
-     * processing.
-     *
-     * @param text the text value to be displayed
-     * @return the object itself for further configuration
-     */
-    public RichText withNewLines(String text) {
-        return setRichText(text.replaceAll("(\\r|\\n|\\r\\n)+", "<br />"));
-    }
+	/**
+	 * Only replaces all new line characters with &lt;br /&gt;, but no Markdown
+	 * processing.
+	 *
+	 * @param text the text value to be displayed
+	 * @return the object itself for further configuration
+	 */
+	public RichText withNewLines(String text) {
+		return setRichText(text.replaceAll("(\\r|\\n|\\r\\n)+", "<br />"));
+	}
 
-    public Whitelist getWhitelist() {
-        if (whitelist == null) {
-            return Whitelist.relaxed();
-        }
-        return whitelist;
-    }
+	public Whitelist getWhitelist() {
+		if (whitelist == null) {
+			return Whitelist.relaxed();
+		}
+		return whitelist;
+	}
 
-    /**
-     *
-     * @param whitelist the whitelist used for sanitizing the rich text content
-     * @return the object itself for further configuration
-     * @deprecated Whitelist is not serializable. Override getWhitelist instead
-     * if you need to support serialiazation
-     */
-    @Deprecated
-    public RichText setWhitelist(Whitelist whitelist) {
-        this.whitelist = whitelist;
-        markAsDirty();
-        return this;
-    }
+	/**
+	 *
+	 * @param whitelist the whitelist used for sanitizing the rich text content
+	 * @return the object itself for further configuration
+	 * @deprecated Whitelist is not serializable. Override getWhitelist instead
+	 * if you need to support serialiazation
+	 */
+	@Deprecated
+	public RichText setWhitelist(Whitelist whitelist) {
+		this.whitelist = whitelist;
+		markAsDirty();
+		return this;
+	}
 
-    @Override
-    public void setValue(String newStringValue) {
-        setRichText(newStringValue);
-    }
+	@Override
+	public void setValue(String newStringValue) {
+		setRichText(newStringValue);
+	}
 
-    public String getText() {
-        return richText;
-    }
+	public String getText() {
+		return richText;
+	}
 
-    public RichText setRichText(String text) {
-        this.richText = text;
-        markAsDirty();
-        return this;
-    }
+	public RichText setRichText(String text) {
+		this.richText = text;
+		markAsDirty();
+		return this;
+	}
 
-    @Override
-    public void beforeClientResponse(boolean initial) {
-        setContentMode(ContentMode.HTML);
-        super.setValue(Jsoup.clean(richText, getWhitelist()));
-        super.beforeClientResponse(initial);
-    }
+	@Override
+	public void beforeClientResponse(boolean initial) {
+		setContentMode(ContentMode.HTML);
+		super.setValue(Jsoup.clean(richText, getWhitelist()));
+		super.beforeClientResponse(initial);
+	}
 
-    public RichText withMarkDownResource(String resourceName) {
-        return withMarkDown(getClass().getResourceAsStream(resourceName));
-    }
+	public RichText withMarkDownResource(String resourceName) {
+		return withMarkDown(getClass().getResourceAsStream(resourceName));
+	}
 
-    public RichText withSafeHtmlResource(String resourceName) {
-        return withSafeHtml(getClass().getResourceAsStream(resourceName));
-    }
+	public RichText withSafeHtmlResource(String resourceName) {
+		return withSafeHtml(getClass().getResourceAsStream(resourceName));
+	}
 
-    @Override
-    public RichText withContent(String content) {
-        return setRichText(content);
-    }
+	@Override
+	public RichText withContent(String content) {
+		return setRichText(content);
+	}
 
-    @Override
-    public RichText withContentMode(ContentMode mode) {
-        setContentMode(mode);
-        return this;
-    }
+	@Override
+	public RichText withContentMode(ContentMode mode) {
+		setContentMode(mode);
+		return this;
+	}
 
-    @Override
-    public RichText withValue(String value) {
-        return setRichText(value);
-    }
+	@Override
+	public RichText withValue(String value) {
+		return setRichText(value);
+	}
 
-    @Override
-    public RichText withId(String id) {
-        super.withId(id);
-        return this;
-    }
+	@Override
+	public RichText withId(String id) {
+		super.withId(id);
+		return this;
+	}
 
-    @Override
-    public RichText withVisible(boolean visible) {
-        super.withVisible(visible);
-        return this;
-    }
+	@Override
+	public RichText withVisible(boolean visible) {
+		super.withVisible(visible);
+		return this;
+	}
 
-    @Override
-    public RichText withEnabled(boolean enabled) {
-        super.withEnabled(enabled);
-        return this;
-    }
+	@Override
+	public RichText withEnabled(boolean enabled) {
+		super.withEnabled(enabled);
+		return this;
+	}
 
-    @Override
-    public RichText withWidthUndefined() {
-        super.withWidthUndefined();
-        return this;
-    }
+	@Override
+	public RichText withWidthUndefined() {
+		super.withWidthUndefined();
+		return this;
+	}
 
-    @Override
-    public RichText withFullHeight() {
-        super.withFullHeight();
-        return this;
-    }
+	@Override
+	public RichText withFullHeight() {
+		super.withFullHeight();
+		return this;
+	}
 
-    @Override
-    public RichText withFullWidth() {
-        super.withFullWidth();
-        return this;
-    }
+	@Override
+	public RichText withFullWidth() {
+		super.withFullWidth();
+		return this;
+	}
 
-    @Override
-    public RichText withStyleName(String... styleNames) {
-        super.withStyleName(styleNames);
-        return this;
-    }
+	@Override
+	public RichText withStyleName(String... styleNames) {
+		super.withStyleName(styleNames);
+		return this;
+	}
 
-    @Override
-    public RichText withSize(MSize mSize) {
-        super.withSize(mSize);
-        return this;
-    }
+	@Override
+	public RichText withSize(MSize mSize) {
+		super.withSize(mSize);
+		return this;
+	}
 
-    @Override
-    public RichText withSize(String width, String height) {
-        super.withSize(width, height);
-        return this;
-    }
+	@Override
+	public RichText withSize(String width, String height) {
+		super.withSize(width, height);
+		return this;
+	}
 
-    @Override
-    public RichText withHeight(String height) {
-        super.withHeight(height);
-        return this;
-    }
+	@Override
+	public RichText withHeight(String height) {
+		super.withHeight(height);
+		return this;
+	}
 
-    @Override
-    public RichText withWidth(String width) {
-        super.withWidth(width);
-        return this;
-    }
+	@Override
+	public RichText withWidth(String width) {
+		super.withWidth(width);
+		return this;
+	}
 
-    @Override
-    public RichText withCaption(String caption) {
-        super.withCaption(caption);
-        return this;
-    }    
+	@Override
+	public RichText withCaption(String caption) {
+		super.withCaption(caption);
+		return this;
+	}
 }

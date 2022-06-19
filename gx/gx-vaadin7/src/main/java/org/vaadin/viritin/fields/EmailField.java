@@ -12,28 +12,28 @@ import org.vaadin.viritin.util.HtmlElementPropertySetter;
  */
 public class EmailField extends MTextField {
 
-    private static final long serialVersionUID = -4717961169375147779L;
+	private static final long serialVersionUID = -4717961169375147779L;
 
-    public EmailField() {
-    }
+	public EmailField() {
+	}
 
-    public EmailField(String caption) {
-        super(caption);
-    }
+	public EmailField(String caption) {
+		super(caption);
+	}
 
-    public EmailField(String caption, String value) {
-        super(caption, value);
-    }
+	public EmailField(String caption, String value) {
+		super(caption, value);
+	}
 
-    private HtmlElementPropertySetter heps;
+	private HtmlElementPropertySetter heps;
 
-    @Override
-    public void beforeClientResponse(boolean initial) {
-        super.beforeClientResponse(initial);
-        if (heps == null) {
-            heps = new HtmlElementPropertySetter(this);
-        }
-        heps.setProperty("type", "email");
-    }
+	@Override
+	public void beforeClientResponse(boolean initial) {
+		super.beforeClientResponse(initial);
+		if (heps == null) {
+			heps = new HtmlElementPropertySetter(this);
+		}
+		heps.setProperty("type", "email");
+	}
 
 }

@@ -20,70 +20,70 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 @Scope("prototype")
 public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument> {
 
-    Upload upload;
-    List<GxUploadedFile> uploadedFiles = new ArrayList<>();
+	Upload upload;
+	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
 
-    public GxFileUploadNewVersionForm() {
-        super(GxDocument.class);
-    }
+	public GxFileUploadNewVersionForm() {
+		super(GxDocument.class);
+	}
 
-    @Override
-    protected void decorateForm(HasComponents entityForm) {
-        upload = new Upload(new Receiver() {
+	@Override
+	protected void decorateForm(HasComponents entityForm) {
+		upload = new Upload(new Receiver() {
 
-            @Override
-            public OutputStream receiveUpload(String fileName, String mimeType) {
-                try {
-                    File file = File.createTempFile("uploaded", fileName);
-                    GxUploadedFile uploadedFile = new GxUploadedFile();
-                    uploadedFile.setFile(file);
-                    uploadedFile.setFileName(fileName);
-                    uploadedFile.setMimeType(mimeType);
-                    uploadedFiles.clear();
-                    uploadedFiles.add(uploadedFile);
-                    FileOutputStream fos = new FileOutputStream(file);
-                    return fos;
-                } catch (Exception e) {
-                    return null;
-                }
-            }
+			@Override
+			public OutputStream receiveUpload(String fileName, String mimeType) {
+				try {
+					File file = File.createTempFile("uploaded", fileName);
+					GxUploadedFile uploadedFile = new GxUploadedFile();
+					uploadedFile.setFile(file);
+					uploadedFile.setFileName(fileName);
+					uploadedFile.setMimeType(mimeType);
+					uploadedFiles.clear();
+					uploadedFiles.add(uploadedFile);
+					FileOutputStream fos = new FileOutputStream(file);
+					return fos;
+				} catch (Exception e) {
+					return null;
+				}
+			}
 
-        });
-        upload.setMaxFiles(1);
-        upload.setMaxFileSize(1024000000);
-        entityForm.add(upload);
-        setColspan(upload, 2);
-    }
+		});
+		upload.setMaxFiles(1);
+		upload.setMaxFileSize(1024000000);
+		entityForm.add(upload);
+		setColspan(upload, 2);
+	}
 
-    public void initializeWithFileUploadHandler(GxFileUploadNewVersionHandler handler) {
-        setDelegate(dlg -> {
-            GxUploadedFile uploadedFile = !uploadedFiles.isEmpty() ? uploadedFiles.get(0) : null;
-            handler.onSave(dlg, uploadedFile);
-        });
-    }
+	public void initializeWithFileUploadHandler(GxFileUploadNewVersionHandler handler) {
+		setDelegate(dlg -> {
+			GxUploadedFile uploadedFile = !uploadedFiles.isEmpty() ? uploadedFiles.get(0) : null;
+			handler.onSave(dlg, uploadedFile);
+		});
+	}
 
-    @Override
-    protected void preBinding(GxDocument entity) {
-        uploadedFiles.clear();
-    }
+	@Override
+	protected void preBinding(GxDocument entity) {
+		uploadedFiles.clear();
+	}
 
-    @Override
-    protected String dialogHeight() {
-        return "300px";
-    }
+	@Override
+	protected String dialogHeight() {
+		return "300px";
+	}
 
-    @Override
-    protected String dialogWidth() {
-        return "500px";
-    }
+	@Override
+	protected String dialogWidth() {
+		return "500px";
+	}
 
-    @Override
-    protected String formTitleProperty() {
-        return "name";
-    }
+	@Override
+	protected String formTitleProperty() {
+		return "name";
+	}
 
-    public static interface GxFileUploadNewVersionHandler {
-        void onSave(GxDocument parentDocument, GxUploadedFile uploadedFile);
-    }
+	public static interface GxFileUploadNewVersionHandler {
+		void onSave(GxDocument parentDocument, GxUploadedFile uploadedFile);
+	}
 
 }

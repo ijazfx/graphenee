@@ -33,15 +33,15 @@ import io.graphenee.util.DataSourceUtil;
 @ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeCoreConfiguration {
 
-    public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core";
-    public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
-    public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core";
+	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
+	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
 
-    public GrapheneeCoreConfiguration(DataSource dataSource) {
-        String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-        Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
-                .baselineVersion("0").load();
-        fw.migrate();
-    }
+	public GrapheneeCoreConfiguration(DataSource dataSource) {
+		String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
+		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
+				.baselineVersion("0").load();
+		fw.migrate();
+	}
 
 }
