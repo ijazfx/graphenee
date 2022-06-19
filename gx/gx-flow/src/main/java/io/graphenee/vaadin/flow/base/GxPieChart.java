@@ -11,19 +11,19 @@ import com.github.appreciated.apexcharts.config.responsive.builder.OptionsBuilde
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class GxPieChart extends VerticalLayout {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private ApexCharts chart;
-    private String width = "100%";
+	private ApexCharts chart;
+	private String width = "100%";
 
-    public void initializeWithLabelsAndSeries(String[] labels, Double[] series) {
-        chart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.pie).build()).withLegend(LegendBuilder.get().withPosition(Position.right).build())
-                .withResponsive(ResponsiveBuilder.get().withBreakpoint(480.0)
-                        .withOptions(OptionsBuilder.get().withLegend(LegendBuilder.get().withPosition(Position.bottom).build()).build()).build())
-                .withLabels(labels).withSeries(series).build();
+	public void initializeWithLabelsAndSeries(String[] labels, Double[] series) {
+		chart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.pie).build()).withLegend(LegendBuilder.get().withPosition(Position.right).build())
+				.withResponsive(ResponsiveBuilder.get().withBreakpoint(480.0)
+						.withOptions(OptionsBuilder.get().withLegend(LegendBuilder.get().withPosition(Position.bottom).build()).build()).build())
+				.withLabels(labels).withSeries(series).build();
 
-        removeAll();
-        add(chart);
-        chart.setWidth(width);
-    }
+		removeAll();
+		add(chart);
+		chart.setWidth(width);
+	}
 }

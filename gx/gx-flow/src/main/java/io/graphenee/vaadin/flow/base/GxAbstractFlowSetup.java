@@ -10,32 +10,32 @@ import io.graphenee.vaadin.flow.utils.DashboardUtils;
 
 public abstract class GxAbstractFlowSetup {
 
-    public String appTitle() {
-        return "Flow Application";
-    }
+	public String appTitle() {
+		return "Flow Application";
+	}
 
-    public String appVersion() {
-        return "1.0";
-    }
+	public String appVersion() {
+		return "1.0";
+	}
 
-    public String appTitleWithVersion() {
-        return String.format("%1$s v%2$s", appTitle(), appVersion());
-    }
+	public String appTitleWithVersion() {
+		return String.format("%1$s v%2$s", appTitle(), appVersion());
+	}
 
-    public String defaultRoute() {
-        return "";
-    }
+	public String defaultRoute() {
+		return "";
+	}
 
-    public GxAuthenticatedUser loggedInUser() {
-        return DashboardUtils.getLoggedInUser();
-    }
+	public GxAuthenticatedUser loggedInUser() {
+		return DashboardUtils.getLoggedInUser();
+	}
 
-    public abstract Class<? extends RouterLayout> routerLayout();
+	public abstract Class<? extends RouterLayout> routerLayout();
 
-    public abstract List<GxMenuItem> menuItems();
+	public abstract List<GxMenuItem> menuItems();
 
-    public Image appLogo() {
-        return null;
-    }
+	public Image appLogo() {
+		return null;
+	}
 
 }

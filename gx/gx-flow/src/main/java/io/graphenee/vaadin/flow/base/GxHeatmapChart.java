@@ -13,15 +13,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class GxHeatmapChart extends VerticalLayout {
 
-        private static final long serialVersionUID = 1L;
-        private ApexCharts heatChart;
+	private static final long serialVersionUID = 1L;
+	private ApexCharts heatChart;
 
-        public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
-                heatChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.heatmap).build()).withDataLabels(DataLabelsBuilder.get().withEnabled(false).build())
-                                .withColors("#008FFB").withSeries(series).withXaxis(XAxisBuilder.get().withType(XAxisType.categories).withCategories(xAxisLabel).build())
-                                .withYaxis(YAxisBuilder.get().withMax(70.0).build()).build();
-                removeAll();
-                add(heatChart);
-                heatChart.setWidth("100%");
-        }
+	public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
+		heatChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.heatmap).build()).withDataLabels(DataLabelsBuilder.get().withEnabled(false).build())
+				.withColors("#008FFB").withSeries(series).withXaxis(XAxisBuilder.get().withType(XAxisType.categories).withCategories(xAxisLabel).build())
+				.withYaxis(YAxisBuilder.get().withMax(70.0).build()).build();
+		removeAll();
+		add(heatChart);
+		heatChart.setWidth("100%");
+	}
 }
