@@ -221,6 +221,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			mainLayout = new SplitLayout();
 			mainLayout.setSizeFull();
+			mainLayout.addClassName("hide-splitter");
 
 			crudMenuBar = new MenuBar();
 			columnMenuBar = new MenuBar();
@@ -304,6 +305,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				Column<T> editColumn = dataGrid.addComponentColumn(source -> {
 					Button rowEditButton = new Button(VaadinIcon.EDIT.create());
 					rowEditButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY_INLINE);
+					customizeEditButton(rowEditButton, source);
 					rowEditButton.addClickListener(cl -> {
 						openForm(source);
 					});
@@ -613,12 +615,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		});
 	}
 
-	protected void customizeEditMenuItem(MenuItem editMenuItem) {
-		editMenuItem.addClickListener(cl -> {
-			if (dataGrid.getSelectedItems().size() == 1) {
-				T entity = dataGrid.getSelectedItems().iterator().next();
-				openForm(entity);
-			}
+	protected void customizeEditButton(Button editButton, T entity) {
+		editButton.addClickListener(cl -> {
+			openForm(entity);
 		});
 	}
 
@@ -836,7 +835,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				renderer = new ComponentRenderer(s -> {
 					Checkbox c = new Checkbox();
 					Boolean value = (Boolean) propertyDefinition.getGetter().apply((T) s);
-					c.setValue((Boolean) value);
+					c.setValue(value);
 					c.setReadOnly(true);
 					return c;
 				});
