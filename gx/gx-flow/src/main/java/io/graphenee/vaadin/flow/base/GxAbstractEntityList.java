@@ -306,9 +306,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					Button rowEditButton = new Button(VaadinIcon.EDIT.create());
 					rowEditButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY_INLINE);
 					customizeEditButton(rowEditButton, source);
-					rowEditButton.addClickListener(cl -> {
-						openForm(source);
-					});
 					return rowEditButton;
 				});
 				editColumn.setKey("__gxEditColumn");
