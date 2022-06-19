@@ -26,13 +26,13 @@ import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm.GxAssigneeHolder;
 import io.graphenee.vaadin.flow.GxFlowNotification;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
-public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
+public abstract class GxFlowUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
-	public GxUserTaskForm(Class<T> entityClass) {
+	public GxFlowUserTaskForm(Class<T> entityClass) {
 		super(entityClass);
 	}
 
-	protected static final Logger L = LoggerFactory.getLogger(GxUserTaskForm.class);
+	protected static final Logger L = LoggerFactory.getLogger(GxFlowUserTaskForm.class);
 
 	private static final long serialVersionUID = 1L;
 	private GxUserTask userTask;
@@ -192,7 +192,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 							GxAssignee assignee = holder.getAssignee();
 							try {
 								getUserTask().assign(assignee.getUsername());
-								GxUserTaskForm.this.onPostAssign(assignee, getEntity());
+								GxFlowUserTaskForm.this.onPostAssign(assignee, getEntity());
 								notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
 								assigneeForm.closePopup();
 								closeDialog();
