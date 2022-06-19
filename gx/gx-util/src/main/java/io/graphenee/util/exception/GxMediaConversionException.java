@@ -18,24 +18,24 @@ package io.graphenee.util.exception;
 @SuppressWarnings("serial")
 public class GxMediaConversionException extends Exception {
 
-    public GxMediaConversionException() {
-        super();
-    }
+	public GxMediaConversionException() {
+		super();
+	}
 
-    public GxMediaConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+	public GxMediaConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 
-    public GxMediaConversionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public GxMediaConversionException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public GxMediaConversionException(String message) {
-        super(message);
-    }
+	public GxMediaConversionException(String message) {
+		super(message);
+	}
 
-    public GxMediaConversionException(Throwable cause) {
-        super(cause);
-    }
+	public GxMediaConversionException(Throwable cause) {
+		super(cause);
+	}
 
 }

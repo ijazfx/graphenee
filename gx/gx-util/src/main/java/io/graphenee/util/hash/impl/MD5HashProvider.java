@@ -26,26 +26,26 @@ import java.security.MessageDigest;
  */
 public class MD5HashProvider extends AbstractHashProvider {
 
-    public static final String ENCRYPTION = "MD5";
+	public static final String ENCRYPTION = "MD5";
 
-    @Override
-    public String encryption() {
-        return ENCRYPTION;
-    }
+	@Override
+	public String encryption() {
+		return ENCRYPTION;
+	}
 
-    @Override
-    public String createHash(String prefix, String input, String signingKey) {
-        // create the md5 hash and UTF-8 encode it
-        MessageDigest md5;
-        try {
-            md5 = MessageDigest.getInstance("MD5");
-            String data = prefix + input + signingKey;
-            byte[] hash = md5.digest(data.getBytes("UTF-8"));
-            return toHexString(hash);
-        } catch (Exception e) {
-            log.warning(e.getMessage());
-        }
-        return null;
-    }
+	@Override
+	public String createHash(String prefix, String input, String signingKey) {
+		// create the md5 hash and UTF-8 encode it
+		MessageDigest md5;
+		try {
+			md5 = MessageDigest.getInstance("MD5");
+			String data = prefix + input + signingKey;
+			byte[] hash = md5.digest(data.getBytes("UTF-8"));
+			return toHexString(hash);
+		} catch (Exception e) {
+			log.warning(e.getMessage());
+		}
+		return null;
+	}
 
 }

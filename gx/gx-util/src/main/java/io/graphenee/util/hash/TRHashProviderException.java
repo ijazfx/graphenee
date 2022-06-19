@@ -21,20 +21,20 @@ package io.graphenee.util.hash;
 @SuppressWarnings("serial")
 public class TRHashProviderException extends Exception {
 
-    public TRHashProviderException() {
-        super();
-    }
+	public TRHashProviderException() {
+		super();
+	}
 
-    public TRHashProviderException(String message, Throwable t) {
-        super(message, t);
-    }
+	public TRHashProviderException(String message, Throwable t) {
+		super(message, t);
+	}
 
-    public TRHashProviderException(String message) {
-        super(message);
-    }
+	public TRHashProviderException(String message) {
+		super(message);
+	}
 
-    public TRHashProviderException(Throwable t) {
-        super(t);
-    }
+	public TRHashProviderException(Throwable t) {
+		super(t);
+	}
 
 }

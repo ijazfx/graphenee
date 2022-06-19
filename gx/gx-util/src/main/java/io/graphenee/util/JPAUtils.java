@@ -25,13 +25,13 @@ import java.util.function.Function;
  * @author tahamalik
  */
 public class JPAUtils {
-    public static <E, B> List<B> applyMapper(List<E> entities, Function<E, B> mapper) {
-        List<B> beans = new ArrayList<>();
-        for (E entity : entities) {
-            beans.add(mapper.apply(entity));
-        }
+	public static <E, B> List<B> applyMapper(List<E> entities, Function<E, B> mapper) {
+		List<B> beans = new ArrayList<>();
+		for (E entity : entities) {
+			beans.add(mapper.apply(entity));
+		}
 
-        return beans;
-    }
+		return beans;
+	}
 
 }

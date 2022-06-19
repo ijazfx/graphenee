@@ -25,6 +25,6 @@ import java.io.Serializable;
  */
 public interface TRParamCallback<T> extends Serializable {
 
-    void execute(T param);
+	void execute(T param);
 
 }

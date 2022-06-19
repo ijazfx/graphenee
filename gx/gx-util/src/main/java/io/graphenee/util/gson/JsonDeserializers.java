@@ -33,58 +33,58 @@ import io.graphenee.util.TRCalendarUtil;
 
 public class JsonDeserializers {
 
-    public static final JsonDeserializer<Timestamp> TIMESTAMP_DESERIALIZER = new TimestampDeserializer();
-    public static final JsonSerializer<Timestamp> TIMESTAMP_SERIALIZER = new TimestampSerializer();
+	public static final JsonDeserializer<Timestamp> TIMESTAMP_DESERIALIZER = new TimestampDeserializer();
+	public static final JsonSerializer<Timestamp> TIMESTAMP_SERIALIZER = new TimestampSerializer();
 
-    public static class TimestampDeserializer implements JsonDeserializer<Timestamp> {
+	public static class TimestampDeserializer implements JsonDeserializer<Timestamp> {
 
-        @Override
-        public Timestamp deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            try {
-                return new Timestamp(json.getAsLong());
-            } catch (Exception ex) {
-                String value = json.getAsString();
-                if (value != null) {
-                    value = value.trim();
-                    try {
-                        return new Timestamp(TRCalendarUtil.yyyyMMddHHmmssSSSFormatter.parse(value).getTime());
-                    } catch (ParseException e1) {
-                        try {
-                            return new Timestamp(TRCalendarUtil.yyyyMMddHHmmssFormatter.parse(value).getTime());
-                        } catch (ParseException e2) {
-                            try {
-                                return new Timestamp(TRCalendarUtil.yyyyMMddFormatter.parse(value).getTime());
-                            } catch (ParseException e3) {
+		@Override
+		public Timestamp deserialize(JsonElement json, java.lang.reflect.Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			try {
+				return new Timestamp(json.getAsLong());
+			} catch (Exception ex) {
+				String value = json.getAsString();
+				if (value != null) {
+					value = value.trim();
+					try {
+						return new Timestamp(TRCalendarUtil.yyyyMMddHHmmssSSSFormatter.parse(value).getTime());
+					} catch (ParseException e1) {
+						try {
+							return new Timestamp(TRCalendarUtil.yyyyMMddHHmmssFormatter.parse(value).getTime());
+						} catch (ParseException e2) {
+							try {
+								return new Timestamp(TRCalendarUtil.yyyyMMddFormatter.parse(value).getTime());
+							} catch (ParseException e3) {
 
-                            }
-                        }
-                    }
-                }
-                return null;
-            }
-        }
-    }
+							}
+						}
+					}
+				}
+				return null;
+			}
+		}
+	}
 
-    public static class TimestampSerializer implements JsonSerializer<Timestamp> {
+	public static class TimestampSerializer implements JsonSerializer<Timestamp> {
 
-        @Override
-        public JsonElement serialize(Timestamp src, Type typeOfSrc, JsonSerializationContext context) {
-            if (src == null)
-                return JsonNull.INSTANCE;
-            return new JsonPrimitive(src.getTime());
-        }
+		@Override
+		public JsonElement serialize(Timestamp src, Type typeOfSrc, JsonSerializationContext context) {
+			if (src == null)
+				return JsonNull.INSTANCE;
+			return new JsonPrimitive(src.getTime());
+		}
 
-    }
+	}
 
-    public static class ByteArrayDeserializer implements JsonDeserializer<byte[]> {
+	public static class ByteArrayDeserializer implements JsonDeserializer<byte[]> {
 
-        @Override
-        public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            if (json == null)
-                return new byte[] {};
-            return Base64.getDecoder().decode(json.getAsString());
-        }
+		@Override
+		public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			if (json == null)
+				return new byte[] {};
+			return Base64.getDecoder().decode(json.getAsString());
+		}
 
-    }
+	}
 
 }
