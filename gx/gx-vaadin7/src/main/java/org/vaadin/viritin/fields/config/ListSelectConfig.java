@@ -7,20 +7,20 @@ import com.vaadin.ui.ListSelect;
  */
 public class ListSelectConfig {
 
-    Integer rows;
+	Integer rows;
 
-    public static final ListSelectConfig build() {
-        return new ListSelectConfig();
-    }
+	public static final ListSelectConfig build() {
+		return new ListSelectConfig();
+	}
 
-    public ListSelectConfig withRows(int rows) {
-        this.rows = rows;
-        return this;
-    }
+	public ListSelectConfig withRows(int rows) {
+		this.rows = rows;
+		return this;
+	}
 
-    public void configurateListSelect(ListSelect listSelect) {
-        if (rows != null) {
-            listSelect.setRows(rows);
-        }
-    }
+	public void configurateListSelect(ListSelect listSelect) {
+		if (rows != null) {
+			listSelect.setRows(rows);
+		}
+	}
 }

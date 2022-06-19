@@ -36,36 +36,35 @@ import com.vaadin.navigator.ViewChangeListener;
  */
 public interface MView extends View {
 
-    /**
-     * Invoked before the view is changed.
-     * 
-     * 
-     * <p>
-     * By returning {@code false} from this method the view change is 
-     * denied. More information in {@link com.vaadin.navigator.ViewChangeListener#beforeViewChange(com.vaadin.navigator.ViewChangeListener.ViewChangeEvent)}.
-     *
-     * 
-     * @param event view change event
-     * @return true if the view change should be allowed or this listener does
-     *    not care about the view change, false to block the change
-     * 
-     * @see com.vaadin.navigator.ViewChangeListener#beforeViewChange(com.vaadin.navigator.ViewChangeListener.ViewChangeEvent)
-     * 
-     */
-    public boolean beforeViewChange(ViewChangeListener.ViewChangeEvent event);
-    
-    /**
-     * Invoked after the view is changed. If a {@code beforeViewChange} method blocked
-     * the view change, this method is not called. Be careful of unbounded
-     * recursion if you decide to change the view again in this class.
-     *
-     * <p> 
-     * This is a logical place to deregister listeners that are owned
-     * by the view.
-     *
-     * @param event view change event
-     */
-    public void afterViewChange(ViewChangeListener.ViewChangeEvent event);
+	/**
+	 * Invoked before the view is changed.
+	 * 
+	 * 
+	 * <p>
+	 * By returning {@code false} from this method the view change is 
+	 * denied. More information in {@link com.vaadin.navigator.ViewChangeListener#beforeViewChange(com.vaadin.navigator.ViewChangeListener.ViewChangeEvent)}.
+	 *
+	 * 
+	 * @param event view change event
+	 * @return true if the view change should be allowed or this listener does
+	 *    not care about the view change, false to block the change
+	 * 
+	 * @see com.vaadin.navigator.ViewChangeListener#beforeViewChange(com.vaadin.navigator.ViewChangeListener.ViewChangeEvent)
+	 * 
+	 */
+	public boolean beforeViewChange(ViewChangeListener.ViewChangeEvent event);
 
-    
+	/**
+	 * Invoked after the view is changed. If a {@code beforeViewChange} method blocked
+	 * the view change, this method is not called. Be careful of unbounded
+	 * recursion if you decide to change the view again in this class.
+	 *
+	 * <p> 
+	 * This is a logical place to deregister listeners that are owned
+	 * by the view.
+	 *
+	 * @param event view change event
+	 */
+	public void afterViewChange(ViewChangeListener.ViewChangeEvent event);
+
 }

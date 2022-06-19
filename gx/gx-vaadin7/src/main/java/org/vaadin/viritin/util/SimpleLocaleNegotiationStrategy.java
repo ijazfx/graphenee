@@ -19,27 +19,25 @@ import java.util.Locale;
  * @author Daniel Nordhoff-Vergien
  *
  */
-public class SimpleLocaleNegotiationStrategy implements
-        LocaleNegotiationStrategey {
-    @Override
-    public Locale negotiate(List<Locale> supportedLocales,
-            VaadinRequest vaadinRequest) {
-        Enumeration<Locale> acceptedLocales = vaadinRequest.getLocales();
-        while (acceptedLocales.hasMoreElements()) {
-            Locale locale = acceptedLocales.nextElement();
-            if (supportedLocales.contains(locale)) {
-                return locale;
-            }
-        }
-        acceptedLocales = vaadinRequest.getLocales();
-        while (acceptedLocales.hasMoreElements()) {
-            Locale locale = acceptedLocales.nextElement();
-            for (Locale supportedLocale : supportedLocales) {
-                if (locale.getLanguage().equals(supportedLocale.getLanguage())) {
-                    return locale;
-                }
-            }
-        }
-        return null;
-    }
+public class SimpleLocaleNegotiationStrategy implements LocaleNegotiationStrategey {
+	@Override
+	public Locale negotiate(List<Locale> supportedLocales, VaadinRequest vaadinRequest) {
+		Enumeration<Locale> acceptedLocales = vaadinRequest.getLocales();
+		while (acceptedLocales.hasMoreElements()) {
+			Locale locale = acceptedLocales.nextElement();
+			if (supportedLocales.contains(locale)) {
+				return locale;
+			}
+		}
+		acceptedLocales = vaadinRequest.getLocales();
+		while (acceptedLocales.hasMoreElements()) {
+			Locale locale = acceptedLocales.nextElement();
+			for (Locale supportedLocale : supportedLocales) {
+				if (locale.getLanguage().equals(supportedLocale.getLanguage())) {
+					return locale;
+				}
+			}
+		}
+		return null;
+	}
 }

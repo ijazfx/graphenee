@@ -75,817 +75,817 @@ import io.graphenee.vaadin.util.VaadinUtils;
 @SuppressWarnings("serial")
 public abstract class AbstractEntityListPanel<T> extends MPanel {
 
-    private static final Logger L = LoggerFactory.getLogger(AbstractEntityListPanel.class);
-
-    private Class<T> entityClass;
-    private boolean isBuilt;
-    private MGrid<T> mainGrid;
-    private FilterableListContainer<T> mainGridContainer;
-    private AbstractLayout toolbar;
-    private AbstractLayout secondaryToolbar;
-    private MButton addButton;
-    private MButton editButton;
-    private MButton deleteButton;
-    private MButton searchButton;
-    private GridCellFilter gridCellFilter;
-    private Object filter;
-    private Function<T, Boolean> onItemClick;
-    private MTextField pageNumberField;
-    private Integer pageNumber = 1;
-    private MButton nextPageButton;
-    private MButton previousPageButton;
-    private CssLayout pagingLayout;
-
-    private Function<Collection<T>, Boolean> onSelection;
-
-    private boolean isSelectionEnabled = true;
-
-    private AbstractEntityListPanelDelegate delegate = null;
-    private TRAbstractSearchForm<?> searchForm = null;
-
-    private ExportDataSpreadSheetComponent exportDataSpreadSheetComponent;
-
-    private MButton exportDataDownloadButton;
-
-    private MVerticalLayout rootLayout;
-
-    private FooterCell statusBar;
-
-    public AbstractEntityListPanel(Class<T> entityClass) {
-        this.entityClass = entityClass;
-        if (!isSpringComponent()) {
-            postConstruct();
-        }
-    }
-
-    protected boolean isSpringComponent() {
-        return this.getClass().getAnnotation(SpringComponent.class) != null;
-    }
-
-    @PostConstruct
-    private void postConstruct() {
-        postInitialize();
-    }
-
-    protected void postInitialize() {
-    }
-
-    public AbstractEntityListPanel<T> build() {
-        if (!isBuilt) {
-            setSizeFull();
-            setStyleName(ValoTheme.PANEL_BORDERLESS);
-            setCaption(panelCaption());
-
-            mainGrid = buildMainGrid();
-
-            addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("New"), event -> {
-                try {
-                    onAddButtonClick(initializeEntity(entityClass.getDeclaredConstructor().newInstance()));
-                } catch (Exception e) {
-                    L.warn(e.getMessage(), e);
-                }
-            }).withStyleName(ValoTheme.BUTTON_PRIMARY);
-
-            editButton = new MButton(FontAwesome.EDIT, localizedSingularValue("Modify"), event -> {
-                Collection<T> items = mainGrid.getSelectedRowsWithType();
-                if (items.size() == 1) {
-                    T item = items.iterator().next();
-                    preEdit(item);
-                    openEditorForm(item);
-                }
-            });
-            editButton.setEnabled(false);
-            deleteButton = new MButton(FontAwesome.REMOVE, localizedSingularValue("Remove"), event -> {
-                Collection<T> issues = mainGrid.getSelectedRowsWithType();
-                if (issues.size() > 0) {
-                    if (shouldShowDeleteConfirmation()) {
-                        ConfirmDialog.show(UI.getCurrent(), "Are you sure to remove selected records?", e -> {
-                            if (e.isConfirmed()) {
-                                for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
-                                    T item = itemIterator.next();
-                                    try {
-                                        if (onDeleteEntity(item)) {
-                                            mainGridContainer.removeItem(item);
-                                            if (delegate != null) {
-                                                delegate.onDelete(item);
-                                            }
-                                        }
-                                    } catch (Exception e1) {
-                                        if (e1.getMessage().contains("ConstraintViolationException"))
-                                            MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
-                                        else
-                                            MNotification.tray("Operation Failed", e1.getMessage());
-                                    }
-                                }
-                                // refresh();
-                                deselectAll();
-                                mainGrid.refreshAllRows();
-                            }
-                        });
-                    }
-
-                    else {
-                        for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
-                            T item = itemIterator.next();
-                            if (onDeleteEntity(item)) {
-                                mainGridContainer.removeItem(item);
-                            }
-                        }
-                        // refresh();
-                        deselectAll();
-                        mainGrid.refreshAllRows();
-                    }
-
-                }
-            });
-            deleteButton.withStyleName(ValoTheme.BUTTON_DANGER);
-            deleteButton.setEnabled(false);
-            searchButton = new MButton(FontAwesome.SEARCH, localizedSingularValue("Search"), event -> {
-                try {
-                    searchForm.openInModalPopup();
-                } catch (Exception e) {
-                    L.warn(e.getMessage(), e);
-                }
-            });
-            exportDataSpreadSheetComponent = new ExportDataSpreadSheetComponent();
-            exportDataSpreadSheetComponent.withColumnsCaptions(() -> {
-                return getGridHeaderCaptionList();
-            });
-            exportDataSpreadSheetComponent.withDataColumns(() -> {
-                List<String> columnList = new ArrayList<>();
-                entityGrid().getColumns().forEach(column -> {
-                    if (!column.isHidden()) {
-                        columnList.add(column.getPropertyId().toString());
-                    }
-                });
-                return columnList;
-            }).withDataItems(() -> {
-                Collection<Object> selectedRows = entityGrid().getSelectedRows();
-                if (selectedRows.size() > 0) {
-                    return selectedRows;
-                }
-                return new ArrayList<>(mainGridContainer.getItemIds());
-            });
-            exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O).withListener(cl -> {
-                exportDataSpreadSheetComponent.prepareDownload();
-            });
-            exportDataDownloadButton.setVisible(shouldShowExportDataButton());
-
-            pageNumberField = new MTextField();
-            pageNumberField.setWidth("50px");
-            pageNumberField.setStyleName(ValoTheme.TEXTFIELD_ALIGN_CENTER);
-            pageNumberField.setConverter(new StringToIntegerConverter());
-            pageNumberField.setValue(pageNumber.toString());
-            pageNumberField.addValueChangeListener(listener -> {
-                pageNumber = (Integer) pageNumberField.getConvertedValue();
-                previousPageButton.setEnabled(pageNumber > 1);
-                nextPageButton.setEnabled(pageNumber < getPageCount());
-                if (filter != null) {
-                    refresh(filter);
-                } else
-                    refresh();
-
-            });
-
-            pageNumberField.addValidator(new IntegerRangeValidator("Must be between 1 and " + getPageCount(), 1, getPageCount()));
-
-            previousPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_LEFT);
-            previousPageButton.setEnabled(false);
-            previousPageButton.addClickListener(listener -> {
-                if (pageNumber > 1) {
-                    pageNumber = pageNumber - 1;
-                    pageNumberField.setValue(pageNumber.toString());
-                }
-            });
-
-            nextPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_RIGHT);
-
-            nextPageButton.addClickListener(listener -> {
-                if (pageNumber < getPageCount()) {
-                    pageNumber = pageNumber + 1;
-                    pageNumberField.setValue(pageNumber.toString());
-                }
-            });
-            toolbar = buildToolbar();
-            if (toolbar.getComponentCount() == 0)
-                toolbar.setVisible(false);
-
-            secondaryToolbar = buildSecondaryToolbar();
-            if (secondaryToolbar.getComponentCount() == 0)
-                secondaryToolbar.setVisible(false);
-
-            rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin()).withSpacing(true);
-            rootLayout.setSizeFull();
-            rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
-            rootLayout.setExpandRatio(mainGrid, 1);
-            setContent(rootLayout);
-
-            postBuild();
-            isBuilt = true;
-        }
-        return this;
-
-    }
-
-    protected MarginInfo rootLayoutMargin() {
-        return new MarginInfo(true);
-    }
-
-    private MGrid<T> buildMainGrid() {
-        MGrid<T> grid = new MGrid<>(entityClass);
-        grid.setStyleName("entity-grid");
-        mainGridContainer = new FilterableListContainer<>(entityClass);
-        grid.setContainerDataSource(mainGridContainer);
-        grid.setSizeFull();
-        grid.setHeightMode(HeightMode.CSS);
-        String[] visibleProperties = visibleProperties();
-        if (visibleProperties != null) {
-            for (String propertyId : visibleProperties()) {
-                if (propertyId.contains(".")) {
-                    //@TODO: no implementation available yet.
-                    //  mainGridContainer.addNestedContainerProperty(propertyId);
-                }
-            }
-            grid.withProperties(visibleProperties());
-        }
-        if (isGridCellFilterEnabled()) {
-            gridCellFilter = new GridCellFilter(grid);
-            gridCellFilter.addCellFilterChangedListener(event -> {
-                if (entityGrid().getSelectedRows().size() > 0) {
-                    statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
-                } else {
-                    statusBar.setText(String.format(" %d records", mainGridContainer.size()));
-                }
-            });
-            if (visibleProperties != null) {
-                addCellFiltersForVisibleProperties(gridCellFilter, visibleProperties);
-            }
-        }
-
-        grid.getColumns().forEach(column -> {
-            column.setHidable(true);
-            applyRendererForColumn(column);
-        });
-
-        grid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
-        grid.addItemClickListener(new TRItemClickListener() {
-
-            //            @Override
-            //            public void onItemClick(ItemClickEvent event) {
-            //                if (event.getPropertyId() != null) {
-            //                    Item  = mainGridContainer.getItem(event.getItemId());
-            //                    BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
-            //                    if (item != null) {
-            //                        if (onItemClick != null) {
-            //                            Boolean value = onItemClick.apply(item.getBean());
-            //                            if (value != null && value == true) {
-            //                                onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
-            //                            }
-            //                        } else {
-            //                            onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
-            //                        }
-            //                    }
-            //                }
-            //            }
-
-            @Override
-            public void onItemClick(ItemClickEvent event) {
-                if (event.getPropertyId() != null) {
-                    T item = (T) event.getItemId();
-                    if (item != null) {
-                        if (onItemClick != null) {
-                            Boolean value = onItemClick.apply(item);
-                            if (value != null && value == true) {
-                                onGridItemClicked(item, event.getPropertyId() != null ? event.getPropertyId().toString() : "");
-                            }
-                        } else {
-                            onGridItemClicked(item, event.getPropertyId() != null ? event.getPropertyId().toString() : "");
-                        }
-                    }
-                }
-            }
-        });
-        grid.addSelectionListener(event -> {
-            if (event.getSelected() != null && !event.getSelected().isEmpty()) {
-                statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(), mainGridContainer.size()));
-            } else {
-                if (shouldShowPaging() && mainGridContainer.size() != 0)
-                    statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
-                else
-                    statusBar.setText(String.format("showing %d records", mainGridContainer.size()));
-            }
-            if (onSelection != null) {
-                Boolean value = onSelection.apply((Collection<T>) event.getSelected());
-                if (value != null && value == true) {
-                    onGridItemSelect(event);
-                }
-            } else {
-                onGridItemSelect(event);
-            }
-        });
-
-        grid.getColumns().forEach(column -> {
-            if (column.getPropertyId() != null) {
-                column.setHeaderCaption(localizedSingularValue(column.getHeaderCaption()));
-            }
-        });
-
-        grid.setCellStyleGenerator(new CellStyleGenerator() {
-
-            @Override
-            public String getStyle(CellReference cell) {
-                if (cell.getPropertyId() == null) {
-                    return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
-                }
-                String cellStyle = generateCellStyle(cell);
-                Alignment alignment = alignmentForProperty(cell.getPropertyId().toString());
-
-                if (Strings.isNullOrEmpty(cellStyle)) {
-                    if (alignment.isLeft()) {
-                        return GrapheneeTheme.STYLE_V_ALIGN_LEFT;
-                    }
-                    if (alignment.isRight()) {
-                        return GrapheneeTheme.STYLE_V_ALIGN_RIGHT;
-                    }
-                    return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
-                } else {
-                    if (alignment.isLeft()) {
-                        return GrapheneeTheme.STYLE_V_ALIGN_LEFT + " " + cellStyle;
-                    }
-                    if (alignment.isRight()) {
-                        return GrapheneeTheme.STYLE_V_ALIGN_RIGHT + " " + cellStyle;
-                    }
-                    return GrapheneeTheme.STYLE_V_ALIGN_CENTER + " " + cellStyle;
-                }
-            }
-        });
-
-        GridContextMenu contextMenu = new GridContextMenu(grid);
-        contextMenu.addGridBodyContextMenuListener(event -> {
-            event.getContextMenu().removeItems();
-            addMenuItemsToContextMenu(contextMenu, (T) event.getItemId(), grid.getSelectedRowsWithType());
-        });
-
-        FooterRow footerRow = grid.appendFooterRow();
-        String[] props = visibleProperties();
-        if (props.length > 1)
-            statusBar = footerRow.join((String[]) visibleProperties());
-        else
-            statusBar = footerRow.getCell(props[0]);
-        return grid;
-    }
-
-    protected void addMenuItemsToContextMenu(ContextMenu contextMenu, T item, Collection<T> selectedItems) {
-    }
-
-    protected String generateCellStyle(CellReference cell) {
-        return null;
-    }
-
-    protected void applyRendererForColumn(Column column) {
-        if (column.getPropertyId() != null) {
-            if (column.getPropertyId().toString().matches("(is|should|has)[A-Z].*")) {
-                column.setMaximumWidth(150);
-                column.setRenderer(new BooleanRenderer(event -> {
-                    if (event.getPropertyId() != null) {
-                        onGridItemClicked((T) event.getItemId(), event.getPropertyId().toString());
-                    } else {
-                        onGridItemClicked((T) event.getItemId(), "");
-                    }
-                }), BooleanRenderer.CHECK_BOX_CONVERTER);
-            } else if ((column.getPropertyId().toString().matches("(date|since)") || column.getPropertyId().toString().matches("(date|since)[A-Z].*")
-                    || column.getPropertyId().toString().matches(".*[a-z](Date|Since)"))) {
-                column.setRenderer(new DateRenderer(applyDateFormatForProperty(column.getPropertyId().toString())));
-            } else if ((column.getPropertyId().toString().equalsIgnoreCase("time") || column.getPropertyId().toString().matches("(time)[A-Z].*")
-                    || column.getPropertyId().toString().matches(".*[a-z](Time)"))) {
-                column.setRenderer(new DateRenderer(applyDateTimeFormatForProperty(column.getPropertyId().toString())));
-            }
-        }
-    }
-
-    protected DateFormat applyDateFormatForProperty(String propertyId) {
-        return TRCalendarUtil.dateFormatter;
-    }
-
-    protected DateFormat applyDateTimeFormatForProperty(String propertyId) {
-        return TRCalendarUtil.dateTimeFormatter;
-    }
-
-    protected Alignment alignmentForProperty(String propertyId) {
-        if (propertyId.matches("(is|should|has)[A-Z].*")) {
-            return Alignment.MIDDLE_LEFT;
-        }
-        if (propertyId.matches("(cost|price|sum|amount|percent)")) {
-            return Alignment.MIDDLE_RIGHT;
-        }
-        if (propertyId.matches("(cost|price|sum|amount|percent)[A-Z].*")) {
-            return Alignment.MIDDLE_RIGHT;
-        }
-        if (propertyId.matches(".*(Cost|Price|Sum|Amount|Percent)")) {
-            return Alignment.MIDDLE_RIGHT;
-        }
-        return Alignment.MIDDLE_LEFT;
-    }
-
-    protected void onGridItemSelect(SelectionEvent event) {
-        editButton.setEnabled(event.getSelected().size() == 1);
-        deleteButton.setEnabled(event.getSelected().size() > 0);
-        if (delegate != null) {
-            delegate.onGridItemSelect(event);
-        }
-    }
-
-    protected void addCellFiltersForVisibleProperties(GridCellFilter filter, String[] visibleProperties) {
-        for (String visibleProperty : visibleProperties) {
-            filter.setTextFilter(visibleProperty, true, false);
-        }
-    }
-
-    protected boolean isGridCellFilterEnabled() {
-        return false;
-    }
-
-    private AbstractLayout buildToolbar() {
-        MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
-        layout.add(addButton);
-        layout.add(editButton);
-        layout.add(deleteButton);
-        layout.add(searchButton);
-        searchButton.setVisible(false);
-
-        if (shouldShowPaging()) {
-            pagingLayout = new CssLayout();
-            pagingLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-            pagingLayout.addComponents(previousPageButton, pageNumberField, nextPageButton);
-            layout.add(pagingLayout);
-            layout.setComponentAlignment(pagingLayout, Alignment.TOP_CENTER);
-        }
-
-        layout.add(exportDataDownloadButton);
-        addButtonsToToolbar(layout);
-
-        boolean addSpacer = true;
-        Iterator<Component> iter = layout.iterator();
-        while (iter.hasNext()) {
-            Component c = iter.next();
-            if (layout.getExpandRatio(c) > 0) {
-                addSpacer = false;
-                break;
-            }
-        }
-
-        if (addSpacer) {
-            MLabel spacerLabel = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN);
-            layout.addComponent(spacerLabel);
-            layout.setExpandRatio(spacerLabel, 1);
-        }
-
-        // localize...
-        localizeRecursively(layout);
-        VaadinUtils.applyStyleRecursively(layout, "small");
-
-        return layout;
-    }
-
-    private AbstractLayout buildSecondaryToolbar() {
-        MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
-
-        addButtonsToSecondaryToolbar(layout);
-
-        boolean addSpacer = true;
-        Iterator<Component> iter = layout.iterator();
-
-        layout.setVisible(layout.getComponentCount() > 0);
-
-        while (iter.hasNext()) {
-            Component c = iter.next();
-            if (layout.getExpandRatio(c) > 0) {
-                addSpacer = false;
-                break;
-            }
-        }
-
-        if (addSpacer) {
-            MLabel spacerLabel = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN);
-            layout.addComponent(spacerLabel);
-            layout.setExpandRatio(spacerLabel, 1);
-        }
-
-        // localize...
-        localizeRecursively(layout);
-        VaadinUtils.applyStyleRecursively(layout, "small");
-
-        return layout;
-    }
-
-    private List<String> getGridHeaderCaptionList() {
-        List<String> columnList = new ArrayList<>();
-        entityGrid().getColumns().forEach(column -> {
-            if (!column.isHidden()) {
-                columnList.add(column.getHeaderCaption());
-            }
-        });
-        return columnList;
-    }
-
-    protected boolean shouldShowExportDataButton() {
-        return false;
-    }
-
-    protected void preEdit(T item) {
-    }
-
-    protected void onAddButtonClick(T entity) {
-        preEdit(entity);
-        openEditorForm(entity);
-    }
-
-    protected boolean shouldShowDeleteConfirmation() {
-        return false;
-    }
-
-    private void openEditorForm(T item) {
-        if (editorForm() != null) {
-            // BeanItem<T> beanItem = mainGridContainer.getItem(item);
-            // if (beanItem == null) {
-            // cachedForm().setEntity(entityClass, item);
-            // } else {
-            // cachedForm().setEntity(entityClass, beanItem.getBean());
-            // }
-            editorForm().setEntity(entityClass, item);
-            editorForm().setSavedHandler(entity -> {
-                try {
-                    if (onSaveEntity(entity)) {
-                        if (delegate != null) {
-                            delegate.onSave(entity);
-                        }
-                        editorForm().closePopup();
-                        // UI.getCurrent().access(() -> {
-                        // if (!mainGridContainer.containsId(entity)) {
-                        // mainGridContainer.addBean(entity);
-                        // }
-                        // mainGrid.clearSortOrder();
-                        // UI.getCurrent().push();
-                        // });
-                        refresh();
-                    }
-                } catch (Exception e) {
-                    L.warn(e.getMessage(), e);
-                }
-            });
-            editorForm().openInModalPopup();
-        }
-    }
-
-    protected T initializeEntity(T item) {
-        return item;
-    }
-
-    protected abstract boolean onSaveEntity(T entity);
-
-    protected abstract boolean onDeleteEntity(T entity);
-
-    public AbstractEntityListPanel<T> refresh() {
-        if (filter != null) {
-            return refresh(filter);
-        }
-        UI.getCurrent().access(() -> {
-            deselectAll();
-            List<T> entities = fetchEntities();
-            mainGridContainer.removeAllItems();
-            if (entities != null) {
-                mainGridContainer.addAll(entities);
-            }
-            statusBar.setText(String.format(" %d records", mainGridContainer.size()));
-            UI.getCurrent().push();
-        });
-        return this;
-    }
-
-    public <F extends Object> AbstractEntityListPanel<T> refresh(F filter) {
-        this.filter = filter;
-        UI.getCurrent().access(() -> {
-            deselectAll();
-            List<T> entities = postFetch(fetchEntities(filter));
-            mainGridContainer.removeAllItems();
-            mainGridContainer.addAll(entities);
-            statusBar.setText(String.format("%d records", mainGridContainer.size()));
-            UI.getCurrent().push();
-        });
-        return this;
-    }
-
-    protected List<T> postFetch(List<T> fetchedEntities) {
-        return fetchedEntities;
-    }
-
-    protected Integer fetchEntityCount() {
-        return 0;
-    }
-
-    protected abstract String panelCaption();
-
-    protected abstract List<T> fetchEntities();
-
-    protected <F extends Object> List<T> fetchEntities(F filter) {
-        return fetchEntities();
-    }
-
-    protected abstract String[] visibleProperties();
-
-    protected abstract TRAbstractForm<T> editorForm();
-
-    protected void postBuild() {
-    }
-
-    protected MGrid<T> entityGrid() {
-        return mainGrid;
-    }
-
-    protected void setAddButtonVisibility(boolean visibility) {
-        if (addButton != null) {
-            addButton.setVisible(visibility);
-        }
-    }
-
-    protected void setEditButtonVisibility(boolean visibility) {
-        if (editButton != null) {
-            editButton.setVisible(visibility);
-        }
-    }
-
-    protected void setDeleteButtonVisibility(boolean visibility) {
-        if (deleteButton != null) {
-            deleteButton.setVisible(visibility);
-        }
-    }
-
-    protected void setAddButtonEnable(boolean isEnable) {
-        if (addButton != null) {
-            addButton.setEnabled(isEnable);
-        }
-    }
-
-    protected void setDeleteButtonEnable(boolean isEnable) {
-        if (deleteButton != null) {
-            deleteButton.setEnabled(isEnable);
-        }
-    }
-
-    protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
-    }
-
-    protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
-    }
-
-    protected void onGridItemClicked(T item) {
-        preEdit(item);
-        openEditorForm(item);
-    }
-
-    protected void onGridItemClicked(T item, String propertyId) {
-        onGridItemClicked(item);
-    }
-
-    public <R extends AbstractEntityListPanel<T>> R withItemClick(Function<T, Boolean> onItemClick) {
-        this.onItemClick = onItemClick;
-        return (R) this;
-    }
-
-    public <R extends AbstractEntityListPanel<T>> R withSelection(Function<Collection<T>, Boolean> onSelection) {
-        this.onSelection = onSelection;
-        return (R) this;
-    }
-
-    public AbstractEntityListPanel<T> clearFilter() {
-        filter = null;
-        return this;
-    }
-
-    public AbstractEntityListPanel<T> withToolbarVisibility(boolean visibility) {
-        toolbar.setVisible(visibility);
-        return this;
-    }
-
-    public AbstractEntityListPanel<T> withSelectionEnabled(boolean isSelectionEnabled) {
-        this.isSelectionEnabled = isSelectionEnabled;
-        return this;
-    }
-
-    public AbstractEntityListPanel<T> withDelegate(AbstractEntityListPanelDelegate delegate) {
-        setDelegate(delegate);
-        return this;
-    }
-
-    public void setDelegate(AbstractEntityListPanelDelegate delegate) {
-        this.delegate = delegate;
-    }
-
-    public AbstractEntityListPanel<T> withSearchForm(TRAbstractSearchForm<?> searchForm) {
-        setSearchForm(searchForm);
-        return this;
-    }
-
-    public void setSearchForm(TRAbstractSearchForm<?> searchForm) {
-        this.searchForm = searchForm;
-        if (searchButton != null) {
-            searchButton.setVisible(searchForm != null);
-        }
-    }
-
-    public static interface AbstractEntityListPanelDelegate {
-
-        default void onGridItemSelect(SelectionEvent event) {
-        }
-
-        default void onSave(Object entity) {
-        }
-
-        default void onDelete(Object entity) {
-        }
-
-    }
-
-    protected String localizedSingularValue(String key) {
-        return VaadinUtils.localizedSingularValue(key);
-    }
-
-    protected String localizedPluralValue(String key) {
-        return VaadinUtils.localizedSingularValue(key);
-    }
-
-    protected void localizeRecursively(Component component) {
-        VaadinUtils.localizeRecursively(component);
-    }
-
-    protected String localizedSingularValue(Locale locale, String key) {
-        return VaadinUtils.localizedSingularValue(key);
-    }
-
-    protected String localizedPluralValue(Locale locale, String key) {
-        return VaadinUtils.localizedSingularValue(key);
-    }
-
-    protected void localizeRecursively(Locale locale, Component component) {
-        VaadinUtils.localizeRecursively(component);
-    }
-
-    public void deselectAll() {
-        try {
-            entityGrid().deselectAll();
-        } catch (Exception e) {
-        }
-    }
-
-    public void showToolbar() {
-        toolbar.setVisible(true);
-    }
-
-    public void hideToolbar() {
-        toolbar.setVisible(false);
-    }
-
-    public void setSelectionMode(SelectionMode mode) {
-        entityGrid().setSelectionMode(mode);
-    }
-
-    public void showSecondaryToolbar() {
-        secondaryToolbar.setVisible(true);
-    }
-
-    public void hideSecondaryToolbar() {
-        secondaryToolbar.setVisible(false);
-    }
-
-    public MButton getAddButton() {
-        return addButton;
-    }
-
-    public MButton getEditButton() {
-        return editButton;
-    }
-
-    public MButton getDeleteButton() {
-        return deleteButton;
-    }
-
-    public Integer getPageNumber() {
-        return pageNumber - 1;
-    }
-
-    public Boolean shouldShowPaging() {
-        return false;
-    }
-
-    protected Integer getPageSize() {
-        return 200;
-    }
-
-    private Integer getPageCount() {
-        int pageCount = fetchEntityCount() / getPageSize();
-        if (pageCount == 0)
-            return 1;
-        return pageCount;
-    }
+	private static final Logger L = LoggerFactory.getLogger(AbstractEntityListPanel.class);
+
+	private Class<T> entityClass;
+	private boolean isBuilt;
+	private MGrid<T> mainGrid;
+	private FilterableListContainer<T> mainGridContainer;
+	private AbstractLayout toolbar;
+	private AbstractLayout secondaryToolbar;
+	private MButton addButton;
+	private MButton editButton;
+	private MButton deleteButton;
+	private MButton searchButton;
+	private GridCellFilter gridCellFilter;
+	private Object filter;
+	private Function<T, Boolean> onItemClick;
+	private MTextField pageNumberField;
+	private Integer pageNumber = 1;
+	private MButton nextPageButton;
+	private MButton previousPageButton;
+	private CssLayout pagingLayout;
+
+	private Function<Collection<T>, Boolean> onSelection;
+
+	private boolean isSelectionEnabled = true;
+
+	private AbstractEntityListPanelDelegate delegate = null;
+	private TRAbstractSearchForm<?> searchForm = null;
+
+	private ExportDataSpreadSheetComponent exportDataSpreadSheetComponent;
+
+	private MButton exportDataDownloadButton;
+
+	private MVerticalLayout rootLayout;
+
+	private FooterCell statusBar;
+
+	public AbstractEntityListPanel(Class<T> entityClass) {
+		this.entityClass = entityClass;
+		if (!isSpringComponent()) {
+			postConstruct();
+		}
+	}
+
+	protected boolean isSpringComponent() {
+		return this.getClass().getAnnotation(SpringComponent.class) != null;
+	}
+
+	@PostConstruct
+	private void postConstruct() {
+		postInitialize();
+	}
+
+	protected void postInitialize() {
+	}
+
+	public AbstractEntityListPanel<T> build() {
+		if (!isBuilt) {
+			setSizeFull();
+			setStyleName(ValoTheme.PANEL_BORDERLESS);
+			setCaption(panelCaption());
+
+			mainGrid = buildMainGrid();
+
+			addButton = new MButton(FontAwesome.PLUS, localizedSingularValue("New"), event -> {
+				try {
+					onAddButtonClick(initializeEntity(entityClass.getDeclaredConstructor().newInstance()));
+				} catch (Exception e) {
+					L.warn(e.getMessage(), e);
+				}
+			}).withStyleName(ValoTheme.BUTTON_PRIMARY);
+
+			editButton = new MButton(FontAwesome.EDIT, localizedSingularValue("Modify"), event -> {
+				Collection<T> items = mainGrid.getSelectedRowsWithType();
+				if (items.size() == 1) {
+					T item = items.iterator().next();
+					preEdit(item);
+					openEditorForm(item);
+				}
+			});
+			editButton.setEnabled(false);
+			deleteButton = new MButton(FontAwesome.REMOVE, localizedSingularValue("Remove"), event -> {
+				Collection<T> issues = mainGrid.getSelectedRowsWithType();
+				if (issues.size() > 0) {
+					if (shouldShowDeleteConfirmation()) {
+						ConfirmDialog.show(UI.getCurrent(), "Are you sure to remove selected records?", e -> {
+							if (e.isConfirmed()) {
+								for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
+									T item = itemIterator.next();
+									try {
+										if (onDeleteEntity(item)) {
+											mainGridContainer.removeItem(item);
+											if (delegate != null) {
+												delegate.onDelete(item);
+											}
+										}
+									} catch (Exception e1) {
+										if (e1.getMessage().contains("ConstraintViolationException"))
+											MNotification.tray("Operation Denied", "Record is in use therefore cannot be removed.");
+										else
+											MNotification.tray("Operation Failed", e1.getMessage());
+									}
+								}
+								// refresh();
+								deselectAll();
+								mainGrid.refreshAllRows();
+							}
+						});
+					}
+
+					else {
+						for (Iterator<T> itemIterator = issues.iterator(); itemIterator.hasNext();) {
+							T item = itemIterator.next();
+							if (onDeleteEntity(item)) {
+								mainGridContainer.removeItem(item);
+							}
+						}
+						// refresh();
+						deselectAll();
+						mainGrid.refreshAllRows();
+					}
+
+				}
+			});
+			deleteButton.withStyleName(ValoTheme.BUTTON_DANGER);
+			deleteButton.setEnabled(false);
+			searchButton = new MButton(FontAwesome.SEARCH, localizedSingularValue("Search"), event -> {
+				try {
+					searchForm.openInModalPopup();
+				} catch (Exception e) {
+					L.warn(e.getMessage(), e);
+				}
+			});
+			exportDataSpreadSheetComponent = new ExportDataSpreadSheetComponent();
+			exportDataSpreadSheetComponent.withColumnsCaptions(() -> {
+				return getGridHeaderCaptionList();
+			});
+			exportDataSpreadSheetComponent.withDataColumns(() -> {
+				List<String> columnList = new ArrayList<>();
+				entityGrid().getColumns().forEach(column -> {
+					if (!column.isHidden()) {
+						columnList.add(column.getPropertyId().toString());
+					}
+				});
+				return columnList;
+			}).withDataItems(() -> {
+				Collection<Object> selectedRows = entityGrid().getSelectedRows();
+				if (selectedRows.size() > 0) {
+					return selectedRows;
+				}
+				return new ArrayList<>(mainGridContainer.getItemIds());
+			});
+			exportDataDownloadButton = new MButton().withCaption("Download").withIcon(FontAwesome.FILE_EXCEL_O).withListener(cl -> {
+				exportDataSpreadSheetComponent.prepareDownload();
+			});
+			exportDataDownloadButton.setVisible(shouldShowExportDataButton());
+
+			pageNumberField = new MTextField();
+			pageNumberField.setWidth("50px");
+			pageNumberField.setStyleName(ValoTheme.TEXTFIELD_ALIGN_CENTER);
+			pageNumberField.setConverter(new StringToIntegerConverter());
+			pageNumberField.setValue(pageNumber.toString());
+			pageNumberField.addValueChangeListener(listener -> {
+				pageNumber = (Integer) pageNumberField.getConvertedValue();
+				previousPageButton.setEnabled(pageNumber > 1);
+				nextPageButton.setEnabled(pageNumber < getPageCount());
+				if (filter != null) {
+					refresh(filter);
+				} else
+					refresh();
+
+			});
+
+			pageNumberField.addValidator(new IntegerRangeValidator("Must be between 1 and " + getPageCount(), 1, getPageCount()));
+
+			previousPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_LEFT);
+			previousPageButton.setEnabled(false);
+			previousPageButton.addClickListener(listener -> {
+				if (pageNumber > 1) {
+					pageNumber = pageNumber - 1;
+					pageNumberField.setValue(pageNumber.toString());
+				}
+			});
+
+			nextPageButton = new MButton().withStyleName(ValoTheme.BUTTON_ICON_ONLY).withIcon(FontAwesome.ARROW_RIGHT);
+
+			nextPageButton.addClickListener(listener -> {
+				if (pageNumber < getPageCount()) {
+					pageNumber = pageNumber + 1;
+					pageNumberField.setValue(pageNumber.toString());
+				}
+			});
+			toolbar = buildToolbar();
+			if (toolbar.getComponentCount() == 0)
+				toolbar.setVisible(false);
+
+			secondaryToolbar = buildSecondaryToolbar();
+			if (secondaryToolbar.getComponentCount() == 0)
+				secondaryToolbar.setVisible(false);
+
+			rootLayout = new MVerticalLayout().withMargin(rootLayoutMargin()).withSpacing(true);
+			rootLayout.setSizeFull();
+			rootLayout.addComponents(toolbar, secondaryToolbar, mainGrid);
+			rootLayout.setExpandRatio(mainGrid, 1);
+			setContent(rootLayout);
+
+			postBuild();
+			isBuilt = true;
+		}
+		return this;
+
+	}
+
+	protected MarginInfo rootLayoutMargin() {
+		return new MarginInfo(true);
+	}
+
+	private MGrid<T> buildMainGrid() {
+		MGrid<T> grid = new MGrid<>(entityClass);
+		grid.setStyleName("entity-grid");
+		mainGridContainer = new FilterableListContainer<>(entityClass);
+		grid.setContainerDataSource(mainGridContainer);
+		grid.setSizeFull();
+		grid.setHeightMode(HeightMode.CSS);
+		String[] visibleProperties = visibleProperties();
+		if (visibleProperties != null) {
+			for (String propertyId : visibleProperties()) {
+				if (propertyId.contains(".")) {
+					//@TODO: no implementation available yet.
+					//  mainGridContainer.addNestedContainerProperty(propertyId);
+				}
+			}
+			grid.withProperties(visibleProperties());
+		}
+		if (isGridCellFilterEnabled()) {
+			gridCellFilter = new GridCellFilter(grid);
+			gridCellFilter.addCellFilterChangedListener(event -> {
+				if (entityGrid().getSelectedRows().size() > 0) {
+					statusBar.setText(String.format("%d out of %d records selected", entityGrid().getSelectedRows().size(), mainGridContainer.size()));
+				} else {
+					statusBar.setText(String.format(" %d records", mainGridContainer.size()));
+				}
+			});
+			if (visibleProperties != null) {
+				addCellFiltersForVisibleProperties(gridCellFilter, visibleProperties);
+			}
+		}
+
+		grid.getColumns().forEach(column -> {
+			column.setHidable(true);
+			applyRendererForColumn(column);
+		});
+
+		grid.setSelectionMode(isSelectionEnabled ? SelectionMode.MULTI : SelectionMode.NONE);
+		grid.addItemClickListener(new TRItemClickListener() {
+
+			//            @Override
+			//            public void onItemClick(ItemClickEvent event) {
+			//                if (event.getPropertyId() != null) {
+			//                    Item  = mainGridContainer.getItem(event.getItemId());
+			//                    BeanItem<T> item = mainGridContainer.getItem(event.getItemId());
+			//                    if (item != null) {
+			//                        if (onItemClick != null) {
+			//                            Boolean value = onItemClick.apply(item.getBean());
+			//                            if (value != null && value == true) {
+			//                                onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+			//                            }
+			//                        } else {
+			//                            onGridItemClicked(item.getBean(), event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+			//                        }
+			//                    }
+			//                }
+			//            }
+
+			@Override
+			public void onItemClick(ItemClickEvent event) {
+				if (event.getPropertyId() != null) {
+					T item = (T) event.getItemId();
+					if (item != null) {
+						if (onItemClick != null) {
+							Boolean value = onItemClick.apply(item);
+							if (value != null && value == true) {
+								onGridItemClicked(item, event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+							}
+						} else {
+							onGridItemClicked(item, event.getPropertyId() != null ? event.getPropertyId().toString() : "");
+						}
+					}
+				}
+			}
+		});
+		grid.addSelectionListener(event -> {
+			if (event.getSelected() != null && !event.getSelected().isEmpty()) {
+				statusBar.setText(String.format("%d out of %d records selected", event.getSelected().size(), mainGridContainer.size()));
+			} else {
+				if (shouldShowPaging() && mainGridContainer.size() != 0)
+					statusBar.setText(String.format("showing %d - %d records", getPageNumber() * getPageSize(), getPageNumber() * getPageSize() + mainGridContainer.size()));
+				else
+					statusBar.setText(String.format("showing %d records", mainGridContainer.size()));
+			}
+			if (onSelection != null) {
+				Boolean value = onSelection.apply((Collection<T>) event.getSelected());
+				if (value != null && value == true) {
+					onGridItemSelect(event);
+				}
+			} else {
+				onGridItemSelect(event);
+			}
+		});
+
+		grid.getColumns().forEach(column -> {
+			if (column.getPropertyId() != null) {
+				column.setHeaderCaption(localizedSingularValue(column.getHeaderCaption()));
+			}
+		});
+
+		grid.setCellStyleGenerator(new CellStyleGenerator() {
+
+			@Override
+			public String getStyle(CellReference cell) {
+				if (cell.getPropertyId() == null) {
+					return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
+				}
+				String cellStyle = generateCellStyle(cell);
+				Alignment alignment = alignmentForProperty(cell.getPropertyId().toString());
+
+				if (Strings.isNullOrEmpty(cellStyle)) {
+					if (alignment.isLeft()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_LEFT;
+					}
+					if (alignment.isRight()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_RIGHT;
+					}
+					return GrapheneeTheme.STYLE_V_ALIGN_CENTER;
+				} else {
+					if (alignment.isLeft()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_LEFT + " " + cellStyle;
+					}
+					if (alignment.isRight()) {
+						return GrapheneeTheme.STYLE_V_ALIGN_RIGHT + " " + cellStyle;
+					}
+					return GrapheneeTheme.STYLE_V_ALIGN_CENTER + " " + cellStyle;
+				}
+			}
+		});
+
+		GridContextMenu contextMenu = new GridContextMenu(grid);
+		contextMenu.addGridBodyContextMenuListener(event -> {
+			event.getContextMenu().removeItems();
+			addMenuItemsToContextMenu(contextMenu, (T) event.getItemId(), grid.getSelectedRowsWithType());
+		});
+
+		FooterRow footerRow = grid.appendFooterRow();
+		String[] props = visibleProperties();
+		if (props.length > 1)
+			statusBar = footerRow.join((String[]) visibleProperties());
+		else
+			statusBar = footerRow.getCell(props[0]);
+		return grid;
+	}
+
+	protected void addMenuItemsToContextMenu(ContextMenu contextMenu, T item, Collection<T> selectedItems) {
+	}
+
+	protected String generateCellStyle(CellReference cell) {
+		return null;
+	}
+
+	protected void applyRendererForColumn(Column column) {
+		if (column.getPropertyId() != null) {
+			if (column.getPropertyId().toString().matches("(is|should|has)[A-Z].*")) {
+				column.setMaximumWidth(150);
+				column.setRenderer(new BooleanRenderer(event -> {
+					if (event.getPropertyId() != null) {
+						onGridItemClicked((T) event.getItemId(), event.getPropertyId().toString());
+					} else {
+						onGridItemClicked((T) event.getItemId(), "");
+					}
+				}), BooleanRenderer.CHECK_BOX_CONVERTER);
+			} else if ((column.getPropertyId().toString().matches("(date|since)") || column.getPropertyId().toString().matches("(date|since)[A-Z].*")
+					|| column.getPropertyId().toString().matches(".*[a-z](Date|Since)"))) {
+				column.setRenderer(new DateRenderer(applyDateFormatForProperty(column.getPropertyId().toString())));
+			} else if ((column.getPropertyId().toString().equalsIgnoreCase("time") || column.getPropertyId().toString().matches("(time)[A-Z].*")
+					|| column.getPropertyId().toString().matches(".*[a-z](Time)"))) {
+				column.setRenderer(new DateRenderer(applyDateTimeFormatForProperty(column.getPropertyId().toString())));
+			}
+		}
+	}
+
+	protected DateFormat applyDateFormatForProperty(String propertyId) {
+		return TRCalendarUtil.dateFormatter;
+	}
+
+	protected DateFormat applyDateTimeFormatForProperty(String propertyId) {
+		return TRCalendarUtil.dateTimeFormatter;
+	}
+
+	protected Alignment alignmentForProperty(String propertyId) {
+		if (propertyId.matches("(is|should|has)[A-Z].*")) {
+			return Alignment.MIDDLE_LEFT;
+		}
+		if (propertyId.matches("(cost|price|sum|amount|percent)")) {
+			return Alignment.MIDDLE_RIGHT;
+		}
+		if (propertyId.matches("(cost|price|sum|amount|percent)[A-Z].*")) {
+			return Alignment.MIDDLE_RIGHT;
+		}
+		if (propertyId.matches(".*(Cost|Price|Sum|Amount|Percent)")) {
+			return Alignment.MIDDLE_RIGHT;
+		}
+		return Alignment.MIDDLE_LEFT;
+	}
+
+	protected void onGridItemSelect(SelectionEvent event) {
+		editButton.setEnabled(event.getSelected().size() == 1);
+		deleteButton.setEnabled(event.getSelected().size() > 0);
+		if (delegate != null) {
+			delegate.onGridItemSelect(event);
+		}
+	}
+
+	protected void addCellFiltersForVisibleProperties(GridCellFilter filter, String[] visibleProperties) {
+		for (String visibleProperty : visibleProperties) {
+			filter.setTextFilter(visibleProperty, true, false);
+		}
+	}
+
+	protected boolean isGridCellFilterEnabled() {
+		return false;
+	}
+
+	private AbstractLayout buildToolbar() {
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+		layout.add(addButton);
+		layout.add(editButton);
+		layout.add(deleteButton);
+		layout.add(searchButton);
+		searchButton.setVisible(false);
+
+		if (shouldShowPaging()) {
+			pagingLayout = new CssLayout();
+			pagingLayout.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+			pagingLayout.addComponents(previousPageButton, pageNumberField, nextPageButton);
+			layout.add(pagingLayout);
+			layout.setComponentAlignment(pagingLayout, Alignment.TOP_CENTER);
+		}
+
+		layout.add(exportDataDownloadButton);
+		addButtonsToToolbar(layout);
+
+		boolean addSpacer = true;
+		Iterator<Component> iter = layout.iterator();
+		while (iter.hasNext()) {
+			Component c = iter.next();
+			if (layout.getExpandRatio(c) > 0) {
+				addSpacer = false;
+				break;
+			}
+		}
+
+		if (addSpacer) {
+			MLabel spacerLabel = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN);
+			layout.addComponent(spacerLabel);
+			layout.setExpandRatio(spacerLabel, 1);
+		}
+
+		// localize...
+		localizeRecursively(layout);
+		VaadinUtils.applyStyleRecursively(layout, "small");
+
+		return layout;
+	}
+
+	private AbstractLayout buildSecondaryToolbar() {
+		MHorizontalLayout layout = new MHorizontalLayout().withSpacing(true).withDefaultComponentAlignment(Alignment.BOTTOM_LEFT); // .withFullWidth();
+
+		addButtonsToSecondaryToolbar(layout);
+
+		boolean addSpacer = true;
+		Iterator<Component> iter = layout.iterator();
+
+		layout.setVisible(layout.getComponentCount() > 0);
+
+		while (iter.hasNext()) {
+			Component c = iter.next();
+			if (layout.getExpandRatio(c) > 0) {
+				addSpacer = false;
+				break;
+			}
+		}
+
+		if (addSpacer) {
+			MLabel spacerLabel = new MLabel().withStyleName(ValoTheme.LABEL_NO_MARGIN);
+			layout.addComponent(spacerLabel);
+			layout.setExpandRatio(spacerLabel, 1);
+		}
+
+		// localize...
+		localizeRecursively(layout);
+		VaadinUtils.applyStyleRecursively(layout, "small");
+
+		return layout;
+	}
+
+	private List<String> getGridHeaderCaptionList() {
+		List<String> columnList = new ArrayList<>();
+		entityGrid().getColumns().forEach(column -> {
+			if (!column.isHidden()) {
+				columnList.add(column.getHeaderCaption());
+			}
+		});
+		return columnList;
+	}
+
+	protected boolean shouldShowExportDataButton() {
+		return false;
+	}
+
+	protected void preEdit(T item) {
+	}
+
+	protected void onAddButtonClick(T entity) {
+		preEdit(entity);
+		openEditorForm(entity);
+	}
+
+	protected boolean shouldShowDeleteConfirmation() {
+		return false;
+	}
+
+	private void openEditorForm(T item) {
+		if (editorForm() != null) {
+			// BeanItem<T> beanItem = mainGridContainer.getItem(item);
+			// if (beanItem == null) {
+			// cachedForm().setEntity(entityClass, item);
+			// } else {
+			// cachedForm().setEntity(entityClass, beanItem.getBean());
+			// }
+			editorForm().setEntity(entityClass, item);
+			editorForm().setSavedHandler(entity -> {
+				try {
+					if (onSaveEntity(entity)) {
+						if (delegate != null) {
+							delegate.onSave(entity);
+						}
+						editorForm().closePopup();
+						// UI.getCurrent().access(() -> {
+						// if (!mainGridContainer.containsId(entity)) {
+						// mainGridContainer.addBean(entity);
+						// }
+						// mainGrid.clearSortOrder();
+						// UI.getCurrent().push();
+						// });
+						refresh();
+					}
+				} catch (Exception e) {
+					L.warn(e.getMessage(), e);
+				}
+			});
+			editorForm().openInModalPopup();
+		}
+	}
+
+	protected T initializeEntity(T item) {
+		return item;
+	}
+
+	protected abstract boolean onSaveEntity(T entity);
+
+	protected abstract boolean onDeleteEntity(T entity);
+
+	public AbstractEntityListPanel<T> refresh() {
+		if (filter != null) {
+			return refresh(filter);
+		}
+		UI.getCurrent().access(() -> {
+			deselectAll();
+			List<T> entities = fetchEntities();
+			mainGridContainer.removeAllItems();
+			if (entities != null) {
+				mainGridContainer.addAll(entities);
+			}
+			statusBar.setText(String.format(" %d records", mainGridContainer.size()));
+			UI.getCurrent().push();
+		});
+		return this;
+	}
+
+	public <F extends Object> AbstractEntityListPanel<T> refresh(F filter) {
+		this.filter = filter;
+		UI.getCurrent().access(() -> {
+			deselectAll();
+			List<T> entities = postFetch(fetchEntities(filter));
+			mainGridContainer.removeAllItems();
+			mainGridContainer.addAll(entities);
+			statusBar.setText(String.format("%d records", mainGridContainer.size()));
+			UI.getCurrent().push();
+		});
+		return this;
+	}
+
+	protected List<T> postFetch(List<T> fetchedEntities) {
+		return fetchedEntities;
+	}
+
+	protected Integer fetchEntityCount() {
+		return 0;
+	}
+
+	protected abstract String panelCaption();
+
+	protected abstract List<T> fetchEntities();
+
+	protected <F extends Object> List<T> fetchEntities(F filter) {
+		return fetchEntities();
+	}
+
+	protected abstract String[] visibleProperties();
+
+	protected abstract TRAbstractForm<T> editorForm();
+
+	protected void postBuild() {
+	}
+
+	protected MGrid<T> entityGrid() {
+		return mainGrid;
+	}
+
+	protected void setAddButtonVisibility(boolean visibility) {
+		if (addButton != null) {
+			addButton.setVisible(visibility);
+		}
+	}
+
+	protected void setEditButtonVisibility(boolean visibility) {
+		if (editButton != null) {
+			editButton.setVisible(visibility);
+		}
+	}
+
+	protected void setDeleteButtonVisibility(boolean visibility) {
+		if (deleteButton != null) {
+			deleteButton.setVisible(visibility);
+		}
+	}
+
+	protected void setAddButtonEnable(boolean isEnable) {
+		if (addButton != null) {
+			addButton.setEnabled(isEnable);
+		}
+	}
+
+	protected void setDeleteButtonEnable(boolean isEnable) {
+		if (deleteButton != null) {
+			deleteButton.setEnabled(isEnable);
+		}
+	}
+
+	protected void addButtonsToToolbar(AbstractOrderedLayout toolbar) {
+	}
+
+	protected void addButtonsToSecondaryToolbar(AbstractOrderedLayout toolbar) {
+	}
+
+	protected void onGridItemClicked(T item) {
+		preEdit(item);
+		openEditorForm(item);
+	}
+
+	protected void onGridItemClicked(T item, String propertyId) {
+		onGridItemClicked(item);
+	}
+
+	public <R extends AbstractEntityListPanel<T>> R withItemClick(Function<T, Boolean> onItemClick) {
+		this.onItemClick = onItemClick;
+		return (R) this;
+	}
+
+	public <R extends AbstractEntityListPanel<T>> R withSelection(Function<Collection<T>, Boolean> onSelection) {
+		this.onSelection = onSelection;
+		return (R) this;
+	}
+
+	public AbstractEntityListPanel<T> clearFilter() {
+		filter = null;
+		return this;
+	}
+
+	public AbstractEntityListPanel<T> withToolbarVisibility(boolean visibility) {
+		toolbar.setVisible(visibility);
+		return this;
+	}
+
+	public AbstractEntityListPanel<T> withSelectionEnabled(boolean isSelectionEnabled) {
+		this.isSelectionEnabled = isSelectionEnabled;
+		return this;
+	}
+
+	public AbstractEntityListPanel<T> withDelegate(AbstractEntityListPanelDelegate delegate) {
+		setDelegate(delegate);
+		return this;
+	}
+
+	public void setDelegate(AbstractEntityListPanelDelegate delegate) {
+		this.delegate = delegate;
+	}
+
+	public AbstractEntityListPanel<T> withSearchForm(TRAbstractSearchForm<?> searchForm) {
+		setSearchForm(searchForm);
+		return this;
+	}
+
+	public void setSearchForm(TRAbstractSearchForm<?> searchForm) {
+		this.searchForm = searchForm;
+		if (searchButton != null) {
+			searchButton.setVisible(searchForm != null);
+		}
+	}
+
+	public static interface AbstractEntityListPanelDelegate {
+
+		default void onGridItemSelect(SelectionEvent event) {
+		}
+
+		default void onSave(Object entity) {
+		}
+
+		default void onDelete(Object entity) {
+		}
+
+	}
+
+	protected String localizedSingularValue(String key) {
+		return VaadinUtils.localizedSingularValue(key);
+	}
+
+	protected String localizedPluralValue(String key) {
+		return VaadinUtils.localizedSingularValue(key);
+	}
+
+	protected void localizeRecursively(Component component) {
+		VaadinUtils.localizeRecursively(component);
+	}
+
+	protected String localizedSingularValue(Locale locale, String key) {
+		return VaadinUtils.localizedSingularValue(key);
+	}
+
+	protected String localizedPluralValue(Locale locale, String key) {
+		return VaadinUtils.localizedSingularValue(key);
+	}
+
+	protected void localizeRecursively(Locale locale, Component component) {
+		VaadinUtils.localizeRecursively(component);
+	}
+
+	public void deselectAll() {
+		try {
+			entityGrid().deselectAll();
+		} catch (Exception e) {
+		}
+	}
+
+	public void showToolbar() {
+		toolbar.setVisible(true);
+	}
+
+	public void hideToolbar() {
+		toolbar.setVisible(false);
+	}
+
+	public void setSelectionMode(SelectionMode mode) {
+		entityGrid().setSelectionMode(mode);
+	}
+
+	public void showSecondaryToolbar() {
+		secondaryToolbar.setVisible(true);
+	}
+
+	public void hideSecondaryToolbar() {
+		secondaryToolbar.setVisible(false);
+	}
+
+	public MButton getAddButton() {
+		return addButton;
+	}
+
+	public MButton getEditButton() {
+		return editButton;
+	}
+
+	public MButton getDeleteButton() {
+		return deleteButton;
+	}
+
+	public Integer getPageNumber() {
+		return pageNumber - 1;
+	}
+
+	public Boolean shouldShowPaging() {
+		return false;
+	}
+
+	protected Integer getPageSize() {
+		return 200;
+	}
+
+	private Integer getPageCount() {
+		int pageCount = fetchEntityCount() / getPageSize();
+		if (pageCount == 0)
+			return 1;
+		return pageCount;
+	}
 
 }

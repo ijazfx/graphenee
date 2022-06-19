@@ -40,186 +40,186 @@ import io.graphenee.vaadin.ui.GxNotification;
 @SuppressWarnings("serial")
 public class ResetPasswordPanel extends Panel {
 
-    private ResetPasswordPanelDelegate delegate;
-    private MTextField usernameTextField;
-    private MPasswordField passwordField;
-    private MPasswordField retypePasswordField;
+	private ResetPasswordPanelDelegate delegate;
+	private MTextField usernameTextField;
+	private MPasswordField passwordField;
+	private MPasswordField retypePasswordField;
 
-    public ResetPasswordPanel(AbstractDashboardSetup dashboardSetup) {
-        setStyleName(ValoTheme.PANEL_BORDERLESS);
-        addStyleName(GrapheneeTheme.STYLE_CENTER);
-        setSizeFull();
-        setContent(createContent());
-    }
+	public ResetPasswordPanel(AbstractDashboardSetup dashboardSetup) {
+		setStyleName(ValoTheme.PANEL_BORDERLESS);
+		addStyleName(GrapheneeTheme.STYLE_CENTER);
+		setSizeFull();
+		setContent(createContent());
+	}
 
-    protected Component createContent() {
-        MVerticalLayout rootLayout = new MVerticalLayout();
-        rootLayout.setWidth("330px");
-        rootLayout.setStyleName("login-panel");
+	protected Component createContent() {
+		MVerticalLayout rootLayout = new MVerticalLayout();
+		rootLayout.setWidth("330px");
+		rootLayout.setStyleName("login-panel");
 
-        MVerticalLayout sendResetKeyLayout = new MVerticalLayout();
+		MVerticalLayout sendResetKeyLayout = new MVerticalLayout();
 
-        MLabel forgotPasswordTitle = new MLabel("Reset Password").withStyleName(ValoTheme.LABEL_H3);
-        sendResetKeyLayout.addComponent(forgotPasswordTitle);
+		MLabel forgotPasswordTitle = new MLabel("Reset Password").withStyleName(ValoTheme.LABEL_H3);
+		sendResetKeyLayout.addComponent(forgotPasswordTitle);
 
-        MVerticalLayout layout1 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
-        layout1.setWidth("100%");
-        usernameTextField = new MTextField().withCaption("Username / Email").withFullWidth();
+		MVerticalLayout layout1 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_LEFT);
+		layout1.setWidth("100%");
+		usernameTextField = new MTextField().withCaption("Username / Email").withFullWidth();
 
-        MButton sendResetKeyButton = new MButton("Send Reset Key");
-        sendResetKeyButton.setStyleName(GrapheneeTheme.STYLE_MARGIN_VERTICAL);
-        sendResetKeyButton.setEnabled(false);
+		MButton sendResetKeyButton = new MButton("Send Reset Key");
+		sendResetKeyButton.setStyleName(GrapheneeTheme.STYLE_MARGIN_VERTICAL);
+		sendResetKeyButton.setEnabled(false);
 
-        layout1.addComponents(usernameTextField, sendResetKeyButton);
-        //layout1.setExpandRatio(usernameTextField, 1);
-        sendResetKeyLayout.addComponent(layout1);
+		layout1.addComponents(usernameTextField, sendResetKeyButton);
+		//layout1.setExpandRatio(usernameTextField, 1);
+		sendResetKeyLayout.addComponent(layout1);
 
-        MVerticalLayout layout2 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_RIGHT);
-        layout2.setWidth("100%");
-        MTextField resetKeyTextField = new MTextField().withInputPrompt("Enter Reset Key").withFullWidth();
-        resetKeyTextField.setMaxLength(6);
-        resetKeyTextField.setEnabled(false);
+		MVerticalLayout layout2 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_RIGHT);
+		layout2.setWidth("100%");
+		MTextField resetKeyTextField = new MTextField().withInputPrompt("Enter Reset Key").withFullWidth();
+		resetKeyTextField.setMaxLength(6);
+		resetKeyTextField.setEnabled(false);
 
-        MButton nextButton = new MButton("Next").withStyleName(ValoTheme.BUTTON_PRIMARY);
-        nextButton.addStyleName(GrapheneeTheme.STYLE_MARGIN_TOP);
-        nextButton.setEnabled(false);
+		MButton nextButton = new MButton("Next").withStyleName(ValoTheme.BUTTON_PRIMARY);
+		nextButton.addStyleName(GrapheneeTheme.STYLE_MARGIN_TOP);
+		nextButton.setEnabled(false);
 
-        layout2.addComponents(resetKeyTextField, nextButton);
-        //layout2.setExpandRatio(resetKeyTextField, 1);
-        sendResetKeyLayout.addComponent(layout2);
+		layout2.addComponents(resetKeyTextField, nextButton);
+		//layout2.setExpandRatio(resetKeyTextField, 1);
+		sendResetKeyLayout.addComponent(layout2);
 
-        passwordField = new MPasswordField("New Password").withFullWidth();
-        retypePasswordField = new MPasswordField("Re-type Password").withFullWidth();
-        retypePasswordField.setEnabled(false);
-        MButton changeButton = new MButton("Change").withStyleName(ValoTheme.BUTTON_PRIMARY);
-        changeButton.setEnabled(false);
+		passwordField = new MPasswordField("New Password").withFullWidth();
+		retypePasswordField = new MPasswordField("Re-type Password").withFullWidth();
+		retypePasswordField.setEnabled(false);
+		MButton changeButton = new MButton("Change").withStyleName(ValoTheme.BUTTON_PRIMARY);
+		changeButton.setEnabled(false);
 
-        MVerticalLayout layout3 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
-        layout3.addComponents(passwordField, retypePasswordField, changeButton);
-        layout3.setComponentAlignment(changeButton, Alignment.MIDDLE_RIGHT);
+		MVerticalLayout layout3 = new MVerticalLayout().withFullWidth().withDefaultComponentAlignment(Alignment.BOTTOM_CENTER);
+		layout3.addComponents(passwordField, retypePasswordField, changeButton);
+		layout3.setComponentAlignment(changeButton, Alignment.MIDDLE_RIGHT);
 
-        sendResetKeyLayout.addComponent(layout3);
+		sendResetKeyLayout.addComponent(layout3);
 
-        MVerticalLayout changePasswordLayout = new MVerticalLayout();
+		MVerticalLayout changePasswordLayout = new MVerticalLayout();
 
-        MLabel changePasswordTitle = new MLabel("Change Password").withStyleName(ValoTheme.LABEL_H3);
-        changePasswordLayout.addComponents(changePasswordTitle, layout3);
+		MLabel changePasswordTitle = new MLabel("Change Password").withStyleName(ValoTheme.LABEL_H3);
+		changePasswordLayout.addComponents(changePasswordTitle, layout3);
 
-        rootLayout.addComponents(sendResetKeyLayout, changePasswordLayout);
-        changePasswordLayout.setVisible(false);
+		rootLayout.addComponents(sendResetKeyLayout, changePasswordLayout);
+		changePasswordLayout.setVisible(false);
 
-        final String[] keys = new String[1];
+		final String[] keys = new String[1];
 
-        // register listeners...
-        usernameTextField.addTextChangeListener(event -> {
-            sendResetKeyButton.setEnabled(event.getText().length() > 0);
-        });
-        usernameTextField.setTextChangeEventMode(TextChangeEventMode.EAGER);
-        sendResetKeyButton.addClickListener(event -> {
-            keys[0] = RandomStringUtils.randomAlphanumeric(6);
-            if (delegate != null) {
-                delegate.sendKeyToUser(keys[0], usernameTextField.getValue(), () -> {
-                    boolean shouldEnable = true;
-                    resetKeyTextField.clear();
-                    resetKeyTextField.setEnabled(shouldEnable);
-                    resetKeyTextField.focus();
-                    GxNotification notification = GxNotification.tray("Your key to reset password has been sent, please check your email.");
-                    notification.setDelayMsec(5000);
-                    notification.show(Page.getCurrent());
-                }, error -> {
-                    usernameTextField.selectAll();
-                    usernameTextField.focus();
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(error.getMessage());
-                    GxNotification notification = GxNotification.closable("Send Key Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
-                    notification.setDelayMsec(5000);
-                    notification.show(Page.getCurrent());
-                });
-            } else {
-                GxNotification notification = GxNotification.closable("Incomplete Implementation", "No delegate available of type ResetPasswordPanel.ResetPasswordPanelDelegate",
-                        Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
-                notification.setDelayMsec(5000);
-                notification.show(Page.getCurrent());
-            }
-        });
-        resetKeyTextField.addTextChangeListener(event -> {
-            String key = event.getText();
-            if (key.length() == 6) {
-                if (key.equals(keys[0]))
-                    nextButton.setEnabled(true);
-                else {
-                    nextButton.setEnabled(false);
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("The reset key is not valid, please try again.");
-                    GxNotification notification = GxNotification.closable("Verification Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
-                    notification.setDelayMsec(5000);
-                    notification.show(Page.getCurrent());
-                }
-            } else {
-                nextButton.setEnabled(false);
-            }
-        });
-        nextButton.addClickListener(event -> {
-            sendResetKeyLayout.setVisible(false);
-            changePasswordLayout.setVisible(true);
-        });
+		// register listeners...
+		usernameTextField.addTextChangeListener(event -> {
+			sendResetKeyButton.setEnabled(event.getText().length() > 0);
+		});
+		usernameTextField.setTextChangeEventMode(TextChangeEventMode.EAGER);
+		sendResetKeyButton.addClickListener(event -> {
+			keys[0] = RandomStringUtils.randomAlphanumeric(6);
+			if (delegate != null) {
+				delegate.sendKeyToUser(keys[0], usernameTextField.getValue(), () -> {
+					boolean shouldEnable = true;
+					resetKeyTextField.clear();
+					resetKeyTextField.setEnabled(shouldEnable);
+					resetKeyTextField.focus();
+					GxNotification notification = GxNotification.tray("Your key to reset password has been sent, please check your email.");
+					notification.setDelayMsec(5000);
+					notification.show(Page.getCurrent());
+				}, error -> {
+					usernameTextField.selectAll();
+					usernameTextField.focus();
+					StringBuilder sb = new StringBuilder();
+					sb.append(error.getMessage());
+					GxNotification notification = GxNotification.closable("Send Key Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					notification.setDelayMsec(5000);
+					notification.show(Page.getCurrent());
+				});
+			} else {
+				GxNotification notification = GxNotification.closable("Incomplete Implementation", "No delegate available of type ResetPasswordPanel.ResetPasswordPanelDelegate",
+						Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+				notification.setDelayMsec(5000);
+				notification.show(Page.getCurrent());
+			}
+		});
+		resetKeyTextField.addTextChangeListener(event -> {
+			String key = event.getText();
+			if (key.length() == 6) {
+				if (key.equals(keys[0]))
+					nextButton.setEnabled(true);
+				else {
+					nextButton.setEnabled(false);
+					StringBuilder sb = new StringBuilder();
+					sb.append("The reset key is not valid, please try again.");
+					GxNotification notification = GxNotification.closable("Verification Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					notification.setDelayMsec(5000);
+					notification.show(Page.getCurrent());
+				}
+			} else {
+				nextButton.setEnabled(false);
+			}
+		});
+		nextButton.addClickListener(event -> {
+			sendResetKeyLayout.setVisible(false);
+			changePasswordLayout.setVisible(true);
+		});
 
-        passwordField.setTextChangeEventMode(TextChangeEventMode.EAGER);
-        passwordField.addTextChangeListener(event -> {
-            retypePasswordField.setEnabled(event.getText().length() > 0);
-        });
+		passwordField.setTextChangeEventMode(TextChangeEventMode.EAGER);
+		passwordField.addTextChangeListener(event -> {
+			retypePasswordField.setEnabled(event.getText().length() > 0);
+		});
 
-        retypePasswordField.addTextChangeListener(event -> {
-            String password = passwordField.getValue();
-            String retypedPassword = event.getText();
-            if (retypedPassword.length() == password.length()) {
-                if (retypedPassword.equals(password))
-                    changeButton.setEnabled(true);
-                else {
-                    changeButton.setEnabled(false);
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("New password and re-typed password must match, please try again.");
-                    GxNotification notification = GxNotification.closable("Match Password Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
-                    notification.setDelayMsec(5000);
-                    notification.show(Page.getCurrent());
-                }
-            } else {
-                changeButton.setEnabled(false);
-            }
-        });
+		retypePasswordField.addTextChangeListener(event -> {
+			String password = passwordField.getValue();
+			String retypedPassword = event.getText();
+			if (retypedPassword.length() == password.length()) {
+				if (retypedPassword.equals(password))
+					changeButton.setEnabled(true);
+				else {
+					changeButton.setEnabled(false);
+					StringBuilder sb = new StringBuilder();
+					sb.append("New password and re-typed password must match, please try again.");
+					GxNotification notification = GxNotification.closable("Match Password Failed", sb.toString(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					notification.setDelayMsec(5000);
+					notification.show(Page.getCurrent());
+				}
+			} else {
+				changeButton.setEnabled(false);
+			}
+		});
 
-        changeButton.addClickListener(event -> {
-            if (delegate != null) {
-                delegate.changePassword(usernameTextField.getValue(), retypePasswordField.getValue(), () -> {
-                    String location = Page.getCurrent().getLocation().toString();
-                    location = location.replace("reset-password", "login");
-                    Page.getCurrent().setLocation(location);
-                }, error -> {
-                    GxNotification notification = GxNotification.closable("Change Password Failed", error.getMessage(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
-                    notification.setDelayMsec(5000);
-                    notification.show(Page.getCurrent());
-                });
-            } else {
-                GxNotification notification = GxNotification.closable("Incomplete Implementation", "No delegate available of type ResetPasswordPanel.ResetPasswordPanelDelegate",
-                        Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
-                notification.setDelayMsec(5000);
-                notification.show(Page.getCurrent());
-            }
-        });
+		changeButton.addClickListener(event -> {
+			if (delegate != null) {
+				delegate.changePassword(usernameTextField.getValue(), retypePasswordField.getValue(), () -> {
+					String location = Page.getCurrent().getLocation().toString();
+					location = location.replace("reset-password", "login");
+					Page.getCurrent().setLocation(location);
+				}, error -> {
+					GxNotification notification = GxNotification.closable("Change Password Failed", error.getMessage(), Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+					notification.setDelayMsec(5000);
+					notification.show(Page.getCurrent());
+				});
+			} else {
+				GxNotification notification = GxNotification.closable("Incomplete Implementation", "No delegate available of type ResetPasswordPanel.ResetPasswordPanelDelegate",
+						Type.ERROR_MESSAGE, Position.BOTTOM_CENTER);
+				notification.setDelayMsec(5000);
+				notification.show(Page.getCurrent());
+			}
+		});
 
-        usernameTextField.focus();
+		usernameTextField.focus();
 
-        return rootLayout;
-    }
+		return rootLayout;
+	}
 
-    public void setDelegate(ResetPasswordPanelDelegate delegate) {
-        this.delegate = delegate;
-    }
+	public void setDelegate(ResetPasswordPanelDelegate delegate) {
+		this.delegate = delegate;
+	}
 
-    public static interface ResetPasswordPanelDelegate {
-        void sendKeyToUser(String key, String username, TRVoidCallback success, TRErrorCallback error);
+	public static interface ResetPasswordPanelDelegate {
+		void sendKeyToUser(String key, String username, TRVoidCallback success, TRErrorCallback error);
 
-        void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error);
-    }
+		void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error);
+	}
 
 }

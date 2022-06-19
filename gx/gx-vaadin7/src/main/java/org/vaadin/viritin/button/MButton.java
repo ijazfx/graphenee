@@ -28,148 +28,147 @@ import java.util.LinkedHashSet;
  */
 public class MButton extends Button {
 
-    private static final long serialVersionUID = 3859208260278798872L;
+	private static final long serialVersionUID = 3859208260278798872L;
 
-    public MButton() {
-    }
+	public MButton() {
+	}
 
-    public MButton(Resource icon) {
-        setIcon(icon);
-    }
+	public MButton(Resource icon) {
+		setIcon(icon);
+	}
 
-    public MButton(Resource icon, ClickListener listener) {
-        super(null, listener);
-        setIcon(icon);
-    }
+	public MButton(Resource icon, ClickListener listener) {
+		super(null, listener);
+		setIcon(icon);
+	}
 
-    public MButton(Resource icon, String caption, ClickListener listener) {
-        super(null, listener);
-        setIcon(icon);
-        setCaption(caption);
-    }
+	public MButton(Resource icon, String caption, ClickListener listener) {
+		super(null, listener);
+		setIcon(icon);
+		setCaption(caption);
+	}
 
-    public MButton(String caption) {
-        super(caption);
-    }
+	public MButton(String caption) {
+		super(caption);
+	}
 
-    public MButton(String caption, ClickListener listener) {
-        super(caption, listener);
-    }
+	public MButton(String caption, ClickListener listener) {
+		super(caption, listener);
+	}
 
-    public MButton withIcon(Resource icon) {
-        setIcon(icon);
-        return this;
-    }
+	public MButton withIcon(Resource icon) {
+		setIcon(icon);
+		return this;
+	}
 
-    public MButton withListener(ClickListener listener) {
-        addClickListener(listener);
-        return this;
-    }
+	public MButton withListener(ClickListener listener) {
+		addClickListener(listener);
+		return this;
+	}
 
-    public MButton withStyleName(String... styleNames) {
-        for (String styleName : styleNames) {
-            addStyleName(styleName);
-        }
-        return this;
-    }
+	public MButton withStyleName(String... styleNames) {
+		for (String styleName : styleNames) {
+			addStyleName(styleName);
+		}
+		return this;
+	}
 
-    public MButton withCaption(String caption) {
-        setCaption(caption);
-        return this;
-    }
+	public MButton withCaption(String caption) {
+		setCaption(caption);
+		return this;
+	}
 
-    public MButton withDescription(String description) {
-        setDescription(description);
-        return this;
-    }
+	public MButton withDescription(String description) {
+		setDescription(description);
+		return this;
+	}
 
-    public MButton withVisible(boolean visible) {
-        setVisible(visible);
-        return this;
-    }
+	public MButton withVisible(boolean visible) {
+		setVisible(visible);
+		return this;
+	}
 
-    public MButton withId(String id) {
-        setId(id);
-        return this;
-    }
+	public MButton withId(String id) {
+		setId(id);
+		return this;
+	}
 
-    public MButton withWidth(String width) {
-        setWidth(width);
-        return this;
-    }
+	public MButton withWidth(String width) {
+		setWidth(width);
+		return this;
+	}
 
-    public MButton withWidth(float width, Unit unit) {
-        setWidth(width, unit);
-        return this;
-    }
+	public MButton withWidth(float width, Unit unit) {
+		setWidth(width, unit);
+		return this;
+	}
 
-    public MButton withFullWidth() {
-        setWidth("100%");
-        return this;
-    }
+	public MButton withFullWidth() {
+		setWidth("100%");
+		return this;
+	}
 
-    public MButton withHeight(String height) {
-        setHeight(height);
-        return this;
-    }
+	public MButton withHeight(String height) {
+		setHeight(height);
+		return this;
+	}
 
-    public MButton withHeight(float height, Unit unit) {
-        setHeight(height, unit);
-        return this;
-    }
+	public MButton withHeight(float height, Unit unit) {
+		setHeight(height, unit);
+		return this;
+	}
 
-    public MButton withFullHeight() {
-        setHeight("100%");
-        return this;
-    }
+	public MButton withFullHeight() {
+		setHeight("100%");
+		return this;
+	}
 
-    public MButton withSize(MSize size) {
-        setWidth(size.getWidth(), size.getWidthUnit());
-        setHeight(size.getHeight(), size.getHeightUnit());
-        return this;
-    }
+	public MButton withSize(MSize size) {
+		setWidth(size.getWidth(), size.getWidthUnit());
+		setHeight(size.getHeight(), size.getHeightUnit());
+		return this;
+	}
 
-    public MButton withClickShortcut(int keycode, int... modifiers){
-        setClickShortcut(keycode, modifiers);
-        return this;
-    }
+	public MButton withClickShortcut(int keycode, int... modifiers) {
+		setClickShortcut(keycode, modifiers);
+		return this;
+	}
 
-    /**
-     * A parameterless version of ClickListener to make it easier to use method
-     * references.
-     */
-    public interface MClickListener {
+	/**
+	 * A parameterless version of ClickListener to make it easier to use method
+	 * references.
+	 */
+	public interface MClickListener {
 
-        void onClick();
-    }
+		void onClick();
+	}
 
-    @Override
-    protected void fireClick(MouseEventDetails details) {
-        super.fireClick(details);
-        if (mClickListeners != null) {
-            final MClickListener[] array = mClickListeners.toArray(
-                    new MClickListener[mClickListeners.size()]);
-            for (MClickListener l : array) {
-                l.onClick();
-            }
-        }
-    }
+	@Override
+	protected void fireClick(MouseEventDetails details) {
+		super.fireClick(details);
+		if (mClickListeners != null) {
+			final MClickListener[] array = mClickListeners.toArray(new MClickListener[mClickListeners.size()]);
+			for (MClickListener l : array) {
+				l.onClick();
+			}
+		}
+	}
 
-    private LinkedHashSet<MClickListener> mClickListeners;
+	private LinkedHashSet<MClickListener> mClickListeners;
 
-    public MButton addClickListener(MClickListener listener) {
-        if (mClickListeners == null) {
-            mClickListeners = new LinkedHashSet<>();
-        }
-        mClickListeners.add(listener);
-        return this;
-    }
+	public MButton addClickListener(MClickListener listener) {
+		if (mClickListeners == null) {
+			mClickListeners = new LinkedHashSet<>();
+		}
+		mClickListeners.add(listener);
+		return this;
+	}
 
-    public MButton removeClickListener(MClickListener listener) {
-        if (mClickListeners != null) {
-            mClickListeners.remove(listener);
-        }
-        return this;
-    }
+	public MButton removeClickListener(MClickListener listener) {
+		if (mClickListeners != null) {
+			mClickListeners.remove(listener);
+		}
+		return this;
+	}
 
 }

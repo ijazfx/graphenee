@@ -16,26 +16,26 @@ import com.vaadin.ui.AbstractComponent;
 @com.vaadin.annotations.JavaScript("viritin.js")
 public class HtmlElementPropertySetter extends AbstractJavaScriptExtension {
 
-    private static final long serialVersionUID = 6463148772177927232L;
+	private static final long serialVersionUID = 6463148772177927232L;
 
-    public HtmlElementPropertySetter(AbstractComponent c) {
-        extend(c);
-    }
+	public HtmlElementPropertySetter(AbstractComponent c) {
+		extend(c);
+	}
 
-    public void setProperty(String name, Object value) {
-        callFunction("xpathset", false, null, name, value);
-    }
+	public void setProperty(String name, Object value) {
+		callFunction("xpathset", false, null, name, value);
+	}
 
-    public void setProperty(String xpath, String name, Object value) {
-        callFunction("xpathset", false, xpath, name, value);
-    }
+	public void setProperty(String xpath, String name, Object value) {
+		callFunction("xpathset", false, xpath, name, value);
+	}
 
-    public void setJavaScriptEventHandler(String name, String js) {
-        callFunction("xpathset", true, null, name, js);
-    }
+	public void setJavaScriptEventHandler(String name, String js) {
+		callFunction("xpathset", true, null, name, js);
+	}
 
-    public void setJavaScriptEventHandler(String xpath, String name, String js) {
-        callFunction("xpathset", true, xpath, name, js);
-    }
+	public void setJavaScriptEventHandler(String xpath, String name, String js) {
+		callFunction("xpathset", true, xpath, name, js);
+	}
 
 }

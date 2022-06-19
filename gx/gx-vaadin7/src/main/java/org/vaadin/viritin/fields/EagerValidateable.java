@@ -20,8 +20,8 @@ package org.vaadin.viritin.fields;
  * @author Matti Tahvonen
  */
 public interface EagerValidateable {
-    boolean isEagerValidation();
+	boolean isEagerValidation();
 
-    void setEagerValidation(boolean eagerValidation);
-    
+	void setEagerValidation(boolean eagerValidation);
+
 }

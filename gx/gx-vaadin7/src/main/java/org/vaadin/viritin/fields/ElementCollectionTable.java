@@ -56,279 +56,250 @@ import java.util.List;
  */
 public class ElementCollectionTable<ET> extends AbstractElementCollection<ET> {
 
-    private static final long serialVersionUID = 8055987316151594559L;
+	private static final long serialVersionUID = 8055987316151594559L;
 
-    private MTable<ET> table;
+	private MTable<ET> table;
 
-    private MButton addButton = new MButton(FontAwesome.PLUS,
-            new Button.ClickListener() {
+	private MButton addButton = new MButton(FontAwesome.PLUS, new Button.ClickListener() {
 
-                private static final long serialVersionUID = 6115218255676556647L;
+		private static final long serialVersionUID = 6115218255676556647L;
 
-                @Override
-                public void buttonClick(Button.ClickEvent event) {
-                    addElement(createInstance());
-                }
-            });
+		@Override
+		public void buttonClick(Button.ClickEvent event) {
+			addElement(createInstance());
+		}
+	});
 
-    private IdentityHashMap<ET, MButton> elementToDelButton = new IdentityHashMap<>();
+	private IdentityHashMap<ET, MButton> elementToDelButton = new IdentityHashMap<>();
 
-    boolean inited = false;
+	boolean inited = false;
 
-    private MVerticalLayout layout = new MVerticalLayout();
+	private MVerticalLayout layout = new MVerticalLayout();
 
-    private String[] deleteElementStyles;
+	private String[] deleteElementStyles;
 
-    private String disabledDeleteThisElementDescription = "Fill this row to add a new element, currently ignored";
+	private String disabledDeleteThisElementDescription = "Fill this row to add a new element, currently ignored";
 
-    public ElementCollectionTable(Class<ET> elementType, Class<?> formType) {
-        super(elementType, formType);
-    }
+	public ElementCollectionTable(Class<ET> elementType, Class<?> formType) {
+		super(elementType, formType);
+	}
 
-    public ElementCollectionTable(Class<ET> elementType, Instantiator i, Class<?> formType) {
-        super(elementType, i, formType);
-    }
-    
-    @Override
-    public void attach() {
-        super.attach();
-        ensureInited();
-    }
+	public ElementCollectionTable(Class<ET> elementType, Instantiator i, Class<?> formType) {
+		super(elementType, i, formType);
+	}
 
-    @Override
-    public void addInternalElement(final ET v) {
-        ensureInited();
-        table.addBeans(v);
-    }
+	@Override
+	public void attach() {
+		super.attach();
+		ensureInited();
+	}
 
-    @Override
-    public void removeInternalElement(ET v) {
-        table.removeItem(v);
-        elementToDelButton.remove(v);
-    }
+	@Override
+	public void addInternalElement(final ET v) {
+		ensureInited();
+		table.addBeans(v);
+	}
 
-    @Override
-    public Layout getLayout() {
-        return layout;
-    }
+	@Override
+	public void removeInternalElement(ET v) {
+		table.removeItem(v);
+		elementToDelButton.remove(v);
+	}
 
-    public MButton getAddButton() {
-        return addButton;
-    }
+	@Override
+	public Layout getLayout() {
+		return layout;
+	}
 
-    /**
-     * @return the Table used in the implementation. Configure carefully.
-     */
-    public MTable<ET> getTable() {
-        return table;
-    }
+	public MButton getAddButton() {
+		return addButton;
+	}
 
-    @Override
-    public void setPersisted(ET v, boolean persisted) {
-        // NOP
-    }
+	/**
+	 * @return the Table used in the implementation. Configure carefully.
+	 */
+	public MTable<ET> getTable() {
+		return table;
+	}
 
-    private void ensureInited() {
-        if (!inited) {
-            setHeight("300px");
-            table = new MTable<ET>(getElementType()).withFullWidth();
-            for (Object propertyId : getVisibleProperties()) {
-                table.addGeneratedColumn(propertyId,
-                        new Table.ColumnGenerator() {
+	@Override
+	public void setPersisted(ET v, boolean persisted) {
+		// NOP
+	}
 
-                            private static final long serialVersionUID = 3637140096807147630L;
+	private void ensureInited() {
+		if (!inited) {
+			setHeight("300px");
+			table = new MTable<ET>(getElementType()).withFullWidth();
+			for (Object propertyId : getVisibleProperties()) {
+				table.addGeneratedColumn(propertyId, new Table.ColumnGenerator() {
 
-                            @Override
-                            public Object generateCell(Table source,
-                                    Object itemId,
-                                    Object columnId) {
-                                MBeanFieldGroup<ET> fg = getFieldGroupFor(
-                                        (ET) itemId);
-                                if (!isAllowEditItems()) {
-                                    fg.setReadOnly(true);
-                                }
-                                Component component = fg.getField(columnId);
-                                if(component == null) {
-                                    getComponentFor((ET) itemId,
-                                            columnId.toString());
-                                }
-                                return component;
-                            }
-                        });
+					private static final long serialVersionUID = 3637140096807147630L;
 
-            }
-            ArrayList<Object> cols = new ArrayList<Object>(
-                    getVisibleProperties());
+					@Override
+					public Object generateCell(Table source, Object itemId, Object columnId) {
+						MBeanFieldGroup<ET> fg = getFieldGroupFor((ET) itemId);
+						if (!isAllowEditItems()) {
+							fg.setReadOnly(true);
+						}
+						Component component = fg.getField(columnId);
+						if (component == null) {
+							getComponentFor((ET) itemId, columnId.toString());
+						}
+						return component;
+					}
+				});
 
-            if (isAllowRemovingItems()) {
-                table.addGeneratedColumn("__ACTIONS",
-                        new Table.ColumnGenerator() {
+			}
+			ArrayList<Object> cols = new ArrayList<Object>(getVisibleProperties());
 
-                            private static final long serialVersionUID = 492486828008202547L;
+			if (isAllowRemovingItems()) {
+				table.addGeneratedColumn("__ACTIONS", new Table.ColumnGenerator() {
 
-                            @Override
-                            public Object generateCell(Table source,
-                                    final Object itemId,
-                                    Object columnId) {
+					private static final long serialVersionUID = 492486828008202547L;
 
-                                MButton b = new MButton(FontAwesome.TRASH_O).
-                                withListener(
-                                        new Button.ClickListener() {
+					@Override
+					public Object generateCell(Table source, final Object itemId, Object columnId) {
 
-                                            private static final long serialVersionUID = -1257102620834362724L;
+						MButton b = new MButton(FontAwesome.TRASH_O).withListener(new Button.ClickListener() {
 
-                                            @Override
-                                            public void buttonClick(
-                                                    Button.ClickEvent event) {
-                                                        removeElement(
-                                                                (ET) itemId);
-                                                    }
-                                        }).withStyleName(
-                                        ValoTheme.BUTTON_ICON_ONLY);
-                                b.setDescription(getDeleteElementDescription());
+							private static final long serialVersionUID = -1257102620834362724L;
 
-								if (getDeleteElementStyles() != null) {
-									for (String style : getDeleteElementStyles()) {
-										b.addStyleName(style);
-									}
-								}
+							@Override
+							public void buttonClick(Button.ClickEvent event) {
+								removeElement((ET) itemId);
+							}
+						}).withStyleName(ValoTheme.BUTTON_ICON_ONLY);
+						b.setDescription(getDeleteElementDescription());
 
-                                elementToDelButton.put((ET) itemId, b);
-                                return b;
-                            }
-                        });
-                table.setColumnHeader("__ACTIONS", "");
-                cols.add("__ACTIONS");
-            }
+						if (getDeleteElementStyles() != null) {
+							for (String style : getDeleteElementStyles()) {
+								b.addStyleName(style);
+							}
+						}
 
-            table.setVisibleColumns(cols.toArray());
-            for (Object property : getVisibleProperties()) {
-                table.setColumnHeader(property, getPropertyHeader(property.
-                        toString()));
-            }
-            layout.expand(table);
-            if (isAllowNewItems()) {
-                layout.addComponent(addButton);
-            }
-            inited = true;
-        }
-    }
+						elementToDelButton.put((ET) itemId, b);
+						return b;
+					}
+				});
+				table.setColumnHeader("__ACTIONS", "");
+				cols.add("__ACTIONS");
+			}
 
-    @Override
-    public void clear() {
-        if (inited) {
-            table.removeAllItems();
-            elementToDelButton.clear();
-        }
-    }
+			table.setVisibleColumns(cols.toArray());
+			for (Object property : getVisibleProperties()) {
+				table.setColumnHeader(property, getPropertyHeader(property.toString()));
+			}
+			layout.expand(table);
+			if (isAllowNewItems()) {
+				layout.addComponent(addButton);
+			}
+			inited = true;
+		}
+	}
 
-    public String getDisabledDeleteElementDescription() {
-        return disabledDeleteThisElementDescription;
-    }
+	@Override
+	public void clear() {
+		if (inited) {
+			table.removeAllItems();
+			elementToDelButton.clear();
+		}
+	}
 
-    public void setDisabledDeleteThisElementDescription(
-            String disabledDeleteThisElementDescription) {
-        this.disabledDeleteThisElementDescription = disabledDeleteThisElementDescription;
-    }
+	public String getDisabledDeleteElementDescription() {
+		return disabledDeleteThisElementDescription;
+	}
 
-    public String getDeleteElementDescription() {
-        return deleteThisElementDescription;
-    }
+	public void setDisabledDeleteThisElementDescription(String disabledDeleteThisElementDescription) {
+		this.disabledDeleteThisElementDescription = disabledDeleteThisElementDescription;
+	}
 
-    private String deleteThisElementDescription = "Delete this element";
+	public String getDeleteElementDescription() {
+		return deleteThisElementDescription;
+	}
 
-    public void setDeleteThisElementDescription(
-            String deleteThisElementDescription) {
-        this.deleteThisElementDescription = deleteThisElementDescription;
-    }
+	private String deleteThisElementDescription = "Delete this element";
 
-    public String[] getDeleteElementStyles() {
-            return deleteElementStyles;
-    }
+	public void setDeleteThisElementDescription(String deleteThisElementDescription) {
+		this.deleteThisElementDescription = deleteThisElementDescription;
+	}
 
-    public void addDeleteElementStyles(String... deleteElementStyles) {
-            this.deleteElementStyles = deleteElementStyles;
-    }
+	public String[] getDeleteElementStyles() {
+		return deleteElementStyles;
+	}
 
+	public void addDeleteElementStyles(String... deleteElementStyles) {
+		this.deleteElementStyles = deleteElementStyles;
+	}
 
-    @Override
-    public void onElementAdded() {
-        // NOP
-    }
+	@Override
+	public void onElementAdded() {
+		// NOP
+	}
 
-    @Override
-    public ElementCollectionTable<ET> setPropertyHeader(String propertyName,
-            String propertyHeader) {
-        super.setPropertyHeader(propertyName, propertyHeader);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> setPropertyHeader(String propertyName, String propertyHeader) {
+		super.setPropertyHeader(propertyName, propertyHeader);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> setVisibleProperties(
-            List<String> properties, List<String> propertyHeaders) {
-        super.setVisibleProperties(properties, propertyHeaders);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> setVisibleProperties(List<String> properties, List<String> propertyHeaders) {
+		super.setVisibleProperties(properties, propertyHeaders);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> setVisibleProperties(
-            List<String> properties) {
-        super.setVisibleProperties(properties);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> setVisibleProperties(List<String> properties) {
+		super.setVisibleProperties(properties);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> setAllowNewElements(
-            boolean allowNewItems) {
-        super.setAllowNewElements(allowNewItems);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> setAllowNewElements(boolean allowNewItems) {
+		super.setAllowNewElements(allowNewItems);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> setAllowRemovingItems(
-            boolean allowRemovingItems) {
-        super.setAllowRemovingItems(allowRemovingItems);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> setAllowRemovingItems(boolean allowRemovingItems) {
+		super.setAllowRemovingItems(allowRemovingItems);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> withCaption(String caption) {
-        super.withCaption(caption);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> withCaption(String caption) {
+		super.withCaption(caption);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> removeElementRemovedListener(
-            ElementRemovedListener listener) {
-        super.removeElementRemovedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> removeElementRemovedListener(ElementRemovedListener listener) {
+		super.removeElementRemovedListener(listener);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> addElementRemovedListener(
-            ElementRemovedListener<ET> listener) {
-        super.addElementRemovedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> addElementRemovedListener(ElementRemovedListener<ET> listener) {
+		super.addElementRemovedListener(listener);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> removeElementAddedListener(
-            ElementAddedListener listener) {
-        super.removeElementAddedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> removeElementAddedListener(ElementAddedListener listener) {
+		super.removeElementAddedListener(listener);
+		return this;
+	}
 
-    @Override
-    public ElementCollectionTable<ET> addElementAddedListener(
-            ElementAddedListener<ET> listener) {
-        super.addElementAddedListener(listener);
-        return this;
-    }
+	@Override
+	public ElementCollectionTable<ET> addElementAddedListener(ElementAddedListener<ET> listener) {
+		super.addElementAddedListener(listener);
+		return this;
+	}
 
-    public ElementCollectionTable<ET> withEditorInstantiator(
-            Instantiator instantiator) {
-        setEditorInstantiator(instantiator);
-        return this;
-    }
+	public ElementCollectionTable<ET> withEditorInstantiator(Instantiator instantiator) {
+		setEditorInstantiator(instantiator);
+		return this;
+	}
 
 }
