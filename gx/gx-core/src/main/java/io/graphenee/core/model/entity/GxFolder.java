@@ -31,145 +31,145 @@ import lombok.Setter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class GxFolder implements Serializable, GxDocumentExplorerItem {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer oid;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	Integer oid;
 
-    UUID folderId = UUID.randomUUID();
+	UUID folderId = UUID.randomUUID();
 
-    @Include
-    String name;
+	@Include
+	String name;
 
-    String note;
+	String note;
 
-    @Convert(converter = GxStringToJsonConverter.class)
-    JSONObject tags;
+	@Convert(converter = GxStringToJsonConverter.class)
+	JSONObject tags;
 
-    Integer sortOrder = 0;
+	Integer sortOrder = 0;
 
-    @Include
-    @ManyToOne
-    @JoinColumn(name = "oid_folder")
-    GxFolder folder;
+	@Include
+	@ManyToOne
+	@JoinColumn(name = "oid_folder")
+	GxFolder folder;
 
-    @Include
-    @ManyToOne
-    @JoinColumn(name = "oid_namespace")
-    GxNamespace namespace;
+	@Include
+	@ManyToOne
+	@JoinColumn(name = "oid_namespace")
+	GxNamespace namespace;
 
-    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<GxFolder> folders = new ArrayList<>();
+	@OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+	List<GxFolder> folders = new ArrayList<>();
 
-    @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<GxDocument> documents = new ArrayList<>();
+	@OneToMany(mappedBy = "folder", cascade = CascadeType.ALL, orphanRemoval = true)
+	List<GxDocument> documents = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "gx_folder_audit_log_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
-    List<GxAuditLog> auditLogs = new ArrayList<>();
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "gx_folder_audit_log_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
+	List<GxAuditLog> auditLogs = new ArrayList<>();
 
-    public void audit(GxUserAccount user, String event) {
-        GxAuditLog log = new GxAuditLog();
-        log.setAuditDate(new Timestamp(System.currentTimeMillis()));
-        log.setAuditEvent(event);
-        log.setGxUserAccount(user);
-        auditLogs.add(log);
-    }
+	public void audit(GxUserAccount user, String event) {
+		GxAuditLog log = new GxAuditLog();
+		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
+		log.setAuditEvent(event);
+		log.setGxUserAccount(user);
+		auditLogs.add(log);
+	}
 
-    @Override
-    public Boolean isFile() {
-        return false;
-    }
+	@Override
+	public Boolean isFile() {
+		return false;
+	}
 
-    @Override
-    public String getMimeType() {
-        return null;
-    }
+	@Override
+	public String getMimeType() {
+		return null;
+	}
 
-    @Override
-    public Long getSize() {
-        return 0L;
-    }
+	@Override
+	public Long getSize() {
+		return 0L;
+	}
 
-    @Override
-    public List<GxDocumentExplorerItem> getChildren() {
-        List<GxDocumentExplorerItem> items = new ArrayList<>(getFolders());
-        items.addAll(getDocuments());
-        return items;
-    }
+	@Override
+	public List<GxDocumentExplorerItem> getChildren() {
+		List<GxDocumentExplorerItem> items = new ArrayList<>(getFolders());
+		items.addAll(getDocuments());
+		return items;
+	}
 
-    @Override
-    public Boolean hasChildren() {
-        return !getFolders().isEmpty() || !getDocuments().isEmpty();
-    }
+	@Override
+	public Boolean hasChildren() {
+		return !getFolders().isEmpty() || !getDocuments().isEmpty();
+	}
 
-    @Override
-    public Integer getChildCount() {
-        return hasChildren() ? getFolders().size() + getDocuments().size() : 0;
-    }
+	@Override
+	public Integer getChildCount() {
+		return hasChildren() ? getFolders().size() + getDocuments().size() : 0;
+	}
 
-    @Override
-    public Integer getVersion() {
-        return null;
-    }
+	@Override
+	public Integer getVersion() {
+		return null;
+	}
 
-    @Override
-    public String getExtension() {
-        return null;
-    }
+	@Override
+	public String getExtension() {
+		return null;
+	}
 
-    @Override
-    public GxDocumentExplorerItem getParent() {
-        return getFolder();
-    }
+	@Override
+	public GxDocumentExplorerItem getParent() {
+		return getFolder();
+	}
 
-    public GxDocument addDocument(GxDocument document) {
-        if (!documents.contains(document)) {
-            documents.add(document);
-            document.setFolder(this);
-        }
-        return document;
-    }
+	public GxDocument addDocument(GxDocument document) {
+		if (!documents.contains(document)) {
+			documents.add(document);
+			document.setFolder(this);
+		}
+		return document;
+	}
 
-    @Override
-    public Timestamp getIssueDate() {
-        return null;
-    }
+	@Override
+	public Timestamp getIssueDate() {
+		return null;
+	}
 
-    @Override
-    public Timestamp getExpiryDate() {
-        return null;
-    }
+	@Override
+	public Timestamp getExpiryDate() {
+		return null;
+	}
 
-    @Override
-    public Integer getExpiryReminderInDays() {
-        return null;
-    }
+	@Override
+	public Integer getExpiryReminderInDays() {
+		return null;
+	}
 
-    @Override
-    public Timestamp getReminderDate() {
-        return null;
-    }
+	@Override
+	public Timestamp getReminderDate() {
+		return null;
+	}
 
-    @Override
-    public void setIssueDate(Timestamp issueDate) {
-    }
+	@Override
+	public void setIssueDate(Timestamp issueDate) {
+	}
 
-    @Override
-    public void setExpiryDate(Timestamp expiryDate) {
-    }
+	@Override
+	public void setExpiryDate(Timestamp expiryDate) {
+	}
 
-    @Override
-    public void setExpiryReminderInDays(Integer expiryReminderInDays) {
-    }
+	@Override
+	public void setExpiryReminderInDays(Integer expiryReminderInDays) {
+	}
 
-    public String getName() {
-        return this.name;
-    }
+	public String getName() {
+		return this.name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
 }

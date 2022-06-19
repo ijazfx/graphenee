@@ -20,237 +20,237 @@ import io.graphenee.util.JpaSpecificationBuilder;
 @Service
 public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService {
 
-    @Autowired
-    GxDocumentRepository docRepo;
+	@Autowired
+	GxDocumentRepository docRepo;
 
-    @Autowired
-    GxFolderRepository folderRepo;
+	@Autowired
+	GxFolderRepository folderRepo;
 
-    @Autowired
-    GxDocumentTypeRepository docTypeRepo;
+	@Autowired
+	GxDocumentTypeRepository docTypeRepo;
 
-    @Override
-    synchronized public GxFolder findOrCreateNamespaceFolder(GxNamespace namespace) {
-        JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-        sb.eq("namespace", namespace);
-        sb.eq("name", namespace.getNamespace());
-        List<GxFolder> folders = folderRepo.findAll(sb.build());
-        if (folders.isEmpty()) {
-            GxFolder folder = new GxFolder();
-            folder.setNamespace(namespace);
-            folder.setName(namespace.getNamespace());
-            folder = folderRepo.save(folder);
-            return folder;
-        }
-        return folders.get(0);
-    }
+	@Override
+	synchronized public GxFolder findOrCreateNamespaceFolder(GxNamespace namespace) {
+		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
+		sb.eq("namespace", namespace);
+		sb.eq("name", namespace.getNamespace());
+		List<GxFolder> folders = folderRepo.findAll(sb.build());
+		if (folders.isEmpty()) {
+			GxFolder folder = new GxFolder();
+			folder.setNamespace(namespace);
+			folder.setName(namespace.getNamespace());
+			folder = folderRepo.save(folder);
+			return folder;
+		}
+		return folders.get(0);
+	}
 
-    @Override
-    public List<GxFolder> findFolder(GxFolder parent, String... sortKey) {
-        JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
-        sb.eq("folder", parent);
-        return folderRepo.findAll(sb.build(), Sort.by(sortKey));
-    }
+	@Override
+	public List<GxFolder> findFolder(GxFolder parent, String... sortKey) {
+		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
+		sb.eq("folder", parent);
+		return folderRepo.findAll(sb.build(), Sort.by(sortKey));
+	}
 
-    @Override
-    public List<GxDocument> findDocument(GxFolder parent, String... sortKey) {
-        List<GxDocument> docs = docRepo.findByOidFolder(parent.getOid());
-        return docs;
-    }
+	@Override
+	public List<GxDocument> findDocument(GxFolder parent, String... sortKey) {
+		List<GxDocument> docs = docRepo.findByOidFolder(parent.getOid());
+		return docs;
+	}
 
-    @Override
-    public List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey) {
-        JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
-        sb.eq("document", document);
-        List<GxDocument> versions = docRepo.findAll(sb.build(), Sort.by(sortKey).descending());
-        versions.add(document);
-        return versions;
-    }
+	@Override
+	public List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey) {
+		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
+		sb.eq("document", document);
+		List<GxDocument> versions = docRepo.findAll(sb.build(), Sort.by(sortKey).descending());
+		versions.add(document);
+		return versions;
+	}
 
-    @Override
-    public List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders) {
-        return folderRepo.saveAll(folders);
-    }
+	@Override
+	public List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders) {
+		return folderRepo.saveAll(folders);
+	}
 
-    @Override
-    public List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents) {
-        return docRepo.saveAll(documents);
-    }
+	@Override
+	public List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents) {
+		return docRepo.saveAll(documents);
+	}
 
-    @Override
-    public GxDocument createDocumentVersion(GxDocument parentDocument, GxDocument newDocument) {
-        while (parentDocument.getDocument() != null) {
-            parentDocument = parentDocument.getDocument();
-        }
-        Integer maxVersion = docRepo.findMaxVersionByDocument(parentDocument);
-        if (maxVersion == null) {
-            maxVersion = 0;
-        }
-        newDocument.setName(parentDocument.getName());
-        newDocument.setVersionNo(maxVersion + 1);
-        newDocument.setDocument(parentDocument);
-        newDocument.setFolder(parentDocument.getFolder());
-        return docRepo.save(newDocument);
-    }
+	@Override
+	public GxDocument createDocumentVersion(GxDocument parentDocument, GxDocument newDocument) {
+		while (parentDocument.getDocument() != null) {
+			parentDocument = parentDocument.getDocument();
+		}
+		Integer maxVersion = docRepo.findMaxVersionByDocument(parentDocument);
+		if (maxVersion == null) {
+			maxVersion = 0;
+		}
+		newDocument.setName(parentDocument.getName());
+		newDocument.setVersionNo(maxVersion + 1);
+		newDocument.setDocument(parentDocument);
+		newDocument.setFolder(parentDocument.getFolder());
+		return docRepo.save(newDocument);
+	}
 
-    @Override
-    public void deleteFolder(List<GxFolder> folders) {
-        folderRepo.deleteInBatch(folders);
-    }
+	@Override
+	public void deleteFolder(List<GxFolder> folders) {
+		folderRepo.deleteInBatch(folders);
+	}
 
-    @Override
-    public void deleteDocument(List<GxDocument> documents) {
-        docRepo.deleteInBatch(documents);
-    }
+	@Override
+	public void deleteDocument(List<GxDocument> documents) {
+		docRepo.deleteInBatch(documents);
+	}
 
-    @Override
-    public Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity) {
-        if (parent.isFile()) {
-            JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-            dsb.eq("document", parent);
-            return docRepo.count(dsb.build());
-        }
-        Long count = 0L;
+	@Override
+	public Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity) {
+		if (parent.isFile()) {
+			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+			dsb.eq("document", parent);
+			return docRepo.count(dsb.build());
+		}
+		Long count = 0L;
 
-        GxFolder folder = (GxFolder) parent;
+		GxFolder folder = (GxFolder) parent;
 
-        JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
-        fsb.like("name", searchEntity.getName());
-        fsb.eq("folder", folder);
-        count = folderRepo.count(fsb.build());
+		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+		fsb.like("name", searchEntity.getName());
+		fsb.eq("folder", folder);
+		count = folderRepo.count(fsb.build());
 
-        JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-        dsb.like("name", searchEntity.getName());
-        dsb.eq("folder", folder);
+		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+		dsb.like("name", searchEntity.getName());
+		dsb.eq("folder", folder);
 
-        count = count + docRepo.count(dsb.build());
+		count = count + docRepo.count(dsb.build());
 
-        return count;
-    }
+		return count;
+	}
 
-    @Override
-    public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, String... sortKey) {
-        List<GxDocumentExplorerItem> items = new ArrayList<>();
-        if (parent.isFile()) {
-            JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-            dsb.like("name", searchEntity.getName());
-            dsb.eq("document", parent);
-            List<GxDocument> docs = docRepo.findAll(dsb.build(), Sort.by(sortKey));
-            items.addAll(docs);
-        } else {
-            GxFolder folder = (GxFolder) parent;
-            JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
-            fsb.like("name", searchEntity.getName());
-            fsb.eq("folder", folder);
-            items.addAll(folderRepo.findAll(fsb.build(), Sort.by(sortKey)));
+	@Override
+	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, String... sortKey) {
+		List<GxDocumentExplorerItem> items = new ArrayList<>();
+		if (parent.isFile()) {
+			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+			dsb.like("name", searchEntity.getName());
+			dsb.eq("document", parent);
+			List<GxDocument> docs = docRepo.findAll(dsb.build(), Sort.by(sortKey));
+			items.addAll(docs);
+		} else {
+			GxFolder folder = (GxFolder) parent;
+			JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+			fsb.like("name", searchEntity.getName());
+			fsb.eq("folder", folder);
+			items.addAll(folderRepo.findAll(fsb.build(), Sort.by(sortKey)));
 
-            JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-            dsb.like("name", searchEntity.getName());
-            dsb.eq("folder", folder);
-            items.addAll(docRepo.findAll(dsb.build(), Sort.by(sortKey)));
-        }
-        items.sort((a, b) -> b.isFile().compareTo(a.isFile()));
-        return items;
-    }
+			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+			dsb.like("name", searchEntity.getName());
+			dsb.eq("folder", folder);
+			items.addAll(docRepo.findAll(dsb.build(), Sort.by(sortKey)));
+		}
+		items.sort((a, b) -> b.isFile().compareTo(a.isFile()));
+		return items;
+	}
 
-    @Override
-    public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> items) {
-        if (items != null) {
-            for (GxDocumentExplorerItem item : items) {
-                if (item.isFile()) {
-                    saveDocument((GxFolder) parent, List.of((GxDocument) item));
-                } else {
-                    saveFolder((GxFolder) parent, List.of((GxFolder) item));
-                }
-            }
-        }
-        return items;
-    }
+	@Override
+	public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> items) {
+		if (items != null) {
+			for (GxDocumentExplorerItem item : items) {
+				if (item.isFile()) {
+					saveDocument((GxFolder) parent, List.of((GxDocument) item));
+				} else {
+					saveFolder((GxFolder) parent, List.of((GxFolder) item));
+				}
+			}
+		}
+		return items;
+	}
 
-    @Override
-    public void deleteExplorerItem(List<GxDocumentExplorerItem> items) {
-        if (items != null) {
-            for (GxDocumentExplorerItem item : items) {
-                if (item.isFile()) {
-                    deleteDocument(List.of((GxDocument) item));
-                } else {
-                    deleteFolder(List.of((GxFolder) item));
-                }
-            }
-        }
-    }
+	@Override
+	public void deleteExplorerItem(List<GxDocumentExplorerItem> items) {
+		if (items != null) {
+			for (GxDocumentExplorerItem item : items) {
+				if (item.isFile()) {
+					deleteDocument(List.of((GxDocument) item));
+				} else {
+					deleteFolder(List.of((GxFolder) item));
+				}
+			}
+		}
+	}
 
-    @Override
-    public void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
-        changeParent(items, targetItem.getParent());
-        List<GxDocumentExplorerItem> sortList = new ArrayList<>();
-        sortList.addAll(items);
-        sortList.add(targetItem);
-        resetSortOrder(sortList);
-    }
+	@Override
+	public void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
+		changeParent(items, targetItem.getParent());
+		List<GxDocumentExplorerItem> sortList = new ArrayList<>();
+		sortList.addAll(items);
+		sortList.add(targetItem);
+		resetSortOrder(sortList);
+	}
 
-    private void resetSortOrder(List<GxDocumentExplorerItem> sortList) {
-        AtomicInteger min = new AtomicInteger(sortList.stream().mapToInt(GxDocumentExplorerItem::getSortOrder).min().orElse(999999));
-        List<GxFolder> folders = new ArrayList<>();
-        List<GxDocument> documents = new ArrayList<>();
-        sortList.forEach(i -> {
-            if (i instanceof GxDocument) {
-                ((GxDocument) i).setSortOrder(min.getAndIncrement());
-                documents.add((GxDocument) i);
-            } else if (i instanceof GxFolder) {
-                ((GxFolder) i).setSortOrder(min.getAndIncrement());
-                folders.add((GxFolder) i);
-            }
-        });
+	private void resetSortOrder(List<GxDocumentExplorerItem> sortList) {
+		AtomicInteger min = new AtomicInteger(sortList.stream().mapToInt(GxDocumentExplorerItem::getSortOrder).min().orElse(999999));
+		List<GxFolder> folders = new ArrayList<>();
+		List<GxDocument> documents = new ArrayList<>();
+		sortList.forEach(i -> {
+			if (i instanceof GxDocument) {
+				((GxDocument) i).setSortOrder(min.getAndIncrement());
+				documents.add((GxDocument) i);
+			} else if (i instanceof GxFolder) {
+				((GxFolder) i).setSortOrder(min.getAndIncrement());
+				folders.add((GxFolder) i);
+			}
+		});
 
-        if (!documents.isEmpty()) {
-            docRepo.saveAll(documents);
-        }
-        if (!folders.isEmpty()) {
-            folderRepo.saveAll(folders);
-        }
-    }
+		if (!documents.isEmpty()) {
+			docRepo.saveAll(documents);
+		}
+		if (!folders.isEmpty()) {
+			folderRepo.saveAll(folders);
+		}
+	}
 
-    @Override
-    public void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
-        changeParent(items, targetItem.getParent());
-        List<GxDocumentExplorerItem> sortList = new ArrayList<>();
-        sortList.add(targetItem);
-        sortList.addAll(items);
-        resetSortOrder(sortList);
-    }
+	@Override
+	public void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
+		changeParent(items, targetItem.getParent());
+		List<GxDocumentExplorerItem> sortList = new ArrayList<>();
+		sortList.add(targetItem);
+		sortList.addAll(items);
+		resetSortOrder(sortList);
+	}
 
-    @Override
-    public void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem parent) {
-        List<GxFolder> folders = new ArrayList<>();
-        List<GxDocument> documents = new ArrayList<>();
-        GxFolder folder = (GxFolder) (parent.isFile() ? parent.getParent() : parent);
-        items.stream().filter(f -> f.getParent() != f && !isAncestorOf(f, parent)).forEach(i -> {
-            if (i instanceof GxDocument) {
-                ((GxDocument) i).setFolder(folder);
-                documents.add((GxDocument) i);
-            } else if (i instanceof GxFolder) {
-                ((GxFolder) i).setFolder(folder);
-                folders.add((GxFolder) i);
-            }
-        });
+	@Override
+	public void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem parent) {
+		List<GxFolder> folders = new ArrayList<>();
+		List<GxDocument> documents = new ArrayList<>();
+		GxFolder folder = (GxFolder) (parent.isFile() ? parent.getParent() : parent);
+		items.stream().filter(f -> f.getParent() != f && !isAncestorOf(f, parent)).forEach(i -> {
+			if (i instanceof GxDocument) {
+				((GxDocument) i).setFolder(folder);
+				documents.add((GxDocument) i);
+			} else if (i instanceof GxFolder) {
+				((GxFolder) i).setFolder(folder);
+				folders.add((GxFolder) i);
+			}
+		});
 
-        if (!documents.isEmpty()) {
-            docRepo.saveAll(documents);
-        }
-        if (!folders.isEmpty()) {
-            folderRepo.saveAll(folders);
-        }
-    }
+		if (!documents.isEmpty()) {
+			docRepo.saveAll(documents);
+		}
+		if (!folders.isEmpty()) {
+			folderRepo.saveAll(folders);
+		}
+	}
 
-    private boolean isAncestorOf(GxDocumentExplorerItem node1, GxDocumentExplorerItem node2) {
-        GxDocumentExplorerItem p = node2.getParent();
-        while (p != null) {
-            if (p.equals(node1))
-                return true;
-            p = p.getParent();
-        }
-        return false;
-    }
+	private boolean isAncestorOf(GxDocumentExplorerItem node1, GxDocumentExplorerItem node2) {
+		GxDocumentExplorerItem p = node2.getParent();
+		while (p != null) {
+			if (p.equals(node1))
+				return true;
+			p = p.getParent();
+		}
+		return false;
+	}
 
 }

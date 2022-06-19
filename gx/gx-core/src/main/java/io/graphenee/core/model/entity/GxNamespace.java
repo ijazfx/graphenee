@@ -47,13 +47,13 @@ public class GxNamespace implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
-	
+
 	@Column(name = "is_active")
 	private Boolean isActive = true;
-	
+
 	@Column(name = "is_protected")
 	private Boolean isProtected = false;
-	
+
 	@Include
 	private String namespace;
 
