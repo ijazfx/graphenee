@@ -31,130 +31,129 @@ import io.graphenee.vaadin.flow.utils.DashboardUtils;
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractLoginView extends VerticalLayout implements HasUrlParameter<String> {
 
-    private static final long serialVersionUID = 1L;
-    private String lastRoute;
-    private Image appLogo;
+	private static final long serialVersionUID = 1L;
+	private String lastRoute;
+	private Image appLogo;
 
-    public GxAbstractLoginView() {
-        setSizeFull();
-        setClassName("gx-login-view");
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setAlignItems(Alignment.CENTER);
-    }
+	public GxAbstractLoginView() {
+		setSizeFull();
+		setClassName("gx-login-view");
+		setJustifyContentMode(JustifyContentMode.CENTER);
+		setAlignItems(Alignment.CENTER);
+	}
 
-    @PostConstruct
-    private void postBuild() {
-        FlexLayout headingLayout = new FlexLayout();
-        headingLayout.setAlignItems(Alignment.BASELINE);
-        headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        headingLayout.setWidth("328px");
-        Span heading = new Span(flowSetup().appTitle());
-        heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-        heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
-        Span version = new Span(flowSetup().appVersion());
-        version.getStyle().set("color", "var(--app-layout-bar-font-color)");
-        version.getStyle().set("font-size", "var(--lumo-font-size-s)");
-        headingLayout.add(heading, version);
+	@PostConstruct
+	private void postBuild() {
+		FlexLayout headingLayout = new FlexLayout();
+		headingLayout.setAlignItems(Alignment.BASELINE);
+		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+		headingLayout.setWidth("328px");
+		Span heading = new Span(flowSetup().appTitle());
+		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
+		heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+		Span version = new Span(flowSetup().appVersion());
+		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
+		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
+		headingLayout.add(heading, version);
 
-        add(headingLayout);
+		add(headingLayout);
 
-        VerticalLayout rootLayout = new VerticalLayout();
-        rootLayout.setSpacing(false);
-        rootLayout.setPadding(false);
-        rootLayout.setWidth("-1px");
-        rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-        rootLayout.getElement().getStyle().set("background", "white");
+		VerticalLayout rootLayout = new VerticalLayout();
+		rootLayout.setSpacing(false);
+		rootLayout.setPadding(false);
+		rootLayout.setWidth("-1px");
+		rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+		rootLayout.getElement().getStyle().set("background", "white");
 
-        appLogo = flowSetup().appLogo();
-        if (appLogo != null) {
-            appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-            appLogo.setWidth("100px");
-            rootLayout.add(appLogo);
-            rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
-        }
+		appLogo = flowSetup().appLogo();
+		if (appLogo != null) {
+			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
+			appLogo.setWidth("100px");
+			rootLayout.add(appLogo);
+			rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
+		}
 
-        add(rootLayout);
+		add(rootLayout);
 
-        LoginForm loginForm = new LoginForm();
-        loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-        // loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
-        loginForm.getElement().getStyle().set("background", "white");
-        loginForm.setForgotPasswordButtonVisible(true);
-        LoginI18n loginI18n = LoginI18n.createDefault();
-        loginI18n.getForm().setSubmit("Sign In");
-        loginI18n.getForm().setTitle("Enter Credentials");
-        loginI18n.getForm().setForgotPassword("Forgot Password? Click here to Reset!");
-        loginI18n.getForm().setUsername("Username");
-        loginI18n.getForm().setPassword("Password");
-        loginForm.setI18n(loginI18n);
+		LoginForm loginForm = new LoginForm();
+		loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
+		loginForm.getElement().getStyle().set("background", "white");
+		loginForm.setForgotPasswordButtonVisible(true);
+		LoginI18n loginI18n = LoginI18n.createDefault();
+		loginI18n.getForm().setSubmit("Sign In");
+		loginI18n.getForm().setTitle("Enter Credentials");
+		loginI18n.getForm().setForgotPassword("Forgot Password? Click here to Reset!");
+		loginI18n.getForm().setUsername("Username");
+		loginI18n.getForm().setPassword("Password");
+		loginForm.setI18n(loginI18n);
 
-        rootLayout.add(loginForm);
+		rootLayout.add(loginForm);
 
-        loginForm.addLoginListener(e -> {
-            try {
-                GxAuthenticatedUser user = onLogin(e);
-                VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
-                DashboardUtils.setCurrentUI(user, getUI().orElse(UI.getCurrent()));
-                RouteConfiguration rc = RouteConfiguration.forSessionScope();
-                registerRoutesOnSuccessfulAuthentication(rc, user);
-                flowSetup().menuItems().forEach(mi -> {
-                    registerRoute(user, rc, mi);
-                });
-                getUI().ifPresent(ui -> {
-                    if (lastRoute != null && user.canDoAction(lastRoute, "view")) {
-                        ui.navigate(lastRoute);
-                    } else {
-                        ui.navigate(flowSetup().defaultRoute());
-                    }
-                });
-            } catch (AuthenticationFailedException afe) {
-                Notification.show(afe.getMessage(), 5000, Position.BOTTOM_CENTER);
-            } catch (PasswordChangeRequiredException pcre) {
-                getUI().ifPresent(ui -> {
-                    ui.navigate("reset-password");
-                });
-            } finally {
-                loginForm.setEnabled(true);
-            }
-        });
-        loginForm.addForgotPasswordListener(e -> {
-            onForgotPassword(e);
-        });
+		loginForm.addLoginListener(e -> {
+			try {
+				GxAuthenticatedUser user = onLogin(e);
+				VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
+				DashboardUtils.setCurrentUI(user, getUI().orElse(UI.getCurrent()));
+				RouteConfiguration rc = RouteConfiguration.forSessionScope();
+				registerRoutesOnSuccessfulAuthentication(rc, user);
+				flowSetup().menuItems().forEach(mi -> {
+					registerRoute(user, rc, mi);
+				});
+				getUI().ifPresent(ui -> {
+					if (lastRoute != null && user.canDoAction(lastRoute, "view")) {
+						ui.navigate(lastRoute);
+					} else {
+						ui.navigate(flowSetup().defaultRoute());
+					}
+				});
+			} catch (AuthenticationFailedException afe) {
+				Notification.show(afe.getMessage(), 5000, Position.BOTTOM_CENTER);
+			} catch (PasswordChangeRequiredException pcre) {
+				getUI().ifPresent(ui -> {
+					ui.navigate("reset-password");
+				});
+			} finally {
+				loginForm.setEnabled(true);
+			}
+		});
+		loginForm.addForgotPasswordListener(e -> {
+			onForgotPassword(e);
+		});
 
-    }
+	}
 
-    private void registerRoute(GxAuthenticatedUser user, RouteConfiguration rc, GxMenuItem mi) {
-        Class<? extends Component> navigationTarget = mi.getComponentClass();
-        if (navigationTarget != null) {
-            String route = mi.getRoute();
-            rc.removeRoute(navigationTarget);
-            rc.removeRoute(route);
-            rc.setRoute(route, navigationTarget, List.of(flowSetup().routerLayout()));
-        }
-        if (mi.hasChildren()) {
-            mi.getChildren().forEach(cmi -> {
-                registerRoute(user, rc, cmi);
-            });
-        }
-    }
+	private void registerRoute(GxAuthenticatedUser user, RouteConfiguration rc, GxMenuItem mi) {
+		Class<? extends Component> navigationTarget = mi.getComponentClass();
+		if (navigationTarget != null) {
+			String route = mi.getRoute();
+			rc.removeRoute(navigationTarget);
+			rc.removeRoute(route);
+			rc.setRoute(route, navigationTarget, List.of(flowSetup().routerLayout()));
+		}
+		if (mi.hasChildren()) {
+			mi.getChildren().forEach(cmi -> {
+				registerRoute(user, rc, cmi);
+			});
+		}
+	}
 
-    protected abstract GxAbstractFlowSetup flowSetup();
+	protected abstract GxAbstractFlowSetup flowSetup();
 
-    protected abstract GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
+	protected abstract GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
 
-    protected void onForgotPassword(ForgotPasswordEvent event) {
-        getUI().ifPresent(ui -> {
-            ui.navigate("reset-password");
-        });
-    }
+	protected void onForgotPassword(ForgotPasswordEvent event) {
+		getUI().ifPresent(ui -> {
+			ui.navigate("reset-password");
+		});
+	}
 
-    protected void registerRoutesOnSuccessfulAuthentication(RouteConfiguration rc, GxAuthenticatedUser user) {
-    }
+	protected void registerRoutesOnSuccessfulAuthentication(RouteConfiguration rc, GxAuthenticatedUser user) {
+	}
 
-    @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
-        if (parameter != null && !parameter.startsWith("login"))
-            this.lastRoute = parameter;
-    }
+	@Override
+	public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
+		if (parameter != null && !parameter.startsWith("login"))
+			this.lastRoute = parameter;
+	}
 
 }

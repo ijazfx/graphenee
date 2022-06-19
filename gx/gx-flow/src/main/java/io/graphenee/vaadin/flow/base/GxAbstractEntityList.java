@@ -647,7 +647,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	@SuppressWarnings("unchecked")
 	private void addFilteredColumn(Column<T> column, PropertyDefinition<T, Object> propertyDefinition) {
 		if (searchEntity == null) {
-			searchEntity = initializeSearchEntity();
+			searchEntity = getSearchEntity();
 		}
 		if (column.getKey().matches("(extension|download)"))
 			return;
