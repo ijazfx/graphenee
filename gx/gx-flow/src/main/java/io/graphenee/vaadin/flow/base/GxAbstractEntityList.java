@@ -21,6 +21,8 @@ import java.util.stream.Stream;
 
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
@@ -76,6 +78,8 @@ import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
+import com.vaadin.flow.data.provider.QuerySortOrder;
+import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -1150,6 +1154,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	public void editItem(T item) {
 		openForm(item);
+	}
+
+	protected List<Order> sortOrdersToSpringOrders(List<QuerySortOrder> sortOrders) {
+		return sortOrders.stream().map(so -> {
+			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC, so.getSorted());
+		}).collect(Collectors.toList());
 	}
 
 }

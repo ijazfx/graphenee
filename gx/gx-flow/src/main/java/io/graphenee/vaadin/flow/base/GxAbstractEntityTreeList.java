@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 
@@ -57,9 +58,9 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
 		int pageNumber = offset / limit;
 		int remainder = offset % limit == 0 ? 0 : offset - (pageNumber * limit);
 		int pageSize = limit;
-		Stream<T> stream = getData(pageNumber, pageSize, query.getParent());
+		Stream<T> stream = getData(pageNumber, pageSize, query.getParent(), query.getSortOrders());
 		if (remainder != 0) {
-			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getParent());
+			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getParent(), query.getSortOrders());
 			stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
 		}
 		return stream;
@@ -69,7 +70,13 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
 
 	protected abstract boolean hasChildren(T parent);
 
-	protected abstract Stream<T> getData(int pageNumber, int pageSize, T parent);
+	protected Stream<T> getData(int pageNumber, int pageSize, T parent, List<QuerySortOrder> sortOrders) {
+		return getData(pageNumber, pageSize, parent);
+	}
+
+	protected Stream<T> getData(int pageNumber, int pageSize, T parent) {
+		return null;
+	}
 
 	@Override
 	final protected Stream<T> getData() {

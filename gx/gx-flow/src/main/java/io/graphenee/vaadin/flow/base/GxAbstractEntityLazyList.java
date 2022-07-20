@@ -1,11 +1,13 @@
 package io.graphenee.vaadin.flow.base;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
+import com.vaadin.flow.data.provider.QuerySortOrder;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
@@ -22,7 +24,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 	@Override
 	@SuppressWarnings("unchecked")
 	protected DataProvider<T, T> dataProvider(Class<T> entityClass) {
-		CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query), query -> {
+		CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query, query.getSortOrders()), query -> {
 			int count = getTotalCount(query.getFilter().orElse(getSearchEntity()));
 			updateTotalCountFooter(count);
 			return count;
@@ -32,15 +34,15 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 
 	protected abstract int getTotalCount(T searchEntity);
 
-	private Stream<T> getPagedData(Query<T, T> query) {
+	private Stream<T> getPagedData(Query<T, T> query, List<QuerySortOrder> sortOrders) {
 		int offset = query.getOffset();
 		int limit = query.getLimit();
 		int pageNumber = offset / limit;
 		int remainder = offset % limit == 0 ? 0 : offset - (pageNumber * limit);
 		int pageSize = limit;
-		Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(getSearchEntity()));
+		Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(getSearchEntity()), sortOrders);
 		if (remainder != 0) {
-			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()));
+			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()), sortOrders);
 			stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
 		}
 		return stream;
@@ -51,7 +53,13 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 		return null;
 	}
 
-	protected abstract Stream<T> getData(int pageNumber, int pageSize, T searchEntity);
+	protected Stream<T> getData(int pageNumber, int pageSize, T searchEntity, List<QuerySortOrder> sortOrders) {
+		return getData(pageNumber, pageSize, searchEntity);
+	}
+
+	protected Stream<T> getData(int pageNumber, int pageSize, T searchEntity) {
+		return null;
+	}
 
 	protected void exportData(ObservableEmitter<T> emitter) {
 		Stream<T> data = null;

@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gx-flow</artifactId>
 	<name>Graphenee Flow UI (Vaadin 14)</name>
@@ -15,8 +17,8 @@
 	<!-- Properties -->
 	<properties>
 		<java.version>11</java.version>
-		<version.vaadin>14.8.4</version.vaadin>
-		<version.vaadin.plugin>14.8.4</version.vaadin.plugin>
+		<version.vaadin>14.8.14</version.vaadin>
+		<version.vaadin.plugin>14.8.14</version.vaadin.plugin>
 	</properties>
 
 	<!-- Repositories -->
@@ -107,4 +109,22 @@
 			<artifactId>poi-ooxml</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${version.vaadin.plugin}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-frontend</goal>
+						</goals>
+						<phase>compile</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
