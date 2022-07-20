@@ -77,7 +77,6 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		// loginForm.getElement().getStyle().set("padding", "var(--lumo-border-radius)");
 		loginForm.getElement().getStyle().set("background", "white");
 		loginForm.setForgotPasswordButtonVisible(true);
 		LoginI18n loginI18n = LoginI18n.createDefault();
