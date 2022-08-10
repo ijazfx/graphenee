@@ -28,86 +28,86 @@ import com.vaadin.ui.Label;
  */
 public class Header extends Label {
 
-    private static final long serialVersionUID = -2879612973232108854L;
+	private static final long serialVersionUID = -2879612973232108854L;
 
-    private String text;
-    private int headerLevel = 1;
+	private String text;
+	private int headerLevel = 1;
 
-    protected Whitelist getWhitelist() {
-        return Whitelist.none();
-    }
+	protected Whitelist getWhitelist() {
+		return Whitelist.none();
+	}
 
-    /**
-     *
-     * @param whitelist the whitelist used for sanitizing the header text
-     * @return the object itself for further configuration
-     * @deprecated Whitelist is not serializable. If using e.g. clustering,
-     * override the getter method for whitelist instead.
-     */
-    @Deprecated
-    public Header setWhitelist(Whitelist whitelist) {
-        markAsDirty();
-        return this;
-    }
+	/**
+	 *
+	 * @param whitelist the whitelist used for sanitizing the header text
+	 * @return the object itself for further configuration
+	 * @deprecated Whitelist is not serializable. If using e.g. clustering,
+	 * override the getter method for whitelist instead.
+	 */
+	@Deprecated
+	public Header setWhitelist(Whitelist whitelist) {
+		markAsDirty();
+		return this;
+	}
 
-    public String getText() {
-        return text;
-    }
+	public String getText() {
+		return text;
+	}
 
-    public Header setText(String text) {
-        this.text = text;
-        markAsDirty();
-        return this;
-    }
+	public Header setText(String text) {
+		this.text = text;
+		markAsDirty();
+		return this;
+	}
 
-    public int getHeaderLevel() {
-        return headerLevel;
-    }
+	public int getHeaderLevel() {
+		return headerLevel;
+	}
 
-    public Header setHeaderLevel(int headerLevel) {
-        if (headerLevel < 1 || headerLevel > 6) {
-            throw new IllegalArgumentException("Header levels 1-6 supported");
-        }
-        this.headerLevel = headerLevel;
-        markAsDirty();
-        return this;
-    }
+	public Header setHeaderLevel(int headerLevel) {
+		if (headerLevel < 1 || headerLevel > 6) {
+			throw new IllegalArgumentException("Header levels 1-6 supported");
+		}
+		this.headerLevel = headerLevel;
+		markAsDirty();
+		return this;
+	}
 
-    public Header(String headerText) {
-        text = headerText;
-    }
+	public Header(String headerText) {
+		text = headerText;
+	}
 
-    @Override
-    public void setValue(String newStringValue) {
-        setText(newStringValue);
-    }
+	@Override
+	public void setValue(String newStringValue) {
+		setText(newStringValue);
+	}
 
-    @Override
-    public void beforeClientResponse(boolean initial) {
-        render();
-        super.beforeClientResponse(initial);
-    }
+	@Override
+	public void beforeClientResponse(boolean initial) {
+		render();
+		super.beforeClientResponse(initial);
+	}
 
-    private void render() {
-        if (text != null) {
-            setContentMode(ContentMode.HTML);
-            StringBuilder sb = new StringBuilder("<h");
-            sb.append(headerLevel);
-            sb.append(">");
-            sb.append(Jsoup.clean(text, getWhitelist()));
-            sb.append("</h");
-            sb.append(headerLevel);
-            sb.append(">");
-            super.setValue(sb.toString());
-            text = null;
-        }
-    }
+	private void render() {
+		if (text != null) {
+			setContentMode(ContentMode.HTML);
+			StringBuilder sb = new StringBuilder("<h");
+			sb.append(headerLevel);
+			sb.append(">");
+			sb.append(Jsoup.clean(text, getWhitelist()));
+			sb.append("</h");
+			sb.append(headerLevel);
+			sb.append(">");
+			super.setValue(sb.toString());
+			text = null;
+		}
+	}
 
-    public Header withStyleName(String... styleNames) {
-        for (String styleName : styleNames) {
-            addStyleName(styleName);
-        }
-        return this;
-    }
+	public Header withStyleName(String... styleNames) {
+		for (String styleName : styleNames) {
+			addStyleName(styleName);
+		}
+		return this;
+	}
 
 }

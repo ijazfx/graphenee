@@ -78,8 +78,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 
 	public static class ValidityChangedEvent<T> extends Component.Event {
 
-		private static final Method method = ReflectTools.findMethod(ValidityChangedListener.class, "onValidityChanged",
-				ValidityChangedEvent.class);
+		private static final Method method = ReflectTools.findMethod(ValidityChangedListener.class, "onValidityChanged", ValidityChangedEvent.class);
 
 		public ValidityChangedEvent(Component source) {
 			super(source);
@@ -338,8 +337,7 @@ public abstract class TRAbstractBaseForm<T> extends CustomComponent implements F
 		return bindEntityWithComponentAndNestedProperties(entity, c, getNestedProperties());
 	}
 
-	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c,
-			String... nestedProperties) {
+	final protected MBeanFieldGroup<T> bindEntityWithComponentAndNestedProperties(T entity, Component c, String... nestedProperties) {
 		preBinding(entity);
 		MBeanFieldGroup<T> beanFieldGroup = BeanBinder.bind(entity, c, nestedProperties);
 		beanFieldGroup.setValidateAllProperties(false);

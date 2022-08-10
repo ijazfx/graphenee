@@ -23,7 +23,8 @@ import io.graphenee.core.exception.SendMailFailedException;
 
 public interface GxMailService {
 
-	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, Collection<GxMailAttachment> attachments) throws SendMailFailedException;
+	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList, Collection<GxMailAttachment> attachments)
+			throws SendMailFailedException;
 
 	void sendEmail(String subject, String content, String senderEmail, String recipientEmail, String ccEmailList, String bccEmailList) throws SendMailFailedException;
 

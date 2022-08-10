@@ -8,19 +8,18 @@ package org.vaadin.viritin.fields;
  *
  * @param <T> the type of the object for which caption is to be generated
  */
-public abstract class AbstractCaptionGenerator<T> implements
-        CaptionGenerator<T> {
+public abstract class AbstractCaptionGenerator<T> implements CaptionGenerator<T> {
 
-    private static final long serialVersionUID = 7397954730260358087L;
-    
-    @Override
-    public String getCaption(T option) {
-        if (option == null) {
-            return "";
-        } else {
-            return generateCaption(option);
-        }
-    }
+	private static final long serialVersionUID = 7397954730260358087L;
 
-    public abstract String generateCaption(T option);
+	@Override
+	public String getCaption(T option) {
+		if (option == null) {
+			return "";
+		} else {
+			return generateCaption(option);
+		}
+	}
+
+	public abstract String generateCaption(T option);
 }

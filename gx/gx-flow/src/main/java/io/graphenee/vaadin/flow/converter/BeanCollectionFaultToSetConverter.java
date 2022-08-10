@@ -12,21 +12,21 @@ import io.graphenee.core.model.BeanCollectionFault;
 
 public class BeanCollectionFaultToSetConverter<T> implements Converter<Set<T>, BeanCollectionFault<T>> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public Result<BeanCollectionFault<T>> convertToModel(Set<T> value, ValueContext context) {
-        BeanCollectionFault<T> from = BeanCollectionFault.from(value);
-        from.markAsModified();
-        return Result.ok(from);
-    }
+	@Override
+	public Result<BeanCollectionFault<T>> convertToModel(Set<T> value, ValueContext context) {
+		BeanCollectionFault<T> from = BeanCollectionFault.from(value);
+		from.markAsModified();
+		return Result.ok(from);
+	}
 
-    @Override
-    public Set<T> convertToPresentation(BeanCollectionFault<T> value, ValueContext context) {
-        if (value == null) {
-            return Collections.emptySet();
-        }
-        return new HashSet<>(value.getBeans());
-    }
+	@Override
+	public Set<T> convertToPresentation(BeanCollectionFault<T> value, ValueContext context) {
+		if (value == null) {
+			return Collections.emptySet();
+		}
+		return new HashSet<>(value.getBeans());
+	}
 
 }

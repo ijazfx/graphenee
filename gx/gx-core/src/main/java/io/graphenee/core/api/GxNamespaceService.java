@@ -16,12 +16,17 @@
 package io.graphenee.core.api;
 
 import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.entity.GxNamespace;
 
 public interface GxNamespaceService {
 
-	GxNamespaceBean systemNamespace();
+	GxNamespace systemNamespaceEntity();
 
-	GxNamespaceBean applicationNamespace();
+	GxNamespace namespaceEntity(String namespace);
+
+	GxNamespace findEntityByOid(Integer oidNamespace);
+
+	GxNamespaceBean systemNamespace();
 
 	GxNamespaceBean namespace(String namespace);
 

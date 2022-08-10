@@ -16,46 +16,46 @@
 package io.graphenee.util.enums;
 
 public enum GxImageType {
-    JPEG("image/jpeg", "jpeg"),
-    JPG("image/jpg", "jpg"),
-    PNG("image/png", "png"),
-    WEB_IMAGE("image/webp", "webp");
+	JPEG("image/jpeg", "jpeg"),
+	JPG("image/jpg", "jpg"),
+	PNG("image/png", "png"),
+	WEB_IMAGE("image/webp", "webp");
 
-    private String mimeType;
+	private String mimeType;
 
-    private String extension;
+	private String extension;
 
-    private GxImageType(String mimeType, String extension) {
-        this.mimeType = mimeType;
-        this.extension = extension;
-    }
+	private GxImageType(String mimeType, String extension) {
+		this.mimeType = mimeType;
+		this.extension = extension;
+	}
 
-    public String getMimeType() {
-        return mimeType;
-    }
+	public String getMimeType() {
+		return mimeType;
+	}
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
 
-    public String getExtension() {
-        return extension;
-    }
+	public String getExtension() {
+		return extension;
+	}
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
 
-    public static GxImageType findByMimeType(String mimeType) {
-        if (mimeType.equals(JPEG.mimeType))
-            return GxImageType.JPEG;
-        if (mimeType.equals(PNG.mimeType))
-            return GxImageType.PNG;
-        if (mimeType.equals(WEB_IMAGE.mimeType))
-            return GxImageType.WEB_IMAGE;
-        if (mimeType.equals(JPG.mimeType))
-            return GxImageType.JPG;
-        return null;
-    }
+	public static GxImageType findByMimeType(String mimeType) {
+		if (mimeType.equals(JPEG.mimeType))
+			return GxImageType.JPEG;
+		if (mimeType.equals(PNG.mimeType))
+			return GxImageType.PNG;
+		if (mimeType.equals(WEB_IMAGE.mimeType))
+			return GxImageType.WEB_IMAGE;
+		if (mimeType.equals(JPG.mimeType))
+			return GxImageType.JPG;
+		return null;
+	}
 
 }

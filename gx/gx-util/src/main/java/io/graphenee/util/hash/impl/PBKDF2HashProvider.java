@@ -27,35 +27,35 @@ import com.lambdaworks.crypto.PBKDF;
  */
 public class PBKDF2HashProvider extends AbstractHashProvider {
 
-    public static final String ENCRYPTION = "PBKDF2";
+	public static final String ENCRYPTION = "PBKDF2";
 
-    private String pbkdf2Salt;
+	private String pbkdf2Salt;
 
-    public PBKDF2HashProvider(String salt) {
-        this.pbkdf2Salt = salt;
-    }
+	public PBKDF2HashProvider(String salt) {
+		this.pbkdf2Salt = salt;
+	}
 
-    @Override
-    public String createHash(String prefix, String input, String signingKey) {
-        try {
-            Encoder encoder = Base64.getEncoder();
-            byte[] temp = (prefix + input).getBytes();
-            byte[] hash = PBKDF.pbkdf2("HmacSHA1", temp, signingKey.getBytes(), 1000, 48);
-            return encoder.encodeToString(hash);
-        } catch (Exception e) {
-            log.warning(e.getMessage());
-            return super.createHash(prefix, input, signingKey);
-        }
-    }
+	@Override
+	public String createHash(String prefix, String input, String signingKey) {
+		try {
+			Encoder encoder = Base64.getEncoder();
+			byte[] temp = (prefix + input).getBytes();
+			byte[] hash = PBKDF.pbkdf2("HmacSHA1", temp, signingKey.getBytes(), 1000, 48);
+			return encoder.encodeToString(hash);
+		} catch (Exception e) {
+			log.warning(e.getMessage());
+			return super.createHash(prefix, input, signingKey);
+		}
+	}
 
-    @Override
-    public String createPasswordHash(String input) {
-        return createHash(PASSWORD_PREFIX, input, pbkdf2Salt);
-    }
+	@Override
+	public String createPasswordHash(String input) {
+		return createHash(PASSWORD_PREFIX, input, pbkdf2Salt);
+	}
 
-    @Override
-    public String encryption() {
-        return ENCRYPTION;
-    }
+	@Override
+	public String encryption() {
+		return ENCRYPTION;
+	}
 
 }

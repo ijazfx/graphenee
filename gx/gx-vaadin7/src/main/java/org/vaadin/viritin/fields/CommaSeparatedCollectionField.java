@@ -33,131 +33,133 @@ import java.util.Collection;
  */
 public class CommaSeparatedCollectionField extends CustomField<Collection> {
 
-    private static final long serialVersionUID = 2443075282417590322L;
+	private static final long serialVersionUID = 2443075282417590322L;
 
-    public interface FromStringInstantiator<T> {
+	public interface FromStringInstantiator<T> {
 
-        T instance(String stringPresentation);
-    }
+		T instance(String stringPresentation);
+	}
 
-    MTextField textField = new MTextField();
-    private Collection collection;
-    private String splitSeparatorRegexp = "\\s*,\\s*";
-    private String joinSeparator = ", ";
-    private Class<?> elementType;
-    private FromStringInstantiator instantiator;
+	MTextField textField = new MTextField();
+	private Collection collection;
+	private String splitSeparatorRegexp = "\\s*,\\s*";
+	private String joinSeparator = ", ";
+	private Class<?> elementType;
+	private FromStringInstantiator instantiator;
 
-    public CommaSeparatedCollectionField() {
-        textField.addValueChangeListener(new ValueChangeListener() {
-            private static final long serialVersionUID = -382717228031608542L;
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                if (textField.isUserValueChange()) {
+	public CommaSeparatedCollectionField() {
+		textField.addValueChangeListener(new ValueChangeListener() {
+			private static final long serialVersionUID = -382717228031608542L;
 
-                    String[] parts = textField.getValue().split(splitSeparatorRegexp);
-                    // TODO null check for collection and create it if not set (e.g. null in property)
-                    collection.clear();
+			@Override
+			public void valueChange(Property.ValueChangeEvent event) {
+				if (textField.isUserValueChange()) {
 
-                    for (final String part : parts) {
-                        if (instantiator != null) {
-                            collection.add(instantiator.instance(part));
-                        } else if (elementType != null) {
+					String[] parts = textField.getValue().split(splitSeparatorRegexp);
+					// TODO null check for collection and create it if not set (e.g. null in property)
+					collection.clear();
 
-                            try {
+					for (final String part : parts) {
+						if (instantiator != null) {
+							collection.add(instantiator.instance(part));
+						} else if (elementType != null) {
 
-                                Method declaredMethod = elementType.getDeclaredMethod("valueOf", String.class);
-                                collection.add(declaredMethod.invoke(null, part));
-                            } catch (NoSuchMethodException ex) {
-                                try {
-                                    collection.add(elementType.getConstructor(String.class).newInstance(part));
-                                } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex1) {
-                                throw new RuntimeException("The string " + part + " could not be converted to " + elementType.getSimpleName(), ex1);
-                                }
-                            } catch (IllegalAccessException | IllegalArgumentException | SecurityException | InvocationTargetException ex) {
-                                throw new RuntimeException("The string " + part + " could not be converted to " + elementType.getSimpleName(), ex);
-                            }
-                        } else {
-                            // assume String values in the collection
-                            collection.add(part);
-                        }
-                    }
-                }
-                fireValueChange(true);
-            }
-        });
-    }
+							try {
 
-    @Override
-    protected Component initContent() {
-        return textField;
-    }
+								Method declaredMethod = elementType.getDeclaredMethod("valueOf", String.class);
+								collection.add(declaredMethod.invoke(null, part));
+							} catch (NoSuchMethodException ex) {
+								try {
+									collection.add(elementType.getConstructor(String.class).newInstance(part));
+								} catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException
+										| InvocationTargetException ex1) {
+									throw new RuntimeException("The string " + part + " could not be converted to " + elementType.getSimpleName(), ex1);
+								}
+							} catch (IllegalAccessException | IllegalArgumentException | SecurityException | InvocationTargetException ex) {
+								throw new RuntimeException("The string " + part + " could not be converted to " + elementType.getSimpleName(), ex);
+							}
+						} else {
+							// assume String values in the collection
+							collection.add(part);
+						}
+					}
+				}
+				fireValueChange(true);
+			}
+		});
+	}
 
-    @Override
-    public Class<? extends Collection> getType() {
-        return Collection.class;
-    }
+	@Override
+	protected Component initContent() {
+		return textField;
+	}
 
-    @Override
-    protected void setInternalValue(Collection newValue) {
-        this.collection = newValue;
+	@Override
+	public Class<? extends Collection> getType() {
+		return Collection.class;
+	}
 
-        String toPresentation = StringUtils.join(collection, joinSeparator);
-        textField.setValue(toPresentation);
-        super.setInternalValue(newValue);
-    }
+	@Override
+	protected void setInternalValue(Collection newValue) {
+		this.collection = newValue;
 
-    public Class<?> getElementType() {
-        return elementType;
-    }
+		String toPresentation = StringUtils.join(collection, joinSeparator);
+		textField.setValue(toPresentation);
+		super.setInternalValue(newValue);
+	}
 
-    /**
-     * Sets the type of element in the collection. The class needs to have
-     * either static valueOf(String) method or a constructor with String
-     * parameter. Those will be used to instantiate objects from user input.
-     * Alternatively you can specify an explicit instantiator.
-     * <p>
-     * If the element type in collection is String, no elmentType or
-     * instantiator is needed.
-     *
-     * @param elementType the type of objects in the collection.
-     */
-    public void setElementType(Class<?> elementType) {
-        this.elementType = elementType;
-    }
+	public Class<?> getElementType() {
+		return elementType;
+	}
 
-    public void setInstantiator(FromStringInstantiator instantiator) {
-        this.instantiator = instantiator;
-    }
+	/**
+	 * Sets the type of element in the collection. The class needs to have
+	 * either static valueOf(String) method or a constructor with String
+	 * parameter. Those will be used to instantiate objects from user input.
+	 * Alternatively you can specify an explicit instantiator.
+	 * <p>
+	 * If the element type in collection is String, no elmentType or
+	 * instantiator is needed.
+	 *
+	 * @param elementType the type of objects in the collection.
+	 */
+	public void setElementType(Class<?> elementType) {
+		this.elementType = elementType;
+	}
 
-    public FromStringInstantiator getInstantiator() {
-        return instantiator;
-    }
+	public void setInstantiator(FromStringInstantiator instantiator) {
+		this.instantiator = instantiator;
+	}
 
-    public String getJoinSeparator() {
-        return joinSeparator;
-    }
+	public FromStringInstantiator getInstantiator() {
+		return instantiator;
+	}
 
-    /**
-     * @param joinSeparator the separator string to be used when joining objects
-     * to string presentation for editing. The default value is ", "
-     */
-    public void setJoinSeparator(String joinSeparator) {
-        this.joinSeparator = joinSeparator;
-    }
+	public String getJoinSeparator() {
+		return joinSeparator;
+	}
 
-    public String getSplitSeparatorRegexp() {
-        return splitSeparatorRegexp;
-    }
+	/**
+	 * @param joinSeparator the separator string to be used when joining objects
+	 * to string presentation for editing. The default value is ", "
+	 */
+	public void setJoinSeparator(String joinSeparator) {
+		this.joinSeparator = joinSeparator;
+	}
 
-    /**
-     * Sets the split separator that is used to slice the input string into a
-     * parts. The value is a regular expression so you can strip away extra
-     * spaces. The default value is "\\s*,\\s*".
-     *
-     * @param splitSeparatorRegexp the split separator
-     */
-    public void setSplitSeparatorRegexp(String splitSeparatorRegexp) {
-        this.splitSeparatorRegexp = splitSeparatorRegexp;
-    }
+	public String getSplitSeparatorRegexp() {
+		return splitSeparatorRegexp;
+	}
+
+	/**
+	 * Sets the split separator that is used to slice the input string into a
+	 * parts. The value is a regular expression so you can strip away extra
+	 * spaces. The default value is "\\s*,\\s*".
+	 *
+	 * @param splitSeparatorRegexp the split separator
+	 */
+	public void setSplitSeparatorRegexp(String splitSeparatorRegexp) {
+		this.splitSeparatorRegexp = splitSeparatorRegexp;
+	}
 
 }

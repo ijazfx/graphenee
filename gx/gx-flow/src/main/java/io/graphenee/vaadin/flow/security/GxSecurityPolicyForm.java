@@ -7,6 +7,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.flowingcode.vaadin.addons.twincolgrid.TwinColGrid;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
@@ -26,10 +30,6 @@ import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouteData;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;
@@ -489,6 +489,11 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
             securityPolicyDocumentComboBox.setValue(entity.getDefaultSecurityPolicyDocumentBean());
             jsonDocumentTextArea.setValue(entity.getDefaultSecurityPolicyDocumentBean().getDocumentJson());
         }
+    }
+
+    @Override
+    protected String dialogWidth() {
+        return "800px";
     }
 
 }

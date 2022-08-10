@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @param <T> the type of bean for which the icon is to be generated
  */
 public interface IconGenerator<T> extends Serializable {
-	
+
 	public Resource getIcon(T option);
-	
+
 }

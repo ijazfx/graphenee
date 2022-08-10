@@ -1,16 +1,22 @@
 package io.graphenee.workshop;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
+import java.io.File;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.graphenee.core.GrapheneeCoreConfiguration;
+import io.graphenee.util.storage.FileStorage;
+import io.graphenee.util.storage.FileStorageFactory;
 
 @Configuration
-@ComponentScan(basePackages = { "io.graphenee", "io.graphenee.workshop" })
 public class FlowApplicationConfiguration {
 
-    @Autowired
-    GrapheneeCoreConfiguration graphenee;
+	@Bean
+	FileStorage fileStorage() {
+		String homeFolder = System.getProperty("user.home");
+		File rootFolder = new File(homeFolder + File.separator + ".gx-workshop-flow");
+		FileStorage storage = FileStorageFactory.createLocalFileStorage(rootFolder);
+		return storage;
+	}
 
 }

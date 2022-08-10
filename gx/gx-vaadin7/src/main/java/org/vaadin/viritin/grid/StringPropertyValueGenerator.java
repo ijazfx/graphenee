@@ -11,17 +11,17 @@ import org.vaadin.viritin.ListContainer;
  */
 public class StringPropertyValueGenerator<M> extends TypedPropertyValueGenerator<M, String> {
 
-    public StringPropertyValueGenerator(Class<M> modelType, ValueGenerator<M> valueGenerator) {
-        super(modelType, String.class, valueGenerator);
-    }
+	public StringPropertyValueGenerator(Class<M> modelType, ValueGenerator<M> valueGenerator) {
+		super(modelType, String.class, valueGenerator);
+	}
 
-    @Override
-    public String getValue(Item item, Object itemId, Object propertyId) {
-        return valueGenerator.getValue((M) ((ListContainer.DynaBeanItem) item).getBean());
-    }
+	@Override
+	public String getValue(Item item, Object itemId, Object propertyId) {
+		return valueGenerator.getValue((M) ((ListContainer.DynaBeanItem) item).getBean());
+	}
 
-    public interface ValueGenerator<M> extends TypedPropertyValueGenerator.ValueGenerator<M, String> {
-        @Override
-        String getValue(M bean);
-    }
+	public interface ValueGenerator<M> extends TypedPropertyValueGenerator.ValueGenerator<M, String> {
+		@Override
+		String getValue(M bean);
+	}
 }

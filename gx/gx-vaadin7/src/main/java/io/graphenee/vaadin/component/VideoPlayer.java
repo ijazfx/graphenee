@@ -15,9 +15,9 @@ import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 // @JavaScript({ "https://cdn.plyr.io/3.6.2/plyr.polyfilled.js" })
 // @StyleSheet({ "https://cdn.plyr.io/3.6.2/plyr.css" })
 public class VideoPlayer extends MVerticalLayout {
-	
+
 	String playerId = "player_" + UUID.randomUUID().toString().replace("-", "");
-	
+
 	public VideoPlayer() {
 		MLabel html = new MLabel().withContentMode(ContentMode.HTML).withStyleName(GrapheneeTheme.STYLE_DISPLAY_INLINE);
 

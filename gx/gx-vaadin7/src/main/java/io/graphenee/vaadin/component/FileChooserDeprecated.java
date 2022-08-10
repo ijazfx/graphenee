@@ -54,359 +54,359 @@ import server.droporchoose.UploadComponent;
 
 public class FileChooserDeprecated extends CustomField<String> {
 
-    public static final Logger L = LoggerFactory.getLogger(FileChooserDeprecated.class);
+	public static final Logger L = LoggerFactory.getLogger(FileChooserDeprecated.class);
 
-    private static final long serialVersionUID = 1L;
-    private Image previewImage;
-    private UploadComponent uploadComponent;
-    private FileStorage storage;
-    private String componentHeight;
-    private String componentWidth;
-    private MLabel progressBar;
-    private String uploadedFilePath;
-    private String uploadedFileName;
-    private Function<String, String> fileNameTranslator;
-    private String rootFolder;
-    private MButton deleteButton;
-    private FileDownloader fileDownloader;
+	private static final long serialVersionUID = 1L;
+	private Image previewImage;
+	private UploadComponent uploadComponent;
+	private FileStorage storage;
+	private String componentHeight;
+	private String componentWidth;
+	private MLabel progressBar;
+	private String uploadedFilePath;
+	private String uploadedFileName;
+	private Function<String, String> fileNameTranslator;
+	private String rootFolder;
+	private MButton deleteButton;
+	private FileDownloader fileDownloader;
 
-    private MHorizontalLayout imageLayout;
+	private MHorizontalLayout imageLayout;
 
-    public String getUploadedFilePath() {
-        return uploadedFilePath;
-    }
+	public String getUploadedFilePath() {
+		return uploadedFilePath;
+	}
 
-    public String getUploadedFileName() {
-        return uploadedFileName;
-    }
+	public String getUploadedFileName() {
+		return uploadedFileName;
+	}
 
-    public FileChooserDeprecated() {
-        this(null);
-    }
+	public FileChooserDeprecated() {
+		this(null);
+	}
 
-    public FileChooserDeprecated(String caption) {
-        this(caption, (fileName) -> {
-            return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(fileName);
-        });
-    }
+	public FileChooserDeprecated(String caption) {
+		this(caption, (fileName) -> {
+			return UUID.randomUUID().toString() + "." + FilenameUtils.getExtension(fileName);
+		});
+	}
 
-    public FileChooserDeprecated(String caption, Function<String, String> fileNameTranslator) {
-        setCaption(caption);
-        this.fileNameTranslator = fileNameTranslator;
-        componentHeight = "-1px";
-        componentWidth = "-1px";
-    }
+	public FileChooserDeprecated(String caption, Function<String, String> fileNameTranslator) {
+		setCaption(caption);
+		this.fileNameTranslator = fileNameTranslator;
+		componentHeight = "-1px";
+		componentWidth = "-1px";
+	}
 
-    public void setStorage(FileStorage storage) {
-        this.storage = storage;
-    }
+	public void setStorage(FileStorage storage) {
+		this.storage = storage;
+	}
 
-    public void setFileNameTranslator(Function<String, String> fileNameTranslator) {
-        this.fileNameTranslator = fileNameTranslator;
-    }
+	public void setFileNameTranslator(Function<String, String> fileNameTranslator) {
+		this.fileNameTranslator = fileNameTranslator;
+	}
 
-    public String getRootFolder() {
-        return rootFolder;
-    }
+	public String getRootFolder() {
+		return rootFolder;
+	}
 
-    public void setRootFolder(String rootFolder) {
-        this.rootFolder = rootFolder;
-        fireValueChange(true);
-    }
+	public void setRootFolder(String rootFolder) {
+		this.rootFolder = rootFolder;
+		fireValueChange(true);
+	}
 
-    private void preview(String filePath) {
-        String mimeType = TRFileContentUtil.getMimeType(filePath);
-        String extension = TRFileContentUtil.getExtensionFromFilename(filePath);
-        if (mimeType.startsWith("image/") || extension.matches("(pdf)")) {
-            File file = new File(filePath);
-            Resource resource = null;
-            if (file.exists()) {
-                resource = new FileResource(file);
-            } else {
-                try {
-                    String resourcePath = storage.resourcePath(getRootFolder(), filePath);
-                    InputStream inputStream = storage.resolve(resourcePath);
-                    InputStreamSource source = new InputStreamSource(inputStream);
-                    resource = new StreamResource(source, UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
-                        @Override
-                        public String getMIMEType() {
-                            String mimeType = FileTypeResolver.getMIMEType(filePath);
-                            if (mimeType != null) {
-                                return mimeType;
-                            }
-                            return super.getMIMEType();
-                        }
-                    };
-                } catch (ResolveFailedException e) {
-                    resource = null;
-                }
-            }
-            if (fileDownloader == null) {
-                ResourcePreviewPanel previewPanel = new ResourcePreviewPanel();
-                previewPanel.build();
-                previewPanel.preview(resource);
-            }
-        }
-    }
+	private void preview(String filePath) {
+		String mimeType = TRFileContentUtil.getMimeType(filePath);
+		String extension = TRFileContentUtil.getExtensionFromFilename(filePath);
+		if (mimeType.startsWith("image/") || extension.matches("(pdf)")) {
+			File file = new File(filePath);
+			Resource resource = null;
+			if (file.exists()) {
+				resource = new FileResource(file);
+			} else {
+				try {
+					String resourcePath = storage.resourcePath(getRootFolder(), filePath);
+					InputStream inputStream = storage.resolve(resourcePath);
+					InputStreamSource source = new InputStreamSource(inputStream);
+					resource = new StreamResource(source, UUID.randomUUID().toString() + "." + TRFileContentUtil.getExtensionFromFilename(filePath)) {
+						@Override
+						public String getMIMEType() {
+							String mimeType = FileTypeResolver.getMIMEType(filePath);
+							if (mimeType != null) {
+								return mimeType;
+							}
+							return super.getMIMEType();
+						}
+					};
+				} catch (ResolveFailedException e) {
+					resource = null;
+				}
+			}
+			if (fileDownloader == null) {
+				ResourcePreviewPanel previewPanel = new ResourcePreviewPanel();
+				previewPanel.build();
+				previewPanel.preview(resource);
+			}
+		}
+	}
 
-    private void uploadReceived(String receivedFileName, Path receivedFilePath) {
-        UI.getCurrent().access(() -> {
-            // float value = (float) readBytes / contentLength;
-            progressBar.setValue("Processing file, please wait!");
-            UI.getCurrent().push();
-        });
-        // String desiredFileName = fileNameTranslator != null ? fileNameTranslator.apply(receivedFileName)
-        // 		: receivedFileName;
+	private void uploadReceived(String receivedFileName, Path receivedFilePath) {
+		UI.getCurrent().access(() -> {
+			// float value = (float) readBytes / contentLength;
+			progressBar.setValue("Processing file, please wait!");
+			UI.getCurrent().push();
+		});
+		// String desiredFileName = fileNameTranslator != null ? fileNameTranslator.apply(receivedFileName)
+		// 		: receivedFileName;
 
-        // determine type of received file to apply conversion.
-        String mimeType = TRFileContentUtil.getMimeType(receivedFileName);
-        String ext = TRFileContentUtil.getExtensionFromFilename(receivedFileName);
-        String storageFileName = UUID.randomUUID().toString() + "." + ext;
+		// determine type of received file to apply conversion.
+		String mimeType = TRFileContentUtil.getMimeType(receivedFileName);
+		String ext = TRFileContentUtil.getExtensionFromFilename(receivedFileName);
+		String storageFileName = UUID.randomUUID().toString() + "." + ext;
 
-        String desiredFileName = receivedFileName;
-        File receivedFile = receivedFilePath.toFile();
-        File newFile = new File(receivedFile.getParent(), storageFileName);
-        receivedFile.renameTo(newFile);
-        receivedFile = newFile;
-        uploadedFilePath = receivedFile.getAbsolutePath();
-        uploadedFileName = desiredFileName;
+		String desiredFileName = receivedFileName;
+		File receivedFile = receivedFilePath.toFile();
+		File newFile = new File(receivedFile.getParent(), storageFileName);
+		receivedFile.renameTo(newFile);
+		receivedFile = newFile;
+		uploadedFilePath = receivedFile.getAbsolutePath();
+		uploadedFileName = desiredFileName;
 
-        if (mimeType.startsWith("image/")) {
-            try {
-                File convertedFile = new File(receivedFile.getParent(), "resized-" + storageFileName);
-                if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
-                    uploadedFilePath = receivedFile.getAbsolutePath();
-                } else {
-                    uploadedFilePath = convertedFile.getAbsolutePath();
-                }
-            } catch (Exception ex) {
-                uploadedFilePath = receivedFilePath.toString();
-                L.warn("Conversion failed so using original file", ex);
-            }
-        }
+		if (mimeType.startsWith("image/")) {
+			try {
+				File convertedFile = new File(receivedFile.getParent(), "resized-" + storageFileName);
+				if (!TRImageUtil.resizeImage(receivedFile, convertedFile)) {
+					uploadedFilePath = receivedFile.getAbsolutePath();
+				} else {
+					uploadedFilePath = convertedFile.getAbsolutePath();
+				}
+			} catch (Exception ex) {
+				uploadedFilePath = receivedFilePath.toString();
+				L.warn("Conversion failed so using original file", ex);
+			}
+		}
 
-        uploadedFileName = new File(uploadedFilePath).getName();
-        String uploadedFileExtension = TRFileContentUtil.getExtensionFromFilename(uploadedFileName);
-        if (!desiredFileName.endsWith(uploadedFileExtension)) {
-            uploadedFileName = desiredFileName + "." + uploadedFileExtension;
-        } else {
-            uploadedFileName = desiredFileName;
-        }
+		uploadedFileName = new File(uploadedFilePath).getName();
+		String uploadedFileExtension = TRFileContentUtil.getExtensionFromFilename(uploadedFileName);
+		if (!desiredFileName.endsWith(uploadedFileExtension)) {
+			uploadedFileName = desiredFileName + "." + uploadedFileExtension;
+		} else {
+			uploadedFileName = desiredFileName;
+		}
 
-        setValue(uploadedFilePath);
+		setValue(uploadedFilePath);
 
-        UI.getCurrent().access(() -> {
-            String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
-            if (extension != null)
-                extension = extension.toLowerCase();
-            Resource resource = null;
-            if (!mimeType.startsWith("image/")) {
-                previewImage.setHeight("32px");
-                previewImage.setWidth("32px");
-                resource = GrapheneeTheme.fileExtensionIconResource(extension);
-                if (resource == null)
-                    resource = GrapheneeTheme.fileExtensionIconResource("bin");
-            } else {
-                previewImage.setWidth("100px");
-                previewImage.setHeightUndefined();
-                try {
-                    InputStream inputStream = new FileInputStream(uploadedFilePath);
-                    StreamSource source = new InputStreamSource(inputStream);
-                    resource = new StreamResource(source, UUID.randomUUID().toString());
-                } catch (FileNotFoundException e) {
-                    resource = null;
-                }
-            }
-            previewImage.setSource(resource);
-            previewImage.markAsDirty();
-            progressBar.setVisible(false);
-            previewImage.setVisible(true);
-            UI.getCurrent().push();
-        });
-    }
+		UI.getCurrent().access(() -> {
+			String extension = TRFileContentUtil.getExtensionFromFilename(uploadedFilePath);
+			if (extension != null)
+				extension = extension.toLowerCase();
+			Resource resource = null;
+			if (!mimeType.startsWith("image/")) {
+				previewImage.setHeight("32px");
+				previewImage.setWidth("32px");
+				resource = GrapheneeTheme.fileExtensionIconResource(extension);
+				if (resource == null)
+					resource = GrapheneeTheme.fileExtensionIconResource("bin");
+			} else {
+				previewImage.setWidth("100px");
+				previewImage.setHeightUndefined();
+				try {
+					InputStream inputStream = new FileInputStream(uploadedFilePath);
+					StreamSource source = new InputStreamSource(inputStream);
+					resource = new StreamResource(source, UUID.randomUUID().toString());
+				} catch (FileNotFoundException e) {
+					resource = null;
+				}
+			}
+			previewImage.setSource(resource);
+			previewImage.markAsDirty();
+			progressBar.setVisible(false);
+			previewImage.setVisible(true);
+			UI.getCurrent().push();
+		});
+	}
 
-    private void uploadStarted(String fileName) {
-        UI.getCurrent().access(() -> {
-            uploadComponent.setVisible(false);
-            imageLayout.setVisible(true);
-            previewImage.setVisible(false);
-            progressBar.setValue("N/A");
-            progressBar.setVisible(true);
-            UI.getCurrent().push();
-        });
-    }
+	private void uploadStarted(String fileName) {
+		UI.getCurrent().access(() -> {
+			uploadComponent.setVisible(false);
+			imageLayout.setVisible(true);
+			previewImage.setVisible(false);
+			progressBar.setValue("N/A");
+			progressBar.setVisible(true);
+			UI.getCurrent().push();
+		});
+	}
 
-    private void uploadProgress(String fileName, long readBytes, long contentLength) {
-        UI.getCurrent().access(() -> {
-            // float value = (float) readBytes / contentLength;
-            progressBar.setValue(readBytes + " / " + contentLength + " bytes uploaded.");
-            UI.getCurrent().push();
-        });
-    }
+	private void uploadProgress(String fileName, long readBytes, long contentLength) {
+		UI.getCurrent().access(() -> {
+			// float value = (float) readBytes / contentLength;
+			progressBar.setValue(readBytes + " / " + contentLength + " bytes uploaded.");
+			UI.getCurrent().push();
+		});
+	}
 
-    private void uploadFailed(String fileName, Path file) {
-        UI.getCurrent().access(() -> {
-            uploadComponent.setVisible(true);
-            imageLayout.setVisible(false);
-            progressBar.setVisible(false);
-            previewImage.setVisible(true);
-            UI.getCurrent().push();
-        });
-    }
+	private void uploadFailed(String fileName, Path file) {
+		UI.getCurrent().access(() -> {
+			uploadComponent.setVisible(true);
+			imageLayout.setVisible(false);
+			progressBar.setVisible(false);
+			previewImage.setVisible(true);
+			UI.getCurrent().push();
+		});
+	}
 
-    public void setComponentHeight(String height) {
-        componentHeight = height;
-    }
+	public void setComponentHeight(String height) {
+		componentHeight = height;
+	}
 
-    public void setComponentWidth(String width) {
-        componentWidth = width;
-        if (uploadComponent != null)
-            uploadComponent.setWidth(width);
-    }
+	public void setComponentWidth(String width) {
+		componentWidth = width;
+		if (uploadComponent != null)
+			uploadComponent.setWidth(width);
+	}
 
-    @Override
-    protected Component initContent() {
-        MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withWidthUndefined();
-        imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-        imageLayout.setHeight(componentHeight);
-        progressBar = new MLabel("Progress");
-        // progressBar.setIndeterminate(false);
-        previewImage = new Image();
-        // previewImage.setHeight("32px");
-        previewImage.setSource(GrapheneeTheme.UPLOAD_ICON);
-        previewImage.addClickListener(event -> {
-            String value = getValue();
-            if (value != null) {
-                preview(value);
-            }
-        });
-        imageLayout.addComponent(progressBar);
-        // MVerticalLayout imageContainer1 = new
-        // MVerticalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER)
-        // .withWidth(componentHeight).withHeight(componentHeight);
-        // imageContainer.addComponent(previewImage);
-        // imageLayout.addComponent(imageContainer);
-        imageLayout.addComponent(previewImage);
+	@Override
+	protected Component initContent() {
+		MHorizontalLayout layout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.TOP_LEFT).withWidthUndefined();
+		imageLayout = new MHorizontalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+		imageLayout.setHeight(componentHeight);
+		progressBar = new MLabel("Progress");
+		// progressBar.setIndeterminate(false);
+		previewImage = new Image();
+		// previewImage.setHeight("32px");
+		previewImage.setSource(GrapheneeTheme.UPLOAD_ICON);
+		previewImage.addClickListener(event -> {
+			String value = getValue();
+			if (value != null) {
+				preview(value);
+			}
+		});
+		imageLayout.addComponent(progressBar);
+		// MVerticalLayout imageContainer1 = new
+		// MVerticalLayout().withDefaultComponentAlignment(Alignment.MIDDLE_CENTER)
+		// .withWidth(componentHeight).withHeight(componentHeight);
+		// imageContainer.addComponent(previewImage);
+		// imageLayout.addComponent(imageContainer);
+		imageLayout.addComponent(previewImage);
 
-        progressBar.setVisible(false);
-        uploadComponent = new UploadComponent();
-        uploadComponent.getChoose().setButtonCaption("Choose a file");
-        uploadComponent.setWidth(componentWidth);
-        uploadComponent.setHeight(componentHeight);
-        uploadComponent.setStyleName("dropBoxLayout");
+		progressBar.setVisible(false);
+		uploadComponent = new UploadComponent();
+		uploadComponent.getChoose().setButtonCaption("Choose a file");
+		uploadComponent.setWidth(componentWidth);
+		uploadComponent.setHeight(componentHeight);
+		uploadComponent.setStyleName("dropBoxLayout");
 
-        uploadComponent.setReceivedCallback(this::uploadReceived);
-        uploadComponent.setStartedCallback(this::uploadStarted);
-        uploadComponent.setProgressCallback(this::uploadProgress);
-        uploadComponent.setFailedCallback(this::uploadFailed);
+		uploadComponent.setReceivedCallback(this::uploadReceived);
+		uploadComponent.setStartedCallback(this::uploadStarted);
+		uploadComponent.setProgressCallback(this::uploadProgress);
+		uploadComponent.setFailedCallback(this::uploadFailed);
 
-        deleteButton = new MButton(FontAwesome.CLOSE).withListener(event -> {
-            setValue(null);
-        }).withStyleName(ValoTheme.BUTTON_SMALL, ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_QUIET);
+		deleteButton = new MButton(FontAwesome.CLOSE).withListener(event -> {
+			setValue(null);
+		}).withStyleName(ValoTheme.BUTTON_SMALL, ValoTheme.BUTTON_ICON_ONLY, ValoTheme.BUTTON_QUIET);
 
-        imageLayout.addComponent(deleteButton);
-        imageLayout.setComponentAlignment(deleteButton, Alignment.BOTTOM_RIGHT);
-        imageLayout.setExpandRatio(deleteButton, 1);
+		imageLayout.addComponent(deleteButton);
+		imageLayout.setComponentAlignment(deleteButton, Alignment.BOTTOM_RIGHT);
+		imageLayout.setExpandRatio(deleteButton, 1);
 
-        addValueChangeListener(event -> {
-            renderComponent();
-        });
+		addValueChangeListener(event -> {
+			renderComponent();
+		});
 
-        layout.addComponents(uploadComponent, imageLayout);
+		layout.addComponents(uploadComponent, imageLayout);
 
-        uploadComponent.setVisible(false);
-        imageLayout.setVisible(false);
+		uploadComponent.setVisible(false);
+		imageLayout.setVisible(false);
 
-        // fireValueChange(true);
-        renderComponent();
+		// fireValueChange(true);
+		renderComponent();
 
-        return layout;
-    }
+		return layout;
+	}
 
-    private void renderComponent() {
-        if (previewImage != null) {
-            if (fileDownloader != null) {
-                previewImage.removeExtension(fileDownloader);
-                fileDownloader = null;
-            }
-            previewImage.markAsDirtyRecursive();
-            String fileName = getValue();
-            Resource resource = null;
-            if (fileName != null) {
-                String mimeType = TRFileContentUtil.getMimeType(fileName);
-                String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
-                if (!mimeType.startsWith("image/")) {
-                    resource = GrapheneeTheme.fileExtensionIconResource(extension);
-                    if (mimeType.startsWith("audio"))
-                        resource = GrapheneeTheme.fileExtensionIconResource("audio");
-                    if (mimeType.startsWith("video"))
-                        resource = GrapheneeTheme.fileExtensionIconResource("video");
-                    if (resource == null)
-                        resource = GrapheneeTheme.fileExtensionIconResource("bin");
-                    previewImage.setHeight("32px");
-                    previewImage.setWidth("32px");
-                    previewImage.setSource(resource);
-                } else {
-                    File file = new File(fileName);
-                    if (file.isFile() && file.exists()) {
-                        resource = new FileResource(file);
-                    } else {
-                        try {
-                            String resourcePath = storage.resourcePath(getRootFolder(), fileName);
-                            InputStream inputStream = storage.resolve(resourcePath);
-                            InputStreamSource isr = new InputStreamSource(inputStream);
-                            resource = new StreamResource(isr, fileName);
-                        } catch (ResolveFailedException e1) {
-                            resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
-                        }
-                    }
-                    previewImage.setWidth("100px");
-                    previewImage.setHeightUndefined();
-                    previewImage.setSource(resource);
-                }
+	private void renderComponent() {
+		if (previewImage != null) {
+			if (fileDownloader != null) {
+				previewImage.removeExtension(fileDownloader);
+				fileDownloader = null;
+			}
+			previewImage.markAsDirtyRecursive();
+			String fileName = getValue();
+			Resource resource = null;
+			if (fileName != null) {
+				String mimeType = TRFileContentUtil.getMimeType(fileName);
+				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
+				if (!mimeType.startsWith("image/")) {
+					resource = GrapheneeTheme.fileExtensionIconResource(extension);
+					if (mimeType.startsWith("audio"))
+						resource = GrapheneeTheme.fileExtensionIconResource("audio");
+					if (mimeType.startsWith("video"))
+						resource = GrapheneeTheme.fileExtensionIconResource("video");
+					if (resource == null)
+						resource = GrapheneeTheme.fileExtensionIconResource("bin");
+					previewImage.setHeight("32px");
+					previewImage.setWidth("32px");
+					previewImage.setSource(resource);
+				} else {
+					File file = new File(fileName);
+					if (file.isFile() && file.exists()) {
+						resource = new FileResource(file);
+					} else {
+						try {
+							String resourcePath = storage.resourcePath(getRootFolder(), fileName);
+							InputStream inputStream = storage.resolve(resourcePath);
+							InputStreamSource isr = new InputStreamSource(inputStream);
+							resource = new StreamResource(isr, fileName);
+						} catch (ResolveFailedException e1) {
+							resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
+						}
+					}
+					previewImage.setWidth("100px");
+					previewImage.setHeightUndefined();
+					previewImage.setSource(resource);
+				}
 
-                if (!mimeType.startsWith("image/") && !extension.matches("(pdf)")) {
-                    try {
-                        File file = new File(fileName);
-                        if (file.isFile() && file.exists()) {
-                            Resource downloadResource = new FileResource(file);
-                            if (fileDownloader == null) {
-                                fileDownloader = new FileDownloader(downloadResource);
-                                fileDownloader.extend(previewImage);
-                            }
-                        } else {
-                            String resourcePath = storage.resourcePath(getRootFolder(), fileName);
-                            InputStream inputStream = storage.resolve(resourcePath);
-                            InputStreamSource isr = new InputStreamSource(inputStream);
-                            Resource downloadResource = new StreamResource(isr, fileName);
-                            if (fileDownloader == null) {
-                                fileDownloader = new FileDownloader(downloadResource);
-                                fileDownloader.extend(previewImage);
-                            }
-                        }
-                    } catch (ResolveFailedException e1) {
-                        resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
-                    }
-                }
+				if (!mimeType.startsWith("image/") && !extension.matches("(pdf)")) {
+					try {
+						File file = new File(fileName);
+						if (file.isFile() && file.exists()) {
+							Resource downloadResource = new FileResource(file);
+							if (fileDownloader == null) {
+								fileDownloader = new FileDownloader(downloadResource);
+								fileDownloader.extend(previewImage);
+							}
+						} else {
+							String resourcePath = storage.resourcePath(getRootFolder(), fileName);
+							InputStream inputStream = storage.resolve(resourcePath);
+							InputStreamSource isr = new InputStreamSource(inputStream);
+							Resource downloadResource = new StreamResource(isr, fileName);
+							if (fileDownloader == null) {
+								fileDownloader = new FileDownloader(downloadResource);
+								fileDownloader.extend(previewImage);
+							}
+						}
+					} catch (ResolveFailedException e1) {
+						resource = GrapheneeTheme.IMAGE_NOT_AVAILBLE;
+					}
+				}
 
-                uploadComponent.setVisible(false);
-                imageLayout.setVisible(true);
-            } else {
-                imageLayout.setVisible(false);
-                uploadComponent.setVisible(true);
-            }
-        }
-    }
+				uploadComponent.setVisible(false);
+				imageLayout.setVisible(true);
+			} else {
+				imageLayout.setVisible(false);
+				uploadComponent.setVisible(true);
+			}
+		}
+	}
 
-    @Override
-    public void setReadOnly(boolean readOnly) {
-        if (deleteButton != null)
-            deleteButton.setVisible(!readOnly);
-    }
+	@Override
+	public void setReadOnly(boolean readOnly) {
+		if (deleteButton != null)
+			deleteButton.setVisible(!readOnly);
+	}
 
-    @Override
-    public Class<? extends String> getType() {
-        return String.class;
-    }
+	@Override
+	public Class<? extends String> getType() {
+		return String.class;
+	}
 
 }

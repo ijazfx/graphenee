@@ -22,6 +22,6 @@ package io.graphenee.util.callback;
  */
 public interface TRVoidCallback {
 
-    void execute();
+	void execute();
 
 }

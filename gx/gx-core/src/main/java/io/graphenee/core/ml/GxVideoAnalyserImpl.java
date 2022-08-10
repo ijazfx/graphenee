@@ -14,70 +14,70 @@ import io.graphenee.util.callback.TRParamCallback;
 @Service
 public class GxVideoAnalyserImpl implements GxVideoAnalyser {
 
-    @Override
-    public String analyse(GxAreaPatternCode areaCode, String mediaFilePath, String jsonFilePath) throws Exception {
-        Integer lineCount = 0;
-        String areaFlag = " -c " + areaCode.getCountryCode();
-        //		areaFlag += " -p " + areaCode.getCountryCode();
+	@Override
+	public String analyse(GxAreaPatternCode areaCode, String mediaFilePath, String jsonFilePath) throws Exception {
+		Integer lineCount = 0;
+		String areaFlag = " -c " + areaCode.getCountryCode();
+		//		areaFlag += " -p " + areaCode.getCountryCode();
 
-        FileWriter myWriter = new FileWriter(jsonFilePath);
-        ProcessBuilder pb = new ProcessBuilder("echo");
+		FileWriter myWriter = new FileWriter(jsonFilePath);
+		ProcessBuilder pb = new ProcessBuilder("echo");
 
-        String cmd = "alpr --motion " + mediaFilePath + areaFlag + " -j";
-        String[] command = new String[] { "bash", "-l", "-c", cmd };
-        pb = new ProcessBuilder(command);
+		String cmd = "alpr --motion " + mediaFilePath + areaFlag + " -j";
+		String[] command = new String[] { "bash", "-l", "-c", cmd };
+		pb = new ProcessBuilder(command);
 
-        myWriter.write("[");
+		myWriter.write("[");
 
-        Process pr = pb.start();
+		Process pr = pb.start();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (lineCount != 0)
-                myWriter.write("," + line);
-            else
-                myWriter.write(line);
-            lineCount++;
-        }
-        myWriter.write("]");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+		String line;
+		while ((line = reader.readLine()) != null) {
+			if (lineCount != 0)
+				myWriter.write("," + line);
+			else
+				myWriter.write(line);
+			lineCount++;
+		}
+		myWriter.write("]");
 
-        myWriter.close();
-        reader.close();
-        pr.waitFor();
-        return jsonFilePath;
-    }
+		myWriter.close();
+		reader.close();
+		pr.waitFor();
+		return jsonFilePath;
+	}
 
-    @Override
-    public void analyseAsync(GxAreaPatternCode areaCode, String mediaFilePath, TRParamCallback<String> jsonCallback, TRErrorCallback errorCallback) {
-        String areaFlag = " -c " + areaCode.getCountryCode();
-        //		areaFlag += " -p " + areaCode.getCountryCode();
+	@Override
+	public void analyseAsync(GxAreaPatternCode areaCode, String mediaFilePath, TRParamCallback<String> jsonCallback, TRErrorCallback errorCallback) {
+		String areaFlag = " -c " + areaCode.getCountryCode();
+		//		areaFlag += " -p " + areaCode.getCountryCode();
 
-        ProcessBuilder pb = new ProcessBuilder("echo");
+		ProcessBuilder pb = new ProcessBuilder("echo");
 
-        String cmd = "alpr --motion " + mediaFilePath + areaFlag + " -j";
-        String[] command = new String[] { "bash", "-l", "-c", cmd };
-        pb = new ProcessBuilder(command);
+		String cmd = "alpr --motion " + mediaFilePath + areaFlag + " -j";
+		String[] command = new String[] { "bash", "-l", "-c", cmd };
+		pb = new ProcessBuilder(command);
 
-        Process pr;
-        try {
-            pr = pb.start();
+		Process pr;
+		try {
+			pr = pb.start();
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            String line;
-            try {
-                while ((line = reader.readLine()) != null) {
-                    jsonCallback.execute(line);
-                }
-            } catch (IOException e) {
-                errorCallback.execute(e);
-            }
+			BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+			String line;
+			try {
+				while ((line = reader.readLine()) != null) {
+					jsonCallback.execute(line);
+				}
+			} catch (IOException e) {
+				errorCallback.execute(e);
+			}
 
-            reader.close();
-            pr.waitFor();
-        } catch (Exception e) {
-            errorCallback.execute(e);
-        }
-    }
+			reader.close();
+			pr.waitFor();
+		} catch (Exception e) {
+			errorCallback.execute(e);
+		}
+	}
 
 }

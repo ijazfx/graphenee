@@ -18,23 +18,23 @@ package io.graphenee.util.storage;
 @SuppressWarnings("serial")
 public class ResolveFailedException extends Exception {
 
-    public ResolveFailedException() {
-    }
+	public ResolveFailedException() {
+	}
 
-    public ResolveFailedException(String message) {
-        super(message);
-    }
+	public ResolveFailedException(String message) {
+		super(message);
+	}
 
-    public ResolveFailedException(Throwable cause) {
-        super(cause);
-    }
+	public ResolveFailedException(Throwable cause) {
+		super(cause);
+	}
 
-    public ResolveFailedException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ResolveFailedException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public ResolveFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
+	public ResolveFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+	}
 
 }

@@ -16,12 +16,12 @@ import java.util.Locale;
  */
 @SuppressWarnings("serial")
 public class LocaleSelect extends TypedSelect<Locale> {
-    public LocaleSelect() {
-        setCaptionGenerator(new CaptionGenerator<Locale>() {
-            @Override
-            public String getCaption(Locale option) {
-                return option.getDisplayName(option);
-            }
-        });
-    }
+	public LocaleSelect() {
+		setCaptionGenerator(new CaptionGenerator<Locale>() {
+			@Override
+			public String getCaption(Locale option) {
+				return option.getDisplayName(option);
+			}
+		});
+	}
 }

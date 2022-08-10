@@ -25,6 +25,6 @@ import java.io.Serializable;
  */
 public interface MValueChangeListener<T> extends Serializable {
 
-    public void valueChange(MValueChangeEvent<T> event);
-    
+	public void valueChange(MValueChangeEvent<T> event);
+
 }

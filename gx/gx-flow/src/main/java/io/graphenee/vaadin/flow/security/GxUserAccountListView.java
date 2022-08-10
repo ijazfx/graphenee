@@ -11,29 +11,29 @@ import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
 @GxSecuredView(GxUserAccountListView.VIEW_NAME)
 public class GxUserAccountListView extends GxVerticalLayoutView {
-    public static final String VIEW_NAME = "user-accounts";
+	public static final String VIEW_NAME = "user-accounts";
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Autowired
-    GxUserAccountList list;
+	@Autowired
+	GxUserAccountList list;
 
-    @Autowired(required = false)
-    GxNamespaceBean namespace;
+	@Autowired(required = false)
+	GxNamespaceBean namespace;
 
-    @Override
-    protected void decorateLayout(HasComponents rootLayout) {
-        rootLayout.add(list);
-    }
+	@Override
+	protected void decorateLayout(HasComponents rootLayout) {
+		rootLayout.add(list);
+	}
 
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-        list.initializeWithNamespace(namespace);
-    }
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		list.initializeWithNamespace(namespace);
+	}
 
-    @Override
-    protected String getCaption() {
-        return "User Accounts";
-    }
+	@Override
+	protected String getCaption() {
+		return "User Accounts";
+	}
 
 }

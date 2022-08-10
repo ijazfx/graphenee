@@ -22,29 +22,26 @@ import com.vaadin.ui.Field;
 
 public class MValueChangeEventImpl<T> extends AbstractField.ValueChangeEvent implements MValueChangeEvent<T> {
 
-    private static final long serialVersionUID = 7702133432642079889L;
+	private static final long serialVersionUID = 7702133432642079889L;
 
-    static final Method VALUE_CHANGE_METHOD;
+	static final Method VALUE_CHANGE_METHOD;
 
-    static {
-        try {
-            VALUE_CHANGE_METHOD = MValueChangeListener.class
-                    .getDeclaredMethod("valueChange",
-                            new Class[]{MValueChangeEvent.class});
-        } catch (final java.lang.NoSuchMethodException e) {
-            // This should never happen
-            throw new java.lang.RuntimeException(
-                    "Internal error finding methods in MValueChangeEventImpl");
-        }
-    }
+	static {
+		try {
+			VALUE_CHANGE_METHOD = MValueChangeListener.class.getDeclaredMethod("valueChange", new Class[] { MValueChangeEvent.class });
+		} catch (final java.lang.NoSuchMethodException e) {
+			// This should never happen
+			throw new java.lang.RuntimeException("Internal error finding methods in MValueChangeEventImpl");
+		}
+	}
 
-    public MValueChangeEventImpl(Field source) {
-        super(source);
-    }
+	public MValueChangeEventImpl(Field source) {
+		super(source);
+	}
 
-    @Override
-    public T getValue() {
-        return (T) getProperty().getValue();
-    }
+	@Override
+	public T getValue() {
+		return (T) getProperty().getValue();
+	}
 
 }

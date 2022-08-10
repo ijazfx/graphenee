@@ -22,42 +22,42 @@ import java.util.logging.Logger;
  */
 public interface TRHashProvider {
 
-    Logger log = Logger.getLogger(TRHashProvider.class.getName());
+	Logger log = Logger.getLogger(TRHashProvider.class.getName());
 
-    String PASSWORD_PREFIX = "icB";
+	String PASSWORD_PREFIX = "icB";
 
-    /**
-     * Creates a hash of a prefixed string provided a signing key.
-     *
-     * @param prefix - A prefix e.g. icB
-     * @param input - source content
-     * @param signingKey - signing key
-     * @return - generated hash
-     */
-    String createHash(String prefix, String input, String signingKey);
+	/**
+	 * Creates a hash of a prefixed string provided a signing key.
+	 *
+	 * @param prefix - A prefix e.g. icB
+	 * @param input - source content
+	 * @param signingKey - signing key
+	 * @return - generated hash
+	 */
+	String createHash(String prefix, String input, String signingKey);
 
-    /**
-     * Return a password hash of string prefixed by the password prefixed
-     * defined by PASSWORD_PREFIX constant. Signing Key is retrieved from
-     * properties depending on the hashing algorithm.
-     *
-     * @param input - password
-     * @return - generated hash
-     */
-    String createPasswordHash(String input);
+	/**
+	 * Return a password hash of string prefixed by the password prefixed
+	 * defined by PASSWORD_PREFIX constant. Signing Key is retrieved from
+	 * properties depending on the hashing algorithm.
+	 *
+	 * @param input - password
+	 * @return - generated hash
+	 */
+	String createPasswordHash(String input);
 
-    /**
-     * Creates a hash of a non-prefixed string provided a signing key.
-     * properties depending on the hashing algorithm.
-     *
-     * @param input - source content
-     * @param signingKey - signing key
-     * @return - generated hash
-     */
-    String createHash(String input, String signingKey);
+	/**
+	 * Creates a hash of a non-prefixed string provided a signing key.
+	 * properties depending on the hashing algorithm.
+	 *
+	 * @param input - source content
+	 * @param signingKey - signing key
+	 * @return - generated hash
+	 */
+	String createHash(String input, String signingKey);
 
-    boolean checkPasswordHash(String input, String hashed);
+	boolean checkPasswordHash(String input, String hashed);
 
-    String encryption();
+	String encryption();
 
 }

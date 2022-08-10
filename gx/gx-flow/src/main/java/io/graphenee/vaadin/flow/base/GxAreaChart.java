@@ -20,16 +20,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class GxAreaChart extends VerticalLayout {
 
-    private static final long serialVersionUID = 1L;
-    private ApexCharts areaChart;
+	private static final long serialVersionUID = 1L;
+	private ApexCharts areaChart;
 
-    public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
-        areaChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.area).withZoom(ZoomBuilder.get().withEnabled(false).build()).build())
-                .withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withStroke(StrokeBuilder.get().withCurve(Curve.straight).build()).withSeries(series)
-                .withSubtitle(TitleSubtitleBuilder.get().withAlign(Align.left).build()).withLabels(xAxisLabel).withXaxis(XAxisBuilder.get().withType(XAxisType.categories).build())
-                .withYaxis(YAxisBuilder.get().withOpposite(true).build()).withLegend(LegendBuilder.get().withHorizontalAlign(HorizontalAlign.left).build()).build();
-        removeAll();
-        add(areaChart);
-        areaChart.setWidth("100%");
-    }
+	public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
+		areaChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.area).withZoom(ZoomBuilder.get().withEnabled(false).build()).build())
+				.withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withStroke(StrokeBuilder.get().withCurve(Curve.straight).build()).withSeries(series)
+				.withSubtitle(TitleSubtitleBuilder.get().withAlign(Align.left).build()).withLabels(xAxisLabel).withXaxis(XAxisBuilder.get().withType(XAxisType.categories).build())
+				.withYaxis(YAxisBuilder.get().withOpposite(true).build()).withLegend(LegendBuilder.get().withHorizontalAlign(HorizontalAlign.left).build()).build();
+		removeAll();
+		add(areaChart);
+		areaChart.setWidth("100%");
+	}
 }

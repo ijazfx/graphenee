@@ -16,7 +16,7 @@ import io.graphenee.gx.theme.graphenee.GrapheneeTheme;
 public class AudioPlayer extends MVerticalLayout {
 
 	String playerId = "player_" + UUID.randomUUID().toString().replace("-", "");
-	
+
 	public AudioPlayer() {
 		MLabel html = new MLabel().withContentMode(ContentMode.HTML).withStyleName(GrapheneeTheme.STYLE_DISPLAY_INLINE);
 

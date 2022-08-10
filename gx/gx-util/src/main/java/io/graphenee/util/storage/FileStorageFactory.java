@@ -28,74 +28,74 @@ import org.springframework.util.StreamUtils;
 
 public class FileStorageFactory {
 
-    public static FileStorage createLocalFileStorage(File rootFolder) {
-        return new LocalFileStorage(rootFolder);
-    }
+	public static FileStorage createLocalFileStorage(File rootFolder) {
+		return new LocalFileStorage(rootFolder);
+	}
 
-    public static FileStorage createS3FileStorage(String awsKey, String awsSecret, String bucketName) {
-        throw new UnsupportedOperationException("This feature is not yet implemented.");
-    }
+	public static FileStorage createS3FileStorage(String awsKey, String awsSecret, String bucketName) {
+		throw new UnsupportedOperationException("This feature is not yet implemented.");
+	}
 
-    static class LocalFileStorage implements FileStorage {
+	static class LocalFileStorage implements FileStorage {
 
-        private File rootFolder;
+		private File rootFolder;
 
-        public LocalFileStorage(File rootFolder) {
-            this.rootFolder = rootFolder;
-        }
+		public LocalFileStorage(File rootFolder) {
+			this.rootFolder = rootFolder;
+		}
 
-        @Override
-        public URI resolveToURI(String resourcePath) throws ResolveFailedException {
-            File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
-            try {
-                return resource.toURI();
-            } catch (Exception e) {
-                throw new ResolveFailedException("Failed to resolve resource " + resourcePath);
-            }
-        }
+		@Override
+		public URI resolveToURI(String resourcePath) throws ResolveFailedException {
+			File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
+			try {
+				return resource.toURI();
+			} catch (Exception e) {
+				throw new ResolveFailedException("Failed to resolve resource " + resourcePath);
+			}
+		}
 
-        @Override
-        public InputStream resolve(String resourcePath) throws ResolveFailedException {
-            File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
-            try {
-                if (resource.exists() && resource.length() > 0) {
-                    return new FileInputStream(resource);
-                } else {
-                    throw new ResolveFailedException("Failed to resolve resource " + resourcePath);
-                }
-            } catch (FileNotFoundException e) {
-                throw new ResolveFailedException("Failed to resolve resource " + resourcePath, e);
-            }
-        }
+		@Override
+		public InputStream resolve(String resourcePath) throws ResolveFailedException {
+			File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
+			try {
+				if (resource.exists() && resource.length() > 0) {
+					return new FileInputStream(resource);
+				} else {
+					throw new ResolveFailedException("Failed to resolve resource " + resourcePath);
+				}
+			} catch (FileNotFoundException e) {
+				throw new ResolveFailedException("Failed to resolve resource " + resourcePath, e);
+			}
+		}
 
-        @Override
-        public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
-            return Executors.newCachedThreadPool().submit(() -> {
-                String resourcePath = resourcePath(folder, fileName);
-                File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
-                resource.getParentFile().mkdirs();
-                try {
-                    FileOutputStream fout = new FileOutputStream(resource);
-                    StreamUtils.copy(inputStream, fout);
-                    long fileSize = resource.length();
-                    // checksum will be computed in future...
-                    String checksum = null;
-                    FileMetaData fileMetaData = new FileMetaData(resourcePath, fileName, Long.valueOf(fileSize).intValue(), checksum);
-                    return fileMetaData;
-                } catch (Exception e) {
-                    throw new SaveFailedException(e);
-                }
-            });
-        }
+		@Override
+		public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
+			return Executors.newCachedThreadPool().submit(() -> {
+				String resourcePath = resourcePath(folder, fileName);
+				File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
+				resource.getParentFile().mkdirs();
+				try {
+					FileOutputStream fout = new FileOutputStream(resource);
+					StreamUtils.copy(inputStream, fout);
+					long fileSize = resource.length();
+					// checksum will be computed in future...
+					String checksum = null;
+					FileMetaData fileMetaData = new FileMetaData(resourcePath, fileName, Long.valueOf(fileSize).intValue(), checksum);
+					return fileMetaData;
+				} catch (Exception e) {
+					throw new SaveFailedException(e);
+				}
+			});
+		}
 
-        @Override
-        public boolean exists(String resourcePath) {
-            if (resourcePath == null)
-                return false;
-            File file = new File(rootFolder, resourcePath);
-            return file.exists();
-        }
+		@Override
+		public boolean exists(String resourcePath) {
+			if (resourcePath == null)
+				return false;
+			File file = new File(rootFolder, resourcePath);
+			return file.exists();
+		}
 
-    }
+	}
 
 }

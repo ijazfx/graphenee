@@ -32,31 +32,27 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 	private JavaMailSender javaMailSender;
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList,
-			Collection<GxMailAttachment> attachments) throws SendMailFailedException {
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList, Collection<GxMailAttachment> attachments)
+			throws SendMailFailedException {
 		MimeMessage message = javaMailSender.createMimeMessage();
 		MimeMessageHelper mimeMessage;
 		try {
 			mimeMessage = new MimeMessageHelper(message, true);
-			mimeMessage.setSubject(subject);
-			mimeMessage.setText(content);
-			if (toEmailList != null)
-				mimeMessage.setTo(toEmailList);
 			mimeMessage.setFrom(senderEmail);
 			mimeMessage.setSentDate(new Date());
+			mimeMessage.setSubject(subject);
+			mimeMessage.setText(content);
+			if (toEmailList != null) {
+				String[] emails = toEmailList.replaceAll("\\s", "").split("[;,]");
+				mimeMessage.setTo(emails);
+			}
 			if (StringUtils.hasText(ccEmailList)) {
-				if (ccEmailList.contains(";")) {
-					String[] emails = ccEmailList.split(";");
-					mimeMessage.setCc(emails);
-				} else
-					mimeMessage.setCc(ccEmailList);
+				String[] emails = ccEmailList.replaceAll("\\s", "").split("[;,]");
+				mimeMessage.setCc(emails);
 			}
 			if (StringUtils.hasText(bccEmailList)) {
-				if (bccEmailList.contains(";")) {
-					String[] emails = bccEmailList.split(";");
-					mimeMessage.setBcc(emails);
-				} else
-					mimeMessage.setBcc(bccEmailList);
+				String[] emails = bccEmailList.replaceAll("\\s", "").split("[;,]");
+				mimeMessage.setBcc(emails);
 			}
 			if (attachments != null) {
 				for (GxMailAttachment attachment : attachments) {
@@ -71,20 +67,17 @@ public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList)
-			throws SendMailFailedException {
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList, String bccEmailList) throws SendMailFailedException {
 		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, bccEmailList, null);
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList)
-			throws SendMailFailedException {
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList, String ccEmailList) throws SendMailFailedException {
 		sendEmail(subject, content, senderEmail, toEmailList, ccEmailList, null);
 	}
 
 	@Override
-	public void sendEmail(String subject, String content, String senderEmail, String toEmailList)
-			throws SendMailFailedException {
+	public void sendEmail(String subject, String content, String senderEmail, String toEmailList) throws SendMailFailedException {
 		sendEmail(subject, content, senderEmail, toEmailList, null);
 	}
 

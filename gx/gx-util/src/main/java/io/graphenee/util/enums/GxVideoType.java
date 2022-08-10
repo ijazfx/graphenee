@@ -16,50 +16,50 @@
 package io.graphenee.util.enums;
 
 public enum GxVideoType {
-    WEBM_VIDEO("video/webm", "webm"),
-    MP4("video/mp4", "mp4"),
-    M4V("video/m4v", "m4v"),
-    MPEG("video/mpeg", "mpeg"),
-    OGG_VIDEO("video/ogg", "ogg");
+	WEBM_VIDEO("video/webm", "webm"),
+	MP4("video/mp4", "mp4"),
+	M4V("video/m4v", "m4v"),
+	MPEG("video/mpeg", "mpeg"),
+	OGG_VIDEO("video/ogg", "ogg");
 
-    private String mimeType;
+	private String mimeType;
 
-    private String extension;
+	private String extension;
 
-    private GxVideoType(String mimeType, String extension) {
-        this.mimeType = mimeType;
-        this.extension = extension;
-    }
+	private GxVideoType(String mimeType, String extension) {
+		this.mimeType = mimeType;
+		this.extension = extension;
+	}
 
-    public String getMimeType() {
-        return mimeType;
-    }
+	public String getMimeType() {
+		return mimeType;
+	}
 
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
-    }
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
 
-    public String getExtension() {
-        return extension;
-    }
+	public String getExtension() {
+		return extension;
+	}
 
-    public void setExtension(String extension) {
-        this.extension = extension;
-    }
+	public void setExtension(String extension) {
+		this.extension = extension;
+	}
 
-    public static GxVideoType findByMimeType(String mimeType) {
-        if (mimeType == GxVideoType.WEBM_VIDEO.mimeType)
-            return GxVideoType.WEBM_VIDEO;
-        if (mimeType == GxVideoType.MP4.mimeType)
-            return GxVideoType.MP4;
-        if (mimeType == GxVideoType.MPEG.mimeType)
-            return GxVideoType.MPEG;
-        if (mimeType == GxVideoType.M4V.mimeType)
-            return GxVideoType.M4V;
-        if (mimeType == GxVideoType.OGG_VIDEO.mimeType)
-            return GxVideoType.OGG_VIDEO;
+	public static GxVideoType findByMimeType(String mimeType) {
+		if (mimeType.equals(GxVideoType.WEBM_VIDEO.mimeType))
+			return GxVideoType.WEBM_VIDEO;
+		if (mimeType.equals(GxVideoType.MP4.mimeType))
+			return GxVideoType.MP4;
+		if (mimeType.equals(GxVideoType.MPEG.mimeType))
+			return GxVideoType.MPEG;
+		if (mimeType.equals(GxVideoType.M4V.mimeType))
+			return GxVideoType.M4V;
+		if (mimeType.equals(GxVideoType.OGG_VIDEO.mimeType))
+			return GxVideoType.OGG_VIDEO;
 
-        return null;
-    }
+		return null;
+	}
 
 }

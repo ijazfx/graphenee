@@ -22,11 +22,11 @@ package io.graphenee.util.hash.impl;
  */
 public class BasicHashProvider extends AbstractHashProvider {
 
-    public static final String ENCRYPTION = "Basic";
+	public static final String ENCRYPTION = "Basic";
 
-    @Override
-    public String encryption() {
-        return ENCRYPTION;
-    }
+	@Override
+	public String encryption() {
+		return ENCRYPTION;
+	}
 
 }
