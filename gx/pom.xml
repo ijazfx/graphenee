@@ -47,7 +47,7 @@
 		<version.json>20160810</version.json>
 		<version.itextpdf>5.5.12</version.itextpdf>
 		<version.lombok>1.18.12</version.lombok>
-		<version.gson>2.8.6</version.gson>
+		<version.gson>2.8.9</version.gson>
 		<version.pdfbox>3.0.0-RC1</version.pdfbox>
 		<version.poi>4.1.2</version.poi>
 		<version.retrofit>2.5.0</version.retrofit>
