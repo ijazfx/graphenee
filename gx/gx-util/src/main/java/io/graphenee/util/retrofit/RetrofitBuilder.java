@@ -26,13 +26,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitBuilder {
 
-    public static <T> T build(Class<T> interfaceType, String baseUrl) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Timestamp.class, JsonDeserializers.TIMESTAMP_DESERIALIZER);
-        Gson gson = builder.create();
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create(gson)).build();
-        return retrofit.create(interfaceType);
+	public static <T> T build(Class<T> interfaceType, String baseUrl) {
+		GsonBuilder builder = new GsonBuilder();
+		builder.registerTypeAdapter(Timestamp.class, JsonDeserializers.TIMESTAMP_DESERIALIZER);
+		Gson gson = builder.create();
+		Retrofit retrofit = new Retrofit.Builder().baseUrl(baseUrl).addConverterFactory(GsonConverterFactory.create(gson)).build();
+		return retrofit.create(interfaceType);
 
-    }
+	}
 
 }

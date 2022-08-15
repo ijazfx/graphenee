@@ -24,6 +24,6 @@ package io.graphenee.util.callback;
  */
 public interface TRCallback<T, R> {
 
-    R execute(T param);
+	R execute(T param);
 
 }

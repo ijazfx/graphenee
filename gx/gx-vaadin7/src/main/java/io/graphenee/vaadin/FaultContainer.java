@@ -28,62 +28,62 @@ import io.graphenee.util.KeyValueWrapper;
 @SuppressWarnings("serial")
 public class FaultContainer<ID, BEANTYPE> extends BeanItemContainer<Fault<ID, BEANTYPE>> {
 
-    private String idPropertyName;
+	private String idPropertyName;
 
-    public FaultContainer(String idPropertyName) {
-        super(Fault.class);
-        this.idPropertyName = idPropertyName;
-    }
+	public FaultContainer(String idPropertyName) {
+		super(Fault.class);
+		this.idPropertyName = idPropertyName;
+	}
 
-    public FaultContainer(String idPropertyName, Collection<BEANTYPE> beanCollection) throws IllegalArgumentException {
-        super(Fault.class);
-        this.idPropertyName = idPropertyName;
-        setBeans(beanCollection);
-    }
+	public FaultContainer(String idPropertyName, Collection<BEANTYPE> beanCollection) throws IllegalArgumentException {
+		super(Fault.class);
+		this.idPropertyName = idPropertyName;
+		setBeans(beanCollection);
+	}
 
-    public void setBeans(Collection<BEANTYPE> beanCollection) {
-        removeAllItems();
-        if (beanCollection != null) {
-            beanCollection.forEach(bean -> {
-                ID oid = (ID) new KeyValueWrapper(bean).valueForKeyPath(idPropertyName);
-                addBean(Fault.fault(oid, bean));
-            });
-        }
-    }
+	public void setBeans(Collection<BEANTYPE> beanCollection) {
+		removeAllItems();
+		if (beanCollection != null) {
+			beanCollection.forEach(bean -> {
+				ID oid = (ID) new KeyValueWrapper(bean).valueForKeyPath(idPropertyName);
+				addBean(Fault.fault(oid, bean));
+			});
+		}
+	}
 
-    @Override
-    protected boolean passesFilters(Object itemId) {
-        BeanItem<Fault<ID, BEANTYPE>> item = getUnfilteredItem(itemId);
-        if (getFilters().isEmpty() || item.getBean() == null) {
-            return true;
-        }
-        final Iterator<Filter> i = getFilters().iterator();
-        while (i.hasNext()) {
-            final Filter f = i.next();
-            if (f instanceof SimpleStringFilter) {
-                SimpleStringFilter sf = (SimpleStringFilter) f;
-                KeyValueWrapper kvw = new KeyValueWrapper(item.getBean().getValue());
-                String value = kvw.stringForKeyPath(sf.getPropertyId().toString());
-                if (value == null) {
-                    return false;
-                }
-                if (sf.isIgnoreCase()) {
-                    if (sf.isOnlyMatchPrefix()) {
-                        return value.toLowerCase().startsWith(sf.getFilterString().toLowerCase());
-                    }
-                    return value.toLowerCase().contains(sf.getFilterString().toLowerCase());
-                } else {
-                    if (sf.isOnlyMatchPrefix()) {
-                        return value.startsWith(sf.getFilterString());
-                    }
-                    return value.contains(sf.getFilterString());
-                }
-            }
-            if (!f.passesFilter(itemId, item)) {
-                return false;
-            }
-        }
-        return true;
-    }
+	@Override
+	protected boolean passesFilters(Object itemId) {
+		BeanItem<Fault<ID, BEANTYPE>> item = getUnfilteredItem(itemId);
+		if (getFilters().isEmpty() || item.getBean() == null) {
+			return true;
+		}
+		final Iterator<Filter> i = getFilters().iterator();
+		while (i.hasNext()) {
+			final Filter f = i.next();
+			if (f instanceof SimpleStringFilter) {
+				SimpleStringFilter sf = (SimpleStringFilter) f;
+				KeyValueWrapper kvw = new KeyValueWrapper(item.getBean().getValue());
+				String value = kvw.stringForKeyPath(sf.getPropertyId().toString());
+				if (value == null) {
+					return false;
+				}
+				if (sf.isIgnoreCase()) {
+					if (sf.isOnlyMatchPrefix()) {
+						return value.toLowerCase().startsWith(sf.getFilterString().toLowerCase());
+					}
+					return value.toLowerCase().contains(sf.getFilterString().toLowerCase());
+				} else {
+					if (sf.isOnlyMatchPrefix()) {
+						return value.startsWith(sf.getFilterString());
+					}
+					return value.contains(sf.getFilterString());
+				}
+			}
+			if (!f.passesFilter(itemId, item)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 }

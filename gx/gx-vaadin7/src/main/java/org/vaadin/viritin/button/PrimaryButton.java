@@ -25,35 +25,35 @@ import com.vaadin.server.Resource;
  */
 public class PrimaryButton extends MButton {
 
-    private static final long serialVersionUID = 1005969185091403505L;
+	private static final long serialVersionUID = 1005969185091403505L;
 
-    public PrimaryButton() {
-        setupPrimaryButton();
-    }
+	public PrimaryButton() {
+		setupPrimaryButton();
+	}
 
-    public PrimaryButton(String caption) {
-        super(caption);
-        setupPrimaryButton();
-    }
+	public PrimaryButton(String caption) {
+		super(caption);
+		setupPrimaryButton();
+	}
 
-    public PrimaryButton(String caption, ClickListener listener) {
-        super(caption, listener);
-        setupPrimaryButton();
-    }
+	public PrimaryButton(String caption, ClickListener listener) {
+		super(caption, listener);
+		setupPrimaryButton();
+	}
 
-    public PrimaryButton(Resource icon, ClickListener listener) {
-        super(icon, listener);
-        setupPrimaryButton();
-    }
+	public PrimaryButton(Resource icon, ClickListener listener) {
+		super(icon, listener);
+		setupPrimaryButton();
+	}
 
-    public PrimaryButton(Resource icon, String caption, ClickListener listener) {
-        super(icon, caption, listener);
-        setupPrimaryButton();
-    }
+	public PrimaryButton(Resource icon, String caption, ClickListener listener) {
+		super(icon, caption, listener);
+		setupPrimaryButton();
+	}
 
-    private void setupPrimaryButton() {
-        setStyleName("primary default");
-        setClickShortcut(ShortcutAction.KeyCode.ENTER, null);
-    }
+	private void setupPrimaryButton() {
+		setStyleName("primary default");
+		setClickShortcut(ShortcutAction.KeyCode.ENTER, null);
+	}
 
 }

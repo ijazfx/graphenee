@@ -9,19 +9,19 @@ import com.vaadin.flow.data.converter.Converter;
 
 public class LocalDateToSqlDateConverter implements Converter<LocalDate, Date> {
 
-    @Override
-    public Result<Date> convertToModel(LocalDate value, ValueContext context) {
-        if (value != null)
-            return Result.ok(Date.valueOf(value));
-        return Result.ok(null);
+	@Override
+	public Result<Date> convertToModel(LocalDate value, ValueContext context) {
+		if (value != null)
+			return Result.ok(Date.valueOf(value));
+		return Result.ok(null);
 
-    }
+	}
 
-    @Override
-    public LocalDate convertToPresentation(Date value, ValueContext context) {
-        if (value == null)
-            return null;
-        return value.toLocalDate();
-    }
+	@Override
+	public LocalDate convertToPresentation(Date value, ValueContext context) {
+		if (value == null)
+			return null;
+		return value.toLocalDate();
+	}
 
 }

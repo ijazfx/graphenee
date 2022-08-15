@@ -24,44 +24,44 @@ import io.graphenee.util.KeyValueWrapper;
 
 public class FaultToValueConverter<ID, T> implements Converter<T, Fault<ID, T>> {
 
-    private static final long serialVersionUID = 1L;
-    private String idProperty;
-    private Class<T> typeOfT;
+	private static final long serialVersionUID = 1L;
+	private String idProperty;
+	private Class<T> typeOfT;
 
-    public FaultToValueConverter(Class<T> typeOfT) {
-        this(typeOfT, "oid");
-    }
+	public FaultToValueConverter(Class<T> typeOfT) {
+		this(typeOfT, "oid");
+	}
 
-    public FaultToValueConverter(Class<T> typeOfT, String idProperty) {
-        this.typeOfT = typeOfT;
-        this.idProperty = idProperty;
-    }
+	public FaultToValueConverter(Class<T> typeOfT, String idProperty) {
+		this.typeOfT = typeOfT;
+		this.idProperty = idProperty;
+	}
 
-    @Override
-    public Fault<ID, T> convertToModel(T value, Class<? extends Fault<ID, T>> targetType, Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
-        if (value == null)
-            return null;
-        ID id = (ID) new KeyValueWrapper(value).valueForKeyPath(idProperty);
-        Fault<ID, T> fault = Fault.fault(id, value);
-        return fault;
-    }
+	@Override
+	public Fault<ID, T> convertToModel(T value, Class<? extends Fault<ID, T>> targetType, Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
+		if (value == null)
+			return null;
+		ID id = (ID) new KeyValueWrapper(value).valueForKeyPath(idProperty);
+		Fault<ID, T> fault = Fault.fault(id, value);
+		return fault;
+	}
 
-    @Override
-    public T convertToPresentation(Fault<ID, T> value, Class<? extends T> targetType, Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
-        if (value == null)
-            return null;
-        return value.getValue();
-    }
+	@Override
+	public T convertToPresentation(Fault<ID, T> value, Class<? extends T> targetType, Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
+		if (value == null)
+			return null;
+		return value.getValue();
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public Class<Fault<ID, T>> getModelType() {
-        return (Class<Fault<ID, T>>) Fault.nullFault().getClass();
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public Class<Fault<ID, T>> getModelType() {
+		return (Class<Fault<ID, T>>) Fault.nullFault().getClass();
+	}
 
-    @Override
-    public Class<T> getPresentationType() {
-        return typeOfT;
-    }
+	@Override
+	public Class<T> getPresentationType() {
+		return typeOfT;
+	}
 
 }

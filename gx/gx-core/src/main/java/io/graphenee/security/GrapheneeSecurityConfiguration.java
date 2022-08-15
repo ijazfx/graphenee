@@ -23,7 +23,9 @@ import io.graphenee.core.GrapheneeCoreConfiguration;
 
 @Configuration
 @AutoConfigureAfter(GrapheneeCoreConfiguration.class)
-@ComponentScan("io.graphenee.security")
+@ComponentScan(GrapheneeSecurityConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeSecurityConfiguration {
+
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.security";
 
 }

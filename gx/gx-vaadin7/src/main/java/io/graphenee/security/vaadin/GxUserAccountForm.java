@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.MCheckBox;
 import org.vaadin.viritin.fields.MPasswordField;
 import org.vaadin.viritin.fields.MTextField;
-import org.vaadin.viritin.layouts.MFormLayout;
 import org.vaadin.viritin.layouts.MVerticalLayout;
 
 import com.vaadin.data.util.converter.Converter;

@@ -45,7 +45,6 @@ public class GxNamespace implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Include
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
 
@@ -55,6 +54,7 @@ public class GxNamespace implements Serializable {
 	@Column(name = "is_protected")
 	private Boolean isProtected = false;
 
+	@Include
 	private String namespace;
 
 	@Column(name = "namespace_description")

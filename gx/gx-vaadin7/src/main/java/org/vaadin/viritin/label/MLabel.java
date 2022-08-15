@@ -25,104 +25,104 @@ import com.vaadin.ui.Label;
  */
 public class MLabel extends Label {
 
-    private static final long serialVersionUID = -635245868195615938L;
+	private static final long serialVersionUID = -635245868195615938L;
 
-    public MLabel() {
-        super();
-    }
+	public MLabel() {
+		super();
+	}
 
-    public MLabel(String content) {
-        super(content);
-    }
+	public MLabel(String content) {
+		super(content);
+	}
 
-    public MLabel(String caption, String content) {
-        super(content);
-        setCaption(caption);
-    }
+	public MLabel(String caption, String content) {
+		super(content);
+		setCaption(caption);
+	}
 
-    public MLabel withCaption(String caption) {
-        setCaption(caption);
-        return this;
-    }
+	public MLabel withCaption(String caption) {
+		setCaption(caption);
+		return this;
+	}
 
-    /**
-     * equals to withValue
-     *
-     * @param content value of label
-     * @return itself
-     */
-    public MLabel withContent(String content) {
-        setValue(content);
-        return this;
-    }
+	/**
+	 * equals to withValue
+	 *
+	 * @param content value of label
+	 * @return itself
+	 */
+	public MLabel withContent(String content) {
+		setValue(content);
+		return this;
+	}
 
-    public MLabel withValue(String value) {
-        setValue(value);
-        return this;
-    }
+	public MLabel withValue(String value) {
+		setValue(value);
+		return this;
+	}
 
-    public MLabel withContentMode(ContentMode mode) {
-        setContentMode(mode);
-        return this;
-    }
+	public MLabel withContentMode(ContentMode mode) {
+		setContentMode(mode);
+		return this;
+	}
 
-    public MLabel withWidth(String width) {
-        setWidth(width);
-        return this;
-    }
+	public MLabel withWidth(String width) {
+		setWidth(width);
+		return this;
+	}
 
-    public MLabel withHeight(String height) {
-        setHeight(height);
-        return this;
-    }
+	public MLabel withHeight(String height) {
+		setHeight(height);
+		return this;
+	}
 
-    public MLabel withSize(String width, String height) {
-        setWidth(width);
-        setHeight(height);
-        return this;
-    }
+	public MLabel withSize(String width, String height) {
+		setWidth(width);
+		setHeight(height);
+		return this;
+	}
 
-    public MLabel withSize(MSize mSize) {
-        setWidth(mSize.getWidth(), mSize.getWidthUnit());
-        setHeight(mSize.getHeight(), mSize.getHeightUnit());
-        return this;
-    }
+	public MLabel withSize(MSize mSize) {
+		setWidth(mSize.getWidth(), mSize.getWidthUnit());
+		setHeight(mSize.getHeight(), mSize.getHeightUnit());
+		return this;
+	}
 
-    public MLabel withStyleName(String... styleNames) {
-        for (String styleName : styleNames) {
-            addStyleName(styleName);
-        }
-        return this;
-    }
+	public MLabel withStyleName(String... styleNames) {
+		for (String styleName : styleNames) {
+			addStyleName(styleName);
+		}
+		return this;
+	}
 
-    public MLabel withFullWidth() {
-        setWidth("100%");
-        return this;
-    }
+	public MLabel withFullWidth() {
+		setWidth("100%");
+		return this;
+	}
 
-    public MLabel withFullHeight() {
-        setHeight("100%");
-        return this;
-    }
+	public MLabel withFullHeight() {
+		setHeight("100%");
+		return this;
+	}
 
-    public MLabel withWidthUndefined() {
-        setWidthUndefined();
-        return this;
-    }
+	public MLabel withWidthUndefined() {
+		setWidthUndefined();
+		return this;
+	}
 
-    public MLabel withEnabled(boolean enabled) {
-        setEnabled(enabled);
-        return this;
-    }
+	public MLabel withEnabled(boolean enabled) {
+		setEnabled(enabled);
+		return this;
+	}
 
-    public MLabel withVisible(boolean visible) {
-        setVisible(visible);
-        return this;
-    }
+	public MLabel withVisible(boolean visible) {
+		setVisible(visible);
+		return this;
+	}
 
-    public MLabel withId(String id) {
-        setId(id);
-        return this;
-    }
+	public MLabel withId(String id) {
+		setId(id);
+		return this;
+	}
 
 }

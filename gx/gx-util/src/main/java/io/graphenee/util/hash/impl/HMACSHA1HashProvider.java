@@ -25,31 +25,31 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class HMACSHA1HashProvider extends AbstractHashProvider {
 
-    public static final String ENCRYPTION = "HMAC-SHA1";
+	public static final String ENCRYPTION = "HMAC-SHA1";
 
-    private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
+	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
-    @Override
-    public String encryption() {
-        return ENCRYPTION;
-    }
+	@Override
+	public String encryption() {
+		return ENCRYPTION;
+	}
 
-    @Override
-    public String createHash(String prefix, String input, String signingKey) {
-        if (!isNullOrEmpty(signingKey)) {
-            SecretKeySpec secretKey = new SecretKeySpec(signingKey.getBytes(), HMAC_SHA1_ALGORITHM);
-            Mac mac;
-            try {
-                mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
-                mac.init(secretKey);
-                String data = prefix + input;
-                byte[] hash = mac.doFinal(data.getBytes("UTF-8"));
-                return toHexString(hash);
-            } catch (Exception e) {
-                log.warning(e.getMessage());
-            }
-        }
-        return null;
-    }
+	@Override
+	public String createHash(String prefix, String input, String signingKey) {
+		if (!isNullOrEmpty(signingKey)) {
+			SecretKeySpec secretKey = new SecretKeySpec(signingKey.getBytes(), HMAC_SHA1_ALGORITHM);
+			Mac mac;
+			try {
+				mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
+				mac.init(secretKey);
+				String data = prefix + input;
+				byte[] hash = mac.doFinal(data.getBytes("UTF-8"));
+				return toHexString(hash);
+			} catch (Exception e) {
+				log.warning(e.getMessage());
+			}
+		}
+		return null;
+	}
 
 }

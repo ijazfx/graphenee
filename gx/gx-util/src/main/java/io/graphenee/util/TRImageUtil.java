@@ -38,141 +38,141 @@ import org.springframework.util.StreamUtils;
 
 public class TRImageUtil {
 
-    private static final Logger L = LoggerFactory.getLogger(TRImageUtil.class);
+	private static final Logger L = LoggerFactory.getLogger(TRImageUtil.class);
 
-    public static boolean resizeImage(File sourceFile, File targetFile) {
-        try {
-            // scale image on disk
-            BufferedImage originalImage = ImageIO.read(sourceFile);
-            if (originalImage.getWidth() < 1024)
-                return false;
-            int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-            BufferedImage resizeImageJpg = resizeImage(originalImage, type, 1024);
-            String ext = TRFileContentUtil.getExtensionFromFilename(sourceFile.getName());
-            ImageIO.write(resizeImageJpg, ext, targetFile);
-            return true;
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
+	public static boolean resizeImage(File sourceFile, File targetFile) {
+		try {
+			// scale image on disk
+			BufferedImage originalImage = ImageIO.read(sourceFile);
+			if (originalImage.getWidth() < 1024)
+				return false;
+			int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+			BufferedImage resizeImageJpg = resizeImage(originalImage, type, 1024);
+			String ext = TRFileContentUtil.getExtensionFromFilename(sourceFile.getName());
+			ImageIO.write(resizeImageJpg, ext, targetFile);
+			return true;
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			return false;
+		}
+	}
 
-    public static void compressImage(File sourceFile, File targetFile) {
-        boolean compressed = false;
-        try {
-            String mimeType = TRFileContentUtil.getMimeType(sourceFile.getName());
-            if (mimeType != null) {
-                Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
-                if (writers.hasNext()) {
-                    ImageWriter writer = writers.next();
-                    FileInputStream sourceStream = new FileInputStream(sourceFile);
-                    FileOutputStream targetStream = new FileOutputStream(targetFile);
-                    compressImage(sourceStream, targetStream, writer);
-                    compressed = true;
-                }
-            }
-        } catch (Exception ex) {
-            L.warn("Compression Failed:", ex);
-        }
-        if (!compressed) {
-            try {
-                FileCopyUtils.copy(sourceFile, targetFile);
-            } catch (IOException ex) {
-                L.warn("Compression Failed:", ex);
-            }
-        }
-    }
+	public static void compressImage(File sourceFile, File targetFile) {
+		boolean compressed = false;
+		try {
+			String mimeType = TRFileContentUtil.getMimeType(sourceFile.getName());
+			if (mimeType != null) {
+				Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
+				if (writers.hasNext()) {
+					ImageWriter writer = writers.next();
+					FileInputStream sourceStream = new FileInputStream(sourceFile);
+					FileOutputStream targetStream = new FileOutputStream(targetFile);
+					compressImage(sourceStream, targetStream, writer);
+					compressed = true;
+				}
+			}
+		} catch (Exception ex) {
+			L.warn("Compression Failed:", ex);
+		}
+		if (!compressed) {
+			try {
+				FileCopyUtils.copy(sourceFile, targetFile);
+			} catch (IOException ex) {
+				L.warn("Compression Failed:", ex);
+			}
+		}
+	}
 
-    public static void compressImage(File sourceFile, OutputStream targetStream) {
-        boolean compressed = false;
-        try {
-            String mimeType = TRFileContentUtil.getMimeType(sourceFile.getName());
-            if (mimeType != null) {
-                Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
-                if (writers.hasNext()) {
-                    ImageWriter writer = writers.next();
-                    FileInputStream sourceStream = new FileInputStream(sourceFile);
-                    compressImage(sourceStream, targetStream, writer);
-                    compressed = true;
-                }
-            }
-        } catch (Exception ex) {
-            L.warn("Compression Failed:", ex);
-        }
-        if (!compressed) {
-            try {
-                StreamUtils.copy(new FileInputStream(sourceFile), targetStream);
-            } catch (IOException ex) {
-                L.warn("Compression Failed:", ex);
-            }
-        }
-    }
+	public static void compressImage(File sourceFile, OutputStream targetStream) {
+		boolean compressed = false;
+		try {
+			String mimeType = TRFileContentUtil.getMimeType(sourceFile.getName());
+			if (mimeType != null) {
+				Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
+				if (writers.hasNext()) {
+					ImageWriter writer = writers.next();
+					FileInputStream sourceStream = new FileInputStream(sourceFile);
+					compressImage(sourceStream, targetStream, writer);
+					compressed = true;
+				}
+			}
+		} catch (Exception ex) {
+			L.warn("Compression Failed:", ex);
+		}
+		if (!compressed) {
+			try {
+				StreamUtils.copy(new FileInputStream(sourceFile), targetStream);
+			} catch (IOException ex) {
+				L.warn("Compression Failed:", ex);
+			}
+		}
+	}
 
-    public static void compressImage(InputStream sourceStream, File targetFile) {
-        boolean compressed = false;
-        try {
-            String mimeType = TRFileContentUtil.getMimeType(targetFile.getName());
-            if (mimeType != null) {
-                Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
-                if (writers.hasNext()) {
-                    ImageWriter writer = writers.next();
-                    FileOutputStream targetStream = new FileOutputStream(targetFile);
-                    compressImage(sourceStream, targetStream, writer);
-                    compressed = true;
-                }
-            }
-        } catch (Exception ex) {
-            L.warn("Compression Failed:", ex);
-        }
-        if (!compressed) {
-            try {
-                StreamUtils.copy(sourceStream, new FileOutputStream(targetFile));
-            } catch (IOException ex) {
-                L.warn("Compression Failed:", ex);
-            }
-        }
-    }
+	public static void compressImage(InputStream sourceStream, File targetFile) {
+		boolean compressed = false;
+		try {
+			String mimeType = TRFileContentUtil.getMimeType(targetFile.getName());
+			if (mimeType != null) {
+				Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
+				if (writers.hasNext()) {
+					ImageWriter writer = writers.next();
+					FileOutputStream targetStream = new FileOutputStream(targetFile);
+					compressImage(sourceStream, targetStream, writer);
+					compressed = true;
+				}
+			}
+		} catch (Exception ex) {
+			L.warn("Compression Failed:", ex);
+		}
+		if (!compressed) {
+			try {
+				StreamUtils.copy(sourceStream, new FileOutputStream(targetFile));
+			} catch (IOException ex) {
+				L.warn("Compression Failed:", ex);
+			}
+		}
+	}
 
-    public static void compressImage(InputStream sourceStream, OutputStream targetStream, ImageWriter imageWriter) {
-        try {
-            float imageQuality = 0.3f;
+	public static void compressImage(InputStream sourceStream, OutputStream targetStream, ImageWriter imageWriter) {
+		try {
+			float imageQuality = 0.3f;
 
-            //Create the buffered image
-            BufferedImage bufferedImage = ImageIO.read(sourceStream);
+			//Create the buffered image
+			BufferedImage bufferedImage = ImageIO.read(sourceStream);
 
-            ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(targetStream);
-            imageWriter.setOutput(imageOutputStream);
+			ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(targetStream);
+			imageWriter.setOutput(imageOutputStream);
 
-            ImageWriteParam imageWriteParam = imageWriter.getDefaultWriteParam();
+			ImageWriteParam imageWriteParam = imageWriter.getDefaultWriteParam();
 
-            //Set the compress quality metrics
-            imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-            imageWriteParam.setCompressionQuality(imageQuality);
+			//Set the compress quality metrics
+			imageWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+			imageWriteParam.setCompressionQuality(imageQuality);
 
-            //Created image
-            imageWriter.write(null, new IIOImage(bufferedImage, null, null), imageWriteParam);
+			//Created image
+			imageWriter.write(null, new IIOImage(bufferedImage, null, null), imageWriteParam);
 
-            // close all streams
-            sourceStream.close();
-            targetStream.close();
-            imageOutputStream.close();
-            imageWriter.dispose();
-        } catch (Exception ex) {
-            L.warn("Compression Failed:", ex);
-        }
-    }
+			// close all streams
+			sourceStream.close();
+			targetStream.close();
+			imageOutputStream.close();
+			imageWriter.dispose();
+		} catch (Exception ex) {
+			L.warn("Compression Failed:", ex);
+		}
+	}
 
-    public static BufferedImage resizeImage(BufferedImage originalImage, int type, Integer targetWidth) {
-        int width = originalImage.getWidth();
-        int height = originalImage.getHeight();
-        double aspectRatio = (height * 1.0) / (width * 1.0);
-        int targetHeight = Double.valueOf(targetWidth * aspectRatio).intValue();
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, type);
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-        g.dispose();
+	public static BufferedImage resizeImage(BufferedImage originalImage, int type, Integer targetWidth) {
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
+		double aspectRatio = (height * 1.0) / (width * 1.0);
+		int targetHeight = Double.valueOf(targetWidth * aspectRatio).intValue();
+		BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, type);
+		Graphics2D g = resizedImage.createGraphics();
+		g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+		g.dispose();
 
-        return resizedImage;
-    }
+		return resizedImage;
+	}
 
 }

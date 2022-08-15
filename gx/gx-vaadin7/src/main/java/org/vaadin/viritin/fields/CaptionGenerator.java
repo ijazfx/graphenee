@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @param <T> the type bean/option for which the caption is to be generated
  */
 public interface CaptionGenerator<T> extends Serializable {
-	
+
 	public String getCaption(T option);
-	
+
 }

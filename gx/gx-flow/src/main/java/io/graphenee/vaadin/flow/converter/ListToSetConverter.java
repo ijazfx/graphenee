@@ -12,14 +12,14 @@ import com.vaadin.flow.data.converter.Converter;
 
 public class ListToSetConverter<T> implements Converter<Set<T>, List<T>> {
 
-    @Override
-    public Result<List<T>> convertToModel(Set<T> value, ValueContext context) {
-        return Result.ok(new ArrayList<>(value));
-    }
+	@Override
+	public Result<List<T>> convertToModel(Set<T> value, ValueContext context) {
+		return Result.ok(new ArrayList<>(value));
+	}
 
-    @Override
-    public Set<T> convertToPresentation(List<T> value, ValueContext context) {
-        return value == null ? Collections.emptySet() : new HashSet<>(value);
-    }
+	@Override
+	public Set<T> convertToPresentation(List<T> value, ValueContext context) {
+		return value == null ? Collections.emptySet() : new HashSet<>(value);
+	}
 
 }

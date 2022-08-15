@@ -27,13 +27,10 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
-import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
-import io.graphenee.i18n.api.LocalizerService;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
@@ -42,19 +39,13 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Autowired
-	GxSupportedLocaleRepository localeRepo;
+	private GxTermRepository termRepo;
 
 	@Autowired
-	GxTermRepository termRepo;
+	private GxNamespaceRepository namespaceRepo;
 
 	@Autowired
-	GxNamespaceRepository namespaceRepo;
-
-	@Autowired
-	GxTermForm editorForm;
-
-	@Autowired
-	LocalizerService localizer;
+	private GxTermForm editorForm;
 
 	private ComboBox<GxNamespace> namespaceComboBox;
 
@@ -90,9 +81,8 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 		}
 	}
 
-	public void initializeWithNamespace(GxNamespaceBean namespace) {
-		GxNamespace appNamespace = namespaceRepo.findByNamespace(namespace.getNamespace());
-		getSearchEntity().setGxNamespace(appNamespace);
+	public void initializeWithNamespace(GxNamespace namespace) {
+		getSearchEntity().setGxNamespace(namespace);
 		refresh();
 	}
 

@@ -34,9 +34,10 @@ import io.graphenee.sms.impl.TwilioSmsServiceImpl;
 
 @Configuration
 @ConditionalOnClass(GrapheneeCoreConfiguration.class)
-//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
-@ComponentScan("io.graphenee.sms")
+@ComponentScan(GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeSmsConfiguration {
+
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.sms";
 
 	@Autowired
 	GxDataService gxDataService;

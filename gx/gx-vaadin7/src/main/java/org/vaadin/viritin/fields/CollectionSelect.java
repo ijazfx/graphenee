@@ -22,7 +22,7 @@ public class CollectionSelect<T> extends CustomField<Collection<T>> {
 	private ListSelect select = new ListSelect() {
 
 		@SuppressWarnings("unchecked")
-        @Override
+		@Override
 		public String getItemCaption(Object option) {
 			if (captionGenerator != null) {
 				return captionGenerator.getCaption((T) option);
@@ -42,8 +42,7 @@ public class CollectionSelect<T> extends CustomField<Collection<T>> {
 		select.addValueChangeListener(new ValueChangeListener() {
 
 			@Override
-			public void valueChange(
-					com.vaadin.data.Property.ValueChangeEvent event) {
+			public void valueChange(com.vaadin.data.Property.ValueChangeEvent event) {
 				/*
 				 * Modify the original collection to make it possible for e.g.
 				 * ORM tools to optimize queries
@@ -71,6 +70,7 @@ public class CollectionSelect<T> extends CustomField<Collection<T>> {
 		this();
 		setOptions(options);
 	}
+
 	public CollectionSelect(String caption, Collection<T> options) {
 		this(caption);
 		setOptions(options);

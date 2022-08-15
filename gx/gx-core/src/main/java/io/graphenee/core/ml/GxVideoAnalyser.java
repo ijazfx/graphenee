@@ -6,8 +6,8 @@ import io.graphenee.util.callback.TRParamCallback;
 
 public interface GxVideoAnalyser {
 
-    String analyse(GxAreaPatternCode areaCode, String mediaFilePath, String jsonFilePath) throws Exception;
+	String analyse(GxAreaPatternCode areaCode, String mediaFilePath, String jsonFilePath) throws Exception;
 
-    void analyseAsync(GxAreaPatternCode areaCode, String mediaFilePath, TRParamCallback<String> jsonCallback, TRErrorCallback errorCallback);
+	void analyseAsync(GxAreaPatternCode areaCode, String mediaFilePath, TRParamCallback<String> jsonCallback, TRErrorCallback errorCallback);
 
 }

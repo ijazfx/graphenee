@@ -43,60 +43,60 @@ import io.graphenee.util.DataSourceUtil;
 @ComponentScan("io.graphenee.jbpm.embedded")
 public class GrapheneeJbpmConfiguration {
 
-    @Autowired(required = false)
-    GrapheneeJbpmProperties grapheneeJbpmProperties;
+	@Autowired(required = false)
+	GrapheneeJbpmProperties grapheneeJbpmProperties;
 
-    @Value("${flyway.enabled:false}")
-    boolean flywayEnabled;
+	@Value("${flyway.enabled:false}")
+	boolean flywayEnabled;
 
-    @PostConstruct
-    public void init() {
-        if (flywayEnabled) {
-            DataSource dsFlyway = grapheneeJbpmProperties().getDataSource();
-            String dbVendor = DataSourceUtil.determineDbVendor(dsFlyway);
-            FluentConfiguration config = Flyway.configure().dataSource(dsFlyway).locations("classpath:db/jbpm/migration/" + dbVendor).table("jbpm_schema_version")
-                    .baselineOnMigrate(true).baselineVersion("0");
-            Flyway flyway = new Flyway(config);
-            flyway.migrate();
-        }
-    }
+	@PostConstruct
+	public void init() {
+		if (flywayEnabled) {
+			DataSource dsFlyway = grapheneeJbpmProperties().getDataSource();
+			String dbVendor = DataSourceUtil.determineDbVendor(dsFlyway);
+			FluentConfiguration config = Flyway.configure().dataSource(dsFlyway).locations("classpath:db/jbpm/migration/" + dbVendor).table("jbpm_schema_version")
+					.baselineOnMigrate(true).baselineVersion("0");
+			Flyway flyway = new Flyway(config);
+			flyway.migrate();
+		}
+	}
 
-    private GrapheneeJbpmProperties grapheneeJbpmProperties() {
-        if (grapheneeJbpmProperties == null) {
-            synchronized (GrapheneeJbpmConfiguration.class) {
-                if (grapheneeJbpmProperties == null) {
-                    grapheneeJbpmProperties = new GrapheneeJbpmProperties();
-                }
-            }
-        }
-        return grapheneeJbpmProperties;
-    }
+	private GrapheneeJbpmProperties grapheneeJbpmProperties() {
+		if (grapheneeJbpmProperties == null) {
+			synchronized (GrapheneeJbpmConfiguration.class) {
+				if (grapheneeJbpmProperties == null) {
+					grapheneeJbpmProperties = new GrapheneeJbpmProperties();
+				}
+			}
+		}
+		return grapheneeJbpmProperties;
+	}
 
-    @Bean("jbpmTransactionManager")
-    public JpaTransactionManager jbpmTransactionManager(@Qualifier("jbpmEntityManagerFactory") EntityManagerFactory jbpmEntityManagerFactory) {
-        JpaTransactionManager tm = new JpaTransactionManager(jbpmEntityManagerFactory);
-        return tm;
-    }
+	@Bean("jbpmTransactionManager")
+	public JpaTransactionManager jbpmTransactionManager(@Qualifier("jbpmEntityManagerFactory") EntityManagerFactory jbpmEntityManagerFactory) {
+		JpaTransactionManager tm = new JpaTransactionManager(jbpmEntityManagerFactory);
+		return tm;
+	}
 
-    @Bean("jbpmEntityManagerFactory")
-    public EntityManagerFactory jbpmEntityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        DataSource ds = grapheneeJbpmProperties().getDataSource();
-        em.setDataSource(ds);
-        em.setPackagesToScan("org.jbpm", "org.drools");
-        em.setPersistenceUnitName("org.jbpm.persistence.jpa");
-        em.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        em.setJpaDialect(new HibernateJpaDialect());
-        em.setMappingResources("META-INF/JBPMorm.xml", "META-INF/Taskorm.xml", "META-INF/TaskAuditorm.xml");
-        em.getJpaPropertyMap().put("hibernate.max_fetch_depth", "3");
-        // em.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "none");
-        em.getJpaPropertyMap().put("hibernate.show_sql", "false");
-        Dialect dialect = DataSourceUtil.determineDialect(ds);
-        em.getJpaPropertyMap().put("hibernate.dialect", dialect);
-        em.getJpaPropertyMap().put("hibernate.id.new_generator_mappings", "false");
-        em.getJpaPropertyMap().put("hibernate.transaction.jta.platform", "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
-        em.afterPropertiesSet();
-        return em.getObject();
-    }
+	@Bean("jbpmEntityManagerFactory")
+	public EntityManagerFactory jbpmEntityManagerFactory() {
+		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+		DataSource ds = grapheneeJbpmProperties().getDataSource();
+		em.setDataSource(ds);
+		em.setPackagesToScan("org.jbpm", "org.drools");
+		em.setPersistenceUnitName("org.jbpm.persistence.jpa");
+		em.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+		em.setJpaDialect(new HibernateJpaDialect());
+		em.setMappingResources("META-INF/JBPMorm.xml", "META-INF/Taskorm.xml", "META-INF/TaskAuditorm.xml");
+		em.getJpaPropertyMap().put("hibernate.max_fetch_depth", "3");
+		// em.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "none");
+		em.getJpaPropertyMap().put("hibernate.show_sql", "false");
+		Dialect dialect = DataSourceUtil.determineDialect(ds);
+		em.getJpaPropertyMap().put("hibernate.dialect", dialect);
+		em.getJpaPropertyMap().put("hibernate.id.new_generator_mappings", "false");
+		em.getJpaPropertyMap().put("hibernate.transaction.jta.platform", "org.hibernate.service.jta.platform.internal.BitronixJtaPlatform");
+		em.afterPropertiesSet();
+		return em.getObject();
+	}
 
 }

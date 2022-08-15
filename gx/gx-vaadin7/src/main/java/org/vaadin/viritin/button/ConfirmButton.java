@@ -26,217 +26,213 @@ import com.vaadin.shared.MouseEventDetails;
  */
 public class ConfirmButton extends MButton {
 
-    private static final long serialVersionUID = -3146998691761708825L;
+	private static final long serialVersionUID = -3146998691761708825L;
 
-    private String confirmWindowCaption;
-    private String confirmationText = "Are you sure?";
-    private String okCaption = "OK";
-    private String cancelCaption = "Cancel";
+	private String confirmWindowCaption;
+	private String confirmationText = "Are you sure?";
+	private String okCaption = "OK";
+	private String cancelCaption = "Cancel";
 
-    private String confirmWindowOkButtonStyle;
+	private String confirmWindowOkButtonStyle;
 
-    public ConfirmButton() {
-    }
+	public ConfirmButton() {
+	}
 
-    public ConfirmButton(String buttonCaption, String confirmationText,
-            ClickListener listener) {
-        super(buttonCaption, listener);
-        this.confirmationText = confirmationText;
-    }
+	public ConfirmButton(String buttonCaption, String confirmationText, ClickListener listener) {
+		super(buttonCaption, listener);
+		this.confirmationText = confirmationText;
+	}
 
-    public ConfirmButton(Resource icon, String confirmationText,
-            ClickListener listener) {
-        super(icon, listener);
-        this.confirmationText = confirmationText;
-    }
+	public ConfirmButton(Resource icon, String confirmationText, ClickListener listener) {
+		super(icon, listener);
+		this.confirmationText = confirmationText;
+	}
 
-    public ConfirmButton(Resource icon, String buttonCaption, String confirmationText,
-            ClickListener listener) {
-        super(icon, buttonCaption, listener);
-        this.confirmationText = confirmationText;
-    }
+	public ConfirmButton(Resource icon, String buttonCaption, String confirmationText, ClickListener listener) {
+		super(icon, buttonCaption, listener);
+		this.confirmationText = confirmationText;
+	}
 
-    @Override
-    protected void fireClick(final MouseEventDetails details) {
-        ConfirmDialog dialog = ConfirmDialog.show(getUI(), getConfirmWindowCaption(),
-                getConfirmationText(), getOkCaption(), getCancelCaption(), new Runnable() {
-            @Override
-            public void run() {
-                doFireClickListener(details);
-            }
-        });
+	@Override
+	protected void fireClick(final MouseEventDetails details) {
+		ConfirmDialog dialog = ConfirmDialog.show(getUI(), getConfirmWindowCaption(), getConfirmationText(), getOkCaption(), getCancelCaption(), new Runnable() {
+			@Override
+			public void run() {
+				doFireClickListener(details);
+			}
+		});
 
-        dialog.getOkButton().addStyleName(confirmWindowOkButtonStyle);
-    }
+		dialog.getOkButton().addStyleName(confirmWindowOkButtonStyle);
+	}
 
-    @Override
-    protected void fireClick() {
-        fireClick(null);
-    }
+	@Override
+	protected void fireClick() {
+		fireClick(null);
+	}
 
-    @Override
-    public void setClickShortcut(int keyCode, int... modifiers) {
-        super.setClickShortcut(keyCode, modifiers); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    @Override
-    public ConfirmButton removeClickListener(MClickListener listener) {
-        super.removeClickListener(listener);
+	@Override
+	public void setClickShortcut(int keyCode, int... modifiers) {
+		super.setClickShortcut(keyCode, modifiers); //To change body of generated methods, choose Tools | Templates.
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton removeClickListener(MClickListener listener) {
+		super.removeClickListener(listener);
 
-    @Override
-    public ConfirmButton addClickListener(MClickListener listener) {
-        super.addClickListener(listener);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton addClickListener(MClickListener listener) {
+		super.addClickListener(listener);
 
-    @Override
-    public ConfirmButton withFullHeight() {
-        super.withFullHeight();
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withFullHeight() {
+		super.withFullHeight();
 
-    @Override
-    public ConfirmButton withHeight(float height, Unit unit) {
-        super.withHeight(height, unit);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withHeight(float height, Unit unit) {
+		super.withHeight(height, unit);
 
-    @Override
-    public ConfirmButton withHeight(String height) {
-        super.withHeight(height);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withHeight(String height) {
+		super.withHeight(height);
 
-    @Override
-    public ConfirmButton withFullWidth() {
-        super.withFullWidth();
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withFullWidth() {
+		super.withFullWidth();
 
-    @Override
-    public ConfirmButton withWidth(float width, Unit unit) {
-        super.withWidth(width, unit);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withWidth(float width, Unit unit) {
+		super.withWidth(width, unit);
 
-    @Override
-    public ConfirmButton withWidth(String width) {
-        super.withWidth(width);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withWidth(String width) {
+		super.withWidth(width);
 
-    @Override
-    public ConfirmButton withId(String id) {
-        super.withId(id);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withId(String id) {
+		super.withId(id);
 
-    @Override
-    public ConfirmButton withVisible(boolean visible) {
-        super.withVisible(visible);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withVisible(boolean visible) {
+		super.withVisible(visible);
 
-    @Override
-    public ConfirmButton withDescription(String description) {
-        super.withDescription(description);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withDescription(String description) {
+		super.withDescription(description);
 
-    @Override
-    public ConfirmButton withCaption(String caption) {
-        super.withCaption(caption);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withCaption(String caption) {
+		super.withCaption(caption);
 
-    @Override
-    public ConfirmButton withStyleName(String... styleNames) {
-        super.withStyleName(styleNames);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withStyleName(String... styleNames) {
+		super.withStyleName(styleNames);
 
-    @Override
-    public ConfirmButton withListener(ClickListener listener) {
-        super.withListener(listener);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withListener(ClickListener listener) {
+		super.withListener(listener);
 
-    @Override
-    public ConfirmButton withIcon(Resource icon) {
-        super.withIcon(icon);
+		return this;
+	}
 
-        return this;
-    }
+	@Override
+	public ConfirmButton withIcon(Resource icon) {
+		super.withIcon(icon);
 
-    protected void doFireClickListener(final MouseEventDetails details) {
-        ConfirmButton.super.fireClick(details);
-    }
+		return this;
+	}
 
-    public String getConfirmWindowCaption() {
-        return confirmWindowCaption;
-    }
+	protected void doFireClickListener(final MouseEventDetails details) {
+		ConfirmButton.super.fireClick(details);
+	}
 
-    public ConfirmButton setConfirmWindowCaption(String confirmWindowCaption) {
-        this.confirmWindowCaption = confirmWindowCaption;
-        return this;
-    }
+	public String getConfirmWindowCaption() {
+		return confirmWindowCaption;
+	}
 
-    public String getConfirmationText() {
-        return confirmationText;
-    }
+	public ConfirmButton setConfirmWindowCaption(String confirmWindowCaption) {
+		this.confirmWindowCaption = confirmWindowCaption;
+		return this;
+	}
 
-    public ConfirmButton setConfirmationText(String confirmationText) {
-        this.confirmationText = confirmationText;
-        return this;
-    }
+	public String getConfirmationText() {
+		return confirmationText;
+	}
 
-    public String getOkCaption() {
-        return okCaption;
-    }
+	public ConfirmButton setConfirmationText(String confirmationText) {
+		this.confirmationText = confirmationText;
+		return this;
+	}
 
-    public ConfirmButton setOkCaption(String okCaption) {
-        this.okCaption = okCaption;
-        return this;
-    }
+	public String getOkCaption() {
+		return okCaption;
+	}
 
-    public String getCancelCaption() {
-        return cancelCaption;
-    }
+	public ConfirmButton setOkCaption(String okCaption) {
+		this.okCaption = okCaption;
+		return this;
+	}
 
-    public ConfirmButton setCancelCaption(String cancelCaption) {
-        this.cancelCaption = cancelCaption;
-        return this;
-    }
+	public String getCancelCaption() {
+		return cancelCaption;
+	}
 
-    public ConfirmButton withI18NCaption(String okCaption, String cancelCaption) {
-        this.okCaption = okCaption;
-        this.cancelCaption = cancelCaption;
-        return this;
-    }
+	public ConfirmButton setCancelCaption(String cancelCaption) {
+		this.cancelCaption = cancelCaption;
+		return this;
+	}
 
-    @Override
-    public ConfirmButton withClickShortcut(int keycode, int... modifiers) {
-        setClickShortcut(keycode, modifiers);
-        return this;
-    }
+	public ConfirmButton withI18NCaption(String okCaption, String cancelCaption) {
+		this.okCaption = okCaption;
+		this.cancelCaption = cancelCaption;
+		return this;
+	}
 
-    public void setConfirmWindowOkButtonStyle(String confirmWindowOkButtonStyle) {
-        this.confirmWindowOkButtonStyle = confirmWindowOkButtonStyle;
-    }
+	@Override
+	public ConfirmButton withClickShortcut(int keycode, int... modifiers) {
+		setClickShortcut(keycode, modifiers);
+		return this;
+	}
+
+	public void setConfirmWindowOkButtonStyle(String confirmWindowOkButtonStyle) {
+		this.confirmWindowOkButtonStyle = confirmWindowOkButtonStyle;
+	}
 }

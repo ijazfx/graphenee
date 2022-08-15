@@ -32,69 +32,69 @@ import org.apache.commons.beanutils.BeanMap;
 
 public class TemplateUtil {
 
-    public static final Pattern KEY_PATTERN = Pattern.compile("(?:\\#\\{)(\\w+)(?:\\})");
+	public static final Pattern KEY_PATTERN = Pattern.compile("(?:\\#\\{)(\\w+)(?:\\})");
 
-    /**
-     * The method parses template text and replaces all matching keys with
-     * values found in data map.
-     *
-     * @param template - A template string such as "Hello #{last_name}"
-     * @param data - key/value pairs to replace keys with values in template
-     * string
-     * @return - Parsed string where keys are replaced with values
-     */
-    public static String parseTemplateWithMap(String template, Map<String, Object> data) {
-        StringBuffer sb = new StringBuffer();
-        Matcher m = KEY_PATTERN.matcher(template);
+	/**
+	 * The method parses template text and replaces all matching keys with
+	 * values found in data map.
+	 *
+	 * @param template - A template string such as "Hello #{last_name}"
+	 * @param data - key/value pairs to replace keys with values in template
+	 * string
+	 * @return - Parsed string where keys are replaced with values
+	 */
+	public static String parseTemplateWithMap(String template, Map<String, Object> data) {
+		StringBuffer sb = new StringBuffer();
+		Matcher m = KEY_PATTERN.matcher(template);
 
-        while (m.find()) {
-            Object value = data.get(m.group(1));
-            if (value == null) {
-                m.appendReplacement(sb, "\\#\\{" + m.group(1) + "\\}");
-            } else {
-                m.appendReplacement(sb, (String) value);
-            }
-        }
+		while (m.find()) {
+			Object value = data.get(m.group(1));
+			if (value == null) {
+				m.appendReplacement(sb, "\\#\\{" + m.group(1) + "\\}");
+			} else {
+				m.appendReplacement(sb, (String) value);
+			}
+		}
 
-        m.appendTail(sb);
+		m.appendTail(sb);
 
-        return sb.toString();
+		return sb.toString();
 
-    }
+	}
 
-    /**
-     * The method parses template text and replaces all matching keys with
-     * matching bean property values.
-     *
-     * @param template - A template string such as "Hello #{last_name}"
-     * @param bean - A bean which is converted to key/value pair and then used
-     * for template parsing
-     * @return - Parsed string where keys are replaced with values
-     */
-    public static String parseTemplateWithBean(String template, Object bean) {
-        BeanMap bm = new BeanMap(bean);
-        StringBuffer sb = new StringBuffer();
-        Matcher m = KEY_PATTERN.matcher(template);
+	/**
+	 * The method parses template text and replaces all matching keys with
+	 * matching bean property values.
+	 *
+	 * @param template - A template string such as "Hello #{last_name}"
+	 * @param bean - A bean which is converted to key/value pair and then used
+	 * for template parsing
+	 * @return - Parsed string where keys are replaced with values
+	 */
+	public static String parseTemplateWithBean(String template, Object bean) {
+		BeanMap bm = new BeanMap(bean);
+		StringBuffer sb = new StringBuffer();
+		Matcher m = KEY_PATTERN.matcher(template);
 
-        while (m.find()) {
-            Object value = bm.get(m.group(1));
-            if (value == null) {
-                m.appendReplacement(sb, "\\#\\{" + m.group(1) + "\\}");
-            } else {
-                m.appendReplacement(sb, (String) value);
-            }
-        }
+		while (m.find()) {
+			Object value = bm.get(m.group(1));
+			if (value == null) {
+				m.appendReplacement(sb, "\\#\\{" + m.group(1) + "\\}");
+			} else {
+				m.appendReplacement(sb, (String) value);
+			}
+		}
 
-        m.appendTail(sb);
+		m.appendTail(sb);
 
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    public static void main(String[] args) {
-        HashMap<String, String> data = new HashMap<>();
-        data.put("name", "Farrukh");
-        data.put("place", "Lahore");
-        data.put("date", LocalDate.now().toString());
-    }
+	public static void main(String[] args) {
+		HashMap<String, String> data = new HashMap<>();
+		data.put("name", "Farrukh");
+		data.put("place", "Lahore");
+		data.put("date", LocalDate.now().toString());
+	}
 
 }

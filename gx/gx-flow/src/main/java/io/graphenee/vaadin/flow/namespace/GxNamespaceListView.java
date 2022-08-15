@@ -10,25 +10,25 @@ import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
 @GxSecuredView(GxNamespaceListView.VIEW_NAME)
 public class GxNamespaceListView extends GxVerticalLayoutView {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public static final String VIEW_NAME = "namespaces";
+	public static final String VIEW_NAME = "namespaces";
 
-    @Autowired
-    private GxNamespaceList list;
+	@Autowired
+	private GxNamespaceList list;
 
-    @Override
-    protected void decorateLayout(HasComponents rootLayout) {
-        rootLayout.add(list);
-    }
+	@Override
+	protected void decorateLayout(HasComponents rootLayout) {
+		rootLayout.add(list);
+	}
 
-    @Override
-    public void afterNavigation(AfterNavigationEvent event) {
-        list.refresh();
-    }
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		list.refresh();
+	}
 
-    @Override
-    protected String getCaption() {
-        return "Namespaces";
-    }
+	@Override
+	protected String getCaption() {
+		return "Namespaces";
+	}
 }

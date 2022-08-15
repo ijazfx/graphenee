@@ -15,31 +15,29 @@ import java.io.Serializable;
  */
 public class TypedPropertyValueGenerator<M, P> extends PropertyValueGenerator<P> {
 
-    private static final long serialVersionUID = 1250403117667296988L;
+	private static final long serialVersionUID = 1250403117667296988L;
 
-    protected Class<M> modelType;
-    protected Class<P> presentationType;
-    protected ValueGenerator<M, P> valueGenerator;
+	protected Class<M> modelType;
+	protected Class<P> presentationType;
+	protected ValueGenerator<M, P> valueGenerator;
 
-    public TypedPropertyValueGenerator(Class<M> modelType,
-                                        Class<P> presentationType,
-                                        ValueGenerator<M, P> valueGenerator) {
-        this.modelType = modelType;
-        this.presentationType = presentationType;
-        this.valueGenerator = valueGenerator;
-    }
+	public TypedPropertyValueGenerator(Class<M> modelType, Class<P> presentationType, ValueGenerator<M, P> valueGenerator) {
+		this.modelType = modelType;
+		this.presentationType = presentationType;
+		this.valueGenerator = valueGenerator;
+	}
 
-    @Override
-    public P getValue(Item item, Object itemId, Object propertyId) {
-        return valueGenerator.getValue((M) ((ListContainer.DynaBeanItem) item).getBean());
-    }
+	@Override
+	public P getValue(Item item, Object itemId, Object propertyId) {
+		return valueGenerator.getValue((M) ((ListContainer.DynaBeanItem) item).getBean());
+	}
 
-    @Override
-    public Class<P> getType() {
-        return presentationType;
-    }
+	@Override
+	public Class<P> getType() {
+		return presentationType;
+	}
 
-    public interface ValueGenerator<M, P> extends Serializable {
-        P getValue(M bean);
-    }
+	public interface ValueGenerator<M, P> extends Serializable {
+		P getValue(M bean);
+	}
 }

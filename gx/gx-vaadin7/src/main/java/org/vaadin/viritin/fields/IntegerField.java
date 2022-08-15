@@ -16,62 +16,62 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class IntegerField extends AbstractNumberField<Integer> {
 
-    private static final long serialVersionUID = 377246000306551089L;
+	private static final long serialVersionUID = 377246000306551089L;
 
-    public IntegerField() {
-        setSizeUndefined();
-    }
+	public IntegerField() {
+		setSizeUndefined();
+	}
 
-    public IntegerField(String caption) {
-        setCaption(caption);
-    }
+	public IntegerField(String caption) {
+		setCaption(caption);
+	}
 
-    @Override
-    protected void userInputToValue(String str) {
-        if (StringUtils.isNotBlank(str)) {
-            setValue(Integer.parseInt(str));
-        } else {
-            setValue(null);
-        }
-    }
+	@Override
+	protected void userInputToValue(String str) {
+		if (StringUtils.isNotBlank(str)) {
+			setValue(Integer.parseInt(str));
+		} else {
+			setValue(null);
+		}
+	}
 
-    @Override
-    public Class<? extends Integer> getType() {
-        return Integer.class;
-    }
+	@Override
+	public Class<? extends Integer> getType() {
+		return Integer.class;
+	}
 
-    public IntegerField withCaption(String caption) {
-        setCaption(caption);
-        return this;
-    }
+	public IntegerField withCaption(String caption) {
+		setCaption(caption);
+		return this;
+	}
 
-    public IntegerField withId(String id) {
-        setId(id);
-        return this;
-    }
+	public IntegerField withId(String id) {
+		setId(id);
+		return this;
+	}
 
-    public IntegerField withFullWidth() {
-        setWidth("100%");
-        return this;
-    }
+	public IntegerField withFullWidth() {
+		setWidth("100%");
+		return this;
+	}
 
-    public IntegerField withWidth(float width, Unit unit) {
-        setWidth(width, unit);
-        return this;
-    }
+	public IntegerField withWidth(float width, Unit unit) {
+		setWidth(width, unit);
+		return this;
+	}
 
-    public IntegerField withWidth(String width) {
-        setWidth(width);
-        return this;
-    }
+	public IntegerField withWidth(String width) {
+		setWidth(width);
+		return this;
+	}
 
-    @Override
-    public IntegerField withBlurListener(FieldEvents.BlurListener listener) {
-        return (IntegerField) super.withBlurListener(listener);
-    }
+	@Override
+	public IntegerField withBlurListener(FieldEvents.BlurListener listener) {
+		return (IntegerField) super.withBlurListener(listener);
+	}
 
-    @Override
-    public IntegerField withFocusListener(FieldEvents.FocusListener listener) {
-        return (IntegerField) super.withFocusListener(listener);
-    }
+	@Override
+	public IntegerField withFocusListener(FieldEvents.FocusListener listener) {
+		return (IntegerField) super.withFocusListener(listener);
+	}
 }

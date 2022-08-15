@@ -39,87 +39,85 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 @Scope("prototype")
 public class GxTermTablePanel extends GxAbstractEntityList<GxTerm> {
 
-    private GxTerm selectedTerm;
+	private GxTerm selectedTerm;
 
-    @Autowired
-    GxSupportedLocaleRepository localeRepo;
+	@Autowired
+	GxSupportedLocaleRepository localeRepo;
 
-    @Autowired
-    GxTermRepository termRepo;
+	@Autowired
+	GxTermRepository termRepo;
 
-    private List<GxSupportedLocale> availableLocales;
+	private List<GxSupportedLocale> availableLocales;
 
-    public List<GxTerm> availableTerms;
+	public List<GxTerm> availableTerms;
 
-    Map<String, GxTerm> terms;
+	Map<String, GxTerm> terms;
 
-    public GxTermTablePanel() {
-        super(GxTerm.class);
-    }
+	public GxTermTablePanel() {
+		super(GxTerm.class);
+	}
 
-    @Override
-    protected String[] visibleProperties() {
-        return new String[] { "language", "termSingular", "termPlural" };
-    }
+	@Override
+	protected String[] visibleProperties() {
+		return new String[] { "language", "termSingular", "termPlural" };
+	}
 
-    private List<GxTerm> findAvailableLocalesAndTerms() {
-        availableLocales = localeRepo.findAll();
-        availableTerms = termRepo.findByGxNamespaceAndTermKey(selectedTerm.getGxNamespace(), selectedTerm.getTermKey());
-        terms = new HashMap<>();
-        availableTerms.forEach(term -> {
-            terms.put(term.getGxSupportedLocale().getLocaleCode(), term);
-        });
+	private List<GxTerm> findAvailableLocalesAndTerms() {
+		availableLocales = localeRepo.findAll();
+		availableTerms = termRepo.findByGxNamespaceAndTermKey(selectedTerm.getGxNamespace(), selectedTerm.getTermKey());
+		terms = new HashMap<>();
+		availableTerms.forEach(term -> {
+			terms.put(term.getGxSupportedLocale().getLocaleCode(), term);
+		});
 
-        for (GxSupportedLocale locale : availableLocales) {
-            if (!terms.containsKey(locale.getLocaleCode())) {
-                GxTerm term = new GxTerm();
-                term.setTermKey(selectedTerm.getTermKey());
-                term.setGxNamespace(selectedTerm.getGxNamespace());
-                term.setGxSupportedLocale(locale);
-                terms.put(locale.getLocaleCode(), term);
-            }
-        }
+		for (GxSupportedLocale locale : availableLocales) {
+			if (!terms.containsKey(locale.getLocaleCode())) {
+				GxTerm term = new GxTerm();
+				term.setTermKey(selectedTerm.getTermKey());
+				term.setGxNamespace(selectedTerm.getGxNamespace());
+				term.setGxSupportedLocale(locale);
+				terms.put(locale.getLocaleCode(), term);
+			}
+		}
 
-        availableTerms = new ArrayList<>(terms.values());
-        availableTerms.sort((a, b) -> a.getLanguage().compareToIgnoreCase(b.getLanguage()));
-        return availableTerms;
-    }
+		availableTerms = new ArrayList<>(terms.values());
+		availableTerms.sort((a, b) -> a.getLanguage().compareToIgnoreCase(b.getLanguage()));
+		return availableTerms;
+	}
 
-    @Override
-    protected void postBuild() {
-        hideToolbar();
-    }
+	@Override
+	protected void postBuild() {
+		hideToolbar();
+	}
 
-    public void initializeWithEntity(GxTerm term) {
-        this.selectedTerm = term;
-        refresh();
-    }
+	public void initializeWithEntity(GxTerm term) {
+		this.selectedTerm = term;
+		refresh();
+	}
 
-    @Override
-    protected Stream<GxTerm> getData() {
-        return findAvailableLocalesAndTerms().stream();
-    }
+	@Override
+	protected Stream<GxTerm> getData() {
+		return findAvailableLocalesAndTerms().stream();
+	}
 
-    @Override
-    protected GxAbstractEntityForm<GxTerm> getEntityForm(GxTerm entity) {
-        return null;
-    }
+	@Override
+	protected GxAbstractEntityForm<GxTerm> getEntityForm(GxTerm entity) {
+		return null;
+	}
 
-    @Override
-    protected boolean isGridInlineEditingEnabled() {
-        return true;
-    }
+	@Override
+	protected boolean isGridInlineEditingEnabled() {
+		return true;
+	}
 
-    @Override
-    protected void onSave(GxTerm entity) {
-        // TODO Auto-generated method stub
+	@Override
+	protected void onSave(GxTerm entity) {
 
-    }
+	}
 
-    @Override
-    protected void onDelete(Collection<GxTerm> entities) {
-        // TODO Auto-generated method stub
+	@Override
+	protected void onDelete(Collection<GxTerm> entities) {
 
-    }
+	}
 
 }

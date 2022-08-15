@@ -31,101 +31,101 @@ import io.graphenee.vaadin.ui.GxNotification;
 @Scope("prototype")
 public class GxImportDataForm extends TRAbstractPanel {
 
-    FileChooser filePath;
+	FileChooser filePath;
 
-    private GxImportDataProcessor importDataProcessor;
+	private GxImportDataProcessor importDataProcessor;
 
-    MGrid importDataGrid;
+	MGrid importDataGrid;
 
-    BeanItemContainer importBeanContainer;
+	BeanItemContainer importBeanContainer;
 
-    private Consumer<List> onImportCompletion;
+	private Consumer<List> onImportCompletion;
 
-    public GxImportDataForm() {
+	public GxImportDataForm() {
 
-    }
+	}
 
-    @Override
-    protected void addButtonsToFooter(MHorizontalLayout layout) {
-        layout.setVisible(false);
-    }
+	@Override
+	protected void addButtonsToFooter(MHorizontalLayout layout) {
+		layout.setVisible(false);
+	}
 
-    public void importData() throws InvalidImportFormatException {
-        if (filePath.getValue() == null || !TRFileContentUtil.getExtensionFromFilename(filePath.getValue()).equals("csv")) {
-            throw new InvalidImportFormatException("File not uploaded or Invalid file format");
-        } else
-            ConfirmDialog.show(UI.getCurrent(), null, "Do you want to import selected file?", "Yes", "No", p -> {
-                if (p.isConfirmed()) {
-                    importDataProcessor.saveData();
-                    List importDataBeans = importDataProcessor.getImportDataBeans();
-                    if (onImportCompletion != null) {
-                        onImportCompletion.accept(importDataBeans);
-                    }
-                }
-            });
-    }
+	public void importData() throws InvalidImportFormatException {
+		if (filePath.getValue() == null || !TRFileContentUtil.getExtensionFromFilename(filePath.getValue()).equals("csv")) {
+			throw new InvalidImportFormatException("File not uploaded or Invalid file format");
+		} else
+			ConfirmDialog.show(UI.getCurrent(), null, "Do you want to import selected file?", "Yes", "No", p -> {
+				if (p.isConfirmed()) {
+					importDataProcessor.saveData();
+					List importDataBeans = importDataProcessor.getImportDataBeans();
+					if (onImportCompletion != null) {
+						onImportCompletion.accept(importDataBeans);
+					}
+				}
+			});
+	}
 
-    @Override
-    protected String panelTitle() {
-        return null;
-    }
+	@Override
+	protected String panelTitle() {
+		return null;
+	}
 
-    @Override
-    protected void addComponentsToContentLayout(MVerticalLayout layout) {
-        importBeanContainer = new BeanItemContainer<>(importDataProcessor.getEntityClass());
-        importDataGrid = new MGrid<>();
-        importDataGrid.setSizeFull();
-        importDataGrid.setContainerDataSource(importBeanContainer);
-        importDataGrid.withProperties(importDataProcessor.getVisibleProperties());
-        filePath = new FileChooser("Select File (Only csv file)");
-        filePath.addValueChangeListener(e -> {
-            importBeanContainer.removeAllItems();
-            if (filePath.getValue() != null) {
-                if (TRFileContentUtil.getExtensionFromFilename(filePath.getValue()).equals("csv")) {
-                    importDataProcessor.loadFile(filePath.getValue());
-                    importBeanContainer.addAll(importDataProcessor.getImportDataBeans());
-                } else {
-                    GxNotification.tray("Invalid Format", "Please upload file in csv format").show(Page.getCurrent());
-                }
-            }
-        });
-        String fileName = "import-template.csv";
-        DownloadButton downloadButton = new DownloadButton((OutputStream out) -> {
-            try {
-                out.write(CSVUtil.getHeaderRow(importDataProcessor.requiredColoumnHeader()).getBytes("UTF-8"));
-            } catch (Exception e2) {
-            }
-        }).setFileNameProvider(() -> {
-            return fileName;
-        }).setMimeTypeProvider(() -> {
-            return "text/csv";
-        }).withCaption("Download Template");
-        downloadButton.withStyleName(ValoTheme.BUTTON_LINK);
-        MHorizontalLayout downloadImportFileLayout = new MHorizontalLayout().withHeightUndefined().withWidth("100%");
-        downloadImportFileLayout.addComponents(filePath, downloadButton);
-        downloadImportFileLayout.setComponentAlignment(downloadButton, Alignment.BOTTOM_RIGHT);
+	@Override
+	protected void addComponentsToContentLayout(MVerticalLayout layout) {
+		importBeanContainer = new BeanItemContainer<>(importDataProcessor.getEntityClass());
+		importDataGrid = new MGrid<>();
+		importDataGrid.setSizeFull();
+		importDataGrid.setContainerDataSource(importBeanContainer);
+		importDataGrid.withProperties(importDataProcessor.getVisibleProperties());
+		filePath = new FileChooser("Select File (Only csv file)");
+		filePath.addValueChangeListener(e -> {
+			importBeanContainer.removeAllItems();
+			if (filePath.getValue() != null) {
+				if (TRFileContentUtil.getExtensionFromFilename(filePath.getValue()).equals("csv")) {
+					importDataProcessor.loadFile(filePath.getValue());
+					importBeanContainer.addAll(importDataProcessor.getImportDataBeans());
+				} else {
+					GxNotification.tray("Invalid Format", "Please upload file in csv format").show(Page.getCurrent());
+				}
+			}
+		});
+		String fileName = "import-template.csv";
+		DownloadButton downloadButton = new DownloadButton((OutputStream out) -> {
+			try {
+				out.write(CSVUtil.getHeaderRow(importDataProcessor.requiredColoumnHeader()).getBytes("UTF-8"));
+			} catch (Exception e2) {
+			}
+		}).setFileNameProvider(() -> {
+			return fileName;
+		}).setMimeTypeProvider(() -> {
+			return "text/csv";
+		}).withCaption("Download Template");
+		downloadButton.withStyleName(ValoTheme.BUTTON_LINK);
+		MHorizontalLayout downloadImportFileLayout = new MHorizontalLayout().withHeightUndefined().withWidth("100%");
+		downloadImportFileLayout.addComponents(filePath, downloadButton);
+		downloadImportFileLayout.setComponentAlignment(downloadButton, Alignment.BOTTOM_RIGHT);
 
-        layout.addComponents(downloadImportFileLayout, importDataGrid);
-        layout.setExpandRatio(importDataGrid, 1);
-        layout.setSpacing(true);
-    }
+		layout.addComponents(downloadImportFileLayout, importDataGrid);
+		layout.setExpandRatio(importDataGrid, 1);
+		layout.setSpacing(true);
+	}
 
-    @Override
-    public TRAbstractPanel build() {
-        TRAbstractPanel build = super.build();
-        filePath.setValue(null);
-        return build;
-    }
+	@Override
+	public TRAbstractPanel build() {
+		TRAbstractPanel build = super.build();
+		filePath.setValue(null);
+		return build;
+	}
 
-    public void initializeWithDataProcessor(GxImportDataProcessor importDataProcessor) {
-        this.importDataProcessor = importDataProcessor;
-    }
+	public void initializeWithDataProcessor(GxImportDataProcessor importDataProcessor) {
+		this.importDataProcessor = importDataProcessor;
+	}
 
-    public Consumer<List> getOnImportCompletion() {
-        return onImportCompletion;
-    }
+	public Consumer<List> getOnImportCompletion() {
+		return onImportCompletion;
+	}
 
-    public void setOnImportCompletion(Consumer<List> onImportCompletion) {
-        this.onImportCompletion = onImportCompletion;
-    }
+	public void setOnImportCompletion(Consumer<List> onImportCompletion) {
+		this.onImportCompletion = onImportCompletion;
+	}
 }

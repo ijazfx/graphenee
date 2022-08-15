@@ -28,43 +28,43 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 
 public class DataSourceUtil {
 
-    public static DataSource createDataSource(String url, String username, String password) {
-        return DataSourceBuilder.create().url(url).username(username).password(password).build();
-    }
+	public static DataSource createDataSource(String url, String username, String password) {
+		return DataSourceBuilder.create().url(url).username(username).password(password).build();
+	}
 
-    public static String determineDbVendor(DataSource dataSource) {
-        String vendor = null;
-        try (Connection c = dataSource.getConnection()) {
-            vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
-            if (vendor.contains("postgresql"))
-                vendor = "postgresql";
-            else if (vendor.contains("sqlserver"))
-                vendor = "sqlserver";
-            else if (vendor.contains("h2"))
-                vendor = "h2";
-            else
-                vendor = c.getMetaData().getDatabaseProductName().toLowerCase();
-        } catch (SQLException e) {
-            vendor = "unknown";
-        }
-        return vendor;
-    }
+	public static String determineDbVendor(DataSource dataSource) {
+		String vendor = null;
+		try (Connection c = dataSource.getConnection()) {
+			vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
+			if (vendor.contains("postgresql"))
+				vendor = "postgresql";
+			else if (vendor.contains("sqlserver"))
+				vendor = "sqlserver";
+			else if (vendor.contains("h2"))
+				vendor = "h2";
+			else
+				vendor = c.getMetaData().getDatabaseProductName().toLowerCase();
+		} catch (SQLException e) {
+			vendor = "unknown";
+		}
+		return vendor;
+	}
 
-    public static Dialect determineDialect(DataSource dataSource) {
-        String vendor = null;
-        try (Connection c = dataSource.getConnection()) {
-            vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
-            if (vendor.contains("postgresql")) {
-                return new PostgreSQL95Dialect();
-            } else if (vendor.contains("sqlserver")) {
-                return new SQLServer2012Dialect();
-            } else if (vendor.contains("h2")) {
-                return new H2Dialect();
-            } else
-                throw new Error("Unable to determine dialect from datasource.");
-        } catch (SQLException e) {
-            throw new Error("Unable to determine hibernate dialect for " + vendor);
-        }
-    }
+	public static Dialect determineDialect(DataSource dataSource) {
+		String vendor = null;
+		try (Connection c = dataSource.getConnection()) {
+			vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
+			if (vendor.contains("postgresql")) {
+				return new PostgreSQL95Dialect();
+			} else if (vendor.contains("sqlserver")) {
+				return new SQLServer2012Dialect();
+			} else if (vendor.contains("h2")) {
+				return new H2Dialect();
+			} else
+				throw new Error("Unable to determine dialect from datasource.");
+		} catch (SQLException e) {
+			throw new Error("Unable to determine hibernate dialect for " + vendor);
+		}
+	}
 
 }

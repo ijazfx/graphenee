@@ -11,16 +11,16 @@ import io.graphenee.core.model.entity.GxRegisteredDevice;
 
 public interface GxRegisteredDeviceDataService {
 
-    GxRegisteredDevice save(GxRegisteredDevice entity);
+	GxRegisteredDevice save(GxRegisteredDevice entity);
 
-    Integer countAll(GxRegisteredDevice searchEntity);
+	Integer countAll(GxRegisteredDevice searchEntity);
 
-    List<GxRegisteredDevice> findRegisteredDevice(GxRegisteredDevice searchEntity, Pageable pageable);
+	List<GxRegisteredDevice> findRegisteredDevice(GxRegisteredDevice searchEntity, Pageable pageable);
 
-    void delete(Collection<GxRegisteredDevice> entities);
+	void delete(Collection<GxRegisteredDevice> entities);
 
-    GxRegisteredDevice registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId) throws RegisterDeviceFailedException;
+	GxRegisteredDevice registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId) throws RegisterDeviceFailedException;
 
-    void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
+	void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
 
 }

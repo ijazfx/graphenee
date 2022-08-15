@@ -26,47 +26,47 @@ import io.graphenee.util.hash.TRHashProvider;
  */
 abstract public class AbstractHashProvider implements TRHashProvider {
 
-    @Override
-    public String createPasswordHash(String input) {
-        return createHash(PASSWORD_PREFIX, input, "");
-    }
+	@Override
+	public String createPasswordHash(String input) {
+		return createHash(PASSWORD_PREFIX, input, "");
+	}
 
-    @Override
-    public String createHash(String prefix, String input, String signingKey) {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA");
-            String finalInput = prefix + input;
-            byte[] hash = digest.digest(finalInput.getBytes("UTF-8"));
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (Exception e) {
-            log.warning(e.getMessage());
-        }
-        return null;
-    }
+	@Override
+	public String createHash(String prefix, String input, String signingKey) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA");
+			String finalInput = prefix + input;
+			byte[] hash = digest.digest(finalInput.getBytes("UTF-8"));
+			return Base64.getEncoder().encodeToString(hash);
+		} catch (Exception e) {
+			log.warning(e.getMessage());
+		}
+		return null;
+	}
 
-    @Override
-    public String createHash(String input, String signingKey) {
-        return createHash("", input, signingKey);
-    }
+	@Override
+	public String createHash(String input, String signingKey) {
+		return createHash("", input, signingKey);
+	}
 
-    @Override
-    public boolean checkPasswordHash(String input, String hashed) {
-        String inputHash = createPasswordHash(input);
-        return inputHash != null && inputHash.equals(hashed);
-    }
+	@Override
+	public boolean checkPasswordHash(String input, String hashed) {
+		String inputHash = createPasswordHash(input);
+		return inputHash != null && inputHash.equals(hashed);
+	}
 
-    protected static String toHexString(byte[] bytes) {
-        try (Formatter formatter = new Formatter()) {
-            for (byte b : bytes) {
-                formatter.format("%02x", b);
-            }
-            return formatter.toString();
-        }
-    }
+	protected static String toHexString(byte[] bytes) {
+		try (Formatter formatter = new Formatter()) {
+			for (byte b : bytes) {
+				formatter.format("%02x", b);
+			}
+			return formatter.toString();
+		}
+	}
 
-    protected boolean isNullOrEmpty(String value) {
-        return value == null || value.trim().length() == 0;
-    }
+	protected boolean isNullOrEmpty(String value) {
+		return value == null || value.trim().length() == 0;
+	}
 
 }
