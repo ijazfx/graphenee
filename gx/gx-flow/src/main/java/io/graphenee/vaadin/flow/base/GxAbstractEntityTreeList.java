@@ -13,6 +13,8 @@ import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 
+import io.reactivex.rxjava3.core.ObservableEmitter;
+
 @CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
 public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T> {
 
@@ -110,6 +112,38 @@ public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T
 	@Override
 	protected boolean shouldDisplayGridFooter() {
 		return false;
+	}
+
+	protected void exportData(ObservableEmitter<T> emitter) {
+		Stream<T> data = getData(0, entityGrid().getPageSize(), null);
+
+		if (!entityGrid().getSelectedItems().isEmpty()) {
+			data = entityGrid().getSelectedItems().stream();
+			data.forEach(d -> {
+				if (emitter.isDisposed()) {
+					return;
+				}
+				emitRecursively(emitter, d);
+			});
+			emitter.onComplete();
+		} else {
+			data.forEach(d -> {
+				if (emitter.isDisposed()) {
+					return;
+				}
+				emitRecursively(emitter, d);
+
+			});
+			emitter.onComplete();
+		}
+	}
+
+	private void emitRecursively(ObservableEmitter<T> emitter, T d) {
+		emitter.onNext(d);
+		Stream<T> ch = getData(0, 100, d);
+		ch.forEach(c -> {
+			emitRecursively(emitter, c);
+		});
 	}
 
 }
