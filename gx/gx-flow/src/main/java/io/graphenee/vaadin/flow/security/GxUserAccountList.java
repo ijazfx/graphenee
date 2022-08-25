@@ -18,12 +18,11 @@ import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.GxEntityFormEventListener;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
 @Component
 @Scope("prototype")
-public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> implements GxEntityFormEventListener<GxUserAccountBean> {
+public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -56,7 +55,6 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> i
 
 	@Override
 	protected GxAbstractEntityForm<GxUserAccountBean> getEntityForm(GxUserAccountBean entity) {
-		entityForm.registerListener(this);
 		return entityForm;
 	}
 
@@ -113,11 +111,6 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> i
 		entities.forEach(e -> {
 			auditService.log(user, remoteAddress, auditEvent, e.getUsername(), auditEntity, e.getOid());
 		});
-	}
-
-	@Override
-	public void onEvent(GxEntityFormEvent event, GxUserAccountBean entity) {
-		System.out.println(event + " --> " + entity);
 	}
 
 }
