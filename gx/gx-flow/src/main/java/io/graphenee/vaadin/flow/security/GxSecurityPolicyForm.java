@@ -489,6 +489,7 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
             securityPolicyDocumentComboBox.setValue(entity.getDefaultSecurityPolicyDocumentBean());
             jsonDocumentTextArea.setValue(entity.getDefaultSecurityPolicyDocumentBean().getDocumentJson());
         }
+        tabs.setSelectedTab(sourceTab);
     }
 
     @Override
