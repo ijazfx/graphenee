@@ -3,7 +3,8 @@
   src: url("/frontend/fonts/RobotoCondensed-Regular.ttf");
 }
 
-html, :host {
+html,
+:host {
   --lumo-font-family: "Roboto Condensed";
   --lumo-space-xl: 1.875rem;
   --lumo-space-l: 1.25rem;
@@ -43,15 +44,15 @@ html, :host {
 }
 
 .gx-login-view {
-	display: flex;
-	flex-flow: column;
-	background: var(--app-layout-bar-background-color);
+  display: flex;
+  flex-flow: column;
+  background: var(--app-layout-bar-background-color);
 }
 
 .gx-reset-password-view {
-	display: flex;
-	flex-flow: column;
-	background: var(--app-layout-bar-background-color);
+  display: flex;
+  flex-flow: column;
+  background: var(--app-layout-bar-background-color);
 }
 
 ::-webkit-scrollbar {
@@ -99,13 +100,19 @@ div[slot="application-content"] {
 }
 
 :host [part~="row"][last] {
-	border-bottom: 2px solid var(--lumo-contrast-10pct);
+  border-bottom: 2px solid var(--lumo-contrast-10pct);
 }
 
-:host [part~="form"] > [part~="footer"] {
-	display: none;
+:host [part~="form"]>[part~="footer"] {
+  display: none;
 }
 
 :host([theme~="no-padding"]) [part="content"] {
-    padding:0;
+  padding: 0;
+}
+
+.footer-layout {
+  padding-top: 1%;
+  padding-left: 6%;
+  font-size: 85%;
 }
