@@ -114,5 +114,5 @@ div[slot="application-content"] {
 .footer-layout {
   padding-top: 1%;
   padding-left: 6%;
-  font-size: 85%;
+  font-size: var(--lumo-font-size-s);
 }
