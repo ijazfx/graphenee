@@ -13,7 +13,7 @@ public class TimestampToDateConverter implements Converter<LocalDate, Timestamp>
 
 	@Override
 	public Result<Timestamp> convertToModel(LocalDate value, ValueContext context) {
-		return value != null ? Result.ok(new Timestamp(Date.valueOf(value).getTime())) : null;
+		return value != null ? Result.ok(new Timestamp(Date.valueOf(value).getTime())) : Result.ok(null);
 	}
 
 	@Override
