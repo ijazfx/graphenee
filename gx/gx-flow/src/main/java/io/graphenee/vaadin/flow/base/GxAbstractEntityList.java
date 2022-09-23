@@ -949,6 +949,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	private void openForm(T entity) {
+		addMenuItem.setEnabled(false); // set enabled false to prevent double click ..
 		preEdit(entity);
 		GxAbstractEntityForm<T> entityForm = cachedForm(entity);
 		if (entityForm != null) {
@@ -1061,6 +1062,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					} else {
 						dialog.close();
 					}
+					addMenuItem.setEnabled(true);
 					refresh();
 				}
 
@@ -1071,6 +1073,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					} else {
 						dialog.close();
 					}
+					addMenuItem.setEnabled(true);
 				}
 			};
 			entityForm.setDelegate(delegate);
