@@ -8,9 +8,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.menubar.MenuBar;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
@@ -60,19 +57,5 @@ public class GxNamespaceList extends GxAbstractEntityList<GxNamespace> {
 	protected boolean shouldShowExportDataMenu() {
 		return false;
 	}
-
-	@Override
-	protected void decorateMenuBar(MenuBar menuBar) {
-		// TODO Auto-generated method stub
-		super.decorateMenuBar(menuBar);
-	}
-
-	@Override
-	protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
-		// TODO Auto-generated method stub
-		super.decorateToolbarLayout(toolbarLayout);
-	}
-
-	
 
 }
