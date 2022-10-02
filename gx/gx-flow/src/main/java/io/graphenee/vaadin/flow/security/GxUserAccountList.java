@@ -3,15 +3,17 @@ package io.graphenee.vaadin.flow.security;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.data.binder.Binder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.data.binder.Binder;
+
 import io.graphenee.core.model.BeanFault;
+import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.model.api.GxAuditLogDataService;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
@@ -26,6 +28,9 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 
 	@Autowired
 	GxDataService dataService;
+
+	@Autowired
+	GxAuditLogDataService auditService;
 
 	@Autowired
 	GxUserAccountForm entityForm;
@@ -94,6 +99,18 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccountBean> {
 	public void initializeWithNamespace(GxNamespaceBean namespace) {
 		this.namespace = namespace;
 		refresh();
+	}
+
+	@Override
+	protected boolean isAuditLogEnabled() {
+		return true;
+	}
+
+	@Override
+	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<GxUserAccountBean> entities) {
+		entities.forEach(e -> {
+			auditService.log(user, remoteAddress, auditEvent, e.getUsername(), auditEntity, e.getOid());
+		});
 	}
 
 }

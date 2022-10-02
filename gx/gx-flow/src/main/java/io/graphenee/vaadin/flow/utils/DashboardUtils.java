@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -62,6 +63,10 @@ public class DashboardUtils {
 			map = new HashMap<>();
 		}
 		return map;
+	}
+
+	public static String getRemoteAddress() {
+		return VaadinRequest.getCurrent().getRemoteAddr();
 	}
 
 }

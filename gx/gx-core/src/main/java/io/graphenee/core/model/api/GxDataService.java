@@ -314,25 +314,35 @@ public interface GxDataService {
 
 	GxSecurityPolicyBean createOrUpdate(GxSecurityPolicyBean bean);
 
+	@Deprecated
 	GxAuditLogBean createOrUpdate(GxAuditLogBean bean);
 
+	@Deprecated
 	GxAuditLogBean auditEvent(String auditEvent);
 
+	@Deprecated
 	GxAuditLogBean auditEventWithAdditionalData(String auditEvent, byte[] additionalData);
 
+	@Deprecated
 	GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean);
 
+	@Deprecated
 	GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean, byte[] additionalData);
 
+	@Deprecated
 	GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean);
 
+	@Deprecated
 	GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean,
 			byte[] additionalData);
 
+	@Deprecated
 	List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity);
 
+	@Deprecated
 	List<GxAuditLogBean> findAuditLogByAuditEntity(String auditEntity);
 
+	@Deprecated
 	List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean);
 
 	void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
@@ -371,6 +381,7 @@ public interface GxDataService {
 
 	GxSmsProviderBean findSmsProviderByProviderName(String providerName);
 
+	@Deprecated
 	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
 
 	@Deprecated
