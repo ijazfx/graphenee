@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.data.domain.Sort.Direction;
@@ -852,7 +853,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 						GxDateRenderer.GxDateResolution.Date);
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
-				renderer = new ComponentRenderer(s -> {
+				renderer = new ComponentRenderer<>(s -> {
 					Checkbox c = new Checkbox();
 					Boolean value = (Boolean) propertyDefinition.getGetter().apply((T) s);
 					c.setValue(value);
@@ -903,6 +904,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected void decorateColumn(String propertyName, Column<T> column) {
+	}
+
+	protected void decorateCell(String propertyName, CellStyle cellStyle) {
 	}
 
 	protected void postBuild() {

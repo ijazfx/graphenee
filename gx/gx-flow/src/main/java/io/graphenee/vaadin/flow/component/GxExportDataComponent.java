@@ -32,6 +32,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -60,6 +62,7 @@ public class GxExportDataComponent<T> {
 	private Supplier<Collection<String>> dataColumnSupplier;
 
 	private CellStyle defaultDateStyle = null;
+	private CellStyle defaultCellStyle = null;
 
 	public GxExportDataComponent<T> withFileName(String fileName) {
 		this.fileName = fileName;
@@ -103,7 +106,8 @@ public class GxExportDataComponent<T> {
 					log.error("Failed to export data", ex);
 				}
 			}).withDoneCallback(ui -> {
-				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName : "exported-data." + FILE_EXTENSION_XLS;
+				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName
+						: "exported-data." + FILE_EXTENSION_XLS;
 				StreamResource resource = new StreamResource(fileName, new InputStreamFactory() {
 
 					@Override
@@ -118,7 +122,8 @@ public class GxExportDataComponent<T> {
 				});
 				StreamRegistration sr = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
 				ui.getPage().open(sr.getResourceUri().toString(), "_blank");
-			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data").withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
+			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data")
+					.withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
 			task.start();
 		} catch (Exception ex) {
 			log.error("Failed to export data", ex);
@@ -135,7 +140,13 @@ public class GxExportDataComponent<T> {
 		if (!CollectionUtils.isEmpty(dataColumns)) {
 			XSSFWorkbook workbook = new XSSFWorkbook();
 			defaultDateStyle = workbook.createCellStyle();
-			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
+			defaultCellStyle = workbook.createCellStyle();
+			defaultCellStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+			defaultCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			defaultDateStyle.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+			defaultDateStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat()
+					.getFormat(TRCalendarUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
 			buildHeaderRow();
 			buildDataRows();
@@ -173,6 +184,9 @@ public class GxExportDataComponent<T> {
 		for (String property : dataColumns) {
 			Object value = kvw.valueForKeyPath(property);
 			Cell cell = row.createCell(i++);
+			if (defaultCellStyle != null) {
+				cell.setCellStyle(defaultCellStyle);
+			}
 			if (value instanceof String) {
 				cell.setCellValue(value.toString());
 			} else if (value instanceof Boolean) {
@@ -195,7 +209,9 @@ public class GxExportDataComponent<T> {
 	}
 
 	private String camelCaseToRegular(String string) {
-		return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
+		return StringUtils.join(
+				StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)),
+				' ');
 	}
 
 }
