@@ -94,6 +94,7 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList.GxEntityListEventListn
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
+import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
@@ -286,6 +287,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					});
 					return columnList;
 				}).withDataProvider(observable);
+				exportDataSpreadSheetComponent.withDelegate(exportDataDelegate());
 
 				exportDataSpreadSheetComponent.prepareDownload();
 			});
@@ -446,6 +448,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			isBuilt = true;
 		}
 		return this;
+	}
+
+	protected GxExportDataComponentDelegate exportDataDelegate() {
+		return null;
 	}
 
 	protected boolean shouldDisplayGridFooter() {
