@@ -2,6 +2,7 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.util.KeyValueWrapper;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import lombok.Setter;
@@ -91,6 +93,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 							validateForm();
 							if (delegate != null)
 								delegate.onSave(entity);
+							listeners.forEach(l -> {
+								l.onEvent(GxEntityFormEvent.SAVE, entity);
+							});
 							if (dialog != null && dialogAutoClose) {
 								dialog.close();
 							}
@@ -110,6 +115,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 					dataBinder.readBean(entity);
 					if (delegate != null)
 						delegate.onReset(entity);
+					listeners.forEach(l -> {
+						l.onEvent(GxEntityFormEvent.RESET, entity);
+					});
 				});
 
 				dismissButton = new Button("DISMISS");
@@ -121,6 +129,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 					}
 					if (delegate != null)
 						delegate.onDismiss(entity);
+					listeners.forEach(l -> {
+						l.onEvent(GxEntityFormEvent.DISMISS, entity);
+					});
 				});
 
 				resetButton.getElement().getStyle().set("margin-left", "auto");
@@ -265,12 +276,18 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		build();
 		entityBound = false;
 		preBinding(entity);
+		listeners.forEach(l -> {
+			l.onEvent(GxEntityFormEvent.PRE_BIND, entity);
+		});
 		dataBinder.readBean(entity);
 		entityBound = true;
 		if (tabs != null) {
 			tabs.setSelectedTab((Tab) tabs.getComponentAt(0));
 		}
 		postBinding(entity);
+		listeners.forEach(l -> {
+			l.onEvent(GxEntityFormEvent.POST_BIND, entity);
+		});
 		String formTitle = formTitle();
 		if (formTitle == null) {
 			String keyPath = formTitleProperty();
@@ -412,6 +429,28 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected boolean isEntityBound() {
 		return entityBound;
+	}
+
+	HashSet<GxEntityFormEventListener<T>> listeners = new HashSet<>();
+
+	public void registerListener(GxEntityFormEventListener<T> listener) {
+		listeners.add(listener);
+	}
+
+	public void unregisterListener(GxEntityFormEventListener<T> listener) {
+		listeners.remove(listener);
+	}
+
+	public static interface GxEntityFormEventListener<T> {
+		public enum GxEntityFormEvent {
+			SAVE,
+			DISMISS,
+			RESET,
+			PRE_BIND,
+			POST_BIND
+		}
+
+		void onEvent(GxEntityFormEvent event, T entity);
 	}
 
 }

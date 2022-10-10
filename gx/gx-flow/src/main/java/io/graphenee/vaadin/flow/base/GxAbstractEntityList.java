@@ -86,14 +86,18 @@ import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
+import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
+import io.graphenee.vaadin.flow.base.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
+import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
+import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import lombok.Getter;
@@ -284,6 +288,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					});
 					return columnList;
 				}).withDataProvider(observable);
+				exportDataSpreadSheetComponent.withDelegate(exportDataDelegate());
 
 				exportDataSpreadSheetComponent.prepareDownload();
 			});
@@ -450,6 +455,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return this;
 	}
 
+	protected GxExportDataComponentDelegate exportDataDelegate() {
+		return null;
+	}
+
 	protected boolean shouldDisplayGridFooter() {
 		return true;
 	}
@@ -465,6 +474,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected boolean isGridInlineEditingEnabled() {
+		return false;
+	}
+
+	protected boolean isAuditLogEnabled() {
 		return false;
 	}
 
@@ -633,25 +646,35 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	protected void customizeDeleteMenuItem(MenuItem deleteMenuItem) {
 		deleteMenuItem.addClickListener(cl -> {
 			if (shouldShowDeleteConfirmation()) {
-				ConfirmDialog.createQuestion().withCaption("Confirmation")
-						.withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
-							try {
-								onDelete(dataGrid.getSelectedItems());
-								refresh();
-								deleteMenuItem.setEnabled(false);
-								dataGrid.deselectAll();
-							} catch (Exception e) {
-								e.printStackTrace();
-								Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-							}
-						}, ButtonOption.focus(), ButtonOption.caption("YES"))
-						.withCancelButton(ButtonOption.caption("NO")).open();
+				ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
+					try {
+						onDelete(dataGrid.getSelectedItems());
+						if (isAuditLogEnabled()) {
+							auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+						}
+						listeners.forEach(l -> {
+							l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+						});
+						refresh();
+						deleteMenuItem.setEnabled(false);
+						dataGrid.deselectAll();
+					} catch (Exception e) {
+						log.warn(e.getMessage(), e);
+						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+					}
+				}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
 			} else {
 				try {
 					onDelete(dataGrid.getSelectedItems());
+					if (isAuditLogEnabled()) {
+						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+					}
+					listeners.forEach(l -> {
+						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+					});
 					refresh();
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.warn(e.getMessage(), e);
 					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 				}
 			}
@@ -686,7 +709,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 									Pattern p = Pattern.compile(fv, Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
 									matched = p.matcher(cv).find();
 								} catch (Exception e) {
-									e.printStackTrace();
+									// ignore this exception.
 								}
 							}
 						}
@@ -1055,16 +1078,32 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 		if (entityForm != null) {
 			entityForm.setEditable(isEditable());
-			entityForm.setEntity(entity);
+			//entityForm.setEntity(entity);
 			EntityFormDelegate<T> delegate = new EntityFormDelegate<T>() {
 
 				@Override
 				public void onSave(T entity) {
-					GxAbstractEntityList.this.onSave(entity);
-					if (!shouldShowFormInDialog()) {
-						mainLayout.getSecondaryComponent().setVisible(false);
-					} else {
-						dialog.close();
+					try {
+						GxAbstractEntityList.this.onSave(entity);
+						if (isAuditLogEnabled()) {
+							try {
+								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE", entityClass.getSimpleName(), List.of(entity));
+							} catch (Exception ex) {
+								// ignore this exception.
+							}
+						}
+						listeners.forEach(l -> {
+							l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
+						});
+						if (!shouldShowFormInDialog()) {
+							mainLayout.getSecondaryComponent().setVisible(false);
+						} else {
+							dialog.close();
+						}
+						refresh();
+					} catch (Exception e) {
+						log.warn(e.getMessage(), e);
+						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 					}
 					addMenuItem.setEnabled(true);
 					refresh();
@@ -1083,6 +1122,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			entityForm.setDelegate(delegate);
 		}
 		return entityForm;
+	}
+
+	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<T> entities) {
+		log.warn(this + " - Override auditLog(...) method to log this event.");
 	}
 
 	protected boolean shouldShowFormInDialog() {
@@ -1193,6 +1236,25 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC,
 					so.getSorted());
 		}).collect(Collectors.toList());
+	}
+
+	HashSet<GxEntityListEventListner<T>> listeners = new HashSet<>();
+
+	public void registerListener(GxEntityListEventListner<T> listener) {
+		listeners.add(listener);
+	}
+
+	public void unregisterListener(GxEntityListEventListner<T> listener) {
+		listeners.remove(listener);
+	}
+
+	public static interface GxEntityListEventListner<T> {
+		public enum GxEntityListEvent {
+			SAVE,
+			DELETE
+		}
+
+		void onEvent(GxEntityListEvent event, Collection<T> entity);
 	}
 
 }

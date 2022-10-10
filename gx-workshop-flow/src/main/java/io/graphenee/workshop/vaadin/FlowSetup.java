@@ -19,37 +19,37 @@ import io.graphenee.vaadin.flow.documents.GxDocumentExplorerView;
 @VaadinSessionScope
 public class FlowSetup extends GxAbstractFlowSetup {
 
-    @Override
-    public String appTitle() {
-        return "Graphenee";
-    }
+	@Override
+	public String appTitle() {
+		return "Graphenee";
+	}
 
-    @Override
-    public Image appLogo() {
-        Image i = new Image();
-        i.setSrc("frontend/images/octans.jfif");
-        return i;
-    }
+	@Override
+	public Image appLogo() {
+		Image i = new Image();
+		i.setSrc("frontend/images/graphenee.jpg");
+		return i;
+	}
 
-    @Override
-    public String appVersion() {
-        return "1.0";
-    }
+	@Override
+	public String appVersion() {
+		return "1.0";
+	}
 
-    @Override
-    public List<GxMenuItem> menuItems() {
-        List<GxMenuItem> items = new ArrayList<>();
+	@Override
+	public List<GxMenuItem> menuItems() {
+		List<GxMenuItem> items = new ArrayList<>();
 
-        items.add(GxMenuItemFactory.setupMenuItem());
-        items.add(GxMenuItem.create("Documents", VaadinIcon.FOLDER_O.create(), GxDocumentExplorerView.class));
-        items.add(GxMenuItemFactory.messageTemplateMenuItem());
+		items.add(GxMenuItemFactory.setupMenuItem());
+		items.add(GxMenuItem.create("Documents", VaadinIcon.FOLDER_O.create(), GxDocumentExplorerView.class));
+		items.add(GxMenuItemFactory.messageTemplateMenuItem());
 
-        return items;
-    }
+		return items;
+	}
 
-    @Override
-    public Class<? extends RouterLayout> routerLayout() {
-        return MainLayout.class;
-    }
+	@Override
+	public Class<? extends RouterLayout> routerLayout() {
+		return MainLayout.class;
+	}
 
 }

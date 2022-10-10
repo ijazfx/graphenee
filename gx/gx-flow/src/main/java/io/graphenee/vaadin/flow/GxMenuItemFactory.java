@@ -8,6 +8,7 @@ import io.graphenee.vaadin.flow.email_template.GxEmailTemplateListView;
 import io.graphenee.vaadin.flow.i18n.GxSupportedLocaleView;
 import io.graphenee.vaadin.flow.i18n.GxTermView;
 import io.graphenee.vaadin.flow.namespace.GxNamespaceListView;
+import io.graphenee.vaadin.flow.security.GxAuditLogListView;
 import io.graphenee.vaadin.flow.security.GxSecurityGroupListView;
 import io.graphenee.vaadin.flow.security.GxSecurityPolicyListView;
 import io.graphenee.vaadin.flow.security.GxUserAccountListView;
@@ -20,6 +21,7 @@ public class GxMenuItemFactory {
 		menu.add(GxMenuItem.create("Users", VaadinIcon.USERS.create(), GxUserAccountListView.class));
 		menu.add(GxMenuItem.create("Groups", VaadinIcon.GROUP.create(), GxSecurityGroupListView.class));
 		menu.add(GxMenuItem.create("Policies", VaadinIcon.TASKS.create(), GxSecurityPolicyListView.class));
+		menu.add(GxMenuItem.create("Audit Log", VaadinIcon.RECORDS.create(), GxAuditLogListView.class));
 		return menu;
 	}
 

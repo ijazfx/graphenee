@@ -60,9 +60,15 @@ public class GxExportDataComponent<T> {
 	private String fileName;
 	private Supplier<Collection<String>> columnsCaptionsSupplier;
 	private Supplier<Collection<String>> dataColumnSupplier;
-
 	private CellStyle defaultDateStyle = null;
 	private CellStyle defaultCellStyle = null;
+
+	private GxExportDataComponentDelegate delegate;
+
+	public GxExportDataComponent<T> withDelegate(GxExportDataComponentDelegate delegate) {
+		this.delegate = delegate;
+		return this;
+	}
 
 	public GxExportDataComponent<T> withFileName(String fileName) {
 		this.fileName = fileName;
@@ -148,6 +154,9 @@ public class GxExportDataComponent<T> {
 			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat()
 					.getFormat(TRCalendarUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
+			if (delegate != null) {
+				delegate.decorateExportDataSheet(sheet);
+			}
 			buildHeaderRow();
 			buildDataRows();
 			workbook.write(stream);
@@ -159,7 +168,14 @@ public class GxExportDataComponent<T> {
 		Row headerRow = sheet.createRow(0);
 		int i = 0;
 		for (String property : columnsCaptions) {
-			headerRow.createCell(i++).setCellValue(camelCaseToRegular(property));
+			Cell cell = headerRow.createCell(i++);
+			cell.setCellValue(camelCaseToRegular(property));
+			if (delegate != null) {
+				delegate.decorateExportHeaderCell(property, cell);
+			}
+		}
+		if (delegate != null) {
+			delegate.decorateExportHeaderRow(headerRow);
 		}
 	}
 
@@ -205,6 +221,12 @@ public class GxExportDataComponent<T> {
 				else
 					cell.setBlank();
 			}
+			if (delegate != null) {
+				delegate.decorateExportDataCell(property, cell);
+			}
+		}
+		if (delegate != null) {
+			delegate.decorateExportDataRow(row);
 		}
 	}
 
@@ -212,6 +234,29 @@ public class GxExportDataComponent<T> {
 		return StringUtils.join(
 				StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)),
 				' ');
+	}
+
+	public static interface GxExportDataComponentDelegate {
+		default Sheet decorateExportDataSheet(Sheet sheet) {
+			return sheet;
+		}
+
+		default Row decorateExportHeaderRow(Row row) {
+			return row;
+		}
+
+		default Row decorateExportDataRow(Row row) {
+			return row;
+		}
+
+		default Cell decorateExportDataCell(String propertyName, Cell cell) {
+			return cell;
+		}
+
+		default Cell decorateExportHeaderCell(String propertyName, Cell cell) {
+			return cell;
+		}
+
 	}
 
 }
