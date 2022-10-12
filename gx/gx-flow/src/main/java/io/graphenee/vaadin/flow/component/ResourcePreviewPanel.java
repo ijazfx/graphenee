@@ -4,6 +4,7 @@ import com.vaadin.componentfactory.pdfviewer.PdfViewer;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -12,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.StreamResource;
 
 import io.graphenee.util.TRFileContentUtil;
+import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -64,12 +66,17 @@ public class ResourcePreviewPanel extends VerticalLayout {
 				resource.setContentType(mimeType);
 				VideoPlayer videoPlayer = new VideoPlayer(resource);
 				bodyLayout.add(videoPlayer);
-			} else {
+			} else if (mimeType.startsWith("pdf")) {
 				PdfViewer pdfPreview = new PdfViewer();
 				pdfPreview.setSizeFull();
 				pdfPreview.openThumbnailsView();
 				pdfPreview.setSrc(resource);
 				bodyLayout.add(pdfPreview);
+			} else {
+				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
+				Image image = IconUtils.fileExtensionIconResource(extension);
+				image.setHeight("48px");
+				bodyLayout.add(image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -107,7 +114,8 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		toolbar.getStyle().set("background-color", "#F8F8F8");
 		toolbar.setWidthFull();
 		toolbar.setPadding(true);
-		toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+		toolbar.setSpacing(false);
+		toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
 		Button dismissButton = new Button("DISMISS");
 		dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 		dismissButton.addClickListener(cl -> {
@@ -115,6 +123,14 @@ public class ResourcePreviewPanel extends VerticalLayout {
 				dialog.close();
 			}
 		});
+		Button downloadButton = new Button("Download");
+		downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		Anchor download = new Anchor("", "");
+		download.setHref(resource);
+		download.setId("download");
+		download.getElement().setAttribute("download", true);
+		download.add(downloadButton);
+		toolbar.add(download);
 		toolbar.add(dismissButton);
 		return toolbar;
 	}

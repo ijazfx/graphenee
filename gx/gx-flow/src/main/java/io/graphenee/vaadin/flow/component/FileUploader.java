@@ -39,7 +39,7 @@ public class FileUploader extends CustomField<String> {
 	private Boolean autoUpload = true;
 	private String dropFileLabel = "Drop files here";
 
-	//5MB
+	// 5MB
 	private int maxFileSize = 5048576;
 
 	@Setter
@@ -206,7 +206,8 @@ public class FileUploader extends CustomField<String> {
 						fileName = buffer.getFileName();
 					}
 					byte[] bytes = IOUtils.toByteArray(stream);
-					image.getElement().setAttribute("src", new StreamResource(fileName, () -> new ByteArrayInputStream(bytes)));
+					image.getElement().setAttribute("src",
+							new StreamResource(fileName, () -> new ByteArrayInputStream(bytes)));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -225,27 +226,27 @@ public class FileUploader extends CustomField<String> {
 				image.setHeight("48px");
 			}
 			image.addClickListener(listener -> {
-				String extension = TRFileContentUtil.getExtensionFromFilename(getValue());
-				if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+				try {
+					String src = getValue();
+					InputStream stream = null;
+					String resourcePath = storage.resourcePath(getRootFolder(), src);
 					try {
-						String src = getValue();
-						InputStream stream = null;
-						String resourcePath = storage.resourcePath(getRootFolder(), src);
-						try {
-							stream = storage.resolve(resourcePath);
-						} catch (Exception e) {
-							File file = new File(src);
-							src = file.getName();
-							stream = FileUtils.openInputStream(file);
-						}
-						byte[] bytes = IOUtils.toByteArray(stream);
-						StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
-						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
+						stream = storage.resolve(resourcePath);
+					} catch (Exception e) {
+						File file = new File(src);
+						src = file.getName();
+						stream = FileUtils.openInputStream(file);
+					}
+					byte[] bytes = IOUtils.toByteArray(stream);
+					StreamResource streamResource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+					try {
+						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
 						resourcePreviewPanel.showInDialog("80%", "80%");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			});
 			return image;
