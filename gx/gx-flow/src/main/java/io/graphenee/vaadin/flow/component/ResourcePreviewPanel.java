@@ -125,11 +125,6 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		});
 		Button downloadButton = new Button("Download");
 		downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-		downloadButton.addClickListener(cl -> {
-			if (dialog != null) {
-				dialog.close();
-			}
-		});
 		Anchor download = new Anchor("", "");
 		download.setHref(resource);
 		download.setId("download");
