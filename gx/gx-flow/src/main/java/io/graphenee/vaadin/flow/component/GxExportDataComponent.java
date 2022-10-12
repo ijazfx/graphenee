@@ -59,6 +59,10 @@ public class GxExportDataComponent<T> {
 	private Supplier<Collection<String>> columnsCaptionsSupplier;
 	private Supplier<Collection<String>> dataColumnSupplier;
 	private CellStyle defaultDateStyle = null;
+	private CellStyle defaultCellStyle = null;
+	private CellStyle defaultRowStyle = null;
+
+	private XSSFWorkbook workbook = null;
 
 	private GxExportDataComponentDelegate delegate;
 
@@ -109,7 +113,8 @@ public class GxExportDataComponent<T> {
 					log.error("Failed to export data", ex);
 				}
 			}).withDoneCallback(ui -> {
-				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName : "exported-data." + FILE_EXTENSION_XLS;
+				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName
+						: "exported-data." + FILE_EXTENSION_XLS;
 				StreamResource resource = new StreamResource(fileName, new InputStreamFactory() {
 
 					@Override
@@ -124,7 +129,8 @@ public class GxExportDataComponent<T> {
 				});
 				StreamRegistration sr = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
 				ui.getPage().open(sr.getResourceUri().toString(), "_blank");
-			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data").withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
+			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data")
+					.withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
 			task.start();
 		} catch (Exception ex) {
 			log.error("Failed to export data", ex);
@@ -139,13 +145,11 @@ public class GxExportDataComponent<T> {
 			dataColumns = dataColumnSupplier.get();
 		}
 		if (!CollectionUtils.isEmpty(dataColumns)) {
-			XSSFWorkbook workbook = new XSSFWorkbook();
+			workbook = new XSSFWorkbook();
 			defaultDateStyle = workbook.createCellStyle();
-			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
+			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat()
+					.getFormat(TRCalendarUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
-			if (delegate != null) {
-				delegate.decorateExportDataSheet(sheet);
-			}
 			buildHeaderRow();
 			buildDataRows();
 			workbook.write(stream);
@@ -155,17 +159,33 @@ public class GxExportDataComponent<T> {
 
 	private void buildHeaderRow() {
 		Row headerRow = sheet.createRow(0);
+		CellStyle rowStyle = null;
+		if (delegate != null) {
+			defaultRowStyle = workbook.createCellStyle();
+			rowStyle = delegate.decorateExportHeaderRow(defaultRowStyle);
+			if (rowStyle != null) {
+				headerRow.setRowStyle(rowStyle);
+			}
+		}
 		int i = 0;
 		for (String property : columnsCaptions) {
 			Cell cell = headerRow.createCell(i++);
-			cell.setCellValue(camelCaseToRegular(property));
 			if (delegate != null) {
-				delegate.decorateExportHeaderCell(property, cell);
+				defaultCellStyle = workbook.createCellStyle();
+				CellStyle style = delegate.decorateExportHeaderCell(property, defaultCellStyle);
+				if (style != null) {
+					cell.setCellStyle(style);
+				}
+				if (style == null && rowStyle != null) {
+					cell.setCellStyle(rowStyle);
+				}
 			}
+			cell.setCellValue(camelCaseToRegular(property));
+
 		}
-		if (delegate != null) {
-			delegate.decorateExportHeaderRow(headerRow);
-		}
+		// if (delegate != null) {
+		// delegate.decorateExportHeaderRow(headerRow);
+		// }
 	}
 
 	private void buildDataRows() {
@@ -184,11 +204,29 @@ public class GxExportDataComponent<T> {
 	}
 
 	private void buildDataRow(Row row, Object item) {
+		CellStyle rowStyle = null;
+		if (delegate != null) {
+			defaultRowStyle = workbook.createCellStyle();
+			rowStyle = delegate.decorateExportDataRow(defaultRowStyle);
+			if (rowStyle != null) {
+				row.setRowStyle(rowStyle);
+			}
+		}
 		int i = 0;
 		KeyValueWrapper kvw = new KeyValueWrapper(item);
 		for (String property : dataColumns) {
 			Object value = kvw.valueForKeyPath(property);
 			Cell cell = row.createCell(i++);
+			if (delegate != null) {
+				defaultCellStyle = workbook.createCellStyle();
+				CellStyle style = delegate.decorateExportDataCell(property, defaultCellStyle, item);
+				if (style != null) {
+					cell.setCellStyle(style);
+				}
+				if (style == null && rowStyle != null) {
+					cell.setCellStyle(rowStyle);
+				}
+			}
 			if (value instanceof String) {
 				cell.setCellValue(value.toString());
 			} else if (value instanceof Boolean) {
@@ -207,38 +245,31 @@ public class GxExportDataComponent<T> {
 				else
 					cell.setBlank();
 			}
-			if (delegate != null) {
-				delegate.decorateExportDataCell(property, cell);
-			}
-		}
-		if (delegate != null) {
-			delegate.decorateExportDataRow(row);
 		}
 	}
 
 	private String camelCaseToRegular(String string) {
-		return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
+		return StringUtils.join(
+				StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)),
+				' ');
 	}
 
 	public static interface GxExportDataComponentDelegate {
-		default Sheet decorateExportDataSheet(Sheet sheet) {
-			return sheet;
+
+		default CellStyle decorateExportHeaderRow(CellStyle rowStyle) {
+			return rowStyle;
 		}
 
-		default Row decorateExportHeaderRow(Row row) {
-			return row;
+		default CellStyle decorateExportDataRow(CellStyle rowStyle) {
+			return rowStyle;
 		}
 
-		default Row decorateExportDataRow(Row row) {
-			return row;
+		default CellStyle decorateExportDataCell(String propertyName, CellStyle cellStyle, Object entity) {
+			return cellStyle;
 		}
 
-		default Cell decorateExportDataCell(String propertyName, Cell cell) {
-			return cell;
-		}
-
-		default Cell decorateExportHeaderCell(String propertyName, Cell cell) {
-			return cell;
+		default CellStyle decorateExportHeaderCell(String propertyName, CellStyle cellStyle) {
+			return cellStyle;
 		}
 
 	}

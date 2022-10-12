@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.data.domain.Sort.Direction;
@@ -30,6 +31,7 @@ import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -42,8 +44,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
-import com.vaadin.flow.component.grid.FooterRow;
-import com.vaadin.flow.component.grid.FooterRow.FooterCell;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
@@ -165,7 +165,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	private ShortcutRegistration deleteMenuItemShortcut;
 
-	private FooterCell totalCountFooterCell;
+	private Text totalCountFooterText;
+	private HorizontalLayout footerTextLayout;
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -203,7 +204,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			dataGrid = dataGrid(entityClass);
 			dataGrid.setSizeFull();
 			dataGrid.addClassName("gx-grid");
-			((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI)).setSelectionColumnFrozen(true);
+			((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI))
+					.setSelectionColumnFrozen(true);
 
 			DataProvider<T, ?> dataProvider = dataProvider(entityClass);
 			if (dataProvider != null) {
@@ -257,7 +259,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			deleteMenuItem = crudMenuBar.addItem(VaadinIcon.TRASH.create());
 			customizeDeleteMenuItem(deleteMenuItem);
 
-			//@TODO: need to fix the export function. The URL is not absolute as well in the export component.
 			exportDataMenuItem = columnMenuBar.addItem(VaadinIcon.DOWNLOAD.create());
 			exportDataMenuItem.setVisible(shouldShowExportDataMenu());
 			exportDataMenuItem.addClickListener(cl -> {
@@ -328,7 +329,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
-						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
+						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName)
+								.get();
 						Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
 						if (renderer != null) {
 							dataGrid.removeColumn(column);
@@ -376,7 +378,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				endColumn.setAutoWidth(true);
 			}
 
-			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column")).forEach(col -> col.setVisible(false));
+			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column"))
+					.forEach(col -> col.setVisible(false));
 
 			for (String key : availableProperties()) {
 				Column<T> columnByKey = dataGrid.getColumnByKey(key);
@@ -386,8 +389,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			}
 
 			mainLayout.addToPrimary(dataGrid);
-
 			add(mainLayout);
+			footerTextLayout = new HorizontalLayout();
+			totalCountFooterText = new Text("No Records");
+
+			footerTextLayout.add(totalCountFooterText);
+			footerTextLayout.addClassName("footer-layout");
 
 			if (!shouldShowFormInDialog()) {
 				formLayout = new VerticalLayout();
@@ -439,9 +446,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			postBuild();
 
 			if (shouldDisplayGridFooter()) {
-				FooterRow footer1 = dataGrid.appendFooterRow();
-				FooterRow footer2 = dataGrid.appendFooterRow();
-				totalCountFooterCell = footer2.join(footer2.getCells());
+				add(footerTextLayout);
 			}
 
 			enableShortcuts();
@@ -506,7 +511,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 	}
 
-	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		AbstractField<?, ?> c = inlineEditorForProperty(propertyName, propertyDefinition);
 		if (c == null) {
 			if (propertyName.matches("date.*|.*Date")) {
@@ -539,11 +545,13 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 		c.getElement().getStyle().set("width", "100%");
 		c.getElement().setProperty("clearButtonVisible", true);
-		c.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+		c.getElement().setProperty("placeholder",
+				propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
 		return c;
 	}
 
-	protected AbstractField<?, ?> inlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	protected AbstractField<?, ?> inlineEditorForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		return null;
 	}
 
@@ -710,7 +718,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				});
 				dataProvider.refreshAll();
 			} else if (entityGrid().getDataProvider() instanceof ConfigurableFilterDataProvider) {
-				ConfigurableFilterDataProvider<T, Void, Object> dataProvider = (ConfigurableFilterDataProvider<T, Void, Object>) entityGrid().getDataProvider();
+				ConfigurableFilterDataProvider<T, Void, Object> dataProvider = (ConfigurableFilterDataProvider<T, Void, Object>) entityGrid()
+						.getDataProvider();
 				propertyDefinition.getSetter().ifPresent(setter -> {
 					if (event.getValue() == null || event.getValue().toString().isBlank()) {
 						setter.accept(searchEntity, null);
@@ -786,7 +795,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 	}
 
-	private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		AbstractField<?, ?> filter = columnFilterForProperty(propertyName, propertyDefinition);
 		if (filter == null) {
 			if (propertyName.matches("date.*|.*Date")) {
@@ -819,11 +829,13 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 		filter.getElement().getStyle().set("width", "100%");
 		filter.getElement().setProperty("clearButtonVisible", true);
-		filter.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+		filter.getElement().setProperty("placeholder",
+				propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
 		return filter;
 	}
 
-	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	protected AbstractField<?, ?> columnFilterForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		return null;
 	}
 
@@ -839,26 +851,32 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		if (renderer == null) {
 			if (propertyName.matches("date.*|.*Date")) {
 				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.Date);
+					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+							GxNumberToDateRenderer.GxDateResolution.Date);
 				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
+					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+							GxDateRenderer.GxDateResolution.Date);
 				}
 			}
 			if (renderer == null && propertyName.matches("dateTime.*|.*DateTime")) {
 				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.DateTime);
+					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+							GxNumberToDateRenderer.GxDateResolution.DateTime);
 				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
+					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+							GxDateRenderer.GxDateResolution.DateTime);
 				}
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
+				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+						GxDateRenderer.GxDateResolution.DateTime);
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Date.class)) {
-				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
+				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+						GxDateRenderer.GxDateResolution.Date);
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
-				renderer = new ComponentRenderer(s -> {
+				renderer = new ComponentRenderer<>(s -> {
 					Checkbox c = new Checkbox();
 					Boolean value = (Boolean) propertyDefinition.getGetter().apply((T) s);
 					c.setValue(value);
@@ -868,7 +886,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			}
 			if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 				NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
-				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), numberFormat);
+				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+						numberFormat);
 			}
 		}
 		return renderer;
@@ -879,7 +898,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			defaultNumberFormat = DecimalFormat.getNumberInstance();
 			defaultNumberFormat.setMaximumFractionDigits(2);
 			defaultNumberFormat.setGroupingUsed(true);
-			//            defaultNumberFormat.setRoundingMode(RoundingMode.CEILING);
+
 		}
 		return defaultNumberFormat;
 	}
@@ -888,7 +907,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return null;
 	}
 
-	protected void configureDefaults(String propertyName, Column<T> column, PropertyDefinition<T, ?> propertyDefinition) {
+	protected void configureDefaults(String propertyName, Column<T> column,
+			PropertyDefinition<T, ?> propertyDefinition) {
 		column.setId(propertyName);
 		Span header = new Span(propertyDefinition.getCaption());
 		header.getStyle().set("white-space", "normal");
@@ -907,6 +927,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected void decorateColumn(String propertyName, Column<T> column) {
+	}
+
+	protected void decorateCell(String propertyName, CellStyle cellStyle) {
 	}
 
 	protected void postBuild() {
@@ -953,6 +976,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	private void openForm(T entity) {
+		addMenuItem.setEnabled(false); // set enabled false to prevent double click ..
 		preEdit(entity);
 		GxAbstractEntityForm<T> entityForm = cachedForm(entity);
 		if (entityForm != null) {
@@ -996,7 +1020,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		build();
 		entityGrid().deselectAll();
 		crudMenuBar.setVisible(isEditable());
-		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__gxEditColumn")).forEach(c -> c.setVisible(isEditable()));
+		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__gxEditColumn"))
+				.forEach(c -> c.setVisible(isEditable()));
 		if (isDragAndDropEnabled()) {
 			dataGrid.setRowsDraggable(isRowDraggable());
 			dataGrid.setDropMode(GridDropMode.ON_TOP_OR_BETWEEN);
@@ -1025,11 +1050,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	protected final void updateTotalCountFooter(int count) {
 		if (shouldDisplayGridFooter()) {
 			if (count == 0) {
-				totalCountFooterCell.setText("No records");
+				totalCountFooterText.setText("No records");
 			} else if (count == 1) {
-				totalCountFooterCell.setText("1 record");
+				totalCountFooterText.setText("1 record");
 			} else {
-				totalCountFooterCell.setText(DecimalFormat.getNumberInstance().format(count) + " records");
+				totalCountFooterText.setText(DecimalFormat.getNumberInstance().format(count)
+						+ " records");
 			}
 		}
 	}
@@ -1038,6 +1064,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	/**
 	 * TODO: Need to improve caching of form.
+	 * 
 	 * @param entity
 	 * @return
 	 */
@@ -1078,6 +1105,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 						log.warn(e.getMessage(), e);
 						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 					}
+					addMenuItem.setEnabled(true);
+					refresh();
 				}
 
 				@Override
@@ -1087,6 +1116,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					} else {
 						dialog.close();
 					}
+					addMenuItem.setEnabled(true);
 				}
 			};
 			entityForm.setDelegate(delegate);
@@ -1154,7 +1184,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	public boolean isSecondaryComponentVisible() {
-		return mainLayout != null && mainLayout.getSecondaryComponent() != null && mainLayout.getSecondaryComponent().isVisible();
+		return mainLayout != null && mainLayout.getSecondaryComponent() != null
+				&& mainLayout.getSecondaryComponent().isVisible();
 	}
 
 	public Dialog showInDialog(TRVoidCallback... callback) {
@@ -1202,7 +1233,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	protected List<Order> sortOrdersToSpringOrders(List<QuerySortOrder> sortOrders) {
 		return sortOrders.stream().map(so -> {
-			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC, so.getSorted());
+			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC,
+					so.getSorted());
 		}).collect(Collectors.toList());
 	}
 
