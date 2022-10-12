@@ -11,7 +11,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HtmlComponent;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -19,9 +18,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.VaadinSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -230,7 +227,6 @@ public class FileUploader extends CustomField<String> {
 			}
 			image.addClickListener(listener -> {
 				try {
-					String extension = TRFileContentUtil.getExtensionFromFilename(getValue());
 					String src = getValue();
 					InputStream stream = null;
 					String resourcePath = storage.resourcePath(getRootFolder(), src);
@@ -243,28 +239,11 @@ public class FileUploader extends CustomField<String> {
 					}
 					byte[] bytes = IOUtils.toByteArray(stream);
 					StreamResource streamResource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
-
-					if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
-							|| mimeType.startsWith("video")) {
-						try {
-							ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
-							resourcePreviewPanel.showInDialog("80%", "80%");
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-					} else {
-						try {
-							LongRunningTask task = LongRunningTask.newTask(UI.getCurrent(), ui -> {
-							}).withDoneCallback(ui -> {
-								StreamRegistration sr = VaadinSession.getCurrent().getResourceRegistry()
-										.registerResource(streamResource);
-								ui.getPage().open(sr.getResourceUri().toString());
-							});
-							task.start();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+					try {
+						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
+						resourcePreviewPanel.showInDialog("80%", "80%");
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
