@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.springframework.data.domain.Sort.Order;
-
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
-import com.vaadin.flow.data.provider.SortOrder;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 

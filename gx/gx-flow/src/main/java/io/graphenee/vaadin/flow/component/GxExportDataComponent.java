@@ -34,6 +34,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.flow.component.UI;
@@ -59,14 +60,13 @@ public class GxExportDataComponent<T> {
 	private Supplier<Collection<String>> columnsCaptionsSupplier;
 	private Supplier<Collection<String>> dataColumnSupplier;
 	private CellStyle defaultDateStyle = null;
-	private CellStyle defaultCellStyle = null;
 	private CellStyle defaultRowStyle = null;
 
 	private XSSFWorkbook workbook = null;
 
-	private GxExportDataComponentDelegate delegate;
+	private GxExportDataComponentDelegate<T> delegate;
 
-	public GxExportDataComponent<T> withDelegate(GxExportDataComponentDelegate delegate) {
+	public GxExportDataComponent<T> withDelegate(GxExportDataComponentDelegate<T> delegate) {
 		this.delegate = delegate;
 		return this;
 	}
@@ -171,8 +171,7 @@ public class GxExportDataComponent<T> {
 		for (String property : columnsCaptions) {
 			Cell cell = headerRow.createCell(i++);
 			if (delegate != null) {
-				defaultCellStyle = workbook.createCellStyle();
-				CellStyle style = delegate.decorateExportHeaderCell(property, defaultCellStyle);
+				CellStyle style = delegate.decorateExportHeaderCell(property, workbook);
 				if (style != null) {
 					cell.setCellStyle(style);
 				}
@@ -183,9 +182,6 @@ public class GxExportDataComponent<T> {
 			cell.setCellValue(camelCaseToRegular(property));
 
 		}
-		// if (delegate != null) {
-		// delegate.decorateExportHeaderRow(headerRow);
-		// }
 	}
 
 	private void buildDataRows() {
@@ -204,6 +200,7 @@ public class GxExportDataComponent<T> {
 	}
 
 	private void buildDataRow(Row row, Object item) {
+		T entity = (T) item;
 		CellStyle rowStyle = null;
 		if (delegate != null) {
 			defaultRowStyle = workbook.createCellStyle();
@@ -218,8 +215,7 @@ public class GxExportDataComponent<T> {
 			Object value = kvw.valueForKeyPath(property);
 			Cell cell = row.createCell(i++);
 			if (delegate != null) {
-				defaultCellStyle = workbook.createCellStyle();
-				CellStyle style = delegate.decorateExportDataCell(property, defaultCellStyle, item);
+				CellStyle style = delegate.decorateExportDataCell(property, workbook, entity);
 				if (style != null) {
 					cell.setCellStyle(style);
 				}
@@ -254,7 +250,7 @@ public class GxExportDataComponent<T> {
 				' ');
 	}
 
-	public static interface GxExportDataComponentDelegate {
+	public static interface GxExportDataComponentDelegate<T> {
 
 		default CellStyle decorateExportHeaderRow(CellStyle rowStyle) {
 			return rowStyle;
@@ -264,12 +260,12 @@ public class GxExportDataComponent<T> {
 			return rowStyle;
 		}
 
-		default CellStyle decorateExportDataCell(String propertyName, CellStyle cellStyle, Object entity) {
-			return cellStyle;
+		default CellStyle decorateExportDataCell(String propertyName, Workbook workbook, T entity) {
+			return null;
 		}
 
-		default CellStyle decorateExportHeaderCell(String propertyName, CellStyle cellStyle) {
-			return cellStyle;
+		default CellStyle decorateExportHeaderCell(String propertyName, Workbook workbook) {
+			return null;
 		}
 
 	}

@@ -455,7 +455,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return this;
 	}
 
-	protected GxExportDataComponentDelegate exportDataDelegate() {
+	protected GxExportDataComponentDelegate<T> exportDataDelegate() {
 		return null;
 	}
 
