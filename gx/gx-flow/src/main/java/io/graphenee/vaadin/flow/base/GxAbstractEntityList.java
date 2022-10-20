@@ -22,9 +22,11 @@ import java.util.stream.Stream;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 
+import com.google.common.eventbus.EventBus;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
@@ -32,6 +34,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -87,6 +90,7 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.model.GxDashboardUser;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
@@ -109,6 +113,9 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	private static final long serialVersionUID = 1L;
+
+	@Autowired
+	EventBus coreEventBus;
 
 	private SplitLayout mainLayout;
 	private GxDialog dialog;
@@ -463,6 +470,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return true;
 	}
 
+	protected boolean shouldAllowColumnReordering() {
+		return false;
+	}
+
 	protected void enableShortcuts() {
 		addMenuItemShortcut = addMenuItem.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 		deleteMenuItemShortcut = deleteMenuItem.addClickShortcut(Key.DELETE, KeyModifier.ALT);
@@ -646,28 +657,32 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	protected void customizeDeleteMenuItem(MenuItem deleteMenuItem) {
 		deleteMenuItem.addClickListener(cl -> {
 			if (shouldShowDeleteConfirmation()) {
-				ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
-					try {
-						onDelete(dataGrid.getSelectedItems());
-						if (isAuditLogEnabled()) {
-							auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
-						}
-						listeners.forEach(l -> {
-							l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
-						});
-						refresh();
-						deleteMenuItem.setEnabled(false);
-						dataGrid.deselectAll();
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
-						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-					}
-				}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
+				ConfirmDialog.createQuestion().withCaption("Confirmation")
+						.withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
+							try {
+								onDelete(dataGrid.getSelectedItems());
+								if (isAuditLogEnabled()) {
+									auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(),
+											"DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+								}
+								listeners.forEach(l -> {
+									l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+								});
+								refresh();
+								deleteMenuItem.setEnabled(false);
+								dataGrid.deselectAll();
+							} catch (Exception e) {
+								log.warn(e.getMessage(), e);
+								Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+							}
+						}, ButtonOption.focus(), ButtonOption.caption("YES"))
+						.withCancelButton(ButtonOption.caption("NO")).open();
 			} else {
 				try {
 					onDelete(dataGrid.getSelectedItems());
 					if (isAuditLogEnabled()) {
-						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE",
+								entityClass.getSimpleName(), dataGrid.getSelectedItems());
 					}
 					listeners.forEach(l -> {
 						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
@@ -843,6 +858,23 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected void decorateGrid(Grid<T> dataGrid) {
+		if (shouldAllowColumnReordering()) {
+			GxDashboardUser user = DashboardUtils.getLoggedInUser();
+			dataGrid.setColumnReorderingAllowed(true);
+			dataGrid.addColumnReorderListener(listener -> {
+				System.out.println("Order Updated.");
+				String columns = listener.getColumns().stream().filter(c -> !c.getKey().contains("__"))
+						.map(c -> c.getKey())
+						.collect(Collectors.joining(","));
+				System.out.println(columns);
+				UI.getCurrent().getPage().executeJs("return window.location.href;").then(String.class, value -> {
+					String viewName = value.substring(value.lastIndexOf('/') + 1, value.length());
+					Notification.show("URL: " + viewName);
+					user.setPreference(viewName, columns);
+					coreEventBus.post(user.getUser());
+				});
+			});
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1078,7 +1110,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 		if (entityForm != null) {
 			entityForm.setEditable(isEditable());
-			//entityForm.setEntity(entity);
+			// entityForm.setEntity(entity);
 			EntityFormDelegate<T> delegate = new EntityFormDelegate<T>() {
 
 				@Override
@@ -1087,7 +1119,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 						GxAbstractEntityList.this.onSave(entity);
 						if (isAuditLogEnabled()) {
 							try {
-								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE", entityClass.getSimpleName(), List.of(entity));
+								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE",
+										entityClass.getSimpleName(), List.of(entity));
 							} catch (Exception ex) {
 								// ignore this exception.
 							}
@@ -1124,7 +1157,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return entityForm;
 	}
 
-	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<T> entities) {
+	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity,
+			Collection<T> entities) {
 		log.warn(this + " - Override auditLog(...) method to log this event.");
 	}
 

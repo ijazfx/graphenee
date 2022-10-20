@@ -341,10 +341,12 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public GxTermBean findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale) {
 		String localeCode = locale.toString();
-		GxTerm term = termRepo.findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey, localeCode);
+		GxTerm term = termRepo.findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey,
+				localeCode);
 		if (term == null) {
 			localeCode = locale.getLanguage();
-			term = termRepo.findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey, localeCode);
+			term = termRepo.findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey,
+					localeCode);
 		}
 		if (term != null) {
 			return makeTermBean(term);
@@ -412,11 +414,13 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public List<GxTermBean> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale) {
+	public List<GxTermBean> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespaceBean namespace,
+			GxSupportedLocaleBean supportedLocale) {
 		PageRequest pageRequest = PageRequest.of(page, size);
 		Page<GxTerm> result = null;
 		if (namespace != null && supportedLocale != null) {
-			result = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(pageRequest, namespace.getOid(), supportedLocale.getOid());
+			result = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(pageRequest, namespace.getOid(),
+					supportedLocale.getOid());
 		} else if (namespace != null) {
 			result = termRepo.findByGxNamespaceOid(pageRequest, namespace.getOid());
 		} else if (supportedLocale != null) {
@@ -428,11 +432,13 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public List<GxTermBean> findDistinctTermByNamespaceAndSupportedLocale(GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale) {
+	public List<GxTermBean> findDistinctTermByNamespaceAndSupportedLocale(GxNamespaceBean namespace,
+			GxSupportedLocaleBean supportedLocale) {
 		List<GxTermBean> distinctTerms = new ArrayList<>();
 		Collection<GxTerm> entities = null;
 		if (namespace != null && supportedLocale != null) {
-			entities = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(namespace.getOid(), supportedLocale.getOid());
+			entities = termRepo.findByGxNamespaceOidAndGxSupportedLocaleOid(namespace.getOid(),
+					supportedLocale.getOid());
 		} else if (namespace != null) {
 			entities = termRepo.findByGxNamespaceOid(namespace.getOid());
 		} else if (supportedLocale != null) {
@@ -543,12 +549,14 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupActive() {
-		return securityGroupRepo.findAllByIsActive(true).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		return securityGroupRepo.findAllByIsActive(true).stream().map(this::makeSecurityGroupBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupInactive() {
-		return securityGroupRepo.findAllByIsActive(false).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		return securityGroupRepo.findAllByIsActive(false).stream().map(this::makeSecurityGroupBean)
+				.collect(Collectors.toList());
 	}
 
 	private GxSecurityGroupBean makeSecurityGroupBean(GxSecurityGroup entity) {
@@ -563,13 +571,16 @@ public class GxDataServiceImpl implements GxDataService {
 			return makeNamespaceBean(namespaceRepo.findOne(oid));
 		}));
 		bean.setSecurityPolicyCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityPolicyRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+			return securityPolicyRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream()
+					.map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 		}));
 		bean.setUserAccountCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return userAccountRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
+			return userAccountRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream()
+					.map(this::makeUserAccountBean).collect(Collectors.toList());
 		}));
 		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return accessKeyRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+			return accessKeyRepo.findAllByGxSecurityGroupsOidEquals(entity.getOid()).stream()
+					.map(this::makeAccessKeyBean).collect(Collectors.toList());
 		}));
 		return bean;
 	}
@@ -630,54 +641,63 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupByNamespace(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityGroupRepo.findByGxNamespace(entity).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+		return securityGroupRepo.findByGxNamespace(entity).stream().map(this::makeSecurityGroupBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupName(GxNamespaceBean namespace, String groupName) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		Optional<GxSecurityGroupBean> securityGroupOptional = securityGroupRepo.findByGxNamespace(entity).stream().filter(sg -> {
-			return sg.getSecurityGroupName().equalsIgnoreCase(groupName);
-		}).map(this::makeSecurityGroupBean).findFirst();
+		Optional<GxSecurityGroupBean> securityGroupOptional = securityGroupRepo.findByGxNamespace(entity).stream()
+				.filter(sg -> {
+					return sg.getSecurityGroupName().equalsIgnoreCase(groupName);
+				}).map(this::makeSecurityGroupBean).findFirst();
 		return securityGroupOptional.isPresent() ? securityGroupOptional.get() : null;
 	}
 
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupByNamespaceActive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityGroupRepo.findByGxNamespace(entity).stream().filter(securityGroup -> securityGroup.getIsActive() == true).map(this::makeSecurityGroupBean)
+		return securityGroupRepo.findByGxNamespace(entity).stream()
+				.filter(securityGroup -> securityGroup.getIsActive() == true).map(this::makeSecurityGroupBean)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupNameActive(GxNamespaceBean namespace, String groupName) {
+	public GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupNameActive(GxNamespaceBean namespace,
+			String groupName) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		Optional<GxSecurityGroupBean> securityGroupOptional = securityGroupRepo.findByGxNamespace(entity).stream().filter(sg -> {
-			return sg.getIsActive() && sg.getSecurityGroupName().equalsIgnoreCase(groupName);
-		}).map(this::makeSecurityGroupBean).findFirst();
+		Optional<GxSecurityGroupBean> securityGroupOptional = securityGroupRepo.findByGxNamespace(entity).stream()
+				.filter(sg -> {
+					return sg.getIsActive() && sg.getSecurityGroupName().equalsIgnoreCase(groupName);
+				}).map(this::makeSecurityGroupBean).findFirst();
 		return securityGroupOptional.isPresent() ? securityGroupOptional.get() : null;
 	}
 
 	@Override
 	public List<GxSecurityGroupBean> findSecurityGroupByNamespaceInactive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityGroupRepo.findByGxNamespace(entity).stream().filter(securityGroup -> securityGroup.getIsActive() == false).map(this::makeSecurityGroupBean)
+		return securityGroupRepo.findByGxNamespace(entity).stream()
+				.filter(securityGroup -> securityGroup.getIsActive() == false).map(this::makeSecurityGroupBean)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxUserAccountBean> findUserAccount() {
-		return userAccountRepo.findAll(Sort.by("username")).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
+		return userAccountRepo.findAll(Sort.by("username")).stream().map(this::makeUserAccountBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxUserAccountBean> findUserAccountActive() {
-		return userAccountRepo.findAll().stream().filter(userAccount -> userAccount.getIsActive() == true).map(this::makeUserAccountBean).collect(Collectors.toList());
+		return userAccountRepo.findAll().stream().filter(userAccount -> userAccount.getIsActive() == true)
+				.map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxUserAccountBean> findUserAccountInactive() {
-		return userAccountRepo.findAll().stream().filter(userAccount -> userAccount.getIsActive() == false).map(this::makeUserAccountBean).collect(Collectors.toList());
+		return userAccountRepo.findAll().stream().filter(userAccount -> userAccount.getIsActive() == false)
+				.map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	private GxUserAccountBean makeUserAccountBean(GxUserAccount entity) {
@@ -694,14 +714,18 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setIsProtected(entity.getIsProtected());
 		bean.setAccountActivationDate(entity.getAccountActivationDate());
 		bean.setProfileImage(entity.getProfileImage());
+		bean.setPreferences(entity.getPreferences());
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+			return securityGroupRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream()
+					.map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
 		bean.setSecurityPolicyCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityPolicyRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+			return securityPolicyRepo.findAllByGxUserAccountsOidEquals(entity.getOid()).stream()
+					.map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 		}));
 		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return accessKeyRepo.findAllByGxUserAccountOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+			return accessKeyRepo.findAllByGxUserAccountOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean)
+					.collect(Collectors.toList());
 		}));
 		if (entity.getGxGender() != null)
 			bean.setGender(GenderEnum.valueOf(entity.getGxGender().getGenderCode()));
@@ -727,6 +751,7 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setIsLocked(bean.getIsLocked());
 		entity.setIsProtected(false);
 		entity.setCountLoginFailed(bean.getCountLoginFailed());
+		entity.setPreferences(bean.getPreferences());
 
 		if (bean.getProfileImage() != null) {
 			entity.setProfileImage(bean.getProfileImage());
@@ -823,13 +848,15 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxUserAccountBean> findUserAccountBySecurityGroupActive(GxSecurityGroupBean securityGroup) {
 		GxSecurityGroup entity = securityGroupRepo.findOne(securityGroup.getOid());
-		return entity.getGxUserAccounts().stream().filter(userAccount -> userAccount.getIsActive() == true).map(this::makeUserAccountBean).collect(Collectors.toList());
+		return entity.getGxUserAccounts().stream().filter(userAccount -> userAccount.getIsActive() == true)
+				.map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxUserAccountBean> findUserAccountBySecurityGroupInactive(GxSecurityGroupBean securityGroup) {
 		GxSecurityGroup entity = securityGroupRepo.findOne(securityGroup.getOid());
-		return entity.getGxUserAccounts().stream().filter(userAccount -> userAccount.getIsActive() == false).map(this::makeUserAccountBean).collect(Collectors.toList());
+		return entity.getGxUserAccounts().stream().filter(userAccount -> userAccount.getIsActive() == false)
+				.map(this::makeUserAccountBean).collect(Collectors.toList());
 	}
 
 	@Override
@@ -839,12 +866,14 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyActive() {
-		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == true).map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == true)
+				.map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyInactive() {
-		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+		return securityPolicyRepo.findAll().stream().filter(securityPolicy -> securityPolicy.getIsActive() == false)
+				.map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 	}
 
 	private GxSecurityPolicyBean makeSecurityPolicyBean(GxSecurityPolicy entity) {
@@ -859,16 +888,20 @@ public class GxDataServiceImpl implements GxDataService {
 			return makeNamespaceBean(namespaceRepo.findOne(oid));
 		}));
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityGroupRepo.findAllByGxSecurityPoliciesOidEquals(entity.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+			return securityGroupRepo.findAllByGxSecurityPoliciesOidEquals(entity.getOid()).stream()
+					.map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
 		bean.setUserAccountCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return userAccountRepo.findAllByGxSecurityPoliciesOidEquals(entity.getOid()).stream().map(this::makeUserAccountBean).collect(Collectors.toList());
+			return userAccountRepo.findAllByGxSecurityPoliciesOidEquals(entity.getOid()).stream()
+					.map(this::makeUserAccountBean).collect(Collectors.toList());
 		}));
 		bean.setSecurityPolicyDocumentCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityPolicyDocumentRepo.findAllByGxSecurityPolicyOidEquals(entity.getOid()).stream().map(this::makeSecurityPolicyDocumentBean).collect(Collectors.toList());
+			return securityPolicyDocumentRepo.findAllByGxSecurityPolicyOidEquals(entity.getOid()).stream()
+					.map(this::makeSecurityPolicyDocumentBean).collect(Collectors.toList());
 		}));
 		bean.setAccessKeyCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return accessKeyRepo.findAllByGxSecurityPolicysOidEquals(entity.getOid()).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+			return accessKeyRepo.findAllByGxSecurityPolicysOidEquals(entity.getOid()).stream()
+					.map(this::makeAccessKeyBean).collect(Collectors.toList());
 		}));
 		return bean;
 	}
@@ -906,11 +939,12 @@ public class GxDataServiceImpl implements GxDataService {
 			bean.getSecurityPolicyDocumentCollectionFault().getBeansRemoved().forEach(removed -> {
 				entity.getGxSecurityPolicyDocuments().removeIf(sp -> sp.getOid().equals(removed.getOid()));
 			});
-			Map<Integer, GxSecurityPolicyDocument> documentMap = entity.getGxSecurityPolicyDocuments().stream().collect(Collectors.toMap(e -> {
-				return e.getOid();
-			}, e -> {
-				return e;
-			}));
+			Map<Integer, GxSecurityPolicyDocument> documentMap = entity.getGxSecurityPolicyDocuments().stream()
+					.collect(Collectors.toMap(e -> {
+						return e.getOid();
+					}, e -> {
+						return e;
+					}));
 			bean.getSecurityPolicyDocumentCollectionFault().getBeansAdded().forEach(added -> {
 				GxSecurityPolicyDocument spd = null;
 				if (added.getOid() != null) {
@@ -943,9 +977,10 @@ public class GxDataServiceImpl implements GxDataService {
 		bean.setDocumentJson(entity.getDocumentJson());
 		bean.setTag(entity.getTag());
 		bean.setIsDefault(entity.getIsDefault());
-		bean.setSecurityPolicyBeanFault(new BeanFault<Integer, GxSecurityPolicyBean>(entity.getGxSecurityPolicy().getOid(), oid -> {
-			return makeSecurityPolicyBean(securityPolicyRepo.findOne(oid));
-		}));
+		bean.setSecurityPolicyBeanFault(
+				new BeanFault<Integer, GxSecurityPolicyBean>(entity.getGxSecurityPolicy().getOid(), oid -> {
+					return makeSecurityPolicyBean(securityPolicyRepo.findOne(oid));
+				}));
 		return bean;
 	}
 
@@ -973,20 +1008,23 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyByNamespace(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityPolicyRepo.findByGxNamespace(entity).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+		return securityPolicyRepo.findByGxNamespace(entity).stream().map(this::makeSecurityPolicyBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyByNamespaceActive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityPolicyRepo.findByGxNamespace(entity).stream().filter(securityPolicy -> securityPolicy.getIsActive() == true).map(this::makeSecurityPolicyBean)
+		return securityPolicyRepo.findByGxNamespace(entity).stream()
+				.filter(securityPolicy -> securityPolicy.getIsActive() == true).map(this::makeSecurityPolicyBean)
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxSecurityPolicyBean> findSecurityPolicyByNamespaceInactive(GxNamespaceBean namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityPolicyRepo.findByGxNamespace(entity).stream().filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean)
+		return securityPolicyRepo.findByGxNamespace(entity).stream()
+				.filter(securityPolicy -> securityPolicy.getIsActive() == false).map(this::makeSecurityPolicyBean)
 				.collect(Collectors.toList());
 	}
 
@@ -1044,17 +1082,20 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxCountryBean findCountryByStateName(String stateName) {
-		return makeCountryBean(countryRepository.findOneByIsActiveTrueAndGxStatesStateNameOrderByCountryNameAsc(stateName));
+		return makeCountryBean(
+				countryRepository.findOneByIsActiveTrueAndGxStatesStateNameOrderByCountryNameAsc(stateName));
 	}
 
 	@Override
 	public GxCountryBean findCountryByStateCode(String stateCode) {
-		return makeCountryBean(countryRepository.findOneByIsActiveTrueAndGxStatesStateCodeOrderByCountryNameAsc(stateCode));
+		return makeCountryBean(
+				countryRepository.findOneByIsActiveTrueAndGxStatesStateCodeOrderByCountryNameAsc(stateCode));
 	}
 
 	@Override
 	public GxCountryBean findCountryByCityName(String cityName) {
-		return makeCountryBean(countryRepository.findOneByIsActiveTrueAndGxCitiesCityNameOrderByCountryNameAsc(cityName));
+		return makeCountryBean(
+				countryRepository.findOneByIsActiveTrueAndGxCitiesCityNameOrderByCountryNameAsc(cityName));
 	}
 
 	@Override
@@ -1227,12 +1268,14 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxStateBean> findStateByCountryNumericCode(Integer numeriCode) {
-		return makeStateBean(stateRepository.findAllByIsActiveTrueAndGxCountryNumericCodeOrderByStateNameAsc(numeriCode));
+		return makeStateBean(
+				stateRepository.findAllByIsActiveTrueAndGxCountryNumericCodeOrderByStateNameAsc(numeriCode));
 	}
 
 	@Override
 	public List<GxStateBean> findStateByCountryCountryName(String countryName) {
-		return makeStateBean(stateRepository.findAllByIsActiveTrueAndGxCountryCountryNameOrderByStateNameAsc(countryName));
+		return makeStateBean(
+				stateRepository.findAllByIsActiveTrueAndGxCountryCountryNameOrderByStateNameAsc(countryName));
 	}
 
 	private List<GxCityBean> makeCityBean(List<GxCity> cityList) {
@@ -1351,34 +1394,40 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSavedQueryBean> findSavedQuery() {
 		List<GxSavedQueryBean> beans = new ArrayList<>();
-		beans.addAll(savedQueryRepository.findAll().stream().map(this::makeSavedQueryBean).collect(Collectors.toList()));
+		beans.addAll(
+				savedQueryRepository.findAll().stream().map(this::makeSavedQueryBean).collect(Collectors.toList()));
 		return beans;
 	}
 
 	@Override
 	public List<GxEmailTemplateBean> findEmailTemplateByNamespace(GxNamespaceBean namespace) {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
-		beans.addAll(emailTemplateRepository.findAllByGxNamespaceOidOrderByTemplateName(namespace.getOid()).stream().map(template -> {
-			return makeEmailTemplateBean(template, namespace);
-		}).collect(Collectors.toList()));
+		beans.addAll(emailTemplateRepository.findAllByGxNamespaceOidOrderByTemplateName(namespace.getOid()).stream()
+				.map(template -> {
+					return makeEmailTemplateBean(template, namespace);
+				}).collect(Collectors.toList()));
 		return beans;
 	}
 
 	@Override
 	public List<GxEmailTemplateBean> findEmailTemplateByNamespaceActive(GxNamespaceBean namespace) {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
-		beans.addAll(emailTemplateRepository.findAllByGxNamespaceOidAndIsActiveOrderByTemplateName(namespace.getOid(), true).stream().map(template -> {
-			return makeEmailTemplateBean(template, namespace);
-		}).collect(Collectors.toList()));
+		beans.addAll(
+				emailTemplateRepository.findAllByGxNamespaceOidAndIsActiveOrderByTemplateName(namespace.getOid(), true)
+						.stream().map(template -> {
+							return makeEmailTemplateBean(template, namespace);
+						}).collect(Collectors.toList()));
 		return beans;
 	}
 
 	@Override
 	public List<GxEmailTemplateBean> findEmailTemplateByNamespaceInactive(GxNamespaceBean namespace) {
 		List<GxEmailTemplateBean> beans = new ArrayList<>();
-		beans.addAll(emailTemplateRepository.findAllByGxNamespaceOidAndIsActiveOrderByTemplateName(namespace.getOid(), false).stream().map(template -> {
-			return makeEmailTemplateBean(template, namespace);
-		}).collect(Collectors.toList()));
+		beans.addAll(
+				emailTemplateRepository.findAllByGxNamespaceOidAndIsActiveOrderByTemplateName(namespace.getOid(), false)
+						.stream().map(template -> {
+							return makeEmailTemplateBean(template, namespace);
+						}).collect(Collectors.toList()));
 		return beans;
 	}
 
@@ -1387,7 +1436,8 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespaceBean namespace = findNamespace(GxNamespaceBean.SYSTEM);
 		GxEmailTemplate emailTemplate = null;
 		if (namespace != null) {
-			emailTemplate = emailTemplateRepository.findOneByTemplateNameAndGxNamespaceOidAndIsActive(templateName, namespace.getOid(), true);
+			emailTemplate = emailTemplateRepository.findOneByTemplateNameAndGxNamespaceOidAndIsActive(templateName,
+					namespace.getOid(), true);
 		} else {
 			emailTemplate = emailTemplateRepository.findOneByTemplateNameAndIsActive(templateName, true);
 		}
@@ -1398,8 +1448,10 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace) {
-		GxEmailTemplate emailTemplate = emailTemplateRepository.findOneByTemplateNameAndGxNamespaceOidAndIsActive(templateName, namespace.getOid(), true);
+	public GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName,
+			GxNamespaceBean namespace) {
+		GxEmailTemplate emailTemplate = emailTemplateRepository
+				.findOneByTemplateNameAndGxNamespaceOidAndIsActive(templateName, namespace.getOid(), true);
 		if (emailTemplate != null) {
 			return makeEmailTemplateBean(emailTemplate, namespace);
 		}
@@ -1411,7 +1463,8 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespaceBean namespace = findNamespace(GxNamespaceBean.SYSTEM);
 		GxEmailTemplate emailTemplate = null;
 		if (namespace != null) {
-			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
+			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode,
+					namespace.getOid(), true);
 		} else {
 			emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndIsActive(templateCode, true);
 		}
@@ -1422,8 +1475,10 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace) {
-		GxEmailTemplate emailTemplate = emailTemplateRepository.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
+	public GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode,
+			GxNamespaceBean namespace) {
+		GxEmailTemplate emailTemplate = emailTemplateRepository
+				.findOneByTemplateCodeAndGxNamespaceOidAndIsActive(templateCode, namespace.getOid(), true);
 		if (emailTemplate != null) {
 			return makeEmailTemplateBean(emailTemplate, namespace);
 		}
@@ -1578,7 +1633,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxUserAccountBean findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespaceBean namespace) {
+	public GxUserAccountBean findUserAccountByUsernamePasswordAndNamespace(String username, String password,
+			GxNamespaceBean namespace) {
 		GxUserAccount userAccount = userAccountRepo.findByUsernameAndGxNamespaceOid(username, namespace.getOid());
 		if (userAccount == null) {
 			userAccount = userAccountRepo.findByUsernameAndGxNamespaceIsNull(username);
@@ -1601,7 +1657,8 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean) {
-		GxSecurityGroup entity = securityGroupRepo.findOneBySecurityGroupNameAndGxNamespaceNamespace(groupName, namespaceBean.getNamespace());
+		GxSecurityGroup entity = securityGroupRepo.findOneBySecurityGroupNameAndGxNamespaceNamespace(groupName,
+				namespaceBean.getNamespace());
 		if (entity != null) {
 			return makeSecurityGroupBean(entity);
 		}
@@ -1625,7 +1682,8 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxSecurityPolicyBean findOrCreateSecurityPolicy(String policyName, GxNamespaceBean namespaceBean) {
-		GxSecurityPolicy entity = securityPolicyRepo.findAllBySecurityPolicyNameAndGxNamespaceNamespace(policyName, namespaceBean.getNamespace());
+		GxSecurityPolicy entity = securityPolicyRepo.findAllBySecurityPolicyNameAndGxNamespaceNamespace(policyName,
+				namespaceBean.getNamespace());
 		if (entity != null) {
 			return makeSecurityPolicyBean(entity);
 		}
@@ -1687,17 +1745,20 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean, byte[] additionalData) {
+	public GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean,
+			byte[] additionalData) {
 		return auditEntityEventByUserWithAdditionalData(null, null, auditEvent, userAccountBean, additionalData);
 	}
 
 	@Override
-	public GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean) {
+	public GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent,
+			GxUserAccountBean userAccountBean) {
 		return auditEntityEventByUserWithAdditionalData(auditEntity, oidAuditEntity, auditEvent, userAccountBean, null);
 	}
 
 	@Override
-	public GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean,
+	public GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity,
+			String auditEvent, GxUserAccountBean userAccountBean,
 			byte[] additionalData) {
 		GxAuditLogBean bean = new GxAuditLogBean();
 		bean.setAuditDate(new Timestamp(System.currentTimeMillis()));
@@ -1714,7 +1775,8 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean) {
-		List<GxAuditLog> entities = auditLogRepository.findAllByGxUserAccountOidOrderByAuditDateDesc(userAccountBean.getOid());
+		List<GxAuditLog> entities = auditLogRepository
+				.findAllByGxUserAccountOidOrderByAuditDateDesc(userAccountBean.getOid());
 		return makeAuditLogBean(entities);
 	}
 
@@ -1726,7 +1788,8 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity) {
-		List<GxAuditLog> entities = auditLogRepository.findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(auditEntity, oidAuditEntity);
+		List<GxAuditLog> entities = auditLogRepository
+				.findAllByAuditEntityAndOidAuditEntityOrderByAuditDateDesc(auditEntity, oidAuditEntity);
 		return makeAuditLogBean(entities);
 	}
 
@@ -1766,20 +1829,23 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess) {
+	public void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp,
+			Integer accessType, Boolean isSuccess) {
 		GxAccessLog accessLog = new GxAccessLog();
 		accessLog.setIsSuccess(isSuccess);
 		accessLog.setAccessTime(timeStamp);
 		UUID accessKeyUuid = UUID.fromString(accessKey);
 		accessLog.setGxAccessKey(gxAccessKeyRepository.findByAccessKey(accessKeyUuid));
-		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName, gxNamespaceBean.getNamespace()));
+		accessLog.setGxResource(resourceRepo.findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(resourceName,
+				gxNamespaceBean.getNamespace()));
 		accessLog.setAccessType(accessType);
 		accessLogRepo.save(accessLog);
 	}
 
 	@Override
 	public List<GxAccessKeyBean> findAccessKey() {
-		return accessKeyRepo.findAll(Sort.by("accessKey")).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		return accessKeyRepo.findAll(Sort.by("accessKey")).stream().map(this::makeAccessKeyBean)
+				.collect(Collectors.toList());
 	}
 
 	private GxAccessKeyBean makeAccessKeyBean(GxAccessKey gxAccessKey) {
@@ -1794,11 +1860,13 @@ public class GxDataServiceImpl implements GxDataService {
 			bean.setAccessKeyType(null);
 
 		bean.setSecurityGroupCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityGroupRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream().map(this::makeSecurityGroupBean).collect(Collectors.toList());
+			return securityGroupRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream()
+					.map(this::makeSecurityGroupBean).collect(Collectors.toList());
 		}));
 
 		bean.setSecurityPolicyCollectionFault(BeanCollectionFault.collectionFault(() -> {
-			return securityPolicyRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream().map(this::makeSecurityPolicyBean).collect(Collectors.toList());
+			return securityPolicyRepo.findAllByGxAccessKeysOidEquals(gxAccessKey.getOid()).stream()
+					.map(this::makeSecurityPolicyBean).collect(Collectors.toList());
 		}));
 		return bean;
 	}
@@ -1849,12 +1917,14 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxAccessKeyBean> findAccessKeyByIsActive(Boolean isActive) {
-		return accessKeyRepo.findAllByIsActive(isActive).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		return accessKeyRepo.findAllByIsActive(isActive).stream().map(this::makeAccessKeyBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxAccessKeyBean> findAccessKeyByIsActiveAndGxUserAccountIsNull(Boolean isActive) {
-		return accessKeyRepo.findAllByIsActiveAndGxUserAccountIsNull(isActive).stream().map(this::makeAccessKeyBean).collect(Collectors.toList());
+		return accessKeyRepo.findAllByIsActiveAndGxUserAccountIsNull(isActive).stream().map(this::makeAccessKeyBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -2091,14 +2161,17 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxRegisteredDeviceBean registerDevice(String namespace, String deviceToken, String systemName, String brand, boolean isTablet, String ownerId)
+	public GxRegisteredDeviceBean registerDevice(String namespace, String deviceToken, String systemName, String brand,
+			boolean isTablet, String ownerId)
 			throws RegisterDeviceFailedException {
 		GxNamespaceBean namespaceBean = findNamespace(namespace);
 		if (namespaceBean == null)
 			throw new RegisterDeviceFailedException("Namespace " + namespace + " does not exist.");
-		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(namespace, deviceToken, ownerId);
+		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(namespace, deviceToken,
+				ownerId);
 		if (device != null)
-			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + "and ownerId " + ownerId + " for namespace " + namespace + " already registered");
+			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + "and ownerId " + ownerId
+					+ " for namespace " + namespace + " already registered");
 		GxRegisteredDevice entity = new GxRegisteredDevice();
 		entity.setBrand(brand);
 		entity.setIsActive(true);
@@ -2115,19 +2188,23 @@ public class GxDataServiceImpl implements GxDataService {
 	public void unregisterDevice(String namespace, String deviceToken) throws UnregisterDeviceFailedException {
 		GxRegisteredDeviceBean device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
 		if (device == null)
-			throw new UnregisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " does not exist.");
+			throw new UnregisterDeviceFailedException(
+					"Device with deviceToken " + deviceToken + " for namespace " + namespace + " does not exist.");
 		gxRegisteredDeviceRepository.deleteById(device.getOid());
 	}
 
 	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceToken(String namespace, String deviceToken) {
-		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceToken(namespace, deviceToken);
+		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceToken(namespace,
+				deviceToken);
 		if (device == null)
 			return null;
 		return makeGxRegisteredDeviceBean(device);
 	}
 
-	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace, String deviceToken, String ownerId) {
-		GxRegisteredDevice device = gxRegisteredDeviceRepository.findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(namespace, deviceToken, ownerId);
+	private GxRegisteredDeviceBean findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace,
+			String deviceToken, String ownerId) {
+		GxRegisteredDevice device = gxRegisteredDeviceRepository
+				.findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(namespace, deviceToken, ownerId);
 		if (device == null)
 			return null;
 		return makeGxRegisteredDeviceBean(device);
@@ -2167,12 +2244,14 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxRegisteredDeviceBean> findRegisteredDevice() {
-		return gxRegisteredDeviceRepository.findAll().stream().map(this::makeGxRegisteredDeviceBean).collect(Collectors.toList());
+		return gxRegisteredDeviceRepository.findAll().stream().map(this::makeGxRegisteredDeviceBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<GxRegisteredDeviceBean> findRegisteredDeviceByNamespace(GxNamespaceBean bean) {
-		return gxRegisteredDeviceRepository.findByGxNamespaceNamespace(bean.getNamespace()).stream().map(this::makeGxRegisteredDeviceBean).collect(Collectors.toList());
+		return gxRegisteredDeviceRepository.findByGxNamespaceNamespace(bean.getNamespace()).stream()
+				.map(this::makeGxRegisteredDeviceBean).collect(Collectors.toList());
 	}
 
 	@Override
@@ -2182,7 +2261,8 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxNamespacePropertyBean> findNamespaceProperty() {
-		return namespacePropertyRepo.findAll().stream().map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
+		return namespacePropertyRepo.findAll().stream().map(this::makeGxNamespacePropertyBean)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -2208,12 +2288,15 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace) {
-		return namespacePropertyRepo.findAllByGxNamespaceOidOrderByPropertyKey(namespace.getOid()).stream().map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
+		return namespacePropertyRepo.findAllByGxNamespaceOidOrderByPropertyKey(namespace.getOid()).stream()
+				.map(this::makeGxNamespacePropertyBean).collect(Collectors.toList());
 	}
 
 	@Override
-	public GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey) {
-		GxNamespaceProperty entity = namespacePropertyRepo.findOneByGxNamespaceOidAndPropertyKey(namespace.getOid(), propertyKey);
+	public GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace,
+			String propertyKey) {
+		GxNamespaceProperty entity = namespacePropertyRepo.findOneByGxNamespaceOidAndPropertyKey(namespace.getOid(),
+				propertyKey);
 		if (entity != null)
 			return makeGxNamespacePropertyBean(entity);
 		return null;
