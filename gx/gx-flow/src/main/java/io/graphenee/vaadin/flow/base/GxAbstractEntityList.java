@@ -862,7 +862,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			GxDashboardUser user = DashboardUtils.getLoggedInUser();
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
-				String columns = listener.getColumns().stream().filter(c -> !c.getKey().contains("__"))
+				String columns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column"))
 						.map(c -> c.getKey())
 						.collect(Collectors.joining(","));
 				UI.getCurrent().getPage().executeJs("return window.location.href;").then(String.class, value -> {
