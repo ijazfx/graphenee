@@ -3,8 +3,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>gx-jbpm-embedded</artifactId>
-	<name>Graphenee jBPM Embedded</name>
+	<artifactId>gx-jbpm-vaadin7</artifactId>
+	<name>Graphenee jBPM Components for Vaadin 7</name>
 	<description>Embedded jBPM Module</description>
 
 	<!-- Parent -->
@@ -107,6 +107,14 @@
 		<dependency>
 			<groupId>io.graphenee</groupId>
 			<artifactId>gx-util</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.graphenee</groupId>
+			<artifactId>gx-jbpm-embedded</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.graphenee</groupId>
+			<artifactId>gx-vaadin7</artifactId>
 		</dependency>
 	</dependencies>
 
