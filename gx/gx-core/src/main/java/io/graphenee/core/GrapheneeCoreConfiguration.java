@@ -20,9 +20,12 @@ import javax.sql.DataSource;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+import com.google.common.eventbus.EventBus;
 
 import io.graphenee.util.DataSourceUtil;
 
@@ -39,9 +42,15 @@ public class GrapheneeCoreConfiguration {
 
 	public GrapheneeCoreConfiguration(DataSource dataSource) {
 		String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
+		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor)
+				.table("graphenee_schema_version").baselineOnMigrate(true)
 				.baselineVersion("0").load();
 		fw.migrate();
+	}
+
+	@Bean
+	public EventBus coreEventBus() {
+		return new EventBus("coreEventBus");
 	}
 
 }

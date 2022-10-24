@@ -2,6 +2,8 @@ package io.graphenee.core.model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.json.JSONObject;
+
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.util.enums.GenderEnum;
 
@@ -109,6 +111,22 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 	@Override
 	public void setUnreadNotificationCount(int count) {
 		notificationCount.set(count);
+	}
+
+	public <T> T getPreference(String key) {
+		return getUser().getPreference(key);
+	}
+
+	public <T> void setPreference(String key, T value) {
+		getUser().setPreference(key, value);
+	}
+
+	public void clearPreference(String key) {
+		getUser().clearPreference(key);
+	}
+
+	public void createAllPreferences() {
+		getUser().createAllPreferences();
 	}
 
 }

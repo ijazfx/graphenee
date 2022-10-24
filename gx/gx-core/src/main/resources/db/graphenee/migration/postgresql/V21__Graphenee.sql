@@ -1,0 +1,1 @@
+alter table gx_user_account add column preferences text not null default '{}';
