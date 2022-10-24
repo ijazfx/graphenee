@@ -33,9 +33,13 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-/**
- * The persistent class for the gx_user_account database table.
- */
+import org.json.JSONObject;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_user_account")
 @NamedQuery(name = "GxUserAccount.findAll", query = "SELECT g FROM GxUserAccount g")
@@ -91,6 +95,9 @@ public class GxUserAccount implements Serializable {
 	@Column(name = "verification_token")
 	private String verificationToken;
 
+	@Column(name = "preferences")
+	private String preferences = "{}";
+
 	@Column(name = "verification_token_expiry_date")
 	private Timestamp verificationTokenExpiryDate;
 
@@ -105,178 +112,26 @@ public class GxUserAccount implements Serializable {
 
 	// bi-directional many-to-many association to GxSecurityGroup
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_security_group") })
+	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = {
+			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_security_group") })
 	private List<GxSecurityGroup> gxSecurityGroups = new ArrayList<>();
 
 	// bi-directional many-to-many association to GxSecurityPolicy
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_security_policy") })
+	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = {
+			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_security_policy") })
 	private List<GxSecurityPolicy> gxSecurityPolicies = new ArrayList<>();
 
 	@OneToMany
-	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
+	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = {
+			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
 	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
 
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
 	private GxNamespace gxNamespace;
-
-	public GxUserAccount() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public Timestamp getAccountActivationDate() {
-		return this.accountActivationDate;
-	}
-
-	public void setAccountActivationDate(Timestamp accountActivationDate) {
-		this.accountActivationDate = accountActivationDate;
-	}
-
-	public Integer getCountLoginFailed() {
-		return this.countLoginFailed;
-	}
-
-	public void setCountLoginFailed(Integer countLoginFailed) {
-		this.countLoginFailed = countLoginFailed;
-	}
-
-	public String getEmail() {
-		return this.email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getFirstName() {
-		return this.firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getFullNameNative() {
-		return this.fullNameNative;
-	}
-
-	public void setFullNameNative(String fullNameNative) {
-		this.fullNameNative = fullNameNative;
-	}
-
-	public Boolean getIsActive() {
-		return this.isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Boolean getIsLocked() {
-		return this.isLocked;
-	}
-
-	public void setIsLocked(Boolean isLocked) {
-		this.isLocked = isLocked;
-	}
-
-	public Boolean getIsPasswordChangeRequired() {
-		return this.isPasswordChangeRequired;
-	}
-
-	public void setIsPasswordChangeRequired(Boolean isPasswordChangeRequired) {
-		this.isPasswordChangeRequired = isPasswordChangeRequired;
-	}
-
-	public Boolean getIsProtected() {
-		return this.isProtected;
-	}
-
-	public void setIsProtected(Boolean isProtected) {
-		this.isProtected = isProtected;
-	}
-
-	public Timestamp getLastLoginDate() {
-		return this.lastLoginDate;
-	}
-
-	public void setLastLoginDate(Timestamp lastLoginDate) {
-		this.lastLoginDate = lastLoginDate;
-	}
-
-	public Timestamp getLastLoginFailedDate() {
-		return this.lastLoginFailedDate;
-	}
-
-	public void setLastLoginFailedDate(Timestamp lastLoginFailedDate) {
-		this.lastLoginFailedDate = lastLoginFailedDate;
-	}
-
-	public String getLastName() {
-		return this.lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getPassword() {
-		return this.password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public byte[] getProfileImage() {
-		return this.profileImage;
-	}
-
-	public void setProfileImage(byte[] profileImage) {
-		this.profileImage = profileImage;
-	}
-
-	public String getUsername() {
-		return this.username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getVerificationToken() {
-		return this.verificationToken;
-	}
-
-	public void setVerificationToken(String verificationToken) {
-		this.verificationToken = verificationToken;
-	}
-
-	public Timestamp getVerificationTokenExpiryDate() {
-		return this.verificationTokenExpiryDate;
-	}
-
-	public void setVerificationTokenExpiryDate(Timestamp verificationTokenExpiryDate) {
-		this.verificationTokenExpiryDate = verificationTokenExpiryDate;
-	}
-
-	public List<GxAuditLog> getGxAuditLogs() {
-		return this.gxAuditLogs;
-	}
-
-	public void setGxAuditLogs(List<GxAuditLog> gxAuditLogs) {
-		this.gxAuditLogs = gxAuditLogs;
-	}
 
 	public GxAuditLog addGxAuditLog(GxAuditLog gxAuditLog) {
 		getGxAuditLogs().add(gxAuditLog);
@@ -292,44 +147,24 @@ public class GxUserAccount implements Serializable {
 		return gxAuditLog;
 	}
 
-	public GxGender getGxGender() {
-		return this.gxGender;
+	@SuppressWarnings("unchecked")
+	public <T> T getPreference(String key) {
+		JSONObject json = new JSONObject(preferences);
+		return (T) json.get(key);
 	}
 
-	public void setGxGender(GxGender gxGender) {
-		this.gxGender = gxGender;
+	public <T> void setPreference(String key, T value) {
+		JSONObject json = new JSONObject(preferences);
+		json.put(key, value);
 	}
 
-	public List<GxSecurityGroup> getGxSecurityGroups() {
-		return this.gxSecurityGroups;
+	public void clearPreference(String key) {
+		JSONObject json = new JSONObject(preferences);
+		json.remove(key);
 	}
 
-	public void setGxSecurityGroups(List<GxSecurityGroup> gxSecurityGroups) {
-		this.gxSecurityGroups = gxSecurityGroups;
-	}
-
-	public List<GxSecurityPolicy> getGxSecurityPolicies() {
-		return this.gxSecurityPolicies;
-	}
-
-	public void setGxSecurityPolicies(List<GxSecurityPolicy> gxSecurityPolicies) {
-		this.gxSecurityPolicies = gxSecurityPolicies;
-	}
-
-	public List<GxAccessKey> getGxAccessKeys() {
-		return gxAccessKeys;
-	}
-
-	public void setGxAccessKeys(List<GxAccessKey> gxAccessKeys) {
-		this.gxAccessKeys = gxAccessKeys;
-	}
-
-	public GxNamespace getGxNamespace() {
-		return gxNamespace;
-	}
-
-	public void setGxNamespace(GxNamespace gxNamespace) {
-		this.gxNamespace = gxNamespace;
+	public void createAllPreferences() {
+		preferences = "{}";
 	}
 
 }

@@ -4,7 +4,7 @@
   <groupId>io.graphenee</groupId>
   <artifactId>gx</artifactId>
   <packaging>pom</packaging>
-  <version>3.6.0</version>
+  <version>3.6.1-SNAPSHOT</version>
   <name>Graphenee Parent</name>
   <description>Graphenee Parent Project</description>
   <url>https://github.com/ijazfx/graphenee</url>
@@ -12,11 +12,13 @@
 	<!-- Modules -->
 	<modules>
 		<module>gx-util</module>
-		<module>gx-blockchain</module>
 		<module>gx-core</module>
-		<module>gx-jbpm-embedded</module>
 		<module>gx-vaadin7</module>
 		<module>gx-flow</module>
+		<module>gx-jbpm-embedded</module>
+		<module>gx-jbpm-vaadin7</module>
+		<module>gx-jbpm-flow</module>
+		<module>gx-blockchain</module>
 	</modules>
 
 	<!-- License -->

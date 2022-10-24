@@ -167,7 +167,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	@Override
-	protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
+	protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName,
+			PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
 		if (propertyName.equals("extension")) {
 			return new ComponentRenderer<>(s -> {
 				Image image = null;
@@ -191,7 +192,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 					image.addClickListener(cl -> {
 						GxDocument document = (GxDocument) s;
-						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
+								|| mimeType.startsWith("video")) {
 							try {
 								InputStream stream = null;
 								String src = document.getPath();
@@ -202,7 +204,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 									e.printStackTrace();
 								}
 								byte[] bytes = IOUtils.toByteArray(stream);
-								StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+								StreamResource resource = new StreamResource(src,
+										() -> new ByteArrayInputStream(bytes));
 								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
 								resourcePreviewPanel.showInDialog("80%", "80%");
 							} catch (Exception e) {

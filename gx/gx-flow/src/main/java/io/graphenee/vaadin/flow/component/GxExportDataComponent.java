@@ -34,6 +34,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.vaadin.flow.component.UI;
@@ -58,8 +59,17 @@ public class GxExportDataComponent<T> {
 	private String fileName;
 	private Supplier<Collection<String>> columnsCaptionsSupplier;
 	private Supplier<Collection<String>> dataColumnSupplier;
-
 	private CellStyle defaultDateStyle = null;
+	private CellStyle defaultRowStyle = null;
+
+	private XSSFWorkbook workbook = null;
+
+	private GxExportDataComponentDelegate<T> delegate;
+
+	public GxExportDataComponent<T> withDelegate(GxExportDataComponentDelegate<T> delegate) {
+		this.delegate = delegate;
+		return this;
+	}
 
 	public GxExportDataComponent<T> withFileName(String fileName) {
 		this.fileName = fileName;
@@ -103,7 +113,8 @@ public class GxExportDataComponent<T> {
 					log.error("Failed to export data", ex);
 				}
 			}).withDoneCallback(ui -> {
-				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName : "exported-data." + FILE_EXTENSION_XLS;
+				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName
+						: "exported-data." + FILE_EXTENSION_XLS;
 				StreamResource resource = new StreamResource(fileName, new InputStreamFactory() {
 
 					@Override
@@ -118,7 +129,8 @@ public class GxExportDataComponent<T> {
 				});
 				StreamRegistration sr = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
 				ui.getPage().open(sr.getResourceUri().toString(), "_blank");
-			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data").withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
+			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data")
+					.withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
 			task.start();
 		} catch (Exception ex) {
 			log.error("Failed to export data", ex);
@@ -133,9 +145,10 @@ public class GxExportDataComponent<T> {
 			dataColumns = dataColumnSupplier.get();
 		}
 		if (!CollectionUtils.isEmpty(dataColumns)) {
-			XSSFWorkbook workbook = new XSSFWorkbook();
+			workbook = new XSSFWorkbook();
 			defaultDateStyle = workbook.createCellStyle();
-			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
+			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat()
+					.getFormat(TRCalendarUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
 			buildHeaderRow();
 			buildDataRows();
@@ -146,9 +159,28 @@ public class GxExportDataComponent<T> {
 
 	private void buildHeaderRow() {
 		Row headerRow = sheet.createRow(0);
+		CellStyle rowStyle = null;
+		if (delegate != null) {
+			defaultRowStyle = workbook.createCellStyle();
+			rowStyle = delegate.decorateExportHeaderRow(defaultRowStyle);
+			if (rowStyle != null) {
+				headerRow.setRowStyle(rowStyle);
+			}
+		}
 		int i = 0;
 		for (String property : columnsCaptions) {
-			headerRow.createCell(i++).setCellValue(camelCaseToRegular(property));
+			Cell cell = headerRow.createCell(i++);
+			if (delegate != null) {
+				CellStyle style = delegate.decorateExportHeaderCell(property, workbook);
+				if (style != null) {
+					cell.setCellStyle(style);
+				}
+				if (style == null && rowStyle != null) {
+					cell.setCellStyle(rowStyle);
+				}
+			}
+			cell.setCellValue(camelCaseToRegular(property));
+
 		}
 	}
 
@@ -168,11 +200,29 @@ public class GxExportDataComponent<T> {
 	}
 
 	private void buildDataRow(Row row, Object item) {
+		T entity = (T) item;
+		CellStyle rowStyle = null;
+		if (delegate != null) {
+			defaultRowStyle = workbook.createCellStyle();
+			rowStyle = delegate.decorateExportDataRow(defaultRowStyle);
+			if (rowStyle != null) {
+				row.setRowStyle(rowStyle);
+			}
+		}
 		int i = 0;
 		KeyValueWrapper kvw = new KeyValueWrapper(item);
 		for (String property : dataColumns) {
 			Object value = kvw.valueForKeyPath(property);
 			Cell cell = row.createCell(i++);
+			if (delegate != null) {
+				CellStyle style = delegate.decorateExportDataCell(property, workbook, entity);
+				if (style != null) {
+					cell.setCellStyle(style);
+				}
+				if (style == null && rowStyle != null) {
+					cell.setCellStyle(rowStyle);
+				}
+			}
 			if (value instanceof String) {
 				cell.setCellValue(value.toString());
 			} else if (value instanceof Boolean) {
@@ -195,7 +245,29 @@ public class GxExportDataComponent<T> {
 	}
 
 	private String camelCaseToRegular(String string) {
-		return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
+		return StringUtils.join(
+				StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)),
+				' ');
+	}
+
+	public static interface GxExportDataComponentDelegate<T> {
+
+		default CellStyle decorateExportHeaderRow(CellStyle rowStyle) {
+			return rowStyle;
+		}
+
+		default CellStyle decorateExportDataRow(CellStyle rowStyle) {
+			return rowStyle;
+		}
+
+		default CellStyle decorateExportDataCell(String propertyName, Workbook workbook, T entity) {
+			return null;
+		}
+
+		default CellStyle decorateExportHeaderCell(String propertyName, Workbook workbook) {
+			return null;
+		}
+
 	}
 
 }

@@ -1,5 +1,6 @@
 package io.graphenee.vaadin.flow.base;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,6 +17,8 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 
 	private static final long serialVersionUID = 1L;
 
+	private List<QuerySortOrder> sortOrders = new ArrayList<>();
+
 	public GxAbstractEntityLazyList(Class<T> entityClass) {
 		super(entityClass);
 		addClassName("gx-entity-lazy-list");
@@ -24,7 +27,13 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 	@Override
 	@SuppressWarnings("unchecked")
 	protected DataProvider<T, T> dataProvider(Class<T> entityClass) {
-		CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> getPagedData(query, query.getSortOrders()), query -> {
+		CallbackDataProvider<T, T> fromFilteringCallbacks = DataProvider.fromFilteringCallbacks(query -> {
+			sortOrders.clear();
+			sortOrders.addAll(query.getSortOrders());
+			return getPagedData(query, sortOrders);
+		}, query ->
+
+		{
 			int count = getTotalCount(query.getFilter().orElse(getSearchEntity()));
 			updateTotalCountFooter(count);
 			return count;
@@ -42,7 +51,8 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 		int pageSize = limit;
 		Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(getSearchEntity()), sortOrders);
 		if (remainder != 0) {
-			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()), sortOrders);
+			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()),
+					sortOrders);
 			stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
 		}
 		return stream;
@@ -77,7 +87,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 			if (count > 0) {
 				int pages = count / 100;
 				for (int i = 0; i < pages; i++) {
-					data = getData(i, 100, getSearchEntity());
+					data = getData(i, 100, getSearchEntity(), sortOrders);
 					data.forEach(d -> {
 						if (emitter.isDisposed()) {
 							return;
@@ -87,7 +97,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 				}
 				int remaining = count - (pages * 100);
 				if (remaining > 0) {
-					data = getData(pages, 100, getSearchEntity());
+					data = getData(pages, 100, getSearchEntity(), sortOrders);
 					data.forEach(d -> {
 						if (emitter.isDisposed()) {
 							return;

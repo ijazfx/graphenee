@@ -8,14 +8,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
-import io.graphenee.jbpm.embedded.flow.GxFlowSelectAssigneeForm.GxFlowAssigneeHolder;
+import io.graphenee.jbpm.embedded.flow.GxSelectAssigneeForm.GxAssigneeHolder;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
 @SuppressWarnings("serial")
-public class GxFlowSelectAssigneeForm extends GxAbstractEntityForm<GxFlowAssigneeHolder> {
+public class GxSelectAssigneeForm extends GxAbstractEntityForm<GxAssigneeHolder> {
 
-	public GxFlowSelectAssigneeForm() {
-		super(GxFlowAssigneeHolder.class);
+	public GxSelectAssigneeForm() {
+		super(GxAssigneeHolder.class);
 	}
 
 	ComboBox<GxAssignee> assignee;
@@ -36,7 +36,7 @@ public class GxFlowSelectAssigneeForm extends GxAbstractEntityForm<GxFlowAssigne
 		return "Assign Task";
 	}
 
-	public static class GxFlowAssigneeHolder {
+	public static class GxAssigneeHolder {
 		GxAssignee assignee;
 
 		public GxAssignee getAssignee() {

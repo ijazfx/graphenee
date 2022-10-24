@@ -100,13 +100,20 @@ div[slot="application-content"] {
 }
 
 :host [part~="row"][last] {
-	border-bottom: 2px solid var(--lumo-contrast-10pct);
+  border-bottom: 2px solid var(--lumo-contrast-10pct);
 }
 
-:host [part~="form"] > [part~="footer"] {
-	display: none;
+:host [part~="form"]>[part~="footer"] {
+  display: none;
 }
 
 :host([theme~="no-padding"]) [part="content"] {
-    padding:0;
+  padding: 0;
+}
+
+.footer-layout {
+  padding-top: 0.7%;
+  padding-left: 6%;
+  font-size: var(--lumo-font-size-s);
+  height: 3%;
 }
