@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
@@ -34,12 +35,10 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -59,6 +58,8 @@ import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -135,7 +136,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	private MenuItem deleteMenuItem;
 
-	private MenuItem columnsMenuItem;
+	private MenuItem columnsDialogMenuItem;
 
 	private MenuItem exportDataMenuItem;
 
@@ -155,7 +156,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	private List<T> items;
 
-	private Map<String, MenuItem> hidingColumnMap = new HashMap<>();
+	private Map<String, Checkbox> hidingColumnMap = new HashMap<>();
 	private Map<String, AbstractField<?, ?>> editorComponentMap = new HashMap<>();
 
 	private T searchEntity;
@@ -203,6 +204,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	private String camelCaseToRegular(String string) {
+		return StringUtils.join(
+				StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)),
+				' ');
 	}
 
 	@SuppressWarnings("unchecked")
@@ -270,7 +277,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			exportDataMenuItem.setVisible(shouldShowExportDataMenu());
 			exportDataMenuItem.addClickListener(cl -> {
 				Set<String> propNameSet = new HashSet<>();
-				for (String propName : availableProperties()) {
+				for (String propName : preferenceProperties()) {
 					propNameSet.add(propName);
 				}
 				final Observable<T> observable = Observable.create(emitter -> {
@@ -302,7 +309,27 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			decorateMenuBar(customMenuBar);
 
-			columnsMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
+			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
+
+			H2 menuHeading = new H2("Column Menu");
+			menuHeading.getElement().getStyle().set("padding-top", "0px");
+			menuHeading.getElement().getStyle().set("margin-top", "0px");
+
+			FormLayout dialogLayout = new FormLayout();
+
+			dialogLayout.add(menuHeading, 2);
+			dialogLayout.add(new Hr(), 2);
+
+			Dialog menuDialog = new Dialog();
+			menuDialog.setWidth("40%");
+			menuDialog.getElement().getStyle().set("padding-bottom", "0px");
+			menuDialog.getElement().getStyle().set("margin-bottom", "0px");
+			menuDialog.setModal(false);
+			menuDialog.add(dialogLayout);
+
+			columnsDialogMenuItem.addClickListener(listener -> {
+				menuDialog.open();
+			});
 
 			deleteMenuItem.setEnabled(false);
 
@@ -331,6 +358,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				editColumn.setResizable(false);
 				editColumn.setFlexGrow(0);
 				columns.add(editColumn);
+				List<String> userPreferences = new ArrayList<>();
+				for (int i = 0; i < preferenceProperties().length; i++) {
+					userPreferences.add(preferenceProperties()[i]);
+				}
+				List<Column<T>> remainingColumns = new ArrayList<>();
+				List<Column<T>> userColumns = new ArrayList<>(preferenceProperties().length);
 				for (int i = 0; i < availableProperties().length; i++) {
 					String propertyName = availableProperties()[i];
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
@@ -340,7 +373,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 								.get();
 						Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
 						if (renderer != null) {
-							dataGrid.removeColumn(column);
+							if (column != null) {
+								dataGrid.removeColumn(column);
+							}
 							column = dataGrid.addColumn(renderer);
 							column.setKey(propertyName);
 						} else {
@@ -348,7 +383,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 								column = dataGrid.addColumn(propertyName);
 						}
 						configureDefaults(propertyName, column, propertyDefinition);
-						if (i == 0 || i == (availableProperties().length - 1)) {
+						if (i == 0 || i == (preferenceProperties().length - 1)) {
 							column.setAutoWidth(true);
 						}
 
@@ -361,34 +396,144 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 						}
 
 						decorateColumn(propertyName, column);
-						SubMenu columnsSubMenu = columnsMenuItem.getSubMenu();
-						MenuItem columnMenuItem = columnsSubMenu.addItem(propertyDefinition.getCaption(), cl -> {
-							boolean checked = cl.getSource().isChecked();
-							cl.getSource().setChecked(checked);
+
+						boolean isAvailable = false;
+						try {
+							isAvailable = userPreferences.contains(propertyName);
+						} catch (Exception e) {
+							isAvailable = true;
+						}
+
+						if (isAvailable) {
+							column.setVisible(true);
+						} else {
+							column.setVisible(false);
+						}
+
+						Checkbox propertyCheck = new Checkbox(camelCaseToRegular(propertyName),
+								isAvailable);
+
+						propertyCheck.addClickListener(listener -> {
+							Boolean checked = listener.getSource().getValue();
+							listener.getSource().setValue(checked);
 							Column<T> columnByKey = dataGrid.getColumnByKey(propertyName);
 							columnByKey.setVisible(checked);
+							if (checked && !userPreferences.contains(propertyName)) {
+								userPreferences.add(propertyName);
+							} else {
+								userPreferences.remove(propertyName);
+							}
+							loggedInUser().setPreference(this.getClass().getName(), userPreferences.stream().collect(Collectors.joining(",")));
 						});
-						columnMenuItem.setCheckable(true);
-						columnMenuItem.setChecked(true);
-						hidingColumnMap.put(propertyName, columnMenuItem);
+						propertyCheck.getElement().getStyle().set("width", "5%");
+						dialogLayout.add(propertyCheck, -1);
+						hidingColumnMap.put(propertyName, propertyCheck);
+
 					} catch (Exception ex) {
 						log.warn(propertyName + " error: " + ex.getMessage());
 					}
 					if (column != null) {
+						if (column.isVisible()) {
+							userColumns.add(column);
+						} else {
+							remainingColumns.add(column);
+						}
+					}
+				}
+				// CheckboxGroup<String> selectedColumns = new CheckboxGroup<>();
+				// selectedColumns.setItems(new HashSet<>(Arrays.asList(availableProperties())));
+				// selectedColumns.select(new HashSet<>(Arrays.asList(preferenceProperties())));
+				// selectedColumns.addValueChangeListener(vcl -> {
+				// 	List<String> userPrefes = Arrays.asList(preferenceProperties());
+				// 	userPrefes = userPrefes.stream().filter(key -> vcl.getValue().contains(key))
+				// 			.collect(Collectors.toList());
+
+				// 	System.out.println("++++++++");
+				// 	System.out.println(userPrefes);
+				// 	System.out.println(vcl.getValue());
+				// 	System.out.println("-------");
+
+				// 	List<String> enableColumnProps = new ArrayList<>();
+				// 	List<String> disableColumnProps = new ArrayList<>();
+
+				// 	if (vcl.getValue().size() > vcl.getOldValue().size()) {
+				// 		Set<String> selectedValues = vcl.getValue();
+				// 		Set<String> oldSelectedValues = vcl.getOldValue();
+				// 		enableColumnProps = selectedValues.stream()
+				// 				.filter(element -> !oldSelectedValues.contains(element))
+				// 				.collect(Collectors.toList());
+				// 		userPrefes.addAll(enableColumnProps);
+				// 		enableColumnProps.forEach(p -> {
+				// 			Column<T> column = dataGrid.getColumnByKey(p);
+				// 			if (column != null) {
+				// 				column.setVisible(true);
+				// 			}
+				// 		});
+				// 	}
+				// 	if (vcl.getValue().size() < vcl.getOldValue().size()) {
+				// 		Set<String> selectedValues = vcl.getValue();
+				// 		Set<String> oldSelectedValues = vcl.getOldValue();
+				// 		disableColumnProps = oldSelectedValues.stream()
+				// 				.filter(element -> !selectedValues.contains(element))
+				// 				.collect(Collectors.toList());
+				// 		userPrefes.removeAll(disableColumnProps);
+				// 		disableColumnProps.forEach(p -> {
+				// 			Column<T> column = dataGrid.getColumnByKey(p);
+				// 			if (column != null) {
+				// 				column.setVisible(false);
+				// 			}
+				// 		});
+				// 	}
+
+				// 	loggedInUser().setPreference(this.getClass().getName(),
+				// 			userPrefes.stream().collect(Collectors.joining(",")));
+				// });
+
+				for (int i = 0; i < userPreferences.size(); i++) {
+					String prop = userPreferences.get(i);
+					Column<T> column = userColumns.stream().filter(c -> c.getKey().equals(prop)).findFirst()
+							.orElse(null);
+					if (column != null) {
 						columns.add(column);
 					}
 				}
+				columns.addAll(remainingColumns);
 				dataGrid.setColumnOrder(columns);
 				decorateGrid(dataGrid);
+				// dialogLayout.add(selectedColumns);
+				// dialogLayout.setColspan(selectedColumns, 2);
+				// selectedColumns.setItemLabelGenerator(key -> {
+				// return camelCaseToRegular(key);
+				// });
 				Column<T> endColumn = dataGrid.addComponentColumn(source -> new Span());
 				endColumn.setKey("__gxLastColumn");
 				endColumn.setAutoWidth(true);
 			}
 
+			dialogLayout.add(new Hr(), 2);
+
+			Button applyButton = new Button("Apply");
+			applyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+			applyButton.addClickListener(listener -> {
+				coreEventBus.post(loggedInUser().getUser());
+				menuDialog.close();
+			});
+
+			Button dismissButton = new Button("DISMISS");
+			dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+			dismissButton.addClickListener(listener -> {
+				menuDialog.close();
+			});
+			HorizontalLayout buttonLayout = new HorizontalLayout(applyButton, dismissButton);
+			buttonLayout.setPadding(false);
+			buttonLayout.setSpacing(false);
+			buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+			dialogLayout.add(buttonLayout, 2);
+
 			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column"))
 					.forEach(col -> col.setVisible(false));
 
-			for (String key : availableProperties()) {
+			for (String key : preferenceProperties()) {
 				Column<T> columnByKey = dataGrid.getColumnByKey(key);
 				if (columnByKey != null) {
 					columnByKey.setVisible(true);
@@ -446,7 +591,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				setColumnVisibility(p, false);
 			}
 
-			for (String p : visibleProperties()) {
+			for (String p : preferenceProperties()) {
 				setColumnVisibility(p, true);
 			}
 
@@ -607,9 +752,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected void setColumnVisibility(String propertyName, boolean isVisible) {
-		MenuItem mi = hidingColumnMap.get(propertyName);
-		if (mi != null) {
-			mi.setChecked(isVisible);
+		Checkbox cb = hidingColumnMap.get(propertyName);
+		if (cb != null) {
+			cb.setValue(isVisible);
 			Column<T> columnByKey = entityGrid().getColumnByKey(propertyName);
 			columnByKey.setVisible(isVisible);
 		}
@@ -622,7 +767,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			dataGrid.getEditor().setBinder(editBinder);
 		}
 		List<Column<T>> removeList = new ArrayList<>(dataGrid.getColumns());
-		for (String key : availableProperties()) {
+		for (String key : preferenceProperties()) {
 			Column<T> column = dataGrid.getColumnByKey(key);
 			if (column != null) {
 				column.setVisible(true);
@@ -862,14 +1007,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			GxDashboardUser user = DashboardUtils.getLoggedInUser();
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
-				String columns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column"))
+				String columns = listener.getColumns().stream()
+						.filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible())
 						.map(c -> c.getKey())
 						.collect(Collectors.joining(","));
-				UI.getCurrent().getPage().executeJs("return window.location.href;").then(String.class, value -> {
-					String viewName = value.substring(value.lastIndexOf('/') + 1, value.length());
-					user.setPreference(viewName, columns);
-					coreEventBus.post(user.getUser());
-				});
+				user.setPreference(this.getClass().getName(), columns);
+				coreEventBus.post(user.getUser());
 			});
 		}
 	}
@@ -1044,6 +1187,33 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected abstract String[] visibleProperties();
+
+	private String[] preferenceProperties() {
+		try {
+			String preferences = loggedInUser().getPreference(this.getClass().getName());
+			String[] props = preferences.split(",");
+			return props;
+		} catch (Exception e) {
+			return availableProperties();
+		}
+	}
+
+	// private String[] allProperties() {
+	// try {
+	// String cols = dataGrid.getColumns().stream()
+	// .filter(c -> !c.getKey().matches("__gx.*Column"))
+	// .map(c -> c.getKey())
+	// .collect(Collectors.joining(","));
+	// String[] props = cols.split(",");
+	// return props;
+	// } catch (Exception e) {
+	// return availableProperties();
+	// }
+	// }
+
+	public GxDashboardUser loggedInUser() {
+		return DashboardUtils.getLoggedInUser();
+	}
 
 	public void refresh() {
 		build();
