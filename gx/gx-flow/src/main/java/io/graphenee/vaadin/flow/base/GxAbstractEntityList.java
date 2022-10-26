@@ -357,6 +357,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				editColumn.setTextAlign(ColumnTextAlign.CENTER);
 				editColumn.setResizable(false);
 				editColumn.setFlexGrow(0);
+				editColumn.setFrozen(true);
 				columns.add(editColumn);
 				List<String> userPreferences = new ArrayList<>();
 				for (int i = 0; i < preferenceProperties().length; i++) {
