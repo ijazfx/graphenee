@@ -424,7 +424,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 							} else {
 								userPreferences.remove(propertyName);
 							}
-							loggedInUser().setPreference(this.getClass().getName(), userPreferences.stream().collect(Collectors.joining(",")));
+							loggedInUser().setPreference(this.getClass().getName(),
+									userPreferences.stream().collect(Collectors.joining(",")));
 						});
 						propertyCheck.getElement().getStyle().set("width", "5%");
 						dialogLayout.add(propertyCheck, -1);
@@ -442,52 +443,53 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					}
 				}
 				// CheckboxGroup<String> selectedColumns = new CheckboxGroup<>();
-				// selectedColumns.setItems(new HashSet<>(Arrays.asList(availableProperties())));
+				// selectedColumns.setItems(new
+				// HashSet<>(Arrays.asList(availableProperties())));
 				// selectedColumns.select(new HashSet<>(Arrays.asList(preferenceProperties())));
 				// selectedColumns.addValueChangeListener(vcl -> {
-				// 	List<String> userPrefes = Arrays.asList(preferenceProperties());
-				// 	userPrefes = userPrefes.stream().filter(key -> vcl.getValue().contains(key))
-				// 			.collect(Collectors.toList());
+				// List<String> userPrefes = Arrays.asList(preferenceProperties());
+				// userPrefes = userPrefes.stream().filter(key -> vcl.getValue().contains(key))
+				// .collect(Collectors.toList());
 
-				// 	System.out.println("++++++++");
-				// 	System.out.println(userPrefes);
-				// 	System.out.println(vcl.getValue());
-				// 	System.out.println("-------");
+				// System.out.println("++++++++");
+				// System.out.println(userPrefes);
+				// System.out.println(vcl.getValue());
+				// System.out.println("-------");
 
-				// 	List<String> enableColumnProps = new ArrayList<>();
-				// 	List<String> disableColumnProps = new ArrayList<>();
+				// List<String> enableColumnProps = new ArrayList<>();
+				// List<String> disableColumnProps = new ArrayList<>();
 
-				// 	if (vcl.getValue().size() > vcl.getOldValue().size()) {
-				// 		Set<String> selectedValues = vcl.getValue();
-				// 		Set<String> oldSelectedValues = vcl.getOldValue();
-				// 		enableColumnProps = selectedValues.stream()
-				// 				.filter(element -> !oldSelectedValues.contains(element))
-				// 				.collect(Collectors.toList());
-				// 		userPrefes.addAll(enableColumnProps);
-				// 		enableColumnProps.forEach(p -> {
-				// 			Column<T> column = dataGrid.getColumnByKey(p);
-				// 			if (column != null) {
-				// 				column.setVisible(true);
-				// 			}
-				// 		});
-				// 	}
-				// 	if (vcl.getValue().size() < vcl.getOldValue().size()) {
-				// 		Set<String> selectedValues = vcl.getValue();
-				// 		Set<String> oldSelectedValues = vcl.getOldValue();
-				// 		disableColumnProps = oldSelectedValues.stream()
-				// 				.filter(element -> !selectedValues.contains(element))
-				// 				.collect(Collectors.toList());
-				// 		userPrefes.removeAll(disableColumnProps);
-				// 		disableColumnProps.forEach(p -> {
-				// 			Column<T> column = dataGrid.getColumnByKey(p);
-				// 			if (column != null) {
-				// 				column.setVisible(false);
-				// 			}
-				// 		});
-				// 	}
+				// if (vcl.getValue().size() > vcl.getOldValue().size()) {
+				// Set<String> selectedValues = vcl.getValue();
+				// Set<String> oldSelectedValues = vcl.getOldValue();
+				// enableColumnProps = selectedValues.stream()
+				// .filter(element -> !oldSelectedValues.contains(element))
+				// .collect(Collectors.toList());
+				// userPrefes.addAll(enableColumnProps);
+				// enableColumnProps.forEach(p -> {
+				// Column<T> column = dataGrid.getColumnByKey(p);
+				// if (column != null) {
+				// column.setVisible(true);
+				// }
+				// });
+				// }
+				// if (vcl.getValue().size() < vcl.getOldValue().size()) {
+				// Set<String> selectedValues = vcl.getValue();
+				// Set<String> oldSelectedValues = vcl.getOldValue();
+				// disableColumnProps = oldSelectedValues.stream()
+				// .filter(element -> !selectedValues.contains(element))
+				// .collect(Collectors.toList());
+				// userPrefes.removeAll(disableColumnProps);
+				// disableColumnProps.forEach(p -> {
+				// Column<T> column = dataGrid.getColumnByKey(p);
+				// if (column != null) {
+				// column.setVisible(false);
+				// }
+				// });
+				// }
 
-				// 	loggedInUser().setPreference(this.getClass().getName(),
-				// 			userPrefes.stream().collect(Collectors.joining(",")));
+				// loggedInUser().setPreference(this.getClass().getName(),
+				// userPrefes.stream().collect(Collectors.joining(",")));
 				// });
 
 				for (int i = 0; i < userPreferences.size(); i++) {
@@ -604,6 +606,16 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			enableShortcuts();
 			isBuilt = true;
+
+			dataGrid.setColumnReorderingAllowed(true);
+			dataGrid.addColumnReorderListener(listener -> {
+				String orderedColumns = listener.getColumns().stream()
+						.filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible())
+						.map(c -> c.getKey())
+						.collect(Collectors.joining(","));
+				loggedInUser().setPreference(this.getClass().getName(), orderedColumns);
+				coreEventBus.post(loggedInUser().getUser());
+			});
 		}
 		return this;
 	}
@@ -1004,18 +1016,18 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	protected void decorateGrid(Grid<T> dataGrid) {
-		if (shouldAllowColumnReordering()) {
-			GxDashboardUser user = DashboardUtils.getLoggedInUser();
-			dataGrid.setColumnReorderingAllowed(true);
-			dataGrid.addColumnReorderListener(listener -> {
-				String columns = listener.getColumns().stream()
-						.filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible())
-						.map(c -> c.getKey())
-						.collect(Collectors.joining(","));
-				user.setPreference(this.getClass().getName(), columns);
-				coreEventBus.post(user.getUser());
-			});
-		}
+		// if (shouldAllowColumnReordering()) {
+		// GxDashboardUser user = DashboardUtils.getLoggedInUser();
+		// dataGrid.setColumnReorderingAllowed(true);
+		// dataGrid.addColumnReorderListener(listener -> {
+		// String columns = listener.getColumns().stream()
+		// .filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible())
+		// .map(c -> c.getKey())
+		// .collect(Collectors.joining(","));
+		// user.setPreference(this.getClass().getName(), columns);
+		// coreEventBus.post(user.getUser());
+		// });
+		// }
 	}
 
 	@SuppressWarnings("unchecked")
