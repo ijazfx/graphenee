@@ -338,16 +338,21 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	public GxDialog showInDialog(T entity, String width, String height) {
 		setEntity(entity);
-		dialog = new GxDialog(GxAbstractEntityForm.this);
-		dialog.addThemeVariants(DialogVariant.NO_PADDING);
-		dialog.setWidth(width);
-		dialog.setHeight(height);
-		dialog.setResizable(true);
-		dialog.setModal(isModeless());
-		dialog.setCloseOnEsc(true);
-		dialog.setDraggable(true);
-		dialog.setResizable(true);
-		dialog.open();
+		if (dialog == null) {
+			dialog = new GxDialog(GxAbstractEntityForm.this);
+			dialog.addThemeVariants(DialogVariant.NO_PADDING);
+			dialog.setResizable(true);
+			dialog.setModal(isModal());
+			dialog.setCloseOnEsc(true);
+			dialog.setDraggable(true);
+			dialog.setResizable(true);
+			dialog.setCloseOnOutsideClick(!isModal());
+		}
+		if (!dialog.isOpened()) {
+			dialog.setWidth(width);
+			dialog.setHeight(height);
+			dialog.open();
+		}
 		return dialog;
 	}
 
@@ -355,8 +360,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 * If returned false, the dialog will close when clicked outside the form. Default value is true.
 	 * @return
 	 */
-	protected boolean isModeless() {
-		return false;
+	protected boolean isModal() {
+		return true;
 	}
 
 	public void closeDialog() {
