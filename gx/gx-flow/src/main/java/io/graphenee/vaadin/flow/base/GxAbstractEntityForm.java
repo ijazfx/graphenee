@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasComponents;
@@ -29,6 +30,7 @@ import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
+import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,21 +89,28 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				saveButton = new Button("SAVE");
 				saveButton.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
 				saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-				saveButton.addClickListener(cl -> {
-					if (entity != null) {
-						try {
-							validateForm();
-							if (delegate != null)
-								delegate.onSave(entity);
-							listeners.forEach(l -> {
-								l.onEvent(GxEntityFormEvent.SAVE, entity);
-							});
-							if (dialog != null && dialogAutoClose) {
-								dialog.close();
+
+				saveButton.addClickListener(new TRDelayClickListener<Button>() {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void onClick(ClickEvent<Button> event) {
+						if (entity != null) {
+							try {
+								validateForm();
+								if (delegate != null)
+									delegate.onSave(entity);
+								listeners.forEach(l -> {
+									l.onEvent(GxEntityFormEvent.SAVE, entity);
+								});
+								if (dialog != null && dialogAutoClose) {
+									dialog.close();
+								}
+							} catch (Exception e) {
+								// e.printStackTrace();
+								// Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 							}
-						} catch (Exception e) {
-							// e.printStackTrace();
-							// Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 						}
 					}
 				});
@@ -111,27 +120,41 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				resetButton = new Button("RESET");
 				resetButton.addClickShortcut(Key.KEY_R, KeyModifier.ALT);
 				resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-				resetButton.addClickListener(cl -> {
-					dataBinder.readBean(entity);
-					if (delegate != null)
-						delegate.onReset(entity);
-					listeners.forEach(l -> {
-						l.onEvent(GxEntityFormEvent.RESET, entity);
-					});
+
+				resetButton.addClickListener(new TRDelayClickListener<Button>() {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void onClick(ClickEvent<Button> event) {
+						dataBinder.readBean(entity);
+						if (delegate != null)
+							delegate.onReset(entity);
+						listeners.forEach(l -> {
+							l.onEvent(GxEntityFormEvent.RESET, entity);
+						});
+					}
 				});
 
 				dismissButton = new Button("DISMISS");
 				dismissButton.addClickShortcut(Key.ESCAPE);
 				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-				dismissButton.addClickListener(cl -> {
-					if (dialog != null) {
-						dialog.close();
+
+				dismissButton.addClickListener(new TRDelayClickListener<Button>() {
+
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void onClick(ClickEvent<Button> event) {
+						if (dialog != null) {
+							dialog.close();
+						}
+						if (delegate != null)
+							delegate.onDismiss(entity);
+						listeners.forEach(l -> {
+							l.onEvent(GxEntityFormEvent.DISMISS, entity);
+						});
 					}
-					if (delegate != null)
-						delegate.onDismiss(entity);
-					listeners.forEach(l -> {
-						l.onEvent(GxEntityFormEvent.DISMISS, entity);
-					});
 				});
 
 				resetButton.getElement().getStyle().set("margin-left", "auto");
@@ -338,16 +361,21 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	public GxDialog showInDialog(T entity, String width, String height) {
 		setEntity(entity);
-		dialog = new GxDialog(GxAbstractEntityForm.this);
-		dialog.addThemeVariants(DialogVariant.NO_PADDING);
-		dialog.setWidth(width);
-		dialog.setHeight(height);
-		dialog.setResizable(true);
-		dialog.setModal(isModeless());
-		dialog.setCloseOnEsc(true);
-		dialog.setDraggable(true);
-		dialog.setResizable(true);
-		dialog.open();
+		if (dialog == null) {
+			dialog = new GxDialog(GxAbstractEntityForm.this);
+			dialog.addThemeVariants(DialogVariant.NO_PADDING);
+			dialog.setResizable(true);
+			dialog.setModal(isModal());
+			dialog.setCloseOnEsc(true);
+			dialog.setDraggable(true);
+			dialog.setResizable(true);
+			dialog.setCloseOnOutsideClick(!isModal());
+		}
+		if (!dialog.isOpened()) {
+			dialog.setWidth(width);
+			dialog.setHeight(height);
+			dialog.open();
+		}
 		return dialog;
 	}
 
@@ -355,8 +383,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 * If returned false, the dialog will close when clicked outside the form. Default value is true.
 	 * @return
 	 */
-	protected boolean isModeless() {
-		return false;
+	protected boolean isModal() {
+		return true;
 	}
 
 	public void closeDialog() {

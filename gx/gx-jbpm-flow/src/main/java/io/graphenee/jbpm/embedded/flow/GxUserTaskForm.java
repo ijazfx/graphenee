@@ -21,18 +21,17 @@ import io.graphenee.jbpm.embedded.GxUserTask;
 import io.graphenee.jbpm.embedded.exception.GxAssignTaskException;
 import io.graphenee.jbpm.embedded.exception.GxCompleteTaskException;
 import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
-import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm;
-import io.graphenee.jbpm.embedded.vaadin.GxSelectAssigneeForm.GxAssigneeHolder;
+import io.graphenee.jbpm.embedded.flow.GxSelectAssigneeForm.GxAssigneeHolder;
 import io.graphenee.vaadin.flow.GxFlowNotification;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
-public abstract class GxFlowUserTaskForm<T> extends GxAbstractEntityForm<T> {
+public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
-	public GxFlowUserTaskForm(Class<T> entityClass) {
+	public GxUserTaskForm(Class<T> entityClass) {
 		super(entityClass);
 	}
 
-	protected static final Logger L = LoggerFactory.getLogger(GxFlowUserTaskForm.class);
+	protected static final Logger L = LoggerFactory.getLogger(GxUserTaskForm.class);
 
 	private static final long serialVersionUID = 1L;
 	private GxUserTask userTask;
@@ -183,26 +182,30 @@ public abstract class GxFlowUserTaskForm<T> extends GxAbstractEntityForm<T> {
 			public void assign(Collection<GxAssignee> assignees) {
 				if (assignees != null && !assignees.isEmpty()) {
 					GxSelectAssigneeForm assigneeForm = new GxSelectAssigneeForm();
-					assigneeForm.setEntity(GxAssigneeHolder.class, new GxAssigneeHolder());
 					assigneeForm.initializeWithAssignees(assignees);
-					assigneeForm.setSavedHandler(holder -> {
-						String msg = "Are you sure to assign the task to " + holder.getAssignee() + "?";
-						org.claspina.confirmdialog.ConfirmDialog dlg = org.claspina.confirmdialog.ConfirmDialog.createQuestion();
-						dlg.withMessage(msg).withYesButton(() -> {
-							GxAssignee assignee = holder.getAssignee();
-							try {
-								getUserTask().assign(assignee.getUsername());
-								GxFlowUserTaskForm.this.onPostAssign(assignee, getEntity());
-								notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
-								assigneeForm.closePopup();
-								closeDialog();
-							} catch (GxAssignTaskException ex) {
-								GxFlowNotification.alert(ex.getMessage()).open();
-								L.error(ex.getMessage(), ex);
-							}
-						});
+					assigneeForm.setDelegate(new EntityFormDelegate<GxSelectAssigneeForm.GxAssigneeHolder>() {
+
+						@Override
+						public void onSave(GxAssigneeHolder holder) {
+							String msg = "Are you sure to assign the task to " + holder.getAssignee() + "?";
+							org.claspina.confirmdialog.ConfirmDialog dlg = org.claspina.confirmdialog.ConfirmDialog.createQuestion();
+							dlg.withMessage(msg).withYesButton(() -> {
+								GxAssignee assignee = holder.getAssignee();
+								try {
+									getUserTask().assign(assignee.getUsername());
+									GxUserTaskForm.this.onPostAssign(assignee, getEntity());
+									notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
+									assigneeForm.closeDialog();
+									closeDialog();
+								} catch (GxAssignTaskException ex) {
+									GxFlowNotification.alert(ex.getMessage()).open();
+									L.error(ex.getMessage(), ex);
+								}
+							});
+						}
+
 					});
-					assigneeForm.openInModalPopup();
+					assigneeForm.showInDialog(new GxAssigneeHolder());
 				} else {
 					GxFlowNotification.info("No potential assignees are available to handle this task.").open();
 				}
