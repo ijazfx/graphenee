@@ -89,30 +89,26 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				saveButton = new Button("SAVE");
 				saveButton.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
 				saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+				saveButton.setDisableOnClick(true);
 
-				saveButton.addClickListener(new TRDelayClickListener<Button>() {
-
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public void onClick(ClickEvent<Button> event) {
-						if (entity != null) {
-							try {
-								validateForm();
-								if (delegate != null)
-									delegate.onSave(entity);
-								listeners.forEach(l -> {
-									l.onEvent(GxEntityFormEvent.SAVE, entity);
-								});
-								if (dialog != null && dialogAutoClose) {
-									dialog.close();
-								}
-							} catch (Exception e) {
-								// e.printStackTrace();
-								// Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				saveButton.addClickListener(cl -> {
+					if (entity != null) {
+						try {
+							validateForm();
+							if (delegate != null)
+								delegate.onSave(entity);
+							listeners.forEach(l -> {
+								l.onEvent(GxEntityFormEvent.SAVE, entity);
+							});
+							if (dialog != null && dialogAutoClose) {
+								dialog.close();
 							}
+						} catch (Exception e) {
+							// e.printStackTrace();
+							// Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 						}
 					}
+					saveButton.setEnabled(true);
 				});
 
 				customizeSaveButton(saveButton);
@@ -380,7 +376,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	/**
-	 * If returned false, the dialog will close when clicked outside the form. Default value is true.
+	 * If returned false, the dialog will close when clicked outside the form.
+	 * Default value is true.
+	 * 
 	 * @return
 	 */
 	protected boolean isModal() {

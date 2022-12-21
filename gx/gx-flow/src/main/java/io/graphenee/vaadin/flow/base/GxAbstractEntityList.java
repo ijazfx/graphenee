@@ -313,7 +313,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
 
-			H2 menuHeading = new H2("Column Menu");
+			H2 menuHeading = new H2("Columns Menu");
 			menuHeading.getElement().getStyle().set("padding-top", "0px");
 			menuHeading.getElement().getStyle().set("margin-top", "0px");
 
