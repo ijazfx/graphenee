@@ -1,7 +1,6 @@
 package io.graphenee.vaadin.flow.renderer;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.vaadin.flow.data.renderer.BasicRenderer;
@@ -31,13 +30,13 @@ public class GxNumberToDateRenderer<T> extends BasicRenderer<T, Number> {
 		super(valueProvider);
 		switch (resolution) {
 		case Date:
-			dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+			dateFormat = TRCalendarUtil.getCustomDateFormatter();
 		break;
 		case Time:
-			dateFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
+			dateFormat = TRCalendarUtil.getCustomTimeFormatter();
 		break;
 		case DateTime:
-			dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
+			dateFormat = TRCalendarUtil.getCustomDateTimeFormatter();
 		break;
 		}
 	}

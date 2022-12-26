@@ -30,7 +30,6 @@ import com.google.common.eventbus.EventBus;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
@@ -40,6 +39,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -72,6 +72,7 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -92,6 +93,7 @@ import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.GxDashboardUser;
+import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
@@ -548,27 +550,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				}
 			});
 
-			dataGrid.addItemClickListener(new TRDelayEventListener<ItemClickEvent<T>>() {
+			dataGrid.addItemClickListener(cl -> onGridItemClicked(cl));
 
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick(ItemClickEvent<T> event) {
-					onGridItemClicked(event);
-				}
-
-			});
-
-			dataGrid.addItemDoubleClickListener(new TRDelayEventListener<ItemDoubleClickEvent<T>>() {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick(ItemDoubleClickEvent<T> event) {
-					onGridItemDoubleClicked(event);
-				}
-
-			});
+			dataGrid.addItemDoubleClickListener(cl -> onGridItemDoubleClicked(cl));
 
 			for (String p : availableProperties()) {
 				setColumnVisibility(p, false);
@@ -649,50 +633,83 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		if (isGridInlineEditingEnabled()) {
 			String propertyName = icl.getColumn().getKey();
 			if (propertyName != null) {
-				AbstractField<?, ?> editorComponent = editorComponentMap.get(propertyName);
+				// AbstractField<?, ?> editorComponent = editorComponentMap.get(propertyName);
 				dataGrid.getEditor().editItem(icl.getItem());
-				if (editorComponent instanceof Focusable) {
-					((Focusable<?>) editorComponent).focus();
-				}
+				//				if (editorComponent instanceof Focusable) {
+				//					((Focusable<?>) editorComponent).focus();
+				//				}
 			}
 		}
 	}
 
 	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+		if (propertyDefinition.getSetter().isEmpty()) {
+			return null;
+		}
+
 		AbstractField<?, ?> c = inlineEditorForProperty(propertyName, propertyDefinition);
 		if (c == null) {
 			if (propertyName.matches("date.*|.*Date")) {
 				if (propertyDefinition.getType().equals(Long.class)) {
-					c = new DatePicker();
+					c = createDatePicker();
 				} else if (c == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					c = new DatePicker();
+					c = createDatePicker();
 				}
 			}
 			if (c == null && propertyName.matches("dateTime.*|.*DateTime")) {
 				if (propertyDefinition.getType().equals(Long.class)) {
-					c = new DateTimePicker();
+					c = createDateTimePicker();
 				}
 			}
 			if (c == null && propertyDefinition.getType().equals(Timestamp.class)) {
-				c = new DateTimePicker();
+				c = createDateTimePicker();
 			}
 			if (c == null && propertyDefinition.getType().equals(Date.class)) {
-				c = new DatePicker();
+				c = createDatePicker();
 			}
 			if (c == null && propertyDefinition.getType().equals(Boolean.class)) {
 				c = new Checkbox();
 			}
-			if (c == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+			if (c == null && propertyDefinition.getType().equals(Integer.class)) {
+				c = new IntegerField();
+			}
+			if (c == null && propertyDefinition.getType().equals(Long.class)) {
+				c = new IntegerField();
+			}
+			if (c == null && propertyDefinition.getType().equals(Float.class)) {
 				c = new NumberField();
+			}
+			if (c == null && propertyDefinition.getType().equals(Double.class)) {
+				c = new NumberField();
+			}
+			if (c == null && propertyDefinition.getType().equals(Boolean.class)) {
+				c = new Checkbox();
 			}
 			if (c == null) {
 				c = new TextField();
 			}
 		}
 		c.getElement().getStyle().set("width", "100%");
-		c.getElement().setProperty("clearButtonVisible", true);
+		// c.getElement().setProperty("clearButtonVisible", true);
+		// c.getElement().setProperty("autoselect", true);
 		c.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
 		return c;
+	}
+
+	protected DateTimePicker createDateTimePicker() {
+		DateTimePicker p = new DateTimePicker();
+		DatePickerI18n i = new DatePickerI18n();
+		i.setDateFormat(TRCalendarUtil.getCustomDateTimeFormatter().toPattern());
+		p.setDatePickerI18n(i);
+		return p;
+	}
+
+	protected DatePicker createDatePicker() {
+		DatePicker p = new DatePicker();
+		DatePickerI18n i = new DatePickerI18n();
+		i.setDateFormat(TRCalendarUtil.getCustomDateFormatter().toPattern());
+		p.setI18n(i);
+		return p;
 	}
 
 	protected AbstractField<?, ?> inlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
@@ -963,21 +980,21 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		if (filter == null) {
 			if (propertyName.matches("date.*|.*Date")) {
 				if (propertyDefinition.getType().equals(Long.class)) {
-					filter = new DatePicker();
+					filter = createDatePicker();
 				} else if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					filter = new DatePicker();
+					filter = createDatePicker();
 				}
 			}
 			if (filter == null && propertyName.matches("dateTime.*|.*DateTime")) {
 				if (propertyDefinition.getType().equals(Long.class)) {
-					filter = new DateTimePicker();
+					filter = createDateTimePicker();
 				}
 			}
 			if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
-				filter = new DateTimePicker();
+				filter = createDateTimePicker();
 			}
 			if (filter == null && propertyDefinition.getType().equals(Date.class)) {
-				filter = new DatePicker();
+				filter = createDatePicker();
 			}
 			if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
 				filter = new Checkbox();
@@ -1130,22 +1147,26 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	private void openForm(T entity) {
 		preEdit(entity);
-		GxAbstractEntityForm<T> entityForm = cachedForm(entity);
-		if (entityForm != null) {
-			if (!shouldShowFormInDialog()) {
-				formLayout.removeAll();
-				formLayout.add(entityForm);
-				mainLayout.getSecondaryComponent().setVisible(true);
-			} else {
-				disableShortcuts();
-				dialog = entityForm.showInDialog(entity);
-				dialog.addOpenedChangeListener(l -> {
-					enableShortcuts();
-				});
-			}
+		if (isGridInlineEditingEnabled()) {
+			entityGrid().getEditor().editItem(entity);
 		} else {
-			if (mainLayout.getSecondaryComponent() != null)
-				mainLayout.getSecondaryComponent().setVisible(false);
+			GxAbstractEntityForm<T> entityForm = cachedForm(entity);
+			if (entityForm != null) {
+				if (!shouldShowFormInDialog()) {
+					formLayout.removeAll();
+					formLayout.add(entityForm);
+					mainLayout.getSecondaryComponent().setVisible(true);
+				} else {
+					disableShortcuts();
+					dialog = entityForm.showInDialog(entity);
+					dialog.addOpenedChangeListener(l -> {
+						enableShortcuts();
+					});
+				}
+			} else {
+				if (mainLayout.getSecondaryComponent() != null)
+					mainLayout.getSecondaryComponent().setVisible(false);
+			}
 		}
 	}
 
