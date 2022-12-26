@@ -41,19 +41,48 @@ public class TRCalendarUtil {
 	private static Map<String, SimpleDateFormat> COMPILED_FORMATTERS = new ConcurrentHashMap<>();
 
 	public static final String[] MONTH_NAMES = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-	public static SimpleDateFormat shortM6Formatter = new SimpleDateFormat("MM/dd/yy");
-	public static SimpleDateFormat shortM8Formatter = new SimpleDateFormat("MM/dd/yyyy");
-	public static SimpleDateFormat shortD6Formatter = new SimpleDateFormat("dd/MM/yy");
-	public static SimpleDateFormat shortD8Formatter = new SimpleDateFormat("dd/MM/yyyy");
-	public static SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM d, yyyy");
-	public static SimpleDateFormat dayFormatter = new SimpleDateFormat("EEEE");
-	public static SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM");
-	public static SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MMM d, yyyy hh:mm aaa");
-	public static SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mm aaa");
-	public static SimpleDateFormat yyyyMMddFormatter = new SimpleDateFormat("yyyy-MM-dd");
-	public static SimpleDateFormat yyyyMMddHHmmssFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	public static SimpleDateFormat yyyyMMddHHmmssSSSFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-	public static SimpleDateFormat zuluTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+
+	static SimpleDateFormat customDateFormatter;
+	static SimpleDateFormat customTimeFormatter;
+	static SimpleDateFormat customDateTimeFormatter;
+
+	synchronized public static void setCustomDateFormatter(SimpleDateFormat sdf) {
+		customDateFormatter = sdf;
+	}
+
+	synchronized public static void setCustomTimeFormatter(SimpleDateFormat sdf) {
+		customTimeFormatter = sdf;
+	}
+
+	synchronized public static void setCustomDateTimeFormatter(SimpleDateFormat sdf) {
+		customDateTimeFormatter = sdf;
+	}
+
+	public static SimpleDateFormat getCustomDateFormatter() {
+		return customDateFormatter != null ? customDateFormatter : dateFormatter;
+	}
+
+	public static SimpleDateFormat getCustomTimeFormatter() {
+		return customTimeFormatter != null ? customTimeFormatter : timeFormatter;
+	}
+
+	public static SimpleDateFormat getCustomDateTimeFormatter() {
+		return customDateTimeFormatter != null ? customDateTimeFormatter : dateTimeFormatter;
+	}
+
+	public static final SimpleDateFormat shortM6Formatter = new SimpleDateFormat("MM/dd/yy");
+	public static final SimpleDateFormat shortM8Formatter = new SimpleDateFormat("MM/dd/yyyy");
+	public static final SimpleDateFormat shortD6Formatter = new SimpleDateFormat("dd/MM/yy");
+	public static final SimpleDateFormat shortD8Formatter = new SimpleDateFormat("dd/MM/yyyy");
+	public static final SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM d, yyyy");
+	public static final SimpleDateFormat dayFormatter = new SimpleDateFormat("EEEE");
+	public static final SimpleDateFormat monthFormatter = new SimpleDateFormat("MMMM");
+	public static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("MMM d, yyyy hh:mm aaa");
+	public static final SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mm aaa");
+	public static final SimpleDateFormat yyyyMMddFormatter = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat yyyyMMddHHmmssFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final SimpleDateFormat yyyyMMddHHmmssSSSFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	public static final SimpleDateFormat zuluTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
 	public static Date addDaysToDate(Date currentDate, int days) {
 		LocalDate now = toLocalDateFromDate(currentDate);

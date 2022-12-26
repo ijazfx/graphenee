@@ -16,5 +16,4 @@ Graphenee consists of following modules:
 * gx-aws - Easy access to AWS services such as SMS
 * gx-jbpm-embedded - Embedded jBPM engine support
 
-Forked Project:
 Copyright &copy; Farrukh Ijaz, all rights reserved.

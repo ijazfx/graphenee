@@ -203,8 +203,8 @@ public class GxExportDataComponent<T> {
 		T entity = (T) item;
 		CellStyle rowStyle = null;
 		if (delegate != null) {
-			defaultRowStyle = workbook.createCellStyle();
-			rowStyle = delegate.decorateExportDataRow(defaultRowStyle);
+			// defaultRowStyle = workbook.createCellStyle();
+			rowStyle = delegate.decorateExportDataRow(workbook, entity);
 			if (rowStyle != null) {
 				row.setRowStyle(rowStyle);
 			}
@@ -256,8 +256,8 @@ public class GxExportDataComponent<T> {
 			return rowStyle;
 		}
 
-		default CellStyle decorateExportDataRow(CellStyle rowStyle) {
-			return rowStyle;
+		default CellStyle decorateExportDataRow(Workbook workbook, T entity) {
+			return null;
 		}
 
 		default CellStyle decorateExportDataCell(String propertyName, Workbook workbook, T entity) {
