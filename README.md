@@ -18,6 +18,3 @@ Graphenee consists of following modules:
 
 Forked Project:
 Copyright &copy; Farrukh Ijaz, all rights reserved.
-
-This Fork, modifications and enhancements:
-Copyright &copy; Octans Digital (Pvt.) Limited, all rights reserved.
