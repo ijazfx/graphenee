@@ -1,14 +1,22 @@
 package io.graphenee.vaadin.flow.base;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
+import com.vaadin.flow.data.provider.SortDirection;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
@@ -51,8 +59,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 		int pageSize = limit;
 		Stream<T> stream = getData(pageNumber, pageSize, query.getFilter().orElse(getSearchEntity()), sortOrders);
 		if (remainder != 0) {
-			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()),
-					sortOrders);
+			Stream<T> nextStream = getData(pageNumber + 1, pageSize, query.getFilter().orElse(getSearchEntity()), sortOrders);
 			stream = Stream.concat(stream, nextStream).skip(remainder).limit(limit);
 		}
 		return stream;
@@ -67,6 +74,9 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 		return getData(pageNumber, pageSize, searchEntity);
 	}
 
+	/**
+	 * @deprecated use {@link #getData(int, int, Object, List)} instead.
+	 */
 	protected Stream<T> getData(int pageNumber, int pageSize, T searchEntity) {
 		return null;
 	}
@@ -108,6 +118,30 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 				emitter.onComplete();
 			}
 		}
+	}
+
+	/**
+	 * @deprecated use {@link #createSort(List, Sort)} or {@link #createSort(List, Sort, Map)} instead.
+	 */
+	protected List<Order> sortOrdersToSpringOrders(List<QuerySortOrder> sortOrders) {
+		return sortOrders.stream().map(so -> {
+			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC, so.getSorted());
+		}).collect(Collectors.toList());
+	}
+
+	protected Sort createSort(List<QuerySortOrder> sortOrders, Sort defaultSort) {
+		return createSort(sortOrders, defaultSort, Collections.emptyMap());
+	}
+
+	protected Sort createSort(List<QuerySortOrder> sortOrders, Sort defaultSort, Map<String, String> keyPropertyMap) {
+		List<Order> orders = sortOrders.stream().map(so -> {
+			String propertyName = keyPropertyMap.getOrDefault(so.getSorted(), so.getSorted());
+			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC, propertyName);
+		}).collect(Collectors.toList());
+		if (orders.isEmpty() && defaultSort != null) {
+			return defaultSort;
+		}
+		return Sort.by(orders);
 	}
 
 	@Override

@@ -23,8 +23,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 
 import com.google.common.eventbus.EventBus;
 import com.vaadin.flow.component.AbstractField;
@@ -37,6 +35,7 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
@@ -83,8 +82,6 @@ import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
-import com.vaadin.flow.data.provider.QuerySortOrder;
-import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -508,6 +505,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				Column<T> columnByKey = dataGrid.getColumnByKey(key);
 				if (columnByKey != null) {
 					columnByKey.setVisible(true);
+					columnByKey.setSortable(true);
 				}
 			}
 
@@ -776,6 +774,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			Column<T> column = dataGrid.getColumnByKey(key);
 			if (column != null) {
 				column.setVisible(true);
+				column.setSortable(true);
 				removeList.remove(column);
 			}
 		}
@@ -997,7 +996,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				filter = createDatePicker();
 			}
 			if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
-				filter = new Checkbox();
+				ComboBox<Boolean> booleanComboBox = new ComboBox<Boolean>();
+				booleanComboBox.setItems(true, false);
+				booleanComboBox.setItemLabelGenerator(v -> {
+					return v == null ? "" : v == true ? "Checked" : "Unchecked";
+				});
+				filter = booleanComboBox;
 			}
 			if (filter == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 				filter = new NumberField();
@@ -1416,12 +1420,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	public void editItem(T item) {
 		openForm(item);
-	}
-
-	protected List<Order> sortOrdersToSpringOrders(List<QuerySortOrder> sortOrders) {
-		return sortOrders.stream().map(so -> {
-			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC, so.getSorted());
-		}).collect(Collectors.toList());
 	}
 
 	HashSet<GxEntityListEventListner<T>> listeners = new HashSet<>();
