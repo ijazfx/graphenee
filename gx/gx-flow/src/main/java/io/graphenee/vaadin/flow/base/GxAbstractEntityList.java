@@ -1012,7 +1012,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		}
 		filter.getElement().getStyle().set("width", "100%");
 		filter.getElement().setProperty("clearButtonVisible", true);
-		filter.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+		// filter.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
 		return filter;
 	}
 
