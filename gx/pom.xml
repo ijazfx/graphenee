@@ -47,7 +47,7 @@
 		<version.zxing>3.3.0</version.zxing>
 		<version.guava>29.0-jre</version.guava>
 		<version.json>20160810</version.json>
-		<version.itextpdf>5.5.12</version.itextpdf>
+		<version.itextpdf>5.5.13.3</version.itextpdf>
 		<version.lombok>1.18.12</version.lombok>
 		<version.gson>2.8.9</version.gson>
 		<version.pdfbox>3.0.0-RC1</version.pdfbox>
