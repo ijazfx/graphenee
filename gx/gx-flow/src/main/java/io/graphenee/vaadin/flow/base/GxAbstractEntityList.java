@@ -1194,9 +1194,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	protected abstract String[] visibleProperties();
 
 	private String[] preferenceProperties() {
+		Set<String> apset = Stream.of(availableProperties()).collect(Collectors.toSet());
 		try {
 			String preferences = loggedInUser().getPreference(this.getClass().getName());
 			String[] props = preferences.split(",");
+			props = Stream.of(props).filter(p -> apset.contains(p)).collect(Collectors.toList()).toArray(new String[] {});
 			return props;
 		} catch (Exception e) {
 			return availableProperties();

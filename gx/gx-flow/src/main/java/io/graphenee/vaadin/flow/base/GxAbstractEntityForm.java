@@ -134,7 +134,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 
 				dismissButton = new Button("DISMISS");
-				dismissButton.addClickShortcut(Key.ESCAPE);
+				// dismissButton.addClickShortcut(Key.ESCAPE);
 				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
 				dismissButton.addClickListener(new TRDelayClickListener<Button>() {
@@ -377,7 +377,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			dialog.addThemeVariants(DialogVariant.NO_PADDING);
 			dialog.setResizable(true);
 			dialog.setModal(isModal());
-			dialog.setCloseOnEsc(true);
+			dialog.setCloseOnEsc(false);
 			dialog.setDraggable(true);
 			dialog.setResizable(true);
 			dialog.setCloseOnOutsideClick(!isModal());
