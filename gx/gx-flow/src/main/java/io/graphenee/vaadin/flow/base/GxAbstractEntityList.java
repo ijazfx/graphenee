@@ -975,49 +975,57 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	}
 
 	private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
-		AbstractField<?, ?> filter = columnFilterForProperty(propertyName, propertyDefinition);
-		if (filter == null) {
-			if (propertyName.matches("date.*|.*Date")) {
-				if (propertyDefinition.getType().equals(Long.class)) {
-					filter = createDatePicker();
-				} else if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					filter = createDatePicker();
-				}
-			}
-			if (filter == null && propertyName.matches("dateTime.*|.*DateTime")) {
-				if (propertyDefinition.getType().equals(Long.class)) {
-					filter = createDateTimePicker();
-				}
-			}
-			if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
+		AbstractField<?, ?> filter = null;
+		if (propertyName.matches("dateTime.*|.*DateTime")) {
+			if (propertyDefinition.getType().equals(Long.class)) {
 				filter = createDateTimePicker();
 			}
-			if (filter == null && propertyDefinition.getType().equals(Date.class)) {
+		}
+		if (filter == null && propertyName.matches("date.*|.*Date")) {
+			if (propertyDefinition.getType().equals(Long.class)) {
+				filter = createDatePicker();
+			} else if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
 				filter = createDatePicker();
 			}
-			if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
-				ComboBox<Boolean> booleanComboBox = new ComboBox<Boolean>();
-				booleanComboBox.setItems(true, false);
-				booleanComboBox.setItemLabelGenerator(v -> {
-					return v == null ? "" : v == true ? "Checked" : "Unchecked";
-				});
-				filter = booleanComboBox;
-			}
-			if (filter == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-				filter = new NumberField();
-			}
-			if (filter == null) {
-				filter = new TextField();
-			}
+		}
+		if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
+			filter = createDateTimePicker();
+		}
+		if (filter == null && propertyDefinition.getType().equals(Date.class)) {
+			filter = createDatePicker();
+		}
+		if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
+			ComboBox<Boolean> booleanComboBox = new ComboBox<Boolean>();
+			booleanComboBox.setItems(true, false);
+			booleanComboBox.setItemLabelGenerator(v -> {
+				return v == null ? "" : v == true ? "Checked" : "Unchecked";
+			});
+			filter = booleanComboBox;
+		}
+		if (filter == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+			filter = new NumberField();
+		}
+		if (filter == null) {
+			filter = new TextField();
 		}
 		filter.getElement().getStyle().set("width", "100%");
 		filter.getElement().setProperty("clearButtonVisible", true);
 		// filter.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
-		return filter;
+		return columnFilterForProperty(propertyName, propertyDefinition, filter);
 	}
 
+	/**
+	 * @deprecated use {@link #columnFilterForProperty(String, PropertyDefinition, AbstractField)} instead.
+	 */
 	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
 		return null;
+	}
+
+	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
+		AbstractField<?, ?> customFilter = columnFilterForProperty(propertyName, propertyDefinition);
+		if (customFilter != null)
+			return customFilter;
+		return defaultFilter;
 	}
 
 	protected void decorateMenuBar(MenuBar menuBar) {
@@ -1031,18 +1039,18 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private Renderer<T> defaultRendererForProperty(String propertyName, PropertyDefinition<T, ?> propertyDefinition) {
 		Renderer<T> renderer = rendererForProperty(propertyName, propertyDefinition);
 		if (renderer == null) {
-			if (propertyName.matches("date.*|.*Date")) {
-				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.Date);
-				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
-				}
-			}
-			if (renderer == null && propertyName.matches("dateTime.*|.*DateTime")) {
+			if (propertyName.matches("dateTime.*|.*DateTime")) {
 				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.DateTime);
 				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
 					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
+				}
+			}
+			if (renderer == null && propertyName.matches("date.*|.*Date")) {
+				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.Date);
+				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
+					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
 				}
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
