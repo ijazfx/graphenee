@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Strings;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
@@ -133,7 +134,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 
 				dismissButton = new Button("DISMISS");
-				dismissButton.addClickShortcut(Key.ESCAPE);
+				// dismissButton.addClickShortcut(Key.ESCAPE);
 				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
 				dismissButton.addClickListener(new TRDelayClickListener<Button>() {
@@ -214,13 +215,18 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			formTitleLabel.getStyle().set("padding-top", "0.25em");
 			formTitleLayout = new HorizontalLayout();
 			formTitleLayout.addClassName("draggable");
-			formTitleLayout.getStyle().set("border-bottom", "2px solid var(--lumo-primary-color-10pct)");
+			formTitleLayout.getStyle().set("border-bottom", "5px solid var(--lumo-primary-color-10pct)");
 			formTitleLayout.getStyle().set("padding-left", "0.5em");
 			formTitleLayout.getStyle().set("padding-top", "0.5em");
 			formTitleLayout.setWidthFull();
 			formTitleLayout.add(formTitleLabel);
 			addComponentAsFirst(formTitleLayout);
 		}
+	}
+
+	protected void setFormTitleVisibility(boolean isVisible) {
+		formTitleLayout.getChildren().forEach(c -> c.setVisible(isVisible));
+		formTitleLayout.getStyle().set("padding-top", isVisible ? "0.5em" : "0.0em");
 	}
 
 	protected String defaultTabTitle() {
@@ -314,7 +320,16 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				formTitle = new KeyValueWrapper(entity).stringForKeyPath(keyPath);
 			}
 		}
-		formTitleLabel.setText(formTitle);
+		if (formTitle != null) {
+			if (formTitle.length() > 50) {
+				formTitleLabel.setText(formTitle.substring(0, 47) + "...");
+				formTitleLabel.setTitle(formTitle);
+			} else {
+				formTitleLabel.setText(formTitle);
+				formTitleLabel.setTitle("");
+			}
+		}
+		setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
 		if (shouldFocusFirstFieldOnShow()) {
 			focusFirst(this);
 		}
@@ -352,7 +367,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected String dialogWidth() {
-		return "600px";
+		return "800px";
 	}
 
 	public GxDialog showInDialog(T entity, String width, String height) {
@@ -362,7 +377,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			dialog.addThemeVariants(DialogVariant.NO_PADDING);
 			dialog.setResizable(true);
 			dialog.setModal(isModal());
-			dialog.setCloseOnEsc(true);
+			dialog.setCloseOnEsc(false);
 			dialog.setDraggable(true);
 			dialog.setResizable(true);
 			dialog.setCloseOnOutsideClick(!isModal());

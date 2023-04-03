@@ -1,5 +1,9 @@
 package io.graphenee.vaadin.flow.base;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import com.vaadin.flow.component.Component;
@@ -7,6 +11,8 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -20,6 +26,7 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {
 
 	private static final long serialVersionUID = 1L;
+	private Tabs tabs;
 
 	public GxAbstractLayoutView() {
 		setSizeFull();
@@ -31,11 +38,53 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
 	@PostConstruct
 	private void postBuild() {
 		add(getCaptionComponent());
+		List<GxTabItem> tabItems = new ArrayList<>();
+		addTabsToView(tabItems);
 		Component rootLayout = getLayoutComponent();
 		if (rootLayout instanceof HasComponents) {
 			decorateLayout((HasComponents) rootLayout);
+			addTabs((HasComponents) rootLayout, tabItems);
+			add(rootLayout);
 		}
-		add(rootLayout);
+	}
+
+	private void addTabs(HasComponents rootLayout, List<GxTabItem> tabItems) {
+		if (tabItems.size() == 0)
+			return;
+		Div selectedTab = new Div();
+		selectedTab.setSizeFull();
+		selectedTab.getStyle().set("overflow-x", "hidden");
+		tabs = new Tabs();
+		tabs.setWidthFull();
+		Component[] tabComponents = new Component[tabItems.size()];
+
+		tabItems.sort(Comparator.comparing(GxTabItem::getIndex));
+		for (int i = 0; i < tabItems.size(); i++) {
+			GxTabItem tabItem = tabItems.get(i);
+			Tab tab = new Tab(tabItem.getLabel());
+			tabs.add(tab);
+			Component component = tabItem.getComponent();
+			tabComponents[i] = component;
+			if (i == 0) {
+				selectedTab.add(tabComponents[i]);
+			}
+		}
+
+		tabs.addSelectedChangeListener(event -> {
+			Integer selectedIndex = tabs.getSelectedIndex();
+			Component selectedComponent = tabComponents[selectedIndex];
+			selectedTab.removeAll();
+			selectedTab.add(selectedComponent);
+			onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), selectedComponent);
+		});
+
+		rootLayout.add(tabs, selectedTab);
+	}
+
+	protected void onTabChange(Integer index, Tab tab, Component component) {
+	}
+
+	protected void addTabsToView(List<GxTabItem> tabItems) {
 	}
 
 	protected abstract Component getLayoutComponent();
