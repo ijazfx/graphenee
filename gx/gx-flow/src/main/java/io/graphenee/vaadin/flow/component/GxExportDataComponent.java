@@ -113,8 +113,7 @@ public class GxExportDataComponent<T> {
 					log.error("Failed to export data", ex);
 				}
 			}).withDoneCallback(ui -> {
-				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName
-						: "exported-data." + FILE_EXTENSION_XLS;
+				String fileName = GxExportDataComponent.this.fileName != null ? GxExportDataComponent.this.fileName : "exported-data." + FILE_EXTENSION_XLS;
 				StreamResource resource = new StreamResource(fileName, new InputStreamFactory() {
 
 					@Override
@@ -128,9 +127,8 @@ public class GxExportDataComponent<T> {
 					}
 				});
 				StreamRegistration sr = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
-				ui.getPage().open(sr.getResourceUri().toString(), "_blank");
-			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data")
-					.withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
+				ui.getPage().open(sr.getResourceUri().toString(), "_top");
+			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data").withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
 			task.start();
 		} catch (Exception ex) {
 			log.error("Failed to export data", ex);
@@ -147,8 +145,7 @@ public class GxExportDataComponent<T> {
 		if (!CollectionUtils.isEmpty(dataColumns)) {
 			workbook = new XSSFWorkbook();
 			defaultDateStyle = workbook.createCellStyle();
-			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat()
-					.getFormat(TRCalendarUtil.dateFormatter.toPattern()));
+			defaultDateStyle.setDataFormat(workbook.getCreationHelper().createDataFormat().getFormat(TRCalendarUtil.dateFormatter.toPattern()));
 			sheet = workbook.createSheet();
 			buildHeaderRow();
 			buildDataRows();
@@ -245,9 +242,7 @@ public class GxExportDataComponent<T> {
 	}
 
 	private String camelCaseToRegular(String string) {
-		return StringUtils.join(
-				StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)),
-				' ');
+		return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(string.substring(0, 1).toUpperCase() + string.substring(1)), ' ');
 	}
 
 	public static interface GxExportDataComponentDelegate<T> {
