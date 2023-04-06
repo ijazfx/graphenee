@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -90,6 +92,7 @@ import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.GxDashboardUser;
+import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
@@ -178,7 +181,13 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private Text totalCountFooterText;
 	private HorizontalLayout footerTextLayout;
 
+	private String className;
+
+	@Autowired
+	GxDataService gxDataService;
+
 	public GxAbstractEntityList(Class<T> entityClass) {
+		this.className = entityClass.getName();
 		this.entityClass = entityClass;
 		this.searchBinder = new Binder<>(entityClass);
 		setSizeFull();
@@ -367,13 +376,17 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				editColumn.setFlexGrow(0);
 				editColumn.setFrozen(true);
 				columns.add(editColumn);
+				System.out.println("Pref props");
 				for (int i = 0; i < preferenceProperties().length; i++) {
 					userPreferences.add(preferenceProperties()[i]);
+					System.out.println(preferenceProperties()[i]);
 				}
 				List<Column<T>> remainingColumns = new ArrayList<>();
 				List<Column<T>> userColumns = new ArrayList<>(preferenceProperties().length);
+				System.out.println("avail props");
 				for (int i = 0; i < availableProperties().length; i++) {
 					String propertyName = availableProperties()[i];
+					System.out.println(propertyName);
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
@@ -411,11 +424,12 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 							isAvailable = true;
 						}
 
-						if (isAvailable) {
-							column.setVisible(true);
-						} else {
-							column.setVisible(false);
-						}
+						column.setVisible(isAvailable);
+
+						// if (isAvailable) {
+						// } else {
+						// 	column.setVisible(false);
+						// }
 
 						Checkbox propertyCheck = new Checkbox(propertyDefinition.getCaption(), isAvailable);
 
@@ -424,8 +438,14 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 							listener.getSource().setValue(checked);
 							Column<T> columnByKey = dataGrid.getColumnByKey(propertyName);
 							columnByKey.setVisible(checked);
+							List<String> availableProps = Arrays.asList(availableProperties());
+							int index = availableProps.indexOf(propertyName);
 							if (checked && !userPreferences.contains(propertyName)) {
-								userPreferences.add(propertyName);
+								userPreferences.add(index, propertyName);
+								// columns.remove(columnByKey);
+								// columns.add(index, columnByKey);
+								// dataGrid.getElement().executeJs("this._swapColumnOrders($0, $1)", columns.get(index).getElement(), columns.get(columns.size() - 1).getElement());
+								// refresh();
 							} else {
 								userPreferences.remove(propertyName);
 							}
@@ -472,9 +492,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 				@Override
 				public void onClick(ClickEvent<Button> event) {
-					loggedInUser().setPreference(this.getClass().getName(), userPreferences.stream().collect(Collectors.joining(",")));
+					loggedInUser().setPreference(className, userPreferences.stream().collect(Collectors.joining(",")));
 					coreEventBus.post(loggedInUser().getUser());
+					// gxDataService.save(loggedInUser().getUser());
 					menuDialog.close();
+					UI.getCurrent().getPage().reload();
 				}
 			});
 
@@ -573,7 +595,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			dataGrid.addColumnReorderListener(listener -> {
 				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
 						.collect(Collectors.joining(","));
-				loggedInUser().setPreference(this.getClass().getName(), orderedColumns);
+				loggedInUser().setPreference(className, orderedColumns);
 				coreEventBus.post(loggedInUser().getUser());
 			});
 		}
@@ -1204,7 +1226,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private String[] preferenceProperties() {
 		Set<String> apset = Stream.of(availableProperties()).collect(Collectors.toSet());
 		try {
-			String preferences = loggedInUser().getPreference(this.getClass().getName());
+			String preferences = loggedInUser().getPreference(className);
 			String[] props = preferences.split(",");
 			props = Stream.of(props).filter(p -> apset.contains(p)).collect(Collectors.toList()).toArray(new String[] {});
 			return props;
