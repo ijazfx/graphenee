@@ -2,6 +2,7 @@ package io.graphenee.vaadin.flow.component;
 
 import com.vaadin.componentfactory.pdfviewer.PdfViewer;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
@@ -51,10 +52,13 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		bodyLayout.setPadding(true);
 		scroller.setContent(bodyLayout);
 		String mimeType = TRFileContentUtil.getMimeType(fileName);
+		if (mimeType == null)
+			mimeType = "application/octat-stream";
+		resource.setContentType(mimeType);
 		try {
 			if (mimeType.startsWith("image")) {
 				Image image = new Image();
-				image.setSizeFull();
+				image.setHeightFull();
 				image.getElement().setAttribute("src", resource);
 				bodyLayout.add(image);
 			} else if (mimeType.startsWith("audio")) {
@@ -66,12 +70,14 @@ public class ResourcePreviewPanel extends VerticalLayout {
 				resource.setContentType(mimeType);
 				VideoPlayer videoPlayer = new VideoPlayer(resource);
 				bodyLayout.add(videoPlayer);
-			} else if (mimeType.startsWith("pdf")) {
+			} else if (mimeType.contains("pdf")) {
 				PdfViewer pdfPreview = new PdfViewer();
 				pdfPreview.setSizeFull();
-				pdfPreview.openThumbnailsView();
 				pdfPreview.setSrc(resource);
 				bodyLayout.add(pdfPreview);
+				UI.getCurrent().access(() -> {
+					pdfPreview.openThumbnailsView();
+				});
 			} else {
 				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
 				Image image = IconUtils.fileExtensionIconResource(extension);

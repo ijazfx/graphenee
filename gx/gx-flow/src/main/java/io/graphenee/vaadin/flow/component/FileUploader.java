@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.springframework.util.StreamUtils;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HtmlComponent;
@@ -19,10 +23,6 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.server.StreamResource;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.springframework.util.StreamUtils;
 
 import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.storage.FileStorage;
@@ -206,8 +206,10 @@ public class FileUploader extends CustomField<String> {
 						fileName = buffer.getFileName();
 					}
 					byte[] bytes = IOUtils.toByteArray(stream);
-					image.getElement().setAttribute("src",
-							new StreamResource(fileName, () -> new ByteArrayInputStream(bytes)));
+					String fileNameOnly = extractFileNameOnly(fileName);
+					StreamResource sr = new StreamResource(fileNameOnly, () -> new ByteArrayInputStream(bytes));
+					sr.setContentType(mimeType);
+					image.getElement().setAttribute("src", sr);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -238,7 +240,8 @@ public class FileUploader extends CustomField<String> {
 						stream = FileUtils.openInputStream(file);
 					}
 					byte[] bytes = IOUtils.toByteArray(stream);
-					StreamResource streamResource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+					String fileNameOnly = extractFileNameOnly(src);
+					StreamResource streamResource = new StreamResource(fileNameOnly, () -> new ByteArrayInputStream(bytes));
 					try {
 						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
 						resourcePreviewPanel.showInDialog("80%", "80%");
@@ -252,6 +255,15 @@ public class FileUploader extends CustomField<String> {
 			return image;
 		}
 		return null;
+	}
+
+	private String extractFileNameOnly(String fileName) {
+		int idx = fileName.lastIndexOf("/");
+		if (idx == -1)
+			idx = 0;
+		else
+			idx++;
+		return fileName.substring(idx);
 	}
 
 	private void showOutput(String text, Component content, HasComponents outputContainer) {

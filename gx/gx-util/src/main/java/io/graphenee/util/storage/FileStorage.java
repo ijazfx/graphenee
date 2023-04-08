@@ -38,7 +38,7 @@ public interface FileStorage {
 			return filePath;
 		}
 		File file = new File(filePath);
-		return folder + File.separator + file.getName();
+		return folder + "/" + file.getName();
 	}
 
 	default InputStream resolve(String resourcePath) throws ResolveFailedException {

@@ -376,17 +376,17 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				editColumn.setFlexGrow(0);
 				editColumn.setFrozen(true);
 				columns.add(editColumn);
-				System.out.println("Pref props");
+				// System.out.println("Pref props");
 				for (int i = 0; i < preferenceProperties().length; i++) {
 					userPreferences.add(preferenceProperties()[i]);
-					System.out.println(preferenceProperties()[i]);
+					// System.out.println(preferenceProperties()[i]);
 				}
 				List<Column<T>> remainingColumns = new ArrayList<>();
 				List<Column<T>> userColumns = new ArrayList<>(preferenceProperties().length);
-				System.out.println("avail props");
+				// System.out.println("avail props");
 				for (int i = 0; i < availableProperties().length; i++) {
 					String propertyName = availableProperties()[i];
-					System.out.println(propertyName);
+					// System.out.println(propertyName);
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
@@ -593,8 +593,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
-				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
-						.collect(Collectors.joining(","));
+				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey()).collect(Collectors.joining(","));
 				loggedInUser().setPreference(className, orderedColumns);
 				coreEventBus.post(loggedInUser().getUser());
 			});
