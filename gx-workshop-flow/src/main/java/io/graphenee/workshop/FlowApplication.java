@@ -12,15 +12,15 @@ import io.graphenee.util.TRCalendarUtil;
 @SpringBootApplication
 public class FlowApplication {
 
-    @Autowired
-    GrapheneeCoreConfiguration graphenee;
+	@Autowired
+	GrapheneeCoreConfiguration graphenee;
 
-    public static void main(String[] args) {
-        TRCalendarUtil.dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
-        TRCalendarUtil.dateTimeFormatter = new SimpleDateFormat("dd.MM.yyyy hh:mm a");
-        TRCalendarUtil.timeFormatter = new SimpleDateFormat("hh:mm a");
+	public static void main(String[] args) {
+		TRCalendarUtil.setCustomDateFormatter(new SimpleDateFormat("dd.MM.yyyy"));
+		TRCalendarUtil.setCustomDateTimeFormatter(new SimpleDateFormat("dd.MM.yyyy hh:mm a"));
+		TRCalendarUtil.setCustomTimeFormatter(new SimpleDateFormat("hh:mm a"));
 
-        SpringApplication.run(FlowApplication.class, args);
-    }
+		SpringApplication.run(FlowApplication.class, args);
+	}
 
 }
