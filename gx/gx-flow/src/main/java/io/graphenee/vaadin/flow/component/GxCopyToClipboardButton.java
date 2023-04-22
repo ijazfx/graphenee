@@ -24,7 +24,6 @@ public class GxCopyToClipboardButton extends Button {
 			sb.append("document.execCommand(\"copy\");\n");
 			sb.append("document.body.removeChild(tempTextArea);");
 			UI.getCurrent().getPage().executeJs(sb.toString());
-			GxNotification.success(content + " copied to clipboard!");
 		});
 	}
 
