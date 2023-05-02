@@ -1136,9 +1136,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		column.setFlexGrow(0);
 		column.setWidth("8rem");
 		if (propertyDefinition != null) {
-			System.out.println(propertyName);
-			System.out.println(propertyDefinition.getType());
-			System.out.println(propertyDefinition.getType().getSuperclass());
 			if (propertyDefinition.getType().getSuperclass() != null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 				column.setTextAlign(ColumnTextAlign.END);
 			}
@@ -1146,7 +1143,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				column.setTextAlign(ColumnTextAlign.START);
 			}
 		}
-		System.out.println("end");
 	}
 
 	protected void decorateColumn(String propertyName, Column<T> column) {
