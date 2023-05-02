@@ -95,10 +95,12 @@ public class LongRunningTask {
 				ui.access(() -> {
 					notification.remove(notificationLoadingLayout);
 					notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-					notification.setDuration(0);
 					HorizontalLayout buttonLayout = new HorizontalLayout();
 					if (doneButton != null) {
 						buttonLayout.add(doneButton);
+						notification.setDuration(0);
+					} else {
+						notification.setDuration(5000);
 					}
 					notification.add(new Text(successMessage != null ? successMessage : "Task has been completed successfully!"), buttonLayout);
 					ui.push();
@@ -112,7 +114,7 @@ public class LongRunningTask {
 				ui.access(() -> {
 					notification.remove(notificationLoadingLayout);
 					notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-					notification.setDuration(0);
+					notification.setDuration(5000);
 					HorizontalLayout buttonLayout = new HorizontalLayout();
 					errorMessage = errorMessage == null ? (cause != null && cause.getMessage() != null ? cause.getMessage() : "Task stopped with error!") : errorMessage;
 					notification.add(new Text(errorMessage), buttonLayout);
