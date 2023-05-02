@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import com.google.common.eventbus.EventBus;
 import com.vaadin.flow.component.AbstractField;
@@ -321,7 +322,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
 
-			H2 menuHeading = new H2("Columns Menu");
+			H2 menuHeading = new H2("Column Menu");
 			menuHeading.getElement().getStyle().set("padding-top", "0px");
 			menuHeading.getElement().getStyle().set("margin-top", "0px");
 
@@ -376,22 +377,19 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				editColumn.setFlexGrow(0);
 				editColumn.setFrozen(true);
 				columns.add(editColumn);
-				// System.out.println("Pref props");
 				for (int i = 0; i < preferenceProperties().length; i++) {
 					userPreferences.add(preferenceProperties()[i]);
-					// System.out.println(preferenceProperties()[i]);
 				}
 				List<Column<T>> remainingColumns = new ArrayList<>();
 				List<Column<T>> userColumns = new ArrayList<>(preferenceProperties().length);
-				// System.out.println("avail props");
 				for (int i = 0; i < availableProperties().length; i++) {
 					String propertyName = availableProperties()[i];
-					// System.out.println(propertyName);
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
 						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
 						Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
+
 						if (renderer != null) {
 							if (column != null) {
 								dataGrid.removeColumn(column);
@@ -407,7 +405,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 							column.setAutoWidth(true);
 						}
 
-						if (isGridFilterEnabled()) {
+						if (isGridFilterEnabled() && !(propertyDefinition.getType().equals(List.class) || propertyDefinition.getType().equals(Set.class))) {
 							addFilteredColumn(column, propertyDefinition);
 						}
 
@@ -593,7 +591,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
-				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey()).collect(Collectors.joining(","));
+				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
+						.collect(Collectors.joining(","));
 				loggedInUser().setPreference(className, orderedColumns);
 				coreEventBus.post(loggedInUser().getUser());
 			});
@@ -789,6 +788,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		if (isGridInlineEditingEnabled()) {
 			Binder<T> editBinder = new Binder<>(entityClass);
 			dataGrid.getEditor().setBinder(editBinder);
+			dataGrid.getEditor().setBuffered(false);
+			editBinder.addValueChangeListener(l -> {
+				dataGrid.getEditor().save();
+				onGridInlineEditorSave(dataGrid.getEditor().getItem());
+			});
 		}
 		List<Column<T>> removeList = new ArrayList<>(dataGrid.getColumns());
 		for (String key : preferenceProperties()) {
@@ -1077,6 +1081,18 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
 				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
 			}
+			if (renderer == null && (propertyDefinition.getType().equals(List.class) || propertyDefinition.getType().equals(Set.class))) {
+				renderer = new ComponentRenderer<>(s -> {
+					MultiselectComboBox<Object> c = new MultiselectComboBox<Object>();
+					Collection<Object> bag = (Collection<Object>) propertyDefinition.getGetter().apply((T) s);
+					Set<Object> value = new HashSet<>(bag);
+					c.setItems(value);
+					c.setValue(value);
+					c.setWidthFull();
+					c.setReadOnly(true);
+					return c;
+				});
+			}
 			if (renderer == null && propertyDefinition.getType().equals(Date.class)) {
 				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
 			}
@@ -1120,13 +1136,17 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		column.setFlexGrow(0);
 		column.setWidth("8rem");
 		if (propertyDefinition != null) {
-			if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+			System.out.println(propertyName);
+			System.out.println(propertyDefinition.getType());
+			System.out.println(propertyDefinition.getType().getSuperclass());
+			if (propertyDefinition.getType().getSuperclass() != null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 				column.setTextAlign(ColumnTextAlign.END);
 			}
-			if (propertyDefinition.getType().equals(String.class)) {
+			if (propertyDefinition.getType() != null && propertyDefinition.getType().equals(String.class)) {
 				column.setTextAlign(ColumnTextAlign.START);
 			}
 		}
+		System.out.println("end");
 	}
 
 	protected void decorateColumn(String propertyName, Column<T> column) {
@@ -1356,6 +1376,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	protected boolean isGridFilterEnabled() {
 		return true;
+	}
+
+	protected void onGridInlineEditorSave(T entity) {
+		this.onSave(entity);
 	}
 
 	protected abstract void onSave(T entity);
