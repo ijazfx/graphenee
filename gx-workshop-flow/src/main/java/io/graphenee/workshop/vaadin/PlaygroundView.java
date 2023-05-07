@@ -10,6 +10,7 @@ import com.vaadin.flow.router.Route;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 import io.graphenee.vaadin.flow.component.GxCopyToClipboardWrapper;
+import io.graphenee.workshop.vaadin.lit.GxEcho;
 
 @GxSecuredView
 @Route(value = "playground", layout = MainLayout.class)
@@ -24,6 +25,16 @@ public class PlaygroundView extends GxVerticalLayoutView {
 		TextField label2 = new TextField("UUID");
 		label2.setValue(UUID.randomUUID().toString());
 		rootLayout.add(new GxCopyToClipboardWrapper(label2));
+
+		GxEcho echo = new GxEcho();
+
+		TextField message = new TextField("Message");
+		message.addValueChangeListener(vcl -> {
+			echo.setMessage(vcl.getValue());
+		});
+
+		rootLayout.add(message, echo);
+
 	}
 
 }
