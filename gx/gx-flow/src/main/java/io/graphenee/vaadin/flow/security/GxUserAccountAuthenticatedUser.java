@@ -99,4 +99,14 @@ public class GxUserAccountAuthenticatedUser implements GxAuthenticatedUser {
 	public void setMobileNumber(String mobileNumber) {
 	}
 
+	@Override
+	public boolean canDoAction(String resource, String action) {
+		return user.canDoAction(resource, action);
+	}
+
+	@Override
+	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+		return user.canDoAction(resource, action, forceRefresh);
+	}
+
 }
