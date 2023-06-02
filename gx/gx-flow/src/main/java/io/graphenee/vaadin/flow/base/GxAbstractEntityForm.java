@@ -132,6 +132,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 						});
 					}
 				});
+				customizeResetButton(resetButton);
 
 				dismissButton = new Button("DISMISS");
 				// dismissButton.addClickShortcut(Key.ESCAPE);
@@ -155,6 +156,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 
 				resetButton.getElement().getStyle().set("margin-left", "auto");
+				customizeDismissButton(dismissButton);
 				c.add(saveButton, resetButton, dismissButton);
 
 			}
@@ -234,6 +236,12 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected void customizeSaveButton(Button saveButton) {
+	}
+
+	protected void customizeDismissButton(Button dismissButton) {
+	}
+
+	protected void customizeResetButton(Button resetButton) {
 	}
 
 	protected String formTitle() {
