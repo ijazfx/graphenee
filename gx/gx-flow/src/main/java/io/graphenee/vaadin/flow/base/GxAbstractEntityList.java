@@ -321,6 +321,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			decorateMenuBar(customMenuBar);
 
 			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
+			decorateColumnMenuBar(columnMenuBar);
 
 			H2 menuHeading = new H2("Column Menu");
 			menuHeading.getElement().getStyle().set("padding-top", "0px");
@@ -598,6 +599,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			});
 		}
 		return this;
+	}
+
+	protected void decorateColumnMenuBar(MenuBar columnMenuBar) {
 	}
 
 	protected GxExportDataComponentDelegate<T> exportDataDelegate() {
