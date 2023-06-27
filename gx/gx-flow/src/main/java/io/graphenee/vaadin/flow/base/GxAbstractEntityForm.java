@@ -2,8 +2,10 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
@@ -418,6 +420,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		this.delegate = delegate;
 	}
 
+	private Map<Integer, Tab> tabMap = new HashMap<>();
+
 	private void addTab(List<GxTabItem> tabItems) {
 		Div selectedTab = new Div();
 		selectedTab.setSizeFull();
@@ -431,6 +435,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			GxTabItem tabItem = tabItems.get(i);
 			Tab tab = new Tab(tabItem.getLabel());
 			tabs.add(tab);
+			tabMap.put(tabItem.getIndex(), tab);
 			Component component = tabItem.getComponent();
 			if (i != 0) {
 				component.getElement().getStyle().set("padding", "10px");
@@ -456,6 +461,12 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected void onTabChange(Integer index, Tab tab, Component component) {
+	}
+
+	protected void selectTab(Integer tabIndex) {
+		Tab tab = tabMap.get(tabIndex);
+		if (tab != null)
+			tabs.setSelectedTab(tab);
 	}
 
 	protected void setTabEnabled(Integer index, Boolean value) {
