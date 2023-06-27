@@ -48,10 +48,10 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 		headingLayout.setAlignItems(Alignment.BASELINE);
 		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
 		headingLayout.setWidth("328px");
-		Span heading = new Span(flowSetup().appTitle());
+		Span heading = new Span(appTitle());
 		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
 		heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
-		Span version = new Span(flowSetup().appVersion());
+		Span version = new Span(appVersion());
 		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
 		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
 		headingLayout.add(heading, version);
@@ -63,9 +63,9 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 		rootLayout.setPadding(false);
 		rootLayout.setWidth("-1px");
 		rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		rootLayout.getElement().getStyle().set("background", "white");
+		rootLayout.getElement().getStyle().set("background", backgoundColor());
 
-		appLogo = flowSetup().appLogo();
+		appLogo = appLogo();
 		if (appLogo != null) {
 			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
 			appLogo.setWidth("100px");
@@ -77,7 +77,7 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		loginForm.getElement().getStyle().set("background", "white");
+		loginForm.getElement().getStyle().set("background", backgoundColor());
 		loginForm.setForgotPasswordButtonVisible(true);
 		LoginI18n loginI18n = LoginI18n.createDefault();
 		loginI18n.getForm().setSubmit("Sign In");
@@ -120,6 +120,22 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 			onForgotPassword(e);
 		});
 
+	}
+
+	protected String backgoundColor() {
+		return "white";
+	}
+
+	protected Image appLogo() {
+		return flowSetup().appLogo();
+	}
+
+	protected String appVersion() {
+		return flowSetup().appVersion();
+	}
+
+	protected String appTitle() {
+		return flowSetup().appTitle();
 	}
 
 	private void registerRoute(GxAuthenticatedUser user, RouteConfiguration rc, GxMenuItem mi) {
