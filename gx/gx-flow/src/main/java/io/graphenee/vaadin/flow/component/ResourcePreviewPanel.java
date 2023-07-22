@@ -1,8 +1,8 @@
 package io.graphenee.vaadin.flow.component;
 
-import com.vaadin.componentfactory.pdfviewer.PdfViewer;
+import org.vaadin.alejandro.PdfBrowserViewer;
+
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
@@ -65,19 +65,14 @@ public class ResourcePreviewPanel extends VerticalLayout {
 				resource.setContentType(mimeType);
 				AudioPlayer audioPlayer = new AudioPlayer(resource);
 				bodyLayout.add(audioPlayer);
-
 			} else if (mimeType.startsWith("video")) {
 				resource.setContentType(mimeType);
 				VideoPlayer videoPlayer = new VideoPlayer(resource);
 				bodyLayout.add(videoPlayer);
 			} else if (mimeType.contains("pdf")) {
-				PdfViewer pdfPreview = new PdfViewer();
-				pdfPreview.setSizeFull();
-				pdfPreview.setSrc(resource);
+				PdfBrowserViewer pdfPreview = new PdfBrowserViewer(resource);
+				pdfPreview.setHeight("100%");
 				bodyLayout.add(pdfPreview);
-				UI.getCurrent().access(() -> {
-					pdfPreview.openThumbnailsView();
-				});
 			} else {
 				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
 				Image image = IconUtils.fileExtensionIconResource(extension);

@@ -18,7 +18,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<version.vaadin>14.8.14</version.vaadin>
-		<version.vaadin.plugin>14.8.14</version.vaadin.plugin>
+		<version.vaadin.plugin>9.1.4</version.vaadin.plugin>
 	</properties>
 
 	<!-- Repositories -->
@@ -50,9 +50,9 @@
 			<version>3.0.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.vaadin.addons.componentfactory</groupId>
-			<artifactId>vcf-pdf-viewer</artifactId>
-			<version>1.0.2</version>
+			<groupId>org.vaadin.alejandro</groupId>
+			<artifactId>pdf-browser</artifactId>
+			<version>3.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -114,7 +114,7 @@
 		<plugins>
 			<plugin>
 				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
+				<artifactId>flow-maven-plugin</artifactId>
 				<version>${version.vaadin.plugin}</version>
 				<executions>
 					<execution>

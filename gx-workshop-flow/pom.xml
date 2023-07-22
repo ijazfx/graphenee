@@ -3,13 +3,12 @@
 	<groupId>io.graphenee</groupId>
 	<artifactId>gx-workshop-flow</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>Graphenee Workshop</name>
 	<description>A demonstration of what Graphenee offers. A place to experiment with graphenee components.</description>
 
 	<properties>
-		<version.graphenee>3.6.5-SNAPSHOT</version.graphenee>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
+		<version.graphenee>3.6.6-SNAPSHOT</version.graphenee>
 	</properties>
 
 	<!-- Dependency Management -->
@@ -146,8 +145,8 @@
 			</plugin>
 			<plugin>
 				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>14.4.3</version>
+				<artifactId>flow-maven-plugin</artifactId>
+				<version>9.1.4</version>
 				<executions>
 					<execution>
 						<goals>
