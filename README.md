@@ -12,8 +12,11 @@ I believe the framework has a lot of potential and there is huge room for improv
 # Modules
 Graphenee consists of following modules:
 * gx-core - Core API, interfaces and utility methods, I18n module that is used to store and manage translation terms, Security module for creating and managing users, groups and policies, Easy access to SMS service providers such as AWS SMS, Twilio, Eocean, etc.
+* gx-util - Utilities have been moved from gx-core to gx-util
 * gx-vaadin7 - Vaadin 7 components to build dashboard, forms, panels and data grids quickly
 * gx-aws - Easy access to AWS services such as SMS
+* gx-flow - Vaadin Flow components to build dashboard, forms, panels and data grids quickly using Vaadin Flow framework.
 * gx-jbpm-embedded - Embedded jBPM engine support
+* gx-blockchain - Interacting with Hyperledger Sawtooth and Ethereum blockchain platforms.
 
-Copyright &copy; Farrukh Ijaz, all rights reserved.
+Copyright &copy; Farrukh Ijaz since 2015, all rights reserved.
