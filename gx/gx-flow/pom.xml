@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>io.graphenee</groupId>
 		<artifactId>gx</artifactId>
-		<version>3.6.6-SNAPSHOT</version>
+		<version>3.6.5</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -110,21 +110,4 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.vaadin</groupId>
-				<artifactId>flow-maven-plugin</artifactId>
-				<version>${version.vaadin.plugin}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-frontend</goal>
-						</goals>
-						<phase>compile</phase>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>
