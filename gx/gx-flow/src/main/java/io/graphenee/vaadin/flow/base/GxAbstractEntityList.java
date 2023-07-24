@@ -56,6 +56,9 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
 import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
@@ -105,6 +108,7 @@ import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.event.TRDelayEventListener;
+import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
@@ -317,6 +321,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 					exportDataSpreadSheetComponent.prepareDownload();
 				}
 			});
+
+			decorateContextMenu(dataGrid.addContextMenu());
 
 			decorateMenuBar(customMenuBar);
 
@@ -601,6 +607,20 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return this;
 	}
 
+	protected void decorateContextMenu(GridContextMenu<T> contextMenu) {
+		GridMenuItem<T> addItem = contextMenu.addItem(new Span(VaadinIcon.PLUS.create(), new Text("Add New Record")));
+		customizeAddContextMenuItem(addItem);
+		GridMenuItem<T> editItem = contextMenu.addItem(new Span(VaadinIcon.PENCIL.create(), new Text("Edit Record")));
+		customizeEditContextMenuItem(editItem);
+		GridMenuItem<T> deleteItem = contextMenu.addItem(new Span(VaadinIcon.TRASH.create(), new Text("Delete Record")));
+		customizeDeleteContextMenuItem(deleteItem);
+		contextMenu.addGridContextMenuOpenedListener(e -> {
+			boolean present = e.getItem().isPresent();
+			editItem.setEnabled(present);
+			deleteItem.setEnabled(present);
+		});
+	}
+
 	protected void decorateColumnMenuBar(MenuBar columnMenuBar) {
 	}
 
@@ -816,9 +836,35 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		return DataProvider.ofCollection(items);
 	}
 
+	protected void customizeAddContextMenuItem(GridMenuItem<T> addItem) {
+		addItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
+
+			@Override
+			public void onClick(GridContextMenuItemClickEvent<T> event) {
+				try {
+					openForm(entityClass.getDeclaredConstructor().newInstance());
+				} catch (Exception e) {
+					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				}
+			}
+		});
+	}
+
+	protected void customizeEditContextMenuItem(GridMenuItem<T> editItem) {
+		editItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
+			@Override
+			public void onClick(GridContextMenuItemClickEvent<T> event) {
+				try {
+					openForm(event.getItem().get());
+				} catch (Exception e) {
+					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				}
+			}
+		});
+	}
+
 	protected void customizeAddMenuItem(MenuItem addMenuItem) {
 		addMenuItem.addClickListener(new TRDelayClickListener<MenuItem>() {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -830,12 +876,10 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				}
 			}
 		});
-
 	}
 
 	protected void customizeEditButton(Button editButton, T entity) {
 		editButton.addClickListener(new TRDelayClickListener<Button>() {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -847,47 +891,59 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	protected void customizeDeleteMenuItem(MenuItem deleteMenuItem) {
 		deleteMenuItem.addClickListener(new TRDelayClickListener<MenuItem>() {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void onClick(ClickEvent<MenuItem> event) {
-				if (shouldShowDeleteConfirmation()) {
-					ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
-						try {
-							onDelete(dataGrid.getSelectedItems());
-							if (isAuditLogEnabled()) {
-								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
-							}
-							listeners.forEach(l -> {
-								l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
-							});
-							refresh();
-							deleteMenuItem.setEnabled(false);
-							dataGrid.deselectAll();
-						} catch (Exception e) {
-							log.warn(e.getMessage(), e);
-							Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-						}
-					}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
-				} else {
-					try {
-						onDelete(dataGrid.getSelectedItems());
-						if (isAuditLogEnabled()) {
-							auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
-						}
-						listeners.forEach(l -> {
-							l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
-						});
-						refresh();
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
-						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-					}
-				}
+				deleteItem(deleteMenuItem);
 			}
 		});
+	}
 
+	protected void customizeDeleteContextMenuItem(GridMenuItem<T> deleteItem) {
+		deleteItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
+			@Override
+			public void onClick(GridContextMenuItemClickEvent<T> event) {
+				entityGrid().select(event.getItem().get());
+				deleteItem(deleteMenuItem);
+			}
+		});
+	}
+
+	private void deleteItem(MenuItem deleteMenuItem) {
+		if (shouldShowDeleteConfirmation()) {
+			ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
+				try {
+					onDelete(dataGrid.getSelectedItems());
+					if (isAuditLogEnabled()) {
+						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+					}
+					listeners.forEach(l -> {
+						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+					});
+					refresh();
+					deleteMenuItem.setEnabled(false);
+					dataGrid.deselectAll();
+				} catch (Exception e) {
+					log.warn(e.getMessage(), e);
+					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				}
+			}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
+		} else {
+			try {
+				onDelete(dataGrid.getSelectedItems());
+				if (isAuditLogEnabled()) {
+					auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+				}
+				listeners.forEach(l -> {
+					l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+				});
+				refresh();
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+				Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")
