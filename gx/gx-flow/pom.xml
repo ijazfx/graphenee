@@ -17,8 +17,8 @@
 	<!-- Properties -->
 	<properties>
 		<java.version>11</java.version>
-		<version.vaadin>14.8.14</version.vaadin>
-		<version.vaadin.plugin>9.1.4</version.vaadin.plugin>
+		<version.vaadin>14.10.3</version.vaadin>
+		<version.vaadin.plugin>14.10.3</version.vaadin.plugin>
 	</properties>
 
 	<!-- Repositories -->
