@@ -8,7 +8,7 @@
 	<description>A demonstration of what Graphenee offers. A place to experiment with graphenee components.</description>
 
 	<properties>
-		<version.graphenee>3.6.6-SNAPSHOT</version.graphenee>
+		<version.graphenee>3.6.6</version.graphenee>
 	</properties>
 
 	<!-- Dependency Management -->
@@ -145,18 +145,44 @@
 			</plugin>
 			<plugin>
 				<groupId>com.vaadin</groupId>
-				<artifactId>flow-maven-plugin</artifactId>
-				<version>9.1.4</version>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>14.10.3</version>
 				<executions>
 					<execution>
 						<goals>
 							<goal>prepare-frontend</goal>
-							<goal>build-frontend</goal>
 						</goals>
+						<phase>compile</phase>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>production</id>
+			<build>
+				<plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <version>14.10.3</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build-frontend</goal>
+                                </goals>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <productionMode>true</productionMode>
+                        </configuration>
+                    </plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

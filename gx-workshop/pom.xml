@@ -8,7 +8,7 @@
     <description>A demonstration of what Graphenee offers. A place to experiment with graphenee components.</description>
 
     <properties>
-        <version.graphenee>3.6.6-SNAPSHOT</version.graphenee>
+        <version.graphenee>3.6.6</version.graphenee>
         <failOnMissingWebXml></failOnMissingWebXml>
     </properties>
 
