@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.spring.annotation.SpringComponent;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;

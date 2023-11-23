@@ -3,15 +3,15 @@ package io.graphenee.vaadin.flow.device_mgmt;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.data.binder.Binder;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.data.binder.Binder;
 
 import io.graphenee.core.model.api.GxRegisteredDeviceDataService;
 import io.graphenee.core.model.entity.GxNamespace;

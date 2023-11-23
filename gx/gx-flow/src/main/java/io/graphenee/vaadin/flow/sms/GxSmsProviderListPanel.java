@@ -18,11 +18,11 @@ package io.graphenee.vaadin.flow.sms;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.grid.ItemClickEvent;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+
+import com.vaadin.flow.component.grid.ItemClickEvent;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.api.GxDataService;

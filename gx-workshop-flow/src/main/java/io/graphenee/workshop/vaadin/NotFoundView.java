@@ -1,7 +1,5 @@
 package io.graphenee.workshop.vaadin;
 
-import javax.servlet.http.HttpServletResponse;
-
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -11,6 +9,7 @@ import com.vaadin.flow.router.NotFoundException;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class NotFoundView extends Div implements HasErrorParameter<NotFoundException> {
 

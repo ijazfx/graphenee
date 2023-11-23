@@ -1,7 +1,5 @@
 package io.graphenee.vaadin.flow.base;
 
-import javax.servlet.http.HttpServletResponse;
-
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -9,6 +7,7 @@ import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasErrorParameter;
 
 import io.graphenee.vaadin.flow.base.ForbiddenView.ForbiddenException;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class ForbiddenView extends VerticalLayout implements HasErrorParameter<ForbiddenException> {
 

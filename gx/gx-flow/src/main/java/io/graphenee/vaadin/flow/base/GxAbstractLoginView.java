@@ -2,8 +2,6 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -27,6 +25,7 @@ import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
+import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractLoginView extends VerticalLayout implements HasUrlParameter<String> {

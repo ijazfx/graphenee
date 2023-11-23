@@ -22,8 +22,8 @@ import javax.sql.DataSource;
 
 import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.dialect.PostgreSQL95Dialect;
-import org.hibernate.dialect.SQLServer2012Dialect;
+import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.SQLServerDialect;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 
 public class DataSourceUtil {
@@ -55,9 +55,9 @@ public class DataSourceUtil {
 		try (Connection c = dataSource.getConnection()) {
 			vendor = c.getMetaData().getDatabaseProductName().replaceAll("\\s", "").toLowerCase();
 			if (vendor.contains("postgresql")) {
-				return new PostgreSQL95Dialect();
+				return new PostgreSQLDialect();
 			} else if (vendor.contains("sqlserver")) {
-				return new SQLServer2012Dialect();
+				return new SQLServerDialect();
 			} else if (vendor.contains("h2")) {
 				return new H2Dialect();
 			} else

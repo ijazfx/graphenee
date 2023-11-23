@@ -1,12 +1,12 @@
 package io.graphenee.vaadin.flow.device_mgmt;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;

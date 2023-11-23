@@ -1,9 +1,9 @@
 package io.graphenee.vaadin.flow.device_mgmt;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxSecuredView;

@@ -15,12 +15,12 @@
  *******************************************************************************/
 package io.graphenee.vaadin.flow.i18n;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Route;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;

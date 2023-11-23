@@ -28,8 +28,6 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouteData;
@@ -41,7 +39,6 @@ import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxTabItem;
-import io.graphenee.vaadin.flow.converter.BeanCollectionFaultToSetConverter;
 
 @Component
 @Scope("prototype")

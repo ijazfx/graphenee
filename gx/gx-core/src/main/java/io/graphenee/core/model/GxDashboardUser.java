@@ -2,8 +2,6 @@ package io.graphenee.core.model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.json.JSONObject;
-
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.util.enums.GenderEnum;
 

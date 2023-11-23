@@ -2,16 +2,16 @@ package io.graphenee.vaadin.flow.security;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import com.flowingcode.vaadin.addons.twincolgrid.TwinColGrid;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.bean.GxSecurityGroupBean;

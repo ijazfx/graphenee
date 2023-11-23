@@ -20,9 +20,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
-import com.google.common.base.Strings;
-
 import org.springframework.stereotype.Service;
+
+import com.google.common.base.Strings;
 
 import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.enums.GxAudioType;

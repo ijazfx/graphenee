@@ -1,9 +1,9 @@
 package io.graphenee.workshop.vaadin;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.router.Route;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;

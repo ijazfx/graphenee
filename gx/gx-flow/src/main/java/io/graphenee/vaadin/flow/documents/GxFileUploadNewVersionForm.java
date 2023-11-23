@@ -6,12 +6,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.context.annotation.Scope;
+
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.upload.Receiver;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-
-import org.springframework.context.annotation.Scope;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;

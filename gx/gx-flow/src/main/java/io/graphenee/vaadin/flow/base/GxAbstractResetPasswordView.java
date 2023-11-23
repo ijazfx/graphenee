@@ -2,8 +2,6 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang3.RandomStringUtils;
 
 import com.vaadin.flow.component.button.Button;
@@ -22,6 +20,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
+import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractResetPasswordView extends VerticalLayout {

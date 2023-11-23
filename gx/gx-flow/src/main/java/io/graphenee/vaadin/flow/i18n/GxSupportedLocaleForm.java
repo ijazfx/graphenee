@@ -15,13 +15,13 @@
  *******************************************************************************/
 package io.graphenee.vaadin.flow.i18n;
 
+import org.springframework.context.annotation.Scope;
+
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-
-import org.springframework.context.annotation.Scope;
 
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;

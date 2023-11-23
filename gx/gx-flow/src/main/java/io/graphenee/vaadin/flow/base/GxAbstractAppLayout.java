@@ -3,8 +3,6 @@ package io.graphenee.vaadin.flow.base;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.annotation.PostConstruct;
-
 import com.github.appreciated.app.layout.component.appbar.AppBarBuilder;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts.LeftHybrid;
@@ -26,6 +24,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

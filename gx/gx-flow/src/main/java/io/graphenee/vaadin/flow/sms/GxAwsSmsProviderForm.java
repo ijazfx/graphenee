@@ -15,15 +15,15 @@
  *******************************************************************************/
 package io.graphenee.vaadin.flow.sms;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.ValidationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.sms.proto.GxSmsConfigProtos;

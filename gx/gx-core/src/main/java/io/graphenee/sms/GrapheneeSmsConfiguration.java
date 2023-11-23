@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.sms;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,6 +29,7 @@ import io.graphenee.core.model.bean.GxSmsProviderBean;
 import io.graphenee.sms.impl.AwsSmsServiceImpl;
 import io.graphenee.sms.impl.EoceanSmsServiceImpl;
 import io.graphenee.sms.impl.TwilioSmsServiceImpl;
+import jakarta.annotation.PostConstruct;
 
 @Configuration
 @ConditionalOnClass(GrapheneeCoreConfiguration.class)

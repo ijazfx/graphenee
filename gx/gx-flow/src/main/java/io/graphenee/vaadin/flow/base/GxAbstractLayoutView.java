@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -21,6 +19,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {

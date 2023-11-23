@@ -28,10 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
-import com.google.common.base.Strings;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
@@ -41,6 +37,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import com.google.common.base.Strings;
 
 import io.graphenee.core.enums.AccessKeyType;
 import io.graphenee.core.enums.SmsProvider;
@@ -117,6 +115,7 @@ import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.util.CryptoUtil;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.enums.GenderEnum;
+import jakarta.annotation.PostConstruct;
 
 @Service
 @DependsOn({ "flyway", "flywayInitializer" })

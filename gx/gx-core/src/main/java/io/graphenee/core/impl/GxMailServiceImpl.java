@@ -18,14 +18,13 @@ package io.graphenee.core.impl;
 import java.util.Collection;
 import java.util.Date;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.util.StringUtils;
 
 import io.graphenee.core.exception.SendMailFailedException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
 

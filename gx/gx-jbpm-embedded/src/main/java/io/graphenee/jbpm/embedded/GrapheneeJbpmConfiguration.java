@@ -15,8 +15,8 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded;
 
-import javax.annotation.PostConstruct;
-import javax.persistence.EntityManagerFactory;
+import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;

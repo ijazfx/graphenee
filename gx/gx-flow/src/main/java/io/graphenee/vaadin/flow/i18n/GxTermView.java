@@ -15,11 +15,11 @@
  *******************************************************************************/
 package io.graphenee.vaadin.flow.i18n;
 
-import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.router.AfterNavigationEvent;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+
+import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.router.AfterNavigationEvent;
 
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
