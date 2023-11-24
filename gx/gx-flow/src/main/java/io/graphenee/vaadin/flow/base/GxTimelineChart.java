@@ -34,16 +34,16 @@ public class GxTimelineChart extends VerticalLayout {
 
 	public GxTimelineChart() {
 		chart = ApexChartsBuilder.get().withColors("#B7BFC6", "#0ED374")
-				.withChart(ChartBuilder.get().withAnimations(AnimationsBuilder.get().withEnabled(false).build()).withType(Type.rangeBar).build())
+				.withChart(ChartBuilder.get().withAnimations(AnimationsBuilder.get().withEnabled(false).build()).withType(Type.RANGEBAR).build())
 				.withGrid(GridBuilder.get().withShow(true).withStrokeDashArray(5.0).build())
 				.withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(true).withRangeBarGroupRows(true).withBarHeight("80%").build()).build())
 				.withDataLabels(DataLabelsBuilder.get().withEnabled(false).build()).withFill(FillBuilder.get().withOpacity(1.0).build())
 				.withYaxis(YAxisBuilder.get()
 						.withLabels(com.github.appreciated.apexcharts.config.yaxis.builder.LabelsBuilder.get().withOffsetX(-50.0).withMinWidth(100.0).withMaxWidth(400.0)
-								.withAlign(Align.left).build())
+								.withAlign(Align.LEFT).build())
 						.build())
-				.withXaxis(XAxisBuilder.get().withType(XAxisType.datetime).withPosition("top").withLabels(LabelsBuilder.get().withFormat("dd.MM.yyyy").build()).build())
-				.withLegend(LegendBuilder.get().withShow(true).withPosition(Position.top).withHorizontalAlign(HorizontalAlign.left).build()).build();
+				.withXaxis(XAxisBuilder.get().withType(XAxisType.DATETIME).withPosition("top").withLabels(LabelsBuilder.get().withFormat("dd.MM.yyyy").build()).build())
+				.withLegend(LegendBuilder.get().withShow(true).withPosition(Position.TOP).withHorizontalAlign(HorizontalAlign.LEFT).build()).build();
 		add(chart);
 		setWidthFull();
 	}

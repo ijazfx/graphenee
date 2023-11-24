@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.github.appreciated.apexcharts.ApexCharts;
 import com.github.appreciated.apexcharts.ApexChartsBuilder;
+import com.github.appreciated.apexcharts.config.YAxis;
 import com.github.appreciated.apexcharts.config.builder.ChartBuilder;
 import com.github.appreciated.apexcharts.config.builder.DataLabelsBuilder;
 import com.github.appreciated.apexcharts.config.builder.FillBuilder;
@@ -34,10 +35,10 @@ public class GxStackedBarChart extends VerticalLayout {
 	public GxStackedBarChart() {
 		String[] colors = new String[] { "#F3B415", "#F27036", "#4E88B4", "#46AF78", "#A93F55", "#2176FF", "#33A1FD", "#BAEE29" };
 		chart = ApexChartsBuilder.get().withColors(colors).withFill(FillBuilder.get().withColors(Arrays.asList(colors)).build())
-				.withChart(ChartBuilder.get().withType(Type.bar).withStacked(true).withStackType(StackType.normal).build())
+				.withChart(ChartBuilder.get().withType(Type.BAR).withStacked(true).withStackType(StackType.NORMAL).build())
 				.withPlotOptions(PlotOptionsBuilder.get().withBar(BarBuilder.get().withHorizontal(false).withColumnWidth("80%").build()).build())
 				.withDataLabels(DataLabelsBuilder.get().withEnabled(false).build())
-				.withLegend(LegendBuilder.get().withShow(false).withPosition(Position.top).withHorizontalAlign(HorizontalAlign.left).build()).build();
+				.withLegend(LegendBuilder.get().withShow(false).withPosition(Position.TOP).withHorizontalAlign(HorizontalAlign.LEFT).build()).build();
 		add(chart);
 		chart.setHeight("200px");
 		setWidthFull();
@@ -52,6 +53,6 @@ public class GxStackedBarChart extends VerticalLayout {
 			chart.updateSeries(series.toArray(new Series[series.size()]));
 			chart.setXaxis(XAxisBuilder.get().withLabels(LabelsBuilder.get().withRotate(-90.0).build()).withCategories(dateList).build());
 		}
-		chart.setYaxis(YAxisBuilder.get().withMax(maxY).withTitle(TitleBuilder.get().withText(verticalTitle).build()).build());
+		chart.setYaxis(new YAxis[] { YAxisBuilder.get().withMax(maxY).withTitle(TitleBuilder.get().withText(verticalTitle).build()).build() });
 	}
 }

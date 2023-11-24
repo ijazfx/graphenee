@@ -1,11 +1,11 @@
-create table gx_currency(
-    oid integer identity not null,
-    alpha3_code varchar(3) not null,
-    currency_name varchar(50) not null,
-    currency_symbol varchar(10) not null,
-    numeric_code integer not null,
-    is_active boolean not null default true,
-    primary key(oid)
+CREATE TABLE gx_currency (
+    oid INTEGER AUTO_INCREMENT NOT NULL,
+    alpha3_code VARCHAR(3) NOT NULL,
+    currency_name VARCHAR(50) NOT NULL,
+    currency_symbol VARCHAR(10) NOT NULL,
+    numeric_code INTEGER NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (oid)
 );
 
 insert into gx_currency (numeric_code, alpha3_code, currency_name, currency_symbol) values (156, 'CNY', 'Yuan', '¥');

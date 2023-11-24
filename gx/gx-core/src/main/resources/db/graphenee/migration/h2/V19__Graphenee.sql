@@ -1,7 +1,9 @@
-alter table gx_document add column sort_order integer not null default 0;
-alter table gx_document add column issue_date timestamp;
-alter table gx_document add column expiry_date timestamp;
-alter table gx_document add column expiry_reminder_in_days integer;
+-- Alter table gx_document
+ALTER TABLE gx_document ADD COLUMN sort_order INT NOT NULL DEFAULT 0;
+ALTER TABLE gx_document ADD COLUMN issue_date TIMESTAMP;
+ALTER TABLE gx_document ADD COLUMN expiry_date TIMESTAMP;
+ALTER TABLE gx_document ADD COLUMN expiry_reminder_in_days INT;
 
-alter table gx_folder add column sort_order integer not null default 0;
-alter table gx_folder add column expiry_reminder_in_days integer;
+-- Alter table gx_folder
+ALTER TABLE gx_folder ADD COLUMN sort_order INT NOT NULL DEFAULT 0;
+ALTER TABLE gx_folder ADD COLUMN expiry_reminder_in_days INT;

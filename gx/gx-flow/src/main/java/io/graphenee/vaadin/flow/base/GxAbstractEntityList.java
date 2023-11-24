@@ -21,12 +21,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.claspina.confirmdialog.ButtonOption;
-import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.gatanaso.MultiselectComboBox;
 
 import com.google.common.eventbus.EventBus;
+import com.vaadin.componentfactory.multiselect.MultiComboBox;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
@@ -39,6 +37,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
@@ -853,7 +852,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			@Override
 			public void onClick(ClickEvent<MenuItem> event) {
 				if (shouldShowDeleteConfirmation()) {
-					ConfirmDialog.createQuestion().withCaption("Confirmation").withMessage("Are you sure to delete selected record(s)?").withOkButton(() -> {
+					ConfirmDialog dialog = new ConfirmDialog("Confirmation", "Are you sure to delete selected record(s)?", "YES", dlg -> {
 						try {
 							onDelete(dataGrid.getSelectedItems());
 							if (isAuditLogEnabled()) {
@@ -869,7 +868,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 							log.warn(e.getMessage(), e);
 							Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 						}
-					}, ButtonOption.focus(), ButtonOption.caption("YES")).withCancelButton(ButtonOption.caption("NO")).open();
+					});
+					dialog.open();
 				} else {
 					try {
 						onDelete(dataGrid.getSelectedItems());
@@ -1087,7 +1087,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			}
 			if (renderer == null && (propertyDefinition.getType().equals(List.class) || propertyDefinition.getType().equals(Set.class))) {
 				renderer = new ComponentRenderer<>(s -> {
-					MultiselectComboBox<Object> c = new MultiselectComboBox<Object>();
+					MultiComboBox<Object> c = new MultiComboBox<>();
+					c.setItems(propertyDefinition.getGetter().apply((T) s));
 					Collection<Object> bag = (Collection<Object>) propertyDefinition.getGetter().apply((T) s);
 					Set<Object> value = new HashSet<>(bag);
 					c.setItems(value);

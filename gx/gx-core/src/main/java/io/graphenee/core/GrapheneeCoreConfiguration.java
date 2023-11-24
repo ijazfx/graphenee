@@ -42,8 +42,7 @@ public class GrapheneeCoreConfiguration {
 
 	public GrapheneeCoreConfiguration(DataSource dataSource) {
 		String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor)
-				.table("graphenee_schema_version").baselineOnMigrate(true)
+		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
 				.baselineVersion("0").load();
 		fw.migrate();
 	}

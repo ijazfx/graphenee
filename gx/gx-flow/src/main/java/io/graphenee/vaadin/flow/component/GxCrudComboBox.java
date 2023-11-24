@@ -1,5 +1,6 @@
 package io.graphenee.vaadin.flow.component;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -66,7 +67,8 @@ public abstract class GxCrudComboBox<T> extends ComboBox<T> {
 
 	@Override
 	public void setReadOnly(boolean readOnly) {
-		super.setReadOnly(readOnly);
+		//TODO: investigate how to set it readonly
+		//		super.setReadOnly(readOnly);
 		validateState(readOnly);
 	}
 
@@ -113,7 +115,7 @@ public abstract class GxCrudComboBox<T> extends ComboBox<T> {
 
 	public void refresh() {
 		T value = getValue();
-		setItems(getData());
+		setItems(getData().collect(Collectors.toList()));
 		if (value != null) {
 			setValue(value);
 		}

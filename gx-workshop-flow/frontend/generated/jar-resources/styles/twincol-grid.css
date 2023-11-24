@@ -1,0 +1,46 @@
+/*-
+ * #%L
+ * TwinColGrid add-on
+ * %%
+ * Copyright (C) 2017 - 2022 Flowing Code
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+.twincol-grid {
+  min-height: calc(var(--lumo-space-m) * 13);
+}
+.twincol-grid .twincol-grid-label {
+  color: var(--lumo-secondary-text-color);
+  font-weight: 500;
+  font-size: var(--lumo-font-size-s);
+}
+
+.twincol-grid .twincol-grid-selection .twincol-grid-label::after {
+  content: var(--lumo-required-field-indicator, "\02022");
+  transition: opacity 0.2s;
+  opacity: 0;
+  color: var(--lumo-primary-text-color);
+  position: relative;
+  padding-left: 0.25em;
+}
+
+.twincol-grid[required] .twincol-grid-selection .twincol-grid-label::after {
+  opacity: 1;
+}
+
+.twincol-grid[invalid] .twincol-grid-selection .twincol-grid-label::after {
+  color: var(--lumo-error-text-color);
+}
+

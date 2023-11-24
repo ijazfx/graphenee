@@ -1,23 +1,21 @@
-create table gx_mobile_application (
-	oid integer identity not null,
-	application_name varchar(50),
-	is_active boolean not null default true,
-	oid_namespace integer not null,
-	foreign key(oid_namespace) references gx_namespace(oid) on delete restrict on update cascade,
-    primary key(oid)
+CREATE TABLE gx_mobile_application (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    application_name VARCHAR(50),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    oid_namespace INT NOT NULL,
+    FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-create table gx_registered_device (
-	oid integer identity not null,
-	oid_mobile_application integer not null,
-	system_name varchar(50),
-	unique_id varchar(100),
-	is_tablet boolean not null default false,
-	brand varchar(50),
-	is_active boolean not null default true,
-	owner_id varchar(100),
-	foreign key(oid_mobile_application) references gx_mobile_application(oid) on delete restrict on update cascade,
-	primary key(oid)
+CREATE TABLE gx_registered_device (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    oid_mobile_application INT NOT NULL,
+    system_name VARCHAR(50),
+    unique_id VARCHAR(100),
+    is_tablet BOOLEAN NOT NULL DEFAULT FALSE,
+    brand VARCHAR(50),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    owner_id VARCHAR(100),
+    FOREIGN KEY (oid_mobile_application) REFERENCES gx_mobile_application(oid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-create index owner_id_index on gx_registered_device(owner_id);
+CREATE INDEX owner_id_index ON gx_registered_device(owner_id);

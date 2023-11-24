@@ -1,6 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.graphenee.core.GrapheneeCoreConfiguration,\
-io.graphenee.i18n.GrapheneeI18nConfiguration,\
-io.graphenee.security.GrapheneeSecurityConfiguration,\
-io.graphenee.sms.GrapheneeSmsConfiguration,\
-io.graphenee.documents.GrapheneeDocumentsConfiguration

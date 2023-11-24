@@ -19,8 +19,8 @@ public class GxLineChart extends VerticalLayout {
 	private ApexCharts lineChart;
 
 	public void initializeWithLabelsAndSeries(String[] xAxisLabel, Series<?>... series) {
-		lineChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.line).withZoom(ZoomBuilder.get().withEnabled(false).build()).build())
-				.withStroke(StrokeBuilder.get().withCurve(Curve.straight).build())
+		lineChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.LINE).withZoom(ZoomBuilder.get().withEnabled(false).build()).build())
+				.withStroke(StrokeBuilder.get().withCurve(Curve.STRAIGHT).build())
 				.withGrid(GridBuilder.get().withRow(RowBuilder.get().withColors("#f3f3f3", "transparent").withOpacity(0.5).build()).build())
 				.withXaxis(XAxisBuilder.get().withCategories(xAxisLabel).build()).withSeries(series).build();
 		removeAll();

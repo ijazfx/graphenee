@@ -1,9 +1,8 @@
-create table gx_sms_provider(
-    oid integer identity not null,
-    provider_name varchar(50) not null,
-    implementation_class varchar(200) not null,
-    config_data bytea,
-    is_primary boolean not null default false,
-    is_active boolean not null default true,
-    primary key(oid)
+CREATE TABLE gx_sms_provider (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    provider_name VARCHAR(50) NOT NULL,
+    implementation_class VARCHAR(200) NOT NULL,
+    config_data BLOB,
+    is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
 );

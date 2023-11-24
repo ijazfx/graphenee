@@ -14,7 +14,7 @@ public class GxRadarChart extends VerticalLayout {
 
 	public void initializeWithLabelsAndSeries(String[] label, Series<?>... series) {
 
-		radarChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.radar).build()).withSeries(series).withLabels(label).build();
+		radarChart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.RADAR).build()).withSeries(series).withLabels(label).build();
 		removeAll();
 		add(radarChart);
 		radarChart.setWidth("100%");

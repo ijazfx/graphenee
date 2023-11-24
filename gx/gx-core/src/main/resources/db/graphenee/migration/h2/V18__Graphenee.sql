@@ -1,52 +1,52 @@
-create table gx_folder (
-	oid integer identity not null,
-	folder_id uuid not null,
-	name varchar(255) not null,
-	note varchar(200),
-	tags text,
-	oid_folder integer,
-	oid_namespace integer not null,
-	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade,
-	foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
+CREATE TABLE gx_folder (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    folder_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    note VARCHAR(200),
+    tags CLOB,
+    oid_folder INT,
+    oid_namespace INT NOT NULL,
+    FOREIGN KEY (oid_folder) REFERENCES gx_folder(oid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table gx_folder_audit_log_join (
-	oid_folder integer not null,
-	oid_audit_log integer not null,
-	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade,
-	foreign key (oid_audit_log) references gx_audit_log(oid) on delete cascade on update cascade
+CREATE TABLE gx_folder_audit_log_join (
+    oid_folder INT NOT NULL,
+    oid_audit_log INT NOT NULL,
+    FOREIGN KEY (oid_folder) REFERENCES gx_folder(oid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (oid_audit_log) REFERENCES gx_audit_log(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table gx_document_type (
-	oid integer identity not null,
-	name varchar(20) not null,
-	note varchar(200),
-	tags text,
-	oid_namespace integer not null,
-	foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
+CREATE TABLE gx_document_type (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(20) NOT NULL,
+    note VARCHAR(200),
+    tags CLOB,
+    oid_namespace INT NOT NULL,
+    FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table gx_document (
-	oid integer identity not null,
-	document_id uuid not null,
-	name varchar(255) not null,
-	note varchar(200),
-	mime_type varchar(100),
-	size bigint not null default 0,
-	version_no integer not null default 0,
-	path varchar(1000) not null,
-	tags text,
-	oid_document integer,
-	oid_folder integer,
-	oid_namespace integer not null,
-	foreign key (oid_document) references gx_document(oid) on delete cascade on update cascade,
-	foreign key (oid_folder) references gx_folder(oid) on delete cascade on update cascade,
-	foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
+CREATE TABLE gx_document (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    document_id UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    note VARCHAR(200),
+    mime_type VARCHAR(100),
+    size BIGINT NOT NULL DEFAULT 0,
+    version_no INT NOT NULL DEFAULT 0,
+    path VARCHAR(1000) NOT NULL,
+    tags CLOB,
+    oid_document INT,
+    oid_folder INT,
+    oid_namespace INT NOT NULL,
+    FOREIGN KEY (oid_document) REFERENCES gx_document(oid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (oid_folder) REFERENCES gx_folder(oid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table gx_document_audit_log_join (
-	oid_document integer not null,
-	oid_audit_log integer not null,
-	foreign key (oid_document) references gx_document(oid) on delete cascade on update cascade,
-	foreign key (oid_audit_log) references gx_audit_log(oid) on delete cascade on update cascade
+CREATE TABLE gx_document_audit_log_join (
+    oid_document INT NOT NULL,
+    oid_audit_log INT NOT NULL,
+    FOREIGN KEY (oid_document) REFERENCES gx_document(oid) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (oid_audit_log) REFERENCES gx_audit_log(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );

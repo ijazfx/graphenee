@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model;
 
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class GxMappedSuperclass {

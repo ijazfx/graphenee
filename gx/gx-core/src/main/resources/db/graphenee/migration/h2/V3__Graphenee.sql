@@ -1,35 +1,31 @@
-create table gx_country(
-	oid integer identity not null,
-	is_active boolean not null default true,
-	country_name varchar(50) not null,
-	alpha3_code varchar(3) not null,
-	numeric_code integer,
-	primary key (oid)
+CREATE TABLE gx_country (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    country_name VARCHAR(50) NOT NULL,
+    alpha3_code VARCHAR(3) NOT NULL,
+    numeric_code INT
 );
 
-create table gx_state(
-	oid integer identity not null,
-	is_active boolean not null default true,
-	state_name varchar(50) not null,
-	state_code varchar(3),
-	oid_gx_country integer not null,
-	primary key (oid),
-	
-	foreign key (oid_gx_country) references gx_country(oid) on delete restrict on update cascade
+CREATE TABLE gx_state (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    state_name VARCHAR(50) NOT NULL,
+    state_code VARCHAR(3),
+    oid_gx_country INT NOT NULL,
+    
+    FOREIGN KEY (oid_gx_country) REFERENCES gx_country(oid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-create table gx_city(
-	oid integer identity not null,
-	is_active boolean not null default true,
-	city_name varchar(50) not null,
-	oid_gx_country integer not null,
-	oid_gx_state integer,
-	primary key (oid),
-	
-	foreign key (oid_gx_country) references gx_country(oid) on delete restrict on update cascade,
-	foreign key (oid_gx_state) references gx_state(oid) on delete restrict on update cascade
+CREATE TABLE gx_city (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    city_name VARCHAR(50) NOT NULL,
+    oid_gx_country INT NOT NULL,
+    oid_gx_state INT,
+    
+    FOREIGN KEY (oid_gx_country) REFERENCES gx_country(oid) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (oid_gx_state) REFERENCES gx_state(oid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
 
 insert into gx_country (country_name,alpha3_code,numeric_code) values ('Afghanistan','AFG','4');
 insert into gx_country (country_name,alpha3_code,numeric_code) values ('Albania','ALB','8');

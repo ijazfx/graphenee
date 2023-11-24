@@ -1,11 +1,10 @@
-create sequence gx_saved_query_seq;
+CREATE SEQUENCE gx_saved_query_seq;
 
-create table gx_saved_query(
-	oid integer identity not null,
-	query_name varchar(50) not null,
-	query_bean_json text not null,
-	query_bean_class_name varchar(200) not null,
-	additional_info varchar(1000),
-	target_user varchar(200),
-	primary key (oid)
+CREATE TABLE gx_saved_query (
+    oid INT DEFAULT NEXTVAL('gx_saved_query_seq') PRIMARY KEY,
+    query_name VARCHAR(50) NOT NULL,
+    query_bean_json TEXT NOT NULL,
+    query_bean_class_name VARCHAR(200) NOT NULL,
+    additional_info VARCHAR(1000),
+    target_user VARCHAR(200)
 );

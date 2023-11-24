@@ -17,9 +17,9 @@ public class GxPieChart extends VerticalLayout {
 	private String width = "100%";
 
 	public void initializeWithLabelsAndSeries(String[] labels, Double[] series) {
-		chart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.pie).build()).withLegend(LegendBuilder.get().withPosition(Position.right).build())
+		chart = ApexChartsBuilder.get().withChart(ChartBuilder.get().withType(Type.PIE).build()).withLegend(LegendBuilder.get().withPosition(Position.RIGHT).build())
 				.withResponsive(ResponsiveBuilder.get().withBreakpoint(480.0)
-						.withOptions(OptionsBuilder.get().withLegend(LegendBuilder.get().withPosition(Position.bottom).build()).build()).build())
+						.withOptions(OptionsBuilder.get().withLegend(LegendBuilder.get().withPosition(Position.BOTTOM).build()).build()).build())
 				.withLabels(labels).withSeries(series).build();
 
 		removeAll();

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -23,7 +24,7 @@ public class GxWeekPicker extends ComboBox<WeekRange> {
 
 	public GxWeekPicker() {
 		setLabel("Week Picker");
-		setItems(IntStream.rangeClosed(1, 52).mapToObj(i -> new WeekRange(i)));
+		setItems(IntStream.rangeClosed(1, 52).mapToObj(i -> new WeekRange(i)).collect(Collectors.toList()));
 	}
 
 	@Getter

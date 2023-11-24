@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
@@ -188,8 +189,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 						@Override
 						public void onSave(GxAssigneeHolder holder) {
 							String msg = "Are you sure to assign the task to " + holder.getAssignee() + "?";
-							org.claspina.confirmdialog.ConfirmDialog dlg = org.claspina.confirmdialog.ConfirmDialog.createQuestion();
-							dlg.withMessage(msg).withYesButton(() -> {
+							ConfirmDialog dialog = new ConfirmDialog("Confirmation", msg, "Yes", dlg -> {
 								GxAssignee assignee = holder.getAssignee();
 								try {
 									getUserTask().assign(assignee.getUsername());

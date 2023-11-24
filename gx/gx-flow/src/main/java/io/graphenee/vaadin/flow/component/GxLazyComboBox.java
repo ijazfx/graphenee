@@ -46,7 +46,8 @@ public class GxLazyComboBox<T> extends ComboBox<T> {
 
 		CallbackDataProvider<T, String> dataProvider = DataProvider.fromFilteringCallbacks(findCallback, countCallback);
 
-		setDataProvider(dataProvider);
+		//TODO: Need to check the purpose of filter convert. It was not required in previous versions.
+		setDataProvider(dataProvider, f -> f);
 	}
 
 	private Stream<T> getPagedData(Query<T, String> query) {

@@ -1,26 +1,24 @@
-create table gx_password_policy (
-	oid integer identity not null,
-	oid_namespace integer not null,
-    password_policy_name varchar(50),
-    max_history integer not null default 6,
-    max_age integer not null default 60,
-    min_length integer not null default 8,
-    is_user_username_allowed boolean not null default false,
-    max_allowed_matching_user_name integer not null default 2,
-    min_uppercase integer not null default 1,
-    min_lowercase integer not null default 1,
-    min_numbers integer not null default 1,
-    min_special_charaters integer not null default 1,
-    is_active boolean not null default false,
-    primary key(oid),
-    foreign key (oid_namespace) references gx_namespace(oid) on delete cascade on update cascade
+CREATE TABLE gx_password_policy (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    oid_namespace INT NOT NULL,
+    password_policy_name VARCHAR(50),
+    max_history INT NOT NULL DEFAULT 6,
+    max_age INT NOT NULL DEFAULT 60,
+    min_length INT NOT NULL DEFAULT 8,
+    is_user_username_allowed BOOLEAN NOT NULL DEFAULT FALSE,
+    max_allowed_matching_user_name INT NOT NULL DEFAULT 2,
+    min_uppercase INT NOT NULL DEFAULT 1,
+    min_lowercase INT NOT NULL DEFAULT 1,
+    min_numbers INT NOT NULL DEFAULT 1,
+    min_special_characters INT NOT NULL DEFAULT 1,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-create table gx_password_history (
-	oid integer identity not null,
-    oid_user_account integer not null,
-    hashed_password varchar(200) not null,
-    password_date timestamp not null,
-    primary key(oid),
-    foreign key(oid_user_account) references gx_user_account(oid) on delete cascade on update cascade
+CREATE TABLE gx_password_history (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    oid_user_account INT NOT NULL,
+    hashed_password VARCHAR(200) NOT NULL,
+    password_date TIMESTAMP NOT NULL,
+    FOREIGN KEY (oid_user_account) REFERENCES gx_user_account(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );

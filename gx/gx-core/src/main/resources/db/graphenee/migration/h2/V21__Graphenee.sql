@@ -1,1 +1,2 @@
-alter table gx_user_account add column preferences text not null default '{}';
+-- Alter table gx_user_account
+ALTER TABLE gx_user_account ADD COLUMN preferences CLOB NOT NULL DEFAULT '{}';

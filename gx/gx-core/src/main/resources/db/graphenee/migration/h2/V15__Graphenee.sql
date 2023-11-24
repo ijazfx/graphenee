@@ -1,17 +1,16 @@
-drop table gx_registered_device;
-drop table gx_mobile_application;
+DROP TABLE IF EXISTS gx_registered_device;
+DROP TABLE IF EXISTS gx_mobile_application;
 
-create table gx_registered_device (
-	oid integer identity not null,
-	system_name varchar(50),
-	device_token varchar(200),
-	is_tablet boolean not null default false,
-	brand varchar(50),
-	is_active boolean not null default true,
-	owner_id varchar(100),
-	oid_namespace integer not null,
-	foreign key(oid_namespace) references gx_namespace(oid) on delete restrict on update cascade,
-    primary key(oid)
+CREATE TABLE gx_registered_device (
+    oid INT AUTO_INCREMENT PRIMARY KEY,
+    system_name VARCHAR(50),
+    device_token VARCHAR(200),
+    is_tablet BOOLEAN NOT NULL DEFAULT FALSE,
+    brand VARCHAR(50),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    owner_id VARCHAR(100),
+    oid_namespace INT NOT NULL,
+    FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-create index owner_id_index on gx_registered_device(owner_id);
+CREATE INDEX IF NOT EXISTS owner_id_index ON gx_registered_device(owner_id);

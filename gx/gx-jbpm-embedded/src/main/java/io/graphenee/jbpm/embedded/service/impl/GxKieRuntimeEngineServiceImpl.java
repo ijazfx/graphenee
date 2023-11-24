@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded.service.impl;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.manager.RuntimeEngine;
