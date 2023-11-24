@@ -315,7 +315,7 @@
   "src/fc-twin-col-grid-auto-resize.js": "7420e709d8ff2d2e12b5dc59adec4291373dd2ce5bd836ca12c66bf3cb8dff3d",
   "src/pdf-print.js": "3329b8ed218b392b774ff779a49de030e0482a740fc1f3fd413be9a9835dd637",
   "styles/applayout-styles.css": "d1adff0d40cf138eec3e6d35adfef432742cab66da69593f204a31b13ccd611c",
-  "styles/gx-common.css": "a130597b3e02c36c7318510562a5b9b106d22e95220115c7364ecc80310f3f68",
+  "styles/gx-common.css": "b5d51a32f9124a9ea6af52f701037f665ad9946bf5b426c340ae8123351f5c32",
   "styles/multiselect-cb-hide.css": "582a7dc8dc1c92eb88bad679eb58d9bc0cb5369a9f25d1a0f8b78db64f80f6b1",
   "styles/toolbar-button.css": "7b285d043fe8e1991814254962e53370aaebe703bbc53c69f9b9c2b4bf93fe0e",
   "styles/twin-col-grid-button.css": "ffaf61a295704617360949ed1658d57e77ca819f5856841cbe5481c7a9422a71",
@@ -329,12 +329,12 @@
  },
  "themeJsonContents": {},
  "entryScripts": [
-  "VAADIN/build/indexhtml-f2dcb26b.js"
+  "VAADIN/build/indexhtml-6025d260.js"
  ],
  "webComponents": [],
  "cvdlModules": {},
  "packageJsonHash": "64106d5a3d190d648f353454ca72aa30d65efa465db777be1215cd4b601d9ee0",
  "indexHtmlGenerated": [
-  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-f2dcb26b.js\"></script>"
+  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-6025d260.js\"></script>"
  ]
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
@@ -18,6 +17,7 @@ import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -286,8 +286,17 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected Component getFormComponent() {
 		FormLayout formLayout = new FormLayout();
+		formLayout.setResponsiveSteps(new ResponsiveStep("100px", 1), new ResponsiveStep("500px", 2), new ResponsiveStep("800px", 3));
 		formLayout.setSizeFull();
 		return formLayout;
+	}
+
+	protected void expand(Component c) {
+		setColspan(c, Integer.MAX_VALUE);
+	}
+
+	protected void shrink(Component c) {
+		setColspan(c, 1);
 	}
 
 	protected void setColspan(Component c, int colspan) {
@@ -330,16 +339,17 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				formTitle = new KeyValueWrapper(entity).stringForKeyPath(keyPath);
 			}
 		}
-		if (formTitle != null) {
-			if (formTitle.length() > 50) {
-				formTitleLabel.setText(formTitle.substring(0, 47) + "...");
-				formTitleLabel.setTitle(formTitle);
-			} else {
-				formTitleLabel.setText(formTitle);
-				formTitleLabel.setTitle("");
-			}
+		if (formTitle == null || formTitle.isBlank()) {
+			formTitle = "Entry Form";
 		}
-		setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
+		if (formTitle.length() > 50) {
+			formTitleLabel.setText(formTitle.substring(0, 47) + "...");
+			formTitleLabel.setTitle(formTitle);
+		} else {
+			formTitleLabel.setText(formTitle);
+			formTitleLabel.setTitle("");
+		}
+		//		setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
 		if (shouldFocusFirstFieldOnShow()) {
 			focusFirst(this);
 		}
