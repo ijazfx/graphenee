@@ -1,1 +1,1 @@
-mvn -f ./pom.xml package deploy -DskipTests
+mvn -Psonatype -f ./pom.xml package deploy -DskipTests
