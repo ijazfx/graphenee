@@ -18,8 +18,9 @@ package io.graphenee.core;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +31,6 @@ import com.google.common.eventbus.EventBus;
 import io.graphenee.util.DataSourceUtil;
 
 @Configuration
-@ConditionalOnClass(DataSource.class)
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
 @EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
 @ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
@@ -40,15 +40,20 @@ public class GrapheneeCoreConfiguration {
 	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
 	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
 
-	public GrapheneeCoreConfiguration(DataSource dataSource) {
-		String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
-				.baselineVersion("0").load();
-		fw.migrate();
+	@ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", matchIfMissing = false)
+	@Bean
+	FlywayMigrationInitializer flywayInitializer(Flyway flyway) {
+		return new FlywayMigrationInitializer(flyway, f -> {
+			DataSource dataSource = flyway.getConfiguration().getDataSource();
+			String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
+			Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version")
+					.baselineOnMigrate(true).baselineVersion("0").load();
+			fw.migrate();
+		});
 	}
 
 	@Bean
-	public EventBus coreEventBus() {
+	EventBus coreEventBus() {
 		return new EventBus("coreEventBus");
 	}
 
