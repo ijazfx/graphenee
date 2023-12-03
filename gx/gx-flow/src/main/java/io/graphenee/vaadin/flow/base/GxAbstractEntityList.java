@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.eventbus.EventBus;
 import com.vaadin.componentfactory.multiselect.MultiComboBox;
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -69,9 +71,11 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.BrowserWindowResizeEvent;
+import com.vaadin.flow.component.page.BrowserWindowResizeListener;
+import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -115,7 +119,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends VerticalLayout {
+public abstract class GxAbstractEntityList<T> extends FlexLayout implements BrowserWindowResizeListener {
 
 	private static final long serialVersionUID = 1L;
 
@@ -126,7 +130,6 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private GxDialog dialog;
 	private Grid<T> dataGrid;
 	private Class<T> entityClass;
-	private Map<T, GxAbstractEntityForm<T>> formCache = new HashMap<>();
 
 	private boolean isBuilt = false;
 
@@ -179,7 +182,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	private ShortcutRegistration deleteMenuItemShortcut;
 
 	private Text totalCountFooterText;
-	private HorizontalLayout footerTextLayout;
+	private FlexLayout footerTextLayout;
 
 	private String className;
 
@@ -191,9 +194,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		this.entityClass = entityClass;
 		this.searchBinder = new Binder<>(entityClass);
 		setSizeFull();
-		setMargin(false);
-		setPadding(false);
-		setSpacing(false);
+		setFlexDirection(FlexDirection.COLUMN);
+		setFlexWrap(FlexWrap.NOWRAP);
 		addClassName("gx-entity-list");
 	}
 
@@ -220,9 +222,13 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	@SuppressWarnings("unchecked")
 	synchronized private GxAbstractEntityList<T> build() {
 		if (!isBuilt) {
+			FlexLayout gridLayout = new FlexLayout();
+			gridLayout.setFlexDirection(FlexDirection.COLUMN);
+			gridLayout.addClassName("gx-grid-layout");
 			dataGrid = dataGrid(entityClass);
 			dataGrid.setSizeFull();
 			dataGrid.addClassName("gx-grid");
+			gridLayout.add(dataGrid);
 			((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI)).setSelectionColumnFrozen(true);
 
 			DataProvider<T, ?> dataProvider = dataProvider(entityClass);
@@ -249,15 +255,16 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 			mainLayout = new SplitLayout();
 			mainLayout.setSizeFull();
-			mainLayout.addClassName("hide-splitter");
+			mainLayout.addClassName("gx-main-split-layout");
 
 			crudMenuBar = new MenuBar();
 			columnMenuBar = new MenuBar();
 			customMenuBar = new MenuBar();
 
 			menuBarLayout = new HorizontalLayout();
-			menuBarLayout.setSpacing(true);
-			menuBarLayout.setPadding(true);
+			menuBarLayout.getStyle().set("padding", "0.75rem");
+			menuBarLayout.addClassName("gx-grid-menubar-layout");
+
 			menuBarLayout.setWidthFull();
 			menuBarLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 
@@ -351,14 +358,11 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			deleteMenuItem.setEnabled(false);
 
 			FormLayout searchForm = new FormLayout();
+			searchForm.getStyle().setPadding("0.75rem");
 			searchForm.setResponsiveSteps(new ResponsiveStep("100px", 6));
 
 			decorateSearchForm(searchForm, searchBinder);
-
-			VerticalLayout searchFormLayout = new VerticalLayout();
-			searchFormLayout.getElement().getStyle().set("padding-top", "0px");
-			searchFormLayout.add(searchForm);
-			add(searchFormLayout);
+			gridLayout.addComponentAsFirst(searchForm);
 
 			List<Column<T>> columns = new ArrayList<>();
 			List<String> userPreferences = new ArrayList<>();
@@ -529,24 +533,25 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				}
 			}
 
-			mainLayout.addToPrimary(dataGrid);
+			mainLayout.addToPrimary(gridLayout);
 			add(mainLayout);
-			footerTextLayout = new HorizontalLayout();
+			footerTextLayout = new FlexLayout();
 			totalCountFooterText = new Text("No Records");
 
 			footerTextLayout.add(totalCountFooterText);
-			footerTextLayout.addClassName("footer-layout");
+			footerTextLayout.addClassName("gx-grid-footer");
 
-			if (!shouldShowFormInDialog()) {
-				formLayout = new VerticalLayout();
-				formLayout.setMargin(false);
-				formLayout.setPadding(false);
-				mainLayout.addToSecondary(formLayout);
-				mainLayout.getSecondaryComponent().setVisible(false);
-				mainLayout.setSplitterPosition(defaultSplitterPosition());
-			} else {
-				mainLayout.setSplitterPosition(100);
-			}
+			//			if (!shouldShowFormInDialog()) {
+			formLayout = new VerticalLayout();
+			formLayout.setClassName("gx-right-drawer");
+			formLayout.setMargin(false);
+			formLayout.setPadding(false);
+			mainLayout.addToSecondary(formLayout);
+			mainLayout.getSecondaryComponent().setVisible(false);
+			mainLayout.setSplitterPosition(defaultSplitterPosition());
+			//			} else {
+			//				mainLayout.setSplitterPosition(100);
+			//			}
 
 			dataGrid.addSelectionListener(sl -> {
 				int selected = sl.getAllSelectedItems().size();
@@ -583,7 +588,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 			postBuild();
 
 			if (shouldDisplayGridFooter()) {
-				add(footerTextLayout);
+				gridLayout.add(footerTextLayout);
 			}
 
 			enableShortcuts();
@@ -1196,31 +1201,39 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	 * @return
 	 */
 	protected double defaultSplitterPosition() {
-		return 0.0;
+		return 60.0;
 	}
 
 	private void openForm(T entity) {
+		/**
+		 * 1. allow user to make changes to the entity using preEdit
+		 * 2. check if grid editing is enabled if yes, then don't show form or edit panel
+		 * 3. if yes, then check if user has opted to show form in edit panel?
+		 * 4. if yes, then show form in edit panel
+		 * 5. else show form in dialog
+		 */
 		preEdit(entity);
 		if (isGridInlineEditingEnabled()) {
 			entityGrid().getEditor().editItem(entity);
 		} else {
 			GxAbstractEntityForm<T> entityForm = cachedForm(entity);
 			if (entityForm != null) {
-				if (!shouldShowFormInDialog()) {
-					formLayout.removeAll();
-					formLayout.add(entityForm);
-					mainLayout.getSecondaryComponent().setVisible(true);
-				} else {
-					disableShortcuts();
-					dialog = entityForm.showInDialog(entity);
-					dialog.addOpenedChangeListener(l -> {
-						enableShortcuts();
-					});
-				}
-			} else {
-				if (mainLayout.getSecondaryComponent() != null)
-					mainLayout.getSecondaryComponent().setVisible(false);
+				entityForm.setEntity(entity);
 			}
+			displayForm(entityForm);
+		}
+	}
+
+	private void displayForm(GxAbstractEntityForm<T> entityForm) {
+		if (entityForm != null) {
+			if (!shouldShowFormInDialog()) {
+				showSecondaryComponent(entityForm);
+			} else {
+				hideSecondaryComponent();
+				dialog = entityForm.showInDialog(entityForm.getEntity());
+			}
+		} else {
+			hideSecondaryComponent();
 		}
 	}
 
@@ -1310,13 +1323,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	 * @return
 	 */
 	private GxAbstractEntityForm<T> cachedForm(T entity) {
-		GxAbstractEntityForm<T> entityForm = formCache.get(entity);
-		if (entityForm == null) {
-			entityForm = getEntityForm(entity);
-			if (entityForm != null) {
-				formCache.put(entity, entityForm);
-			}
-		}
+		GxAbstractEntityForm<T> entityForm = getEntityForm(entity);
 		if (entityForm != null) {
 			entityForm.setEditable(isEditable());
 
@@ -1337,7 +1344,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 							l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
 						});
 						if (!shouldShowFormInDialog()) {
-							mainLayout.getSecondaryComponent().setVisible(false);
+							hideSecondaryComponent();
 						} else {
 							dialog.close();
 						}
@@ -1352,7 +1359,7 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 				@Override
 				public void onDismiss(T entity) {
 					if (!shouldShowFormInDialog()) {
-						mainLayout.getSecondaryComponent().setVisible(false);
+						hideSecondaryComponent();
 					} else {
 						dialog.close();
 					}
@@ -1367,7 +1374,26 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		log.warn(this + " - Override auditLog(...) method to log this event.");
 	}
 
+	AtomicInteger deviceWidth = new AtomicInteger(800);
+
+	@Override
+	protected void onAttach(AttachEvent attachEvent) {
+		getUI().get().getPage().addBrowserWindowResizeListener(this);
+		PendingJavaScriptResult result = getUI().get().getPage().executeJs("return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth");
+		result.then(r -> {
+			deviceWidth.set(Double.valueOf(r.asNumber()).intValue());
+		});
+	}
+
+	@Override
+	public void browserWindowResized(BrowserWindowResizeEvent event) {
+		deviceWidth.set(event.getWidth());
+	}
+
 	protected boolean shouldShowFormInDialog() {
+		if (deviceWidth.get() > 800) {
+			return false;
+		}
 		return true;
 	}
 
@@ -1439,8 +1465,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 		FlexLayout layout = new FlexLayout();
 		layout.setSizeFull();
 		layout.setFlexDirection(FlexDirection.COLUMN);
+		layout.setFlexWrap(FlexWrap.NOWRAP);
 		layout.add(GxAbstractEntityList.this, dlgFooter);
-		layout.setFlexGrow(2, GxAbstractEntityList.this);
+		//layout.setFlexGrow(2, GxAbstractEntityList.this);
 		GxDialog dlg = new GxDialog(layout);
 		dlg.addThemeVariants(DialogVariant.NO_PADDING);
 		dlg.setId("dlg" + UUID.randomUUID().toString().replace("-", ""));

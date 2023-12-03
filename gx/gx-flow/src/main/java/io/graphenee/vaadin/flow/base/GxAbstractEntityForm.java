@@ -214,14 +214,15 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			formTitleLabel.getStyle().set("border-radius", "var(--lumo-border-radius)");
 			formTitleLabel.getStyle().set("border-bottom-right-radius", "0px");
 			formTitleLabel.getStyle().set("border-bottom-left-radius", "0px");
-			formTitleLabel.getStyle().set("padding-left", "0.5em");
-			formTitleLabel.getStyle().set("padding-right", "0.5em");
-			formTitleLabel.getStyle().set("padding-top", "0.25em");
+			formTitleLabel.getStyle().set("padding-left", "0.5rem");
+			formTitleLabel.getStyle().set("padding-right", "0.5rem");
+			formTitleLabel.getStyle().set("padding-top", "0.25rem");
 			formTitleLayout = new HorizontalLayout();
 			formTitleLayout.addClassName("draggable");
+			formTitleLayout.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
 			formTitleLayout.getStyle().set("border-bottom", "5px solid var(--lumo-primary-color-10pct)");
-			formTitleLayout.getStyle().set("padding-left", "0.5em");
-			formTitleLayout.getStyle().set("padding-top", "0.5em");
+			formTitleLayout.getStyle().set("padding-left", "0.5rem");
+			formTitleLayout.getStyle().set("padding-top", "0.5rem");
 			formTitleLayout.setWidthFull();
 			formTitleLayout.add(formTitleLabel);
 			addComponentAsFirst(formTitleLayout);
@@ -230,7 +231,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected void setFormTitleVisibility(boolean isVisible) {
 		formTitleLayout.getChildren().forEach(c -> c.setVisible(isVisible));
-		formTitleLayout.getStyle().set("padding-top", isVisible ? "0.5em" : "0.0em");
+		formTitleLayout.getStyle().set("padding-top", isVisible ? "0.5rem" : "0.0rem");
 	}
 
 	protected String defaultTabTitle() {
@@ -286,7 +287,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected Component getFormComponent() {
 		FormLayout formLayout = new FormLayout();
-		formLayout.setResponsiveSteps(new ResponsiveStep("100px", 1), new ResponsiveStep("500px", 2), new ResponsiveStep("800px", 3));
+		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("480px", 2))); //, new ResponsiveStep("640px", 3)));
 		formLayout.setSizeFull();
 		return formLayout;
 	}

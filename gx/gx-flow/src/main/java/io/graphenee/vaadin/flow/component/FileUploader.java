@@ -18,7 +18,7 @@ import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
@@ -81,7 +81,7 @@ public class FileUploader extends CustomField<String> {
 		output = new Div();
 		buffer = new MemoryBuffer();
 		upload = new Upload(buffer);
-		upload.setDropLabel(new Label(dropFileLabel));
+		upload.setDropLabel(new NativeLabel(dropFileLabel));
 
 		if (allowedFileTypes != null) {
 			upload.setAcceptedFileTypes(allowedFileTypes);
@@ -142,7 +142,7 @@ public class FileUploader extends CustomField<String> {
 		});
 
 		if (label != null) {
-			add(new Label(label));
+			add(new NativeLabel(label));
 		}
 
 		add(upload, output);
@@ -169,7 +169,7 @@ public class FileUploader extends CustomField<String> {
 
 	public void setDropFileLabel(String dropFileLabel) {
 		this.dropFileLabel = dropFileLabel;
-		upload.setDropLabel(new Label(dropFileLabel));
+		upload.setDropLabel(new NativeLabel(dropFileLabel));
 	}
 
 	@Override

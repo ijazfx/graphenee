@@ -14,7 +14,7 @@ html {
   --lumo-font-size-s: 0.8125rem;
   --lumo-font-size-xs: 0.75rem;
   --lumo-font-size-xxs: 0.6875rem;
-  --lumo-border-radius: 0.5em;
+  --lumo-border-radius: 0.1rem;
   --lumo-size-xl: 3rem;
   --lumo-size-l: 2.5rem;
   --lumo-size-m: 2rem;
@@ -97,6 +97,11 @@ vaadin-app-layout::part(navbar) {
 	color: var(--background-text-color);
 }
 
+.gx-right-drawer {
+  box-shadow: -0.75rem 0 0.75rem rgba(0, 0, 0, 0.2); /* Adjust the values for your shadow effect */
+  z-index: 100;
+}
+
 .gx-login-view {
 	display: flex;
 	flex-flow: column;
@@ -112,7 +117,7 @@ vaadin-app-layout::part(navbar) {
 }
 
 ::-webkit-scrollbar {
-  width: 0.4em;
+  width: 0.4rem;
   background-color: transparent;
   display: block;
   overflow: auto;
@@ -120,4 +125,22 @@ vaadin-app-layout::part(navbar) {
 
 ::-webkit-scrollbar-thumb {
   background-color: #eee;
+}
+
+.gx-entity-list > * {
+    margin: 0px;
+    padding: 0px;
+}
+
+.gx-grid {
+    border-left: none;
+    border-right: none;
+}
+
+.gx-grid-footer {
+    margin: 0.75rem
+}
+
+.gx-grid-search-layout {
+    margin: 0.75rem;
 }

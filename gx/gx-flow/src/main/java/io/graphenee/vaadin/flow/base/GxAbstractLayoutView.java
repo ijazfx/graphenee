@@ -9,6 +9,7 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -22,21 +23,23 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/gx-common.css")
-public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {
+public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver {
 
 	private static final long serialVersionUID = 1L;
 	private Tabs tabs;
 
 	public GxAbstractLayoutView() {
 		setSizeFull();
-		getElement().getStyle().set("margin", "0");
-		getElement().getStyle().set("padding", "0");
+		setFlexDirection(FlexDirection.COLUMN);
 		addClassName("gx-layout-view");
 	}
 
 	@PostConstruct
 	private void postBuild() {
-		add(getCaptionComponent());
+		Component captionComponent = getCaptionComponent();
+		if (captionComponent != null) {
+			add(getCaptionComponent());
+		}
 		List<GxTabItem> tabItems = new ArrayList<>();
 		addTabsToView(tabItems);
 		Component rootLayout = getLayoutComponent();
@@ -96,14 +99,13 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
 	}
 
 	protected Component getCaptionComponent() {
+		if (getCaption() == null)
+			return null;
 		H3 lblCaption = new H3(getCaption());
-		lblCaption.getElement().getStyle().set("padding", "0");
+		lblCaption.getElement().getStyle().set("padding", "0.75rem");
 		lblCaption.getElement().getStyle().set("font-size", "var(--lumo-font-size-xl");
 		lblCaption.getElement().getStyle().set("color", "var(--lumo-primary-color");
-		lblCaption.getElement().getStyle().set("margin-bottom", "0.4em");
-		lblCaption.getElement().getStyle().set("margin-left", "0.85em");
-		lblCaption.getElement().getStyle().set("margin-top", "1em");
-		lblCaption.getElement().getStyle().set("border-bottom", "0.2em solid var(--lumo-primary-color)");
+		lblCaption.getElement().getStyle().set("border-bottom", "0.2rem solid var(--lumo-primary-color)");
 		lblCaption.getElement().getStyle().set("display", "inline-block");
 		return lblCaption;
 	}
