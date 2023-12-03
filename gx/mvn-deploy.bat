@@ -1,1 +1,1 @@
-call mvn -Psonatype -f ./pom.xml package deploy -DskipTests
+call mvn -Psonatype -f ./pom.xml deploy -DskipTests
