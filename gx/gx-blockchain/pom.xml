@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gx-blockchain</artifactId>
 	<name>Graphenee Blockchain</name>
@@ -14,7 +16,8 @@
 
 	<!-- Properties -->
 	<properties>
-		<version.web3>4.5.4</version.web3>
+		<version.web3>5.0.0</version.web3>
+		<version.quorum>4.10.0</version.quorum>
 		<version.sawtooth>v0.1.2</version.sawtooth>
 	</properties>
 
@@ -50,6 +53,11 @@
 			<groupId>org.web3j</groupId>
 			<artifactId>abi</artifactId>
 			<version>${version.web3}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>quorum</artifactId>
+			<version>${version.quorum}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hyperledger.sawtooth</groupId>

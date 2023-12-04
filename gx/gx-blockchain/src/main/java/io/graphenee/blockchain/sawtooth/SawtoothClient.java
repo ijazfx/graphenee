@@ -79,7 +79,7 @@ public class SawtoothClient {
 			// build batch list
 			BatchList batchList = BatchList.newBuilder().addBatches(batch).build();
 
-			RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/octet-stream"), batchList.toByteArray());
+			RequestBody body = RequestBody.create(batchList.toByteArray(), okhttp3.MediaType.parse("application/octet-stream"));
 			Call<JsonObject> call = service.sendBatches(body);
 			Response<JsonObject> response = call.execute();
 			System.err.println(response);
