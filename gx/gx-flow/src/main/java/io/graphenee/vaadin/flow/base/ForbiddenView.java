@@ -1,6 +1,6 @@
 package io.graphenee.vaadin.flow.base;
 
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.ErrorParameter;
@@ -13,7 +13,7 @@ public class ForbiddenView extends VerticalLayout implements HasErrorParameter<F
 
 	private static final long serialVersionUID = 1L;
 
-	private final Label error = new Label();
+	private final NativeLabel error = new NativeLabel();
 
 	public ForbiddenView() {
 		add(error);
@@ -25,6 +25,7 @@ public class ForbiddenView extends VerticalLayout implements HasErrorParameter<F
 		return HttpServletResponse.SC_FORBIDDEN;
 	}
 
+	@SuppressWarnings("serial")
 	public static class ForbiddenException extends RuntimeException {
 
 	}
