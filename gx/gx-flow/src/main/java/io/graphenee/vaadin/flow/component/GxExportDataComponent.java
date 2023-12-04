@@ -101,6 +101,7 @@ public class GxExportDataComponent<T> {
 		return this;
 	}
 
+	@SuppressWarnings("serial")
 	public void prepareDownload() {
 		try {
 			File file = File.createTempFile(UUID.randomUUID().toString(), "xls");
@@ -196,8 +197,7 @@ public class GxExportDataComponent<T> {
 		}
 	}
 
-	private void buildDataRow(Row row, Object item) {
-		T entity = (T) item;
+	private void buildDataRow(Row row, T entity) {
 		CellStyle rowStyle = null;
 		if (delegate != null) {
 			// defaultRowStyle = workbook.createCellStyle();
@@ -207,7 +207,7 @@ public class GxExportDataComponent<T> {
 			}
 		}
 		int i = 0;
-		KeyValueWrapper kvw = new KeyValueWrapper(item);
+		KeyValueWrapper kvw = new KeyValueWrapper(entity);
 		for (String property : dataColumns) {
 			Object value = kvw.valueForKeyPath(property);
 			Cell cell = row.createCell(i++);

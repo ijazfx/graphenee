@@ -15,7 +15,7 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
-@CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
+@CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
 public abstract class GxAbstractEntityTreeList<T> extends GxAbstractEntityList<T> {
 
 	private static final long serialVersionUID = 1L;

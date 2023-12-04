@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.ClickEvent;
@@ -331,7 +330,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		dataBinder.readBean(entity);
 		entityBound = true;
 		if (tabs != null) {
-			tabs.setSelectedTab((Tab) tabs.getComponentAt(0));
+			tabs.setSelectedTab((Tab) tabs.getTabAt(0));
 		}
 		postBinding(entity);
 		listeners.forEach(l -> {
@@ -485,7 +484,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected void setTabEnabled(Integer index, Boolean value) {
-		Component c = tabs.getComponentAt(index);
+		Component c = tabs.getTabAt(index);
 		if (c instanceof Tab) {
 			Tab tab = (Tab) c;
 			tab.setEnabled(value);

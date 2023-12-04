@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -17,6 +17,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
+@SuppressWarnings("serial")
 @Scope("prototype")
 @SpringComponent
 public class GxEmailTemplateForm extends GxAbstractEntityForm<GxEmailTemplate> {
@@ -34,7 +35,7 @@ public class GxEmailTemplateForm extends GxAbstractEntityForm<GxEmailTemplate> {
 	private Tabs tabs;
 	private Tab emailTab;
 	private Tab messageTab;
-	private Label messageCount;
+	private NativeLabel messageCount;
 	private VerticalLayout content;
 
 	final int perSMSMaxLength = 160;
@@ -55,7 +56,7 @@ public class GxEmailTemplateForm extends GxAbstractEntityForm<GxEmailTemplate> {
 		senderEmailAddress = new TextField("Sender");
 		senderEmailAddress.setWidthFull();
 
-		messageCount = new Label();
+		messageCount = new NativeLabel();
 		messageCount.setWidthFull();
 
 		body = new TextArea("Body");

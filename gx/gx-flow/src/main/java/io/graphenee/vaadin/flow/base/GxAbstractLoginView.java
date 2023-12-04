@@ -27,7 +27,7 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.annotation.PostConstruct;
 
-@CssImport("./styles/gx-common.css")
+@CssImport("./styles/graphenee.css")
 public abstract class GxAbstractLoginView extends VerticalLayout implements HasUrlParameter<String> {
 
 	private static final long serialVersionUID = 1L;

@@ -20,7 +20,7 @@ import com.vaadin.flow.data.provider.SortDirection;
 
 import io.reactivex.rxjava3.core.ObservableEmitter;
 
-@CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
+@CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
 public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T> {
 
 	private static final long serialVersionUID = 1L;
@@ -77,6 +77,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 	/**
 	 * @deprecated use {@link #getData(int, int, Object, List)} instead.
 	 */
+	@Deprecated
 	protected Stream<T> getData(int pageNumber, int pageSize, T searchEntity) {
 		return null;
 	}
@@ -123,6 +124,7 @@ public abstract class GxAbstractEntityLazyList<T> extends GxAbstractEntityList<T
 	/**
 	 * @deprecated use {@link #createSort(List, Sort)} or {@link #createSort(List, Sort, Map)} instead.
 	 */
+	@Deprecated
 	protected List<Order> sortOrdersToSpringOrders(List<QuerySortOrder> sortOrders) {
 		return sortOrders.stream().map(so -> {
 			return new Order(so.getDirection() == SortDirection.ASCENDING ? Direction.ASC : Direction.DESC, so.getSorted());

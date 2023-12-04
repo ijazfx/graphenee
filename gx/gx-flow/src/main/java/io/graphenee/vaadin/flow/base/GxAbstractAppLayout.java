@@ -25,7 +25,7 @@ import lombok.Setter;
 
 @Push
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
-@CssImport("./styles/gx-common.css")
+@CssImport("./styles/graphenee.css")
 public abstract class GxAbstractAppLayout extends AppLayout implements RouterLayout, AppShellConfigurator {
 
 	private static final long serialVersionUID = 1L;

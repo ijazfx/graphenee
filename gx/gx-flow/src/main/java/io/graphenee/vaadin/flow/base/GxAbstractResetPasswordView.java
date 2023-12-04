@@ -22,7 +22,7 @@ import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import jakarta.annotation.PostConstruct;
 
-@CssImport("./styles/gx-common.css")
+@CssImport("./styles/graphenee.css")
 public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 
 	private static final long serialVersionUID = 1L;

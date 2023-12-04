@@ -123,7 +123,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@CssImport(value = "./styles/gx-common.css", themeFor = "vaadin-grid")
+@CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
 public abstract class GxAbstractEntityList<T> extends FlexLayout implements BrowserWindowResizeListener {
 
 	private static final long serialVersionUID = 1L;
@@ -1124,6 +1124,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 	/**
 	 * @deprecated use {@link #columnFilterForProperty(String, PropertyDefinition, AbstractField)} instead.
 	 */
+	@Deprecated
 	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
 		return null;
 	}

@@ -58,7 +58,7 @@ public class GxTimelineChart extends VerticalLayout {
 		chart.updateSeries(series);
 	}
 
-	@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+	@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 	public static class TimelineSeries extends Series<TimelineData> {
 
 		@Include
@@ -76,7 +76,7 @@ public class GxTimelineChart extends VerticalLayout {
 
 	}
 
-	@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+	@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 	public static class TimelineData {
 
 		@Include

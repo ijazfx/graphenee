@@ -25,7 +25,7 @@ import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.util.callback.TRParamCallback;
 import jakarta.annotation.PostConstruct;
 
-@CssImport("./styles/gx-common.css")
+@CssImport("./styles/graphenee.css")
 public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver {
 
 	private static final long serialVersionUID = 1L;
