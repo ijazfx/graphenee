@@ -1,5 +1,6 @@
 package io.graphenee.vaadin.flow.base;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -20,6 +21,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 
 @Push
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
@@ -27,6 +29,9 @@ import jakarta.annotation.PostConstruct;
 public abstract class GxAbstractAppLayout extends AppLayout implements RouterLayout, AppShellConfigurator {
 
 	private static final long serialVersionUID = 1L;
+
+	@Setter
+	private GxAbstractAppLayoutDelegate delegate;
 
 	@PostConstruct
 	private void postBuild() {
@@ -68,7 +73,11 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 			logout.addClickListener(cl -> {
 				getUI().ifPresent(ui -> {
 					VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, null);
-					ui.navigate("/");
+					if (delegate != null) {
+						delegate.onLogout(ui);
+					} else {
+						ui.navigate("/");
+					}
 				});
 			});
 
@@ -113,5 +122,11 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 	}
 
 	protected abstract GxAbstractFlowSetup flowSetup();
+
+	public static interface GxAbstractAppLayoutDelegate {
+		default void onLogout(UI ui) {
+			ui.navigate("/");
+		}
+	}
 
 }

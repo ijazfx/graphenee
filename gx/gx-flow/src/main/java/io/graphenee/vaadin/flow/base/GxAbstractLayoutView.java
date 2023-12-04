@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
@@ -20,6 +22,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.util.callback.TRParamCallback;
 import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/gx-common.css")
@@ -141,6 +144,31 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
+	}
+
+	public static ConfirmDialog createYesNoComponentDialog(String title, Component component, TRParamCallback<ConfirmEvent> confirmCallback) {
+		return createComponentDialog(title, component, "YES", "NO", confirmCallback);
+	}
+
+	public static ConfirmDialog createComponentDialog(String title, Component component, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
+		ConfirmDialog d = new ConfirmDialog(title, null, confirmText, dlg -> {
+			callback.execute(dlg);
+		});
+		d.setText(component);
+		d.setRejectText(cancelText);
+		return d;
+	}
+
+	public static ConfirmDialog createYesNoDialog(String title, String message, TRParamCallback<ConfirmEvent> confirmCallback) {
+		return createDialog(title, message, "YES", "NO", confirmCallback);
+	}
+
+	public static ConfirmDialog createDialog(String title, String message, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
+		ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
+			callback.execute(dlg);
+		});
+		d.setRejectText(cancelText);
+		return d;
 	}
 
 }

@@ -40,6 +40,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
@@ -57,6 +58,9 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
 import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
@@ -108,6 +112,7 @@ import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.event.TRDelayEventListener;
+import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
@@ -323,6 +328,10 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 					exportDataSpreadSheetComponent.prepareDownload();
 				}
 			});
+
+			if (shouldShowContextMenu()) {
+				decorateContextMenu(dataGrid.addContextMenu());
+			}
 
 			decorateMenuBar(customMenuBar);
 
@@ -605,6 +614,65 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		return this;
 	}
 
+	protected void decorateContextMenu(GridContextMenu<T> contextMenu) {
+		GridMenuItem<T> addItem = contextMenu.addItem(new Span(VaadinIcon.PLUS.create(), new Text("Add New Record")));
+		customizeAddContextMenuItem(addItem);
+		GridMenuItem<T> editItem = contextMenu.addItem(new Span(VaadinIcon.PENCIL.create(), new Text("Edit Record")));
+		customizeEditContextMenuItem(editItem);
+		GridMenuItem<T> deleteItem = contextMenu.addItem(new Span(VaadinIcon.TRASH.create(), new Text("Delete Record")));
+		customizeDeleteContextMenuItem(deleteItem);
+		contextMenu.addGridContextMenuOpenedListener(e -> {
+			boolean present = e.getItem().isPresent();
+			editItem.setEnabled(present);
+			deleteItem.setEnabled(present);
+		});
+	}
+
+	protected boolean shouldShowContextMenu() {
+		return true;
+	}
+
+	@SuppressWarnings("serial")
+	protected void customizeAddContextMenuItem(GridMenuItem<T> addItem) {
+		addItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
+
+			@Override
+			public void onClick(GridContextMenuItemClickEvent<T> event) {
+				try {
+					openForm(entityClass.getDeclaredConstructor().newInstance());
+				} catch (Exception e) {
+					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				}
+			}
+
+		});
+	}
+
+	@SuppressWarnings("serial")
+	protected void customizeEditContextMenuItem(GridMenuItem<T> editItem) {
+		editItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
+			@Override
+			public void onClick(GridContextMenuItemClickEvent<T> event) {
+				try {
+					openForm(event.getItem().get());
+				} catch (Exception e) {
+					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				}
+			}
+		});
+	}
+
+	@SuppressWarnings("serial")
+	protected void customizeDeleteContextMenuItem(GridMenuItem<T> deleteItem) {
+		deleteItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
+			@Override
+			public void onClick(GridContextMenuItemClickEvent<T> event) {
+				entityGrid().select(event.getItem().get());
+				deleteRows(List.of(event.getItem().get()));
+			}
+		});
+	}
+
 	protected void decorateColumnMenuBar(MenuBar columnMenuBar) {
 	}
 
@@ -856,43 +924,48 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 			@Override
 			public void onClick(ClickEvent<MenuItem> event) {
-				if (shouldShowDeleteConfirmation()) {
-					ConfirmDialog dialog = new ConfirmDialog("Confirmation", "Are you sure to delete selected record(s)?", "YES", dlg -> {
-						try {
-							onDelete(dataGrid.getSelectedItems());
-							if (isAuditLogEnabled()) {
-								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
-							}
-							listeners.forEach(l -> {
-								l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
-							});
-							refresh();
-							deleteMenuItem.setEnabled(false);
-							dataGrid.deselectAll();
-						} catch (Exception e) {
-							log.warn(e.getMessage(), e);
-							Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-						}
-					});
-					dialog.open();
-				} else {
-					try {
-						onDelete(dataGrid.getSelectedItems());
-						if (isAuditLogEnabled()) {
-							auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
-						}
-						listeners.forEach(l -> {
-							l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
-						});
-						refresh();
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
-						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
-					}
-				}
+				deleteRows(dataGrid.getSelectedItems());
 			}
+
 		});
 
+	}
+
+	private void deleteRows(Collection<T> selectedItems) {
+		if (shouldShowDeleteConfirmation()) {
+			ConfirmDialog dialog = new ConfirmDialog("Confirmation", "Are you sure to delete selected record(s)?", "YES", dlg -> {
+				try {
+					onDelete(selectedItems);
+					if (isAuditLogEnabled()) {
+						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+					}
+					listeners.forEach(l -> {
+						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+					});
+					refresh();
+					deleteMenuItem.setEnabled(false);
+					dataGrid.deselectAll();
+				} catch (Exception e) {
+					log.warn(e.getMessage(), e);
+					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				}
+			});
+			dialog.open();
+		} else {
+			try {
+				onDelete(selectedItems);
+				if (isAuditLogEnabled()) {
+					auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+				}
+				listeners.forEach(l -> {
+					l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+				});
+				refresh();
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+				Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1522,6 +1595,31 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		}
 
 		void onEvent(GxEntityListEvent event, Collection<T> entity);
+	}
+
+	public static ConfirmDialog createYesNoComponentDialog(String title, Component component, TRParamCallback<ConfirmEvent> confirmCallback) {
+		return createComponentDialog(title, component, "YES", "NO", confirmCallback);
+	}
+
+	public static ConfirmDialog createComponentDialog(String title, Component component, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
+		ConfirmDialog d = new ConfirmDialog(title, null, confirmText, dlg -> {
+			callback.execute(dlg);
+		});
+		d.setText(component);
+		d.setRejectText(cancelText);
+		return d;
+	}
+
+	public static ConfirmDialog createYesNoDialog(String title, String message, TRParamCallback<ConfirmEvent> confirmCallback) {
+		return createDialog(title, message, "YES", "NO", confirmCallback);
+	}
+
+	public static ConfirmDialog createDialog(String title, String message, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
+		ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
+			callback.execute(dlg);
+		});
+		d.setRejectText(cancelText);
+		return d;
 	}
 
 }

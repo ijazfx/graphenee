@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.ClickEvent;
@@ -16,10 +17,12 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
@@ -30,6 +33,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.util.KeyValueWrapper;
+import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
@@ -43,7 +47,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	private static final long serialVersionUID = 1L;
 
 	private HorizontalLayout formTitleLayout;
-	private Label formTitleLabel;
+	private NativeLabel formTitleLabel;
 	private Component entityForm;
 	private Component toolbar;
 	private Button saveButton;
@@ -206,7 +210,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	private void buildFormTitle() {
 		if (formTitleLabel == null) {
-			formTitleLabel = new Label();
+			formTitleLabel = new NativeLabel();
 			formTitleLabel.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
 			formTitleLabel.getStyle().set("font-weight", "bold");
 			formTitleLabel.getStyle().set("color", "var(--lumo-primary-color)");
@@ -522,6 +526,31 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 
 		void onEvent(GxEntityFormEvent event, T entity);
+	}
+
+	public static ConfirmDialog createYesNoComponentDialog(String title, Component component, TRParamCallback<ConfirmEvent> confirmCallback) {
+		return createComponentDialog(title, component, "YES", "NO", confirmCallback);
+	}
+
+	public static ConfirmDialog createComponentDialog(String title, Component component, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
+		ConfirmDialog d = new ConfirmDialog(title, null, confirmText, dlg -> {
+			callback.execute(dlg);
+		});
+		d.setText(component);
+		d.setRejectText(cancelText);
+		return d;
+	}
+
+	public static ConfirmDialog createYesNoDialog(String title, String message, TRParamCallback<ConfirmEvent> confirmCallback) {
+		return createDialog(title, message, "YES", "NO", confirmCallback);
+	}
+
+	public static ConfirmDialog createDialog(String title, String message, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
+		ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
+			callback.execute(dlg);
+		});
+		d.setRejectText(cancelText);
+		return d;
 	}
 
 }
