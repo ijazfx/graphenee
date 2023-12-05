@@ -25,11 +25,11 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.ValidationException;
 
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
-public class GxAwsSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderBean> {
+public class GxAwsSmsProviderForm extends GxAbstractEntityForm<GxSmsProvider> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -49,11 +49,11 @@ public class GxAwsSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderBean
 	private TextField senderId;
 
 	public GxAwsSmsProviderForm() {
-		super(GxSmsProviderBean.class);
+		super(GxSmsProvider.class);
 	}
 
 	@Override
-	protected void postBinding(GxSmsProviderBean entity) {
+	protected void postBinding(GxSmsProvider entity) {
 		try {
 			configBuilder = GxSmsConfigProtos.AwsSmsConfig.parseFrom(entity.getConfigData()).toBuilder();
 			awsAccessKeyId.setValue(configBuilder.getAwsAccessKeyId());

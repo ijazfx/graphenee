@@ -18,391 +18,352 @@ package io.graphenee.core.model.api;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
+
+import org.springframework.data.domain.Pageable;
 
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.exception.RegisterDeviceFailedException;
 import io.graphenee.core.exception.UnregisterDeviceFailedException;
-import io.graphenee.core.model.bean.GxAccessKeyBean;
-import io.graphenee.core.model.bean.GxAuditLogBean;
-import io.graphenee.core.model.bean.GxCityBean;
-import io.graphenee.core.model.bean.GxCountryBean;
-import io.graphenee.core.model.bean.GxCurrencyBean;
-import io.graphenee.core.model.bean.GxEmailTemplateBean;
-import io.graphenee.core.model.bean.GxGenderBean;
-import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.bean.GxNamespacePropertyBean;
-import io.graphenee.core.model.bean.GxRegisteredDeviceBean;
-import io.graphenee.core.model.bean.GxResourceBean;
-import io.graphenee.core.model.bean.GxSavedQueryBean;
-import io.graphenee.core.model.bean.GxSecurityGroupBean;
-import io.graphenee.core.model.bean.GxSecurityPolicyBean;
-import io.graphenee.core.model.bean.GxSmsProviderBean;
-import io.graphenee.core.model.bean.GxStateBean;
-import io.graphenee.core.model.bean.GxSupportedLocaleBean;
-import io.graphenee.core.model.bean.GxTermBean;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxAccessKey;
+import io.graphenee.core.model.entity.GxAuditLog;
+import io.graphenee.core.model.entity.GxCity;
+import io.graphenee.core.model.entity.GxCountry;
+import io.graphenee.core.model.entity.GxCurrency;
+import io.graphenee.core.model.entity.GxEmailTemplate;
+import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxNamespaceProperty;
+import io.graphenee.core.model.entity.GxRegisteredDevice;
+import io.graphenee.core.model.entity.GxResource;
+import io.graphenee.core.model.entity.GxSavedQuery;
+import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxSmsProvider;
+import io.graphenee.core.model.entity.GxState;
+import io.graphenee.core.model.entity.GxSupportedLocale;
+import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxUserAccount;
+import io.graphenee.security.exception.GxPermissionException;
 
 public interface GxDataService {
 
 	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
 
-	List<GxGenderBean> findGender();
+	GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccount userAccount);
 
-	@Deprecated
-	List<GxNamespaceBean> findNamespace();
+	GxAuditLog auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccount userAccount, byte[] additionalData);
 
-	List<GxNamespace> findNamespaceEntity();
+	GxAuditLog auditEvent(String auditEvent);
 
-	@Deprecated
-	GxNamespaceBean findNamespace(Integer oidNamespace);
+	GxAuditLog auditEventByUser(String auditEvent, GxUserAccount userAccount);
 
-	GxNamespace findNamespaceEntity(Integer oidNamespace);
+	GxAuditLog auditEventByUserWithAdditionalData(String auditEvent, GxUserAccount userAccount, byte[] additionalData);
 
-	@Deprecated
-	GxNamespaceBean findSystemNamespace();
+	GxAuditLog auditEventWithAdditionalData(String auditEvent, byte[] additionalData);
 
-	GxNamespace findSystemNamespaceEntity();
+	void delete(GxAccessKey entity);
 
-	List<GxSupportedLocaleBean> findSupportedLocale();
+	void delete(GxCity city);
 
-	List<GxTermBean> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale);
+	void delete(GxCountry entity);
 
-	List<GxTermBean> findDistinctTermByNamespaceAndSupportedLocale(GxNamespaceBean namespace, GxSupportedLocaleBean supportedLocale);
+	void delete(GxCurrency entity);
 
-	List<GxTermBean> findTermByLocale(Locale locale);
+	void delete(GxEmailTemplate entity);
 
-	List<GxTermBean> findTermByTermKey(String termKey);
+	void delete(GxNamespace entity);
 
-	List<GxTermBean> findTermByTermKeyAndLocale(String termKey, Locale locale);
+	void delete(GxNamespaceProperty entity);
 
-	GxTermBean findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale);
+	void delete(GxRegisteredDevice entity);
 
-	GxTermBean save(GxTermBean entity);
+	void delete(GxResource entity);
 
-	void deleteTermByTermKeyAndOidNameSpace(String termKey, Integer oidNamespace);
+	void delete(GxSavedQuery entity);
 
-	void delete(GxTermBean entity);
+	void delete(GxSecurityGroup entity);
 
-	GxSupportedLocaleBean save(GxSupportedLocaleBean entity);
+	void delete(GxSecurityPolicy entity);
 
-	void delete(GxSupportedLocaleBean entity);
+	void delete(GxSmsProvider entity);
 
-	@Deprecated
-	GxNamespaceBean findNamespace(String namespace);
+	void delete(GxState entity);
 
-	GxNamespace findNamespaceEntity(String namespace);
+	void delete(GxSupportedLocale entity);
 
-	GxNamespaceBean save(GxNamespaceBean entity);
+	void delete(GxTerm entity);
 
-	void delete(GxNamespaceBean entity);
+	void delete(GxUserAccount entity);
 
-	List<GxNamespacePropertyBean> findNamespaceProperty();
+	void deleteTermByTermKeyAndNamespace(String termKey, GxNamespace namespace);
 
-	GxNamespacePropertyBean findNamespaceProperty(Integer oidNamespaceProperty);
+	GxAccessKey findAccessKey(UUID accessKey);
 
-	GxNamespacePropertyBean save(GxNamespacePropertyBean bean);
+	List<GxAccessKey> findAccessKey();
 
-	void delete(GxNamespacePropertyBean bean);
+	List<GxAccessKey> findAccessKeyByIsActive(Boolean isActive);
 
-	@Deprecated
-	List<GxNamespacePropertyBean> findNamespacePropertyByNamespace(GxNamespaceBean namespace);
+	List<GxAccessKey> findAccessKeyByIsActiveAndUserAccountIsNull(Boolean isActive);
 
-	List<GxNamespaceProperty> findNamespacePropertyEntityByNamespace(GxNamespace namespace);
+	List<GxAuditLog> findAuditLogByAuditEntity(String auditEntity);
 
-	GxNamespacePropertyBean findNamespacePropertyByNamespaceAndPropertyKey(GxNamespaceBean namespace, String propertyKey);
+	List<GxAuditLog> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity);
 
-	List<GxSecurityGroupBean> findSecurityGroup();
+	List<GxAuditLog> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
 
-	GxSecurityGroupBean findSecurityGroup(Integer oidSecurityGroup);
+	List<GxAuditLog> findAuditLogByUser(GxUserAccount userAccount);
 
-	GxSecurityGroupBean save(GxSecurityGroupBean bean);
+	List<GxCity> findCity();
 
-	void delete(GxSecurityGroupBean bean);
+	GxCity findCity(Integer oid);
 
-	List<GxSecurityGroupBean> findSecurityGroupByNamespace(GxNamespaceBean namespace);
+	GxCity findCityByCityName(String cityName);
 
-	GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupName(GxNamespaceBean namespace, String groupName);
+	List<GxCity> findCityByCountry(GxCountry country);
 
-	GxSecurityGroupBean findSecurityGroupByNamespaceAndGroupNameActive(GxNamespaceBean namespace, String groupName);
+	List<GxCity> findCityByCountryNumericCode(Integer numericCode);
 
-	List<GxUserAccountBean> findUserAccount();
+	List<GxCity> findCityByState(GxState state);
 
-	GxUserAccountBean save(GxUserAccountBean bean);
+	List<GxCity> findCityByStateCode(String stateCode);
 
-	void delete(GxUserAccountBean bean);
+	List<GxCountry> findCountry();
 
-	List<GxSecurityPolicyBean> findSecurityPolicy();
+	GxCountry findCountry(Integer oid);
 
-	GxSecurityPolicyBean save(GxSecurityPolicyBean bean);
+	GxCountry findCountryByCityName(String cityName);
 
-	void delete(GxSecurityPolicyBean bean);
+	GxCountry findCountryByCountryAlpha3Code(String alpha3Code);
 
-	List<GxSecurityPolicyBean> findSecurityPolicyByNamespace(GxNamespaceBean namespace);
+	GxCountry findCountryByCountryName(String countryName);
 
-	List<GxUserAccountBean> findUserAccountByNamespace(GxNamespaceBean namespace);
+	GxCountry findCountryByNumericCode(Integer numericCode);
 
-	List<GxUserAccountBean> findUserAccountBySecurityGroup(GxSecurityGroupBean securityGroup);
+	GxCountry findCountryByStateCode(String stateCode);
 
-	GxGenderBean findGenderByCode(String genderCode);
+	GxCountry findCountryByStateName(String stateName);
 
-	GxCountryBean createOrUpdate(GxCountryBean bean);
+	List<GxCurrency> findCurrency();
 
-	GxStateBean createOrUpdate(GxStateBean bean);
+	GxCurrency findCurrency(Integer oid);
 
-	void delete(GxStateBean bean);
+	List<GxCurrency> findCurrencyActive();
 
-	void delete(GxCountryBean bean);
+	GxCurrency findCurrencyByCurrencyAlpha3Code(String alpha3Code);
 
-	List<GxCountryBean> findCountry();
+	GxCurrency findCurrencyByCurrencyNumericCode(Integer numericCode);
 
-	GxCountryBean findCountry(Integer oid);
+	List<GxTerm> findDistinctTermByNamespaceAndSupportedLocale(GxNamespace namespace, GxSupportedLocale supportedLocale);
 
-	GxCountryBean findCountryByCountryName(String countryName);
+	GxTerm findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale);
 
-	GxCountryBean findCountryByCountryAlpha3Code(String alpha3Code);
+	List<GxEmailTemplate> findEmailTemplate();
 
-	GxCountryBean findCountryByNumericCode(Integer numericCode);
+	GxEmailTemplate findEmailTemplate(Integer oid);
 
-	GxCountryBean findCountryByStateName(String stateName);
+	List<GxEmailTemplate> findEmailTemplateActive();
 
-	GxCountryBean findCountryByStateCode(String stateCode);
+	List<GxEmailTemplate> findEmailTemplateByNamespace(GxNamespace namespace);
 
-	GxCountryBean findCountryByCityName(String cityName);
+	List<GxEmailTemplate> findEmailTemplateByNamespaceActive(GxNamespace namespace);
 
-	List<GxStateBean> findState();
+	List<GxEmailTemplate> findEmailTemplateByNamespaceInactive(GxNamespace namespace);
 
-	GxStateBean findState(Integer oid);
+	GxEmailTemplate findEmailTemplateByTemplateCodeActive(String templateCode);
 
-	GxStateBean findStateByStateCode(String stateCode);
+	GxEmailTemplate findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespace namespace);
 
-	GxStateBean findStateByStateName(String stateName);
+	GxEmailTemplate findEmailTemplateByTemplateNameActive(String templateName);
 
-	GxStateBean findStateByCityName(String cityName);
+	GxEmailTemplate findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespace namespace);
 
-	List<GxStateBean> findStateByCountry(Integer oidCountry);
+	List<GxEmailTemplate> findEmailTemplateInactive();
 
-	List<GxStateBean> findStateByCountryNumericCode(Integer numeriCode);
+	List<GxGender> findGender();
 
-	List<GxStateBean> findStateByCountryCountryName(String countryName);
+	GxGender findGenderByCode(String genderCode);
 
-	List<GxCityBean> findCity();
+	List<GxNamespace> findNamespace();
 
-	GxCityBean createOrUpdate(GxCityBean cityBean);
+	GxNamespace findNamespace(Integer oidNamespace);
 
-	void delete(GxCityBean cityBean);
+	GxNamespace findNamespace(String namespace);
 
-	GxCityBean findCity(Integer oid);
+	List<GxNamespaceProperty> findNamespaceProperty();
 
-	GxCityBean findCityByCityName(String cityName);
+	GxNamespaceProperty findNamespaceProperty(Integer oidNamespaceProperty);
 
-	List<GxCityBean> findCityByCountry(Integer oidCountry);
+	List<GxNamespaceProperty> findNamespacePropertyByNamespace(GxNamespace namespace);
 
-	List<GxCityBean> findCityByState(Integer oidState);
+	GxNamespaceProperty findNamespacePropertyByNamespaceAndPropertyKey(GxNamespace namespace, String propertyKey);
 
-	List<GxCityBean> findCityByCountryNumericCode(Integer numericCode);
+	GxNamespace findOrCreateNamespace(String namespace);
 
-	List<GxCityBean> findCityByStateCode(String stateCode);
+	GxSecurityGroup findOrCreateSecurityGroup(String groupName, GxNamespace namespace);
 
-	GxCurrencyBean createOrUpdate(GxCurrencyBean bean);
+	GxSecurityPolicy findOrCreateSecurityPolicy(String policyName, GxNamespace namespace);
 
-	void delete(GxCurrencyBean bean);
+	Long countRegisterDevice(GxRegisteredDevice se);
 
-	List<GxCurrencyBean> findCurrency();
+	List<GxRegisteredDevice> findRegisteredDevice(GxRegisteredDevice se, Pageable page);
 
-	List<GxCurrencyBean> findCurrencyActive();
+	List<GxRegisteredDevice> findRegisteredDeviceByNamespace(GxNamespace entity);
 
-	GxCurrencyBean findCurrency(Integer oid);
+	GxResource findResourceByResourceNameAndNamespace(String resourceName, GxNamespace namespace);
 
-	GxCurrencyBean findCurrencyByCurrencyNumericCode(Integer numericCode);
+	List<GxResource> findResourceByNamespace(GxNamespace namespace);
 
-	GxCurrencyBean findCurrencyByCurrencyAlpha3Code(String alpha3Code);
+	List<GxSavedQuery> findSavedQuery();
 
-	GxSavedQueryBean findSavedQuery(Integer oid);
+	GxSavedQuery findSavedQuery(Integer oid);
 
-	List<GxSavedQueryBean> findSavedQueryByUsername(String username);
+	List<GxSavedQuery> findSavedQueryByUsername(String username);
 
-	void delete(GxSavedQueryBean bean);
+	List<GxSecurityGroup> findSecurityGroup();
 
-	List<GxSavedQueryBean> findSavedQuery();
+	GxSecurityGroup findSecurityGroup(Integer oidSecurityGroup);
 
-	GxSavedQueryBean save(GxSavedQueryBean bean);
+	List<GxSecurityGroup> findSecurityGroupActive();
 
-	@Deprecated
-	GxEmailTemplateBean findEmailTemplateByTemplateNameActive(String templateName);
+	List<GxSecurityGroup> findSecurityGroupByNamespace(GxNamespace namespace);
 
-	@Deprecated
-	GxEmailTemplateBean findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespaceBean namespace);
+	List<GxSecurityGroup> findSecurityGroupByNamespaceActive(GxNamespace namespace);
 
-	@Deprecated
-	GxEmailTemplateBean findEmailTemplateByTemplateCodeActive(String templateCode);
+	GxSecurityGroup findSecurityGroupByNamespaceAndGroupName(GxNamespace namespace, String groupName);
 
-	@Deprecated
-	GxEmailTemplateBean findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespaceBean namespace);
+	GxSecurityGroup findSecurityGroupByNamespaceAndGroupNameActive(GxNamespace namespace, String groupName);
 
-	@Deprecated
-	List<GxEmailTemplateBean> findEmailTemplate();
+	List<GxSecurityGroup> findSecurityGroupByNamespaceInactive(GxNamespace namespace);
 
-	@Deprecated
-	List<GxEmailTemplateBean> findEmailTemplateByNamespace(GxNamespaceBean namespace);
+	List<GxSecurityGroup> findSecurityGroupInactive();
 
-	@Deprecated
-	GxEmailTemplateBean save(GxEmailTemplateBean bean);
+	List<GxSecurityPolicy> findSecurityPolicy();
 
-	@Deprecated
-	void delete(GxEmailTemplateBean bean);
+	List<GxSecurityPolicy> findSecurityPolicyActive();
 
-	@Deprecated
-	GxNamespaceBean findOrCreateNamespace(String namespace);
+	List<GxSecurityPolicy> findSecurityPolicyByNamespace(GxNamespace namespace);
 
-	GxNamespace findOrCreateNamespaceEntity(String namespace);
+	List<GxSecurityPolicy> findSecurityPolicyByNamespaceActive(GxNamespace namespace);
 
-	@Deprecated
-	GxEmailTemplateBean findEmailTemplate(Integer oid);
+	List<GxSecurityPolicy> findSecurityPolicyByNamespaceInactive(GxNamespace namespace);
 
-	@Deprecated
-	List<GxEmailTemplateBean> findEmailTemplateByNamespaceActive(GxNamespaceBean namespace);
+	List<GxSecurityPolicy> findSecurityPolicyInactive();
 
-	@Deprecated
-	List<GxEmailTemplateBean> findEmailTemplateByNamespaceInactive(GxNamespaceBean namespace);
+	List<GxSmsProvider> findSmsProvider();
 
-	@Deprecated
-	List<GxEmailTemplateBean> findEmailTemplateActive();
+	GxSmsProvider findSmsProvider(Integer oid);
 
-	@Deprecated
-	List<GxEmailTemplateBean> findEmailTemplateInactive();
+	List<GxSmsProvider> findSmsProviderActive();
 
-	List<GxSecurityGroupBean> findSecurityGroupActive();
+	GxSmsProvider findSmsProviderByProvider(SmsProvider smsProvider);
 
-	List<GxSecurityGroupBean> findSecurityGroupInactive();
+	GxSmsProvider findSmsProviderByProviderName(String providerName);
 
-	List<GxSecurityGroupBean> findSecurityGroupByNamespaceActive(GxNamespaceBean namespace);
+	GxSmsProvider findSmsProviderPrimary();
 
-	List<GxSecurityGroupBean> findSecurityGroupByNamespaceInactive(GxNamespaceBean namespace);
+	List<GxState> findState();
 
-	List<GxSecurityPolicyBean> findSecurityPolicyActive();
+	GxState findState(Integer oid);
 
-	List<GxSecurityPolicyBean> findSecurityPolicyInactive();
+	GxState findStateByCityName(String cityName);
 
-	List<GxSecurityPolicyBean> findSecurityPolicyByNamespaceActive(GxNamespaceBean namespace);
+	List<GxState> findStateByCountry(GxCountry country);
 
-	List<GxSecurityPolicyBean> findSecurityPolicyByNamespaceInactive(GxNamespaceBean namespace);
+	List<GxState> findStateByCountryCountryName(String countryName);
 
-	List<GxUserAccountBean> findUserAccountActive();
+	List<GxState> findStateByCountryNumericCode(Integer numeriCode);
 
-	List<GxUserAccountBean> findUserAccountInactive();
+	GxState findStateByStateCode(String stateCode);
 
-	List<GxUserAccountBean> findUserAccountBySecurityGroupActive(GxSecurityGroupBean securityGroup);
+	GxState findStateByStateName(String stateName);
 
-	List<GxUserAccountBean> findUserAccountBySecurityGroupInactive(GxSecurityGroupBean securityGroup);
+	List<GxSupportedLocale> findSupportedLocale();
 
-	GxUserAccountBean findUserAccount(Integer oidUserAccount);
+	List<GxTerm> findTermByLocale(Locale locale);
 
-	GxUserAccountBean findUserAccountByUsername(String username);
+	List<GxTerm> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespace namespace, GxSupportedLocale supportedLocale);
 
-	GxUserAccountBean findUserAccountByUsernameAndNamespace(String username, GxNamespaceBean namespaceBean);
+	List<GxTerm> findTermByTermKey(String termKey);
 
-	GxUserAccountBean findUserAccountByUsernameAndPassword(String username, String password);
+	List<GxTerm> findTermByTermKeyAndLocale(String termKey, Locale locale);
 
-	GxSecurityGroupBean findOrCreateSecurityGroup(String groupName, GxNamespaceBean namespaceBean);
+	List<GxUserAccount> findUserAccount();
 
-	GxSecurityGroupBean createOrUpdate(GxSecurityGroupBean bean);
+	GxUserAccount findUserAccount(Integer oidUserAccount);
 
-	GxSecurityPolicyBean findOrCreateSecurityPolicy(String policyName, GxNamespaceBean namespaceBean);
+	List<GxUserAccount> findUserAccountActive();
 
-	GxSecurityPolicyBean createOrUpdate(GxSecurityPolicyBean bean);
+	List<GxUserAccount> findUserAccountByNamespace(GxNamespace namespace);
 
-	@Deprecated
-	GxAuditLogBean createOrUpdate(GxAuditLogBean bean);
+	List<GxUserAccount> findUserAccountBySecurityGroup(GxSecurityGroup securityGroup);
 
-	@Deprecated
-	GxAuditLogBean auditEvent(String auditEvent);
+	List<GxUserAccount> findUserAccountBySecurityGroupActive(GxSecurityGroup securityGroup);
 
-	@Deprecated
-	GxAuditLogBean auditEventWithAdditionalData(String auditEvent, byte[] additionalData);
+	List<GxUserAccount> findUserAccountBySecurityGroupInactive(GxSecurityGroup securityGroup);
 
-	@Deprecated
-	GxAuditLogBean auditEventByUser(String auditEvent, GxUserAccountBean userAccountBean);
+	GxUserAccount findUserAccountByUsername(String username);
 
-	@Deprecated
-	GxAuditLogBean auditEventByUserWithAdditionalData(String auditEvent, GxUserAccountBean userAccountBean, byte[] additionalData);
+	GxUserAccount findUserAccountByUsernameAndNamespace(String username, GxNamespace namespace);
 
-	@Deprecated
-	GxAuditLogBean auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean);
+	GxUserAccount findUserAccountByUsernameAndPassword(String username, String password);
 
-	@Deprecated
-	GxAuditLogBean auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccountBean userAccountBean,
-			byte[] additionalData);
+	GxUserAccount findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespace namespace);
 
-	@Deprecated
-	List<GxAuditLogBean> findAuditLogByAuditEntityAndOidAuditEntity(String auditEntity, Integer oidAuditEntity);
+	List<GxUserAccount> findUserAccountInactive();
 
-	@Deprecated
-	List<GxAuditLogBean> findAuditLogByAuditEntity(String auditEntity);
+	void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
 
-	@Deprecated
-	List<GxAuditLogBean> findAuditLogByUser(GxUserAccountBean userAccountBean);
+	void markAsPrimary(GxSmsProvider entity);
 
-	void log(GxNamespaceBean gxNamespaceBean, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
+	GxRegisteredDevice registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId) throws RegisterDeviceFailedException;
 
-	List<GxAccessKeyBean> findAccessKey();
+	GxAccessKey save(GxAccessKey entity);
 
-	GxAccessKeyBean save(GxAccessKeyBean bean);
+	GxAuditLog save(GxAuditLog entity);
 
-	void delete(GxAccessKeyBean bean);
+	GxCity save(GxCity city);
 
-	List<GxAccessKeyBean> findAccessKeyByIsActive(Boolean isActive);
+	GxCountry save(GxCountry entity);
 
-	List<GxAccessKeyBean> findAccessKeyByIsActiveAndGxUserAccountIsNull(Boolean isActive);
+	GxCurrency save(GxCurrency entity);
 
-	GxResourceBean createOrUpdate(GxResourceBean bean);
+	GxEmailTemplate save(GxEmailTemplate entity);
 
-	List<GxResourceBean> findResourceByNamespace(GxNamespaceBean gxNamespaceBean);
+	GxNamespace save(GxNamespace entity);
 
-	void delete(GxResourceBean bean);
+	GxNamespaceProperty save(GxNamespaceProperty entity);
 
-	GxSmsProviderBean createOrUpdate(GxSmsProviderBean bean);
+	GxRegisteredDevice save(GxRegisteredDevice entity);
 
-	void markAsPrimary(GxSmsProviderBean bean);
+	GxResource save(GxResource entity);
 
-	void delete(GxSmsProvider bean);
+	GxSavedQuery save(GxSavedQuery entity);
 
-	List<GxSmsProviderBean> findSmsProvider();
+	GxSecurityGroup save(GxSecurityGroup entity);
 
-	GxSmsProviderBean findSmsProvider(Integer oid);
+	GxSecurityPolicy save(GxSecurityPolicy entity);
 
-	List<GxSmsProviderBean> findSmsProviderActive();
+	GxSmsProvider save(GxSmsProvider entity);
 
-	GxSmsProviderBean findSmsProviderPrimary();
+	GxState save(GxState entity);
 
-	GxSmsProviderBean findSmsProviderByProvider(SmsProvider smsProvider);
+	GxSupportedLocale save(GxSupportedLocale entity);
 
-	GxSmsProviderBean findSmsProviderByProviderName(String providerName);
+	GxTerm save(GxTerm entity);
 
-	@Deprecated
-	List<GxAuditLogBean> findAuditLogByOidAuditEntity(Integer oidAuditEntity);
+	GxUserAccount save(GxUserAccount entity);
 
-	@Deprecated
-	GxRegisteredDeviceBean createOrUpdate(GxRegisteredDeviceBean bean);
+	GxNamespace systemNamespace();
 
-	@Deprecated
-	List<GxRegisteredDeviceBean> findRegisteredDevice();
-
-	@Deprecated
-	List<GxRegisteredDeviceBean> findRegisteredDeviceByNamespace(GxNamespaceBean bean);
-
-	@Deprecated
-	void delete(GxRegisteredDeviceBean bean);
-
-	@Deprecated
-	GxRegisteredDeviceBean registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId)
-			throws RegisterDeviceFailedException;
-
-	@Deprecated
 	void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
 
-	GxUserAccountBean findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespaceBean namespace);
+	void access(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+
+	void checkIn(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+
+	void checkOut(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+
+	boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
 
 }

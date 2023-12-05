@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
@@ -27,15 +28,15 @@ public interface GxStateRepository extends GxJpaRepository<GxState, Integer> {
 
 	List<GxState> findAllByIsActiveTrueOrderByStateNameAsc();
 
-	List<GxState> findAllByIsActiveTrueAndGxCountryOidOrderByStateNameAsc(Integer countryOid);
+	List<GxState> findAllByIsActiveTrueAndCountryOrderByStateNameAsc(GxCountry country);
 
-	List<GxState> findAllByIsActiveTrueAndGxCountryCountryNameOrderByStateNameAsc(String countryName);
+	List<GxState> findAllByIsActiveTrueAndCountryCountryNameOrderByStateNameAsc(String countryName);
 
-	List<GxState> findAllByIsActiveTrueAndGxCountryNumericCodeOrderByStateNameAsc(Integer numericCode);
+	List<GxState> findAllByIsActiveTrueAndCountryNumericCodeOrderByStateNameAsc(Integer numericCode);
 
 	GxState findOneByIsActiveTrueAndStateCodeOrderByStateNameAsc(String stateCode);
 
 	GxState findOneByIsActiveTrueAndStateNameOrderByStateNameAsc(String stateName);
 
-	GxState findOneByIsActiveTrueAndGxCitiesCityNameOrderByStateNameAsc(String cityName);
+	GxState findOneByIsActiveTrueAndCitiesCityNameOrderByStateNameAsc(String cityName);
 }

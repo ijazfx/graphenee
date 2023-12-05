@@ -50,13 +50,13 @@ public class AwsSmsServiceImpl implements GxSmsService {
 		try {
 			PublishResult publish = snsClient.publish(new PublishRequest().withMessage(message).withPhoneNumber(phone).withMessageAttributes(smsAttributes));
 			if (publish != null) {
-				GxSmsResponse gxSmsResponse = new GxSmsResponse();
-				gxSmsResponse.setDetail(publish.getMessageId());
+				GxSmsResponse smsResponse = new GxSmsResponse();
+				smsResponse.setDetail(publish.getMessageId());
 				int smsCount = message.length() / perSMSMaxLength;
 				if (message.length() % perSMSMaxLength != 0)
 					smsCount += 1;
-				gxSmsResponse.setSmsCount(smsCount);
-				return gxSmsResponse;
+				smsResponse.setSmsCount(smsCount);
+				return smsResponse;
 			}
 		} catch (Exception ex) {
 			throw new GxSmsSendException(ex.getMessage(), ex);
@@ -77,13 +77,13 @@ public class AwsSmsServiceImpl implements GxSmsService {
 		try {
 			PublishResult publish = snsClient.publish(new PublishRequest().withMessage(message).withPhoneNumber(phone).withMessageAttributes(smsAttributes));
 			if (publish != null) {
-				GxSmsResponse gxSmsResponse = new GxSmsResponse();
-				gxSmsResponse.setDetail(publish.getMessageId());
+				GxSmsResponse smsResponse = new GxSmsResponse();
+				smsResponse.setDetail(publish.getMessageId());
 				int smsCount = message.length() / perSMSMaxLength;
 				if (message.length() % perSMSMaxLength != 0)
 					smsCount += 1;
-				gxSmsResponse.setSmsCount(smsCount);
-				return gxSmsResponse;
+				smsResponse.setSmsCount(smsCount);
+				return smsResponse;
 			}
 		} catch (Exception ex) {
 			throw new GxSmsSendException(ex.getMessage(), ex);

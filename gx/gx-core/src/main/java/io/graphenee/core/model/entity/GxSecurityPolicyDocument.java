@@ -16,84 +16,37 @@
 package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * The persistent class for the gx_security_policy_document database table.
- */
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_security_policy_document")
-@NamedQuery(name = "GxSecurityPolicyDocument.findAll", query = "SELECT g FROM GxSecurityPolicyDocument g")
-public class GxSecurityPolicyDocument implements Serializable {
+public class GxSecurityPolicyDocument extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
+	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-	private String tag;
-
-	@Column(name = "document_json")
+	private String tag = SDF.format(new java.util.Date());
 	private String documentJson;
+	private Boolean isDefault = false;
 
-	@Column(name = "is_default")
-	private Boolean isDefault;
-
-	// bi-directional many-to-one association to GxSecurityPolicy
 	@ManyToOne
 	@JoinColumn(name = "oid_security_policy")
-	private GxSecurityPolicy gxSecurityPolicy;
+	private GxSecurityPolicy securityPolicy;
 
-	public GxSecurityPolicyDocument() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public String getTag() {
+	@Override
+	public String toString() {
 		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
-
-	public String getDocumentJson() {
-		return this.documentJson;
-	}
-
-	public void setDocumentJson(String documentJson) {
-		this.documentJson = documentJson;
-	}
-
-	public Boolean getIsDefault() {
-		return this.isDefault;
-	}
-
-	public void setIsDefault(Boolean isDefault) {
-		this.isDefault = isDefault;
-	}
-
-	public GxSecurityPolicy getGxSecurityPolicy() {
-		return this.gxSecurityPolicy;
-	}
-
-	public void setGxSecurityPolicy(GxSecurityPolicy gxSecurityPolicy) {
-		this.gxSecurityPolicy = gxSecurityPolicy;
 	}
 
 }

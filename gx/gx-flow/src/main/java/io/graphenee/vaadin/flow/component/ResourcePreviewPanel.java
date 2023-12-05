@@ -18,6 +18,7 @@ import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+@SuppressWarnings("serial")
 public class ResourcePreviewPanel extends VerticalLayout {
 
 	@Setter

@@ -28,6 +28,7 @@ public class GxComboBox<T> extends ComboBox<T> {
 		setLabel(label);
 	}
 
+	@SuppressWarnings("serial")
 	public GxComboBox() {
 		Icon icon = new Icon(VaadinIcon.SEARCH);
 		icon.getElement().setAttribute("slot", "suffix");

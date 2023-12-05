@@ -3,7 +3,7 @@ package io.graphenee.workshop.vaadin;
 import java.util.UUID;
 
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
@@ -20,7 +20,7 @@ public class PlaygroundView extends GxVerticalLayoutView {
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
-		Label label1 = new Label(UUID.randomUUID().toString());
+		NativeLabel label1 = new NativeLabel(UUID.randomUUID().toString());
 		rootLayout.add(new GxCopyToClipboardWrapper(label1));
 		TextField label2 = new TextField("UUID");
 		label2.setValue(UUID.randomUUID().toString());

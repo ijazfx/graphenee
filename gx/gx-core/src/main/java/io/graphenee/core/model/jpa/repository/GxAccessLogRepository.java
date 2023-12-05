@@ -21,15 +21,16 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import io.graphenee.core.model.entity.GxAccessKey;
 import io.graphenee.core.model.entity.GxAccessLog;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 public interface GxAccessLogRepository extends GxJpaRepository<GxAccessLog, Integer> {
 
-	List<GxAccessLog> findAllByGxAccessKeyOid(Integer oidAccessKey);
+	List<GxAccessLog> findAllByAccessKey(GxAccessKey accessKey);
 
-	@Query("select g2 from GxAccessLog g2 where g2.gxAccessKey.oid=:oidAccessKey and g2.isSuccess=:isSuccess and (g2.accessType=:accessTypeCheckIn or g2.accessType=:accessTypeCheckOut) and g2.accessTime = "
-			+ "(select  max(g1.accessTime) from GxAccessLog g1 where g1.gxAccessKey.oid=:oidAccessKey and g1.isSuccess=:isSuccess and (g1.accessType=:accessTypeCheckIn or g1.accessType=:accessTypeCheckOut) and g1.accessTime BETWEEN :fromDate and :toDate)")
+	@Query("select g2 from GxAccessLog g2 where g2.accessKey.oid=:oidAccessKey and g2.isSuccess=:isSuccess and (g2.accessType=:accessTypeCheckIn or g2.accessType=:accessTypeCheckOut) and g2.accessTime = "
+			+ "(select  max(g1.accessTime) from GxAccessLog g1 where g1.accessKey.oid=:oidAccessKey and g1.isSuccess=:isSuccess and (g1.accessType=:accessTypeCheckIn or g1.accessType=:accessTypeCheckOut) and g1.accessTime BETWEEN :fromDate and :toDate)")
 	GxAccessLog findTodayLastLogByAccessKey(@Param("oidAccessKey") Integer oidAccessKey, @Param("isSuccess") Boolean isSuccess,
 			@Param("accessTypeCheckIn") Integer accessTypeCheckIn, @Param("accessTypeCheckOut") Integer accessTypeCheckOut, @Param("fromDate") Timestamp fromDate,
 			@Param("toDate") Timestamp toDate);

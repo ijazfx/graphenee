@@ -21,14 +21,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxEmailTemplate;
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
 public interface GxEmailTemplateRepository extends GxJpaRepository<GxEmailTemplate, Integer>, JpaSpecificationExecutor<GxEmailTemplate> {
 
-	List<GxEmailTemplate> findAllByGxNamespaceOidOrderByTemplateName(Integer oidNamespace);
+	List<GxEmailTemplate> findAllByNamespaceOrderByTemplateName(GxNamespace namespace);
 
-	List<GxEmailTemplate> findAllByGxNamespaceOidAndIsActiveOrderByTemplateName(Integer oidNamespace, Boolean isActive);
+	List<GxEmailTemplate> findAllByNamespaceAndIsActiveOrderByTemplateName(GxNamespace namespace, Boolean isActive);
 
 	List<GxEmailTemplate> findAllByIsActiveOrderByTemplateName(Boolean isActive);
 
@@ -36,8 +37,8 @@ public interface GxEmailTemplateRepository extends GxJpaRepository<GxEmailTempla
 
 	GxEmailTemplate findOneByTemplateCodeAndIsActive(String templateCode, Boolean isActive);
 
-	GxEmailTemplate findOneByTemplateNameAndGxNamespaceOidAndIsActive(String templateName, Integer oidNamespace, Boolean isActive);
+	GxEmailTemplate findOneByTemplateNameAndNamespaceAndIsActive(String templateName, GxNamespace namespace, Boolean isActive);
 
-	GxEmailTemplate findOneByTemplateCodeAndGxNamespaceOidAndIsActive(String templateCode, Integer oidNamespace, Boolean isActive);
+	GxEmailTemplate findOneByTemplateCodeAndNamespaceAndIsActive(String templateCode, GxNamespace namespace, Boolean isActive);
 
 }

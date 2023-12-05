@@ -25,7 +25,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.impl.AwsSmsServiceImpl;
 import io.graphenee.sms.impl.EoceanSmsServiceImpl;
 import io.graphenee.sms.impl.TwilioSmsServiceImpl;
@@ -39,7 +39,7 @@ public class GrapheneeSmsConfiguration {
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.sms";
 
 	@Autowired
-	GxDataService gxDataService;
+	GxDataService dataService;
 
 	@Autowired
 	PlatformTransactionManager transactionManager;
@@ -49,37 +49,37 @@ public class GrapheneeSmsConfiguration {
 		TransactionTemplate tran = new TransactionTemplate(transactionManager);
 		tran.execute(status -> {
 			// add sms providers...
-			GxSmsProviderBean provider = gxDataService.findSmsProviderByProvider(SmsProvider.AWS);
+			GxSmsProvider provider = dataService.findSmsProviderByProvider(SmsProvider.AWS);
 			if (provider == null) {
-				provider = new GxSmsProviderBean();
+				provider = new GxSmsProvider();
 				provider.setConfigData(null);
 				provider.setImplementationClass(AwsSmsServiceImpl.class.getName());
 				provider.setIsActive(true);
 				provider.setIsPrimary(true);
 				provider.setProviderName(SmsProvider.AWS.getProviderName());
-				gxDataService.createOrUpdate(provider);
+				dataService.save(provider);
 			}
 
-			provider = gxDataService.findSmsProviderByProvider(SmsProvider.EOCEAN);
+			provider = dataService.findSmsProviderByProvider(SmsProvider.EOCEAN);
 			if (provider == null) {
-				provider = new GxSmsProviderBean();
+				provider = new GxSmsProvider();
 				provider.setConfigData(null);
 				provider.setImplementationClass(EoceanSmsServiceImpl.class.getName());
 				provider.setIsActive(true);
 				provider.setIsPrimary(false);
 				provider.setProviderName(SmsProvider.EOCEAN.getProviderName());
-				gxDataService.createOrUpdate(provider);
+				dataService.save(provider);
 			}
 
-			provider = gxDataService.findSmsProviderByProvider(SmsProvider.TWILIO);
+			provider = dataService.findSmsProviderByProvider(SmsProvider.TWILIO);
 			if (provider == null) {
-				provider = new GxSmsProviderBean();
+				provider = new GxSmsProvider();
 				provider.setConfigData(null);
 				provider.setImplementationClass(TwilioSmsServiceImpl.class.getName());
 				provider.setIsActive(true);
 				provider.setIsPrimary(false);
 				provider.setProviderName(SmsProvider.TWILIO.getProviderName());
-				gxDataService.createOrUpdate(provider);
+				dataService.save(provider);
 			}
 
 			return null;

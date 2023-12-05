@@ -3,15 +3,15 @@ package io.graphenee.vaadin.flow.security;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.util.enums.GenderEnum;
 
 public class GxUserAccountAuthenticatedUser implements GxAuthenticatedUser {
 
-	private GxUserAccountBean user;
+	private GxUserAccount user;
 	private AtomicInteger unreadNotificationCount = new AtomicInteger(0);
 
-	public GxUserAccountAuthenticatedUser(GxUserAccountBean user) {
+	public GxUserAccountAuthenticatedUser(GxUserAccount user) {
 		this.user = user;
 	}
 
@@ -72,12 +72,12 @@ public class GxUserAccountAuthenticatedUser implements GxAuthenticatedUser {
 
 	@Override
 	public GenderEnum getGender() {
-		return user.getGender();
+		return GenderEnum.genderByGenderCode(user.getGender().getGenderCode());
 	}
 
 	@Override
 	public void setGender(GenderEnum gender) {
-		user.setGender(gender);
+		user.setGender(null);
 	}
 
 	@Override

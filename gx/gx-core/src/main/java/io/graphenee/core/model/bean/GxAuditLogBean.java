@@ -30,7 +30,7 @@ public class GxAuditLogBean implements Serializable {
 	private Integer oidAuditEntity;
 	private byte[] additionalData;
 
-	private BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault;
+	private BeanFault<Integer, GxUserAccountBean> userAccountBeanFault;
 
 	public Integer getOid() {
 		return oid;
@@ -80,20 +80,20 @@ public class GxAuditLogBean implements Serializable {
 		this.additionalData = additionalData;
 	}
 
-	public BeanFault<Integer, GxUserAccountBean> getGxUserAccountBeanFault() {
-		return gxUserAccountBeanFault;
+	public BeanFault<Integer, GxUserAccountBean> getUserAccountBeanFault() {
+		return userAccountBeanFault;
 	}
 
-	public void setGxUserAccountBeanFault(BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault) {
-		this.gxUserAccountBeanFault = gxUserAccountBeanFault;
+	public void setUserAccountBeanFault(BeanFault<Integer, GxUserAccountBean> userAccountBeanFault) {
+		this.userAccountBeanFault = userAccountBeanFault;
 	}
 
 	public String getUsername() {
-		return getGxUserAccountBeanFault() != null ? getGxUserAccountBeanFault().getBean().getUsername() : null;
+		return getUserAccountBeanFault() != null ? getUserAccountBeanFault().getBean().getUsername() : null;
 	}
 
 	public String getFullName() {
-		return getGxUserAccountBeanFault() != null ? getGxUserAccountBeanFault().getBean().getFullName() : null;
+		return getUserAccountBeanFault() != null ? getUserAccountBeanFault().getBean().getFullName() : null;
 	}
 
 	@Override

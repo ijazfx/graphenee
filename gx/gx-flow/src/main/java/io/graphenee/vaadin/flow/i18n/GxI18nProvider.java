@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import io.graphenee.i18n.api.LocalizerService;
 
+@SuppressWarnings("serial")
 @Service
 public class GxI18nProvider implements com.vaadin.flow.i18n.I18NProvider {
 

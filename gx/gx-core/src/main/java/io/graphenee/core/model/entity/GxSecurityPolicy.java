@@ -17,180 +17,72 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * The persistent class for the gx_security_policy database table.
- */
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_security_policy")
-@NamedQuery(name = "GxSecurityPolicy.findAll", query = "SELECT g FROM GxSecurityPolicy g")
-public class GxSecurityPolicy implements Serializable {
+public class GxSecurityPolicy extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "is_active")
-	private Boolean isActive;
-
-	@Column(name = "is_protected")
-	private Boolean isProtected;
-
-	private Integer priority;
-
-	@Column(name = "security_policy_name")
+	private Boolean isActive = true;
+	private Boolean isProtected = false;
+	private Integer priority = 0;
 	private String securityPolicyName;
-
-	@Column(name = "security_policy_description")
 	private String securityPolicyDescription;
 
-	// bi-directional many-to-many association to GxSecurityGroup
+	@ManyToOne
+	@JoinColumn(name = "oid_namespace")
+	private GxNamespace namespace;
+
 	@ManyToMany
 	@JoinTable(name = "gx_security_group_security_policy_join", joinColumns = { @JoinColumn(name = "oid_security_policy") }, inverseJoinColumns = {
 			@JoinColumn(name = "oid_security_group") })
-	private List<GxSecurityGroup> gxSecurityGroups = new ArrayList<>();
+	private Set<GxSecurityGroup> securityGroups = new HashSet<>();
 
-	// bi-directional many-to-one association to GxNamespace
-	@ManyToOne
-	@JoinColumn(name = "oid_namespace")
-	private GxNamespace gxNamespace;
-
-	// bi-directional many-to-one association to GxSecurityPolicyDocument
-	@OneToMany(mappedBy = "gxSecurityPolicy", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<GxSecurityPolicyDocument> gxSecurityPolicyDocuments = new ArrayList<>();
+	@OneToMany(mappedBy = "securityPolicy", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<GxSecurityPolicyDocument> securityPolicyDocuments = new ArrayList<>();
 
 	@ManyToMany
 	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = { @JoinColumn(name = "oid_security_policy") }, inverseJoinColumns = {
 			@JoinColumn(name = "oid_user_account") })
-	private List<GxUserAccount> gxUserAccounts = new ArrayList<>();
+	private Set<GxUserAccount> userAccounts = new HashSet<>();
 
 	@ManyToMany
 	@JoinTable(name = "gx_access_key_security_policy_join", joinColumns = { @JoinColumn(name = "oid_security_policy") }, inverseJoinColumns = {
 			@JoinColumn(name = "oid_access_key") })
-	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
+	private Set<GxAccessKey> accessKeys = new HashSet<>();
 
-	public GxSecurityPolicy() {
+	public GxSecurityPolicyDocument addSecurityPolicyDocument(GxSecurityPolicyDocument document) {
+		securityPolicyDocuments.add(document);
+		document.setSecurityPolicy(this);
+		return document;
 	}
 
-	public Integer getOid() {
-		return this.oid;
+	public GxSecurityPolicyDocument removeSecurityPolicyDocument(GxSecurityPolicyDocument document) {
+		securityPolicyDocuments.add(document);
+		document.setSecurityPolicy(null);
+		return document;
 	}
 
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public Boolean getIsActive() {
-		return this.isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Boolean getIsProtected() {
-		return this.isProtected;
-	}
-
-	public void setIsProtected(Boolean isProtected) {
-		this.isProtected = isProtected;
-	}
-
-	public Integer getPriority() {
-		return this.priority;
-	}
-
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
-
-	public String getSecurityPolicyName() {
-		return this.securityPolicyName;
-	}
-
-	public void setSecurityPolicyName(String securityPolicyName) {
-		this.securityPolicyName = securityPolicyName;
-	}
-
-	public String getSecurityPolicyDescription() {
-		return securityPolicyDescription;
-	}
-
-	public void setSecurityPolicyDescription(String securityPolicyDescription) {
-		this.securityPolicyDescription = securityPolicyDescription;
-	}
-
-	public List<GxSecurityGroup> getGxSecurityGroups() {
-		return this.gxSecurityGroups;
-	}
-
-	public void setGxSecurityGroups(List<GxSecurityGroup> gxSecurityGroups) {
-		this.gxSecurityGroups = gxSecurityGroups;
-	}
-
-	public GxNamespace getGxNamespace() {
-		return this.gxNamespace;
-	}
-
-	public void setGxNamespace(GxNamespace gxNamespace) {
-		this.gxNamespace = gxNamespace;
-	}
-
-	public List<GxSecurityPolicyDocument> getGxSecurityPolicyDocuments() {
-		if (gxSecurityPolicyDocuments == null) {
-			gxSecurityPolicyDocuments = new ArrayList<>();
-		}
-		return gxSecurityPolicyDocuments;
-	}
-
-	public void setGxSecurityPolicyDocuments(List<GxSecurityPolicyDocument> gxSecurityPolicyDocuments) {
-		this.gxSecurityPolicyDocuments = gxSecurityPolicyDocuments;
-	}
-
-	public GxSecurityPolicyDocument addGxSecurityPolicyDocument(GxSecurityPolicyDocument gxSecurityPolicyDocument) {
-		getGxSecurityPolicyDocuments().add(gxSecurityPolicyDocument);
-		gxSecurityPolicyDocument.setGxSecurityPolicy(this);
-
-		return gxSecurityPolicyDocument;
-	}
-
-	public GxSecurityPolicyDocument removeGxSecurityPolicyDocument(GxSecurityPolicyDocument gxSecurityPolicyDocument) {
-		getGxSecurityPolicyDocuments().remove(gxSecurityPolicyDocument);
-		gxSecurityPolicyDocument.setGxSecurityPolicy(null);
-
-		return gxSecurityPolicyDocument;
-	}
-
-	public List<GxUserAccount> getGxUserAccounts() {
-		return this.gxUserAccounts;
-	}
-
-	public void setGxUserAccounts(List<GxUserAccount> gxUserAccounts) {
-		this.gxUserAccounts = gxUserAccounts;
-	}
-
-	public List<GxAccessKey> getGxAccessKeys() {
-		return gxAccessKeys;
-	}
-
-	public void setGxAccessKeys(List<GxAccessKey> gxAccessKeys) {
-		this.gxAccessKeys = gxAccessKeys;
+	public GxSecurityPolicyDocument defaultDocument() {
+		return securityPolicyDocuments.stream().filter(d -> d.getIsDefault()).findFirst().orElse(null);
 	}
 
 }

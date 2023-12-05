@@ -25,14 +25,14 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.ValidationException;
 
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
-public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderBean> {
+public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProvider> {
 
 	public GxTwilioSmsProviderForm() {
-		super(GxSmsProviderBean.class);
+		super(GxSmsProvider.class);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -49,7 +49,7 @@ public class GxTwilioSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 	private PasswordField authToken;
 
 	@Override
-	protected void postBinding(GxSmsProviderBean entity) {
+	protected void postBinding(GxSmsProvider entity) {
 		try {
 			configBuilder = GxSmsConfigProtos.TwilioConfig.parseFrom(entity.getConfigData()).toBuilder();
 			accountSid.setValue(configBuilder.getAccountSid());

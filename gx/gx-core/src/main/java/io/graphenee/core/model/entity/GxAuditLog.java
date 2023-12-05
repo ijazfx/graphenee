@@ -18,15 +18,11 @@ package io.graphenee.core.model.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,13 +30,8 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_audit_log")
-@NamedQuery(name = "GxAuditLog.findAll", query = "SELECT g FROM GxAuditLog g")
-public class GxAuditLog implements Serializable {
+public class GxAuditLog extends GxMappedSuperclass implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
 
 	private Timestamp auditDate;
 	private String auditEntity;
@@ -53,11 +44,11 @@ public class GxAuditLog implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "oid_user_account")
-	private GxUserAccount gxUserAccount;
+	private GxUserAccount userAccount;
 
 	public String getUsername() {
-		if (username == null && gxUserAccount != null) {
-			username = gxUserAccount.getUsername();
+		if (username == null && userAccount != null) {
+			username = userAccount.getUsername();
 		}
 		return username;
 	}

@@ -16,6 +16,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument> {

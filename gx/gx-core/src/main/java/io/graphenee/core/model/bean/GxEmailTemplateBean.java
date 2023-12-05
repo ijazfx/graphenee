@@ -18,17 +18,17 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 
 import io.graphenee.core.model.BeanFault;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Getter
+@Setter
+
 public class GxEmailTemplateBean implements Serializable {
 
 	private static final long serialVersionUID = 6239781437082703091L;
 
-	@Include
 	private Integer oid;
 
 	private String bccList;

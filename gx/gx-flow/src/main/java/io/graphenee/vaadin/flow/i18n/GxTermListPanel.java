@@ -21,9 +21,11 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Sort;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
@@ -34,6 +36,7 @@ import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
@@ -55,19 +58,19 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "termKey", "termSingular", "termPlural" };
+		return new String[] { "supportedLocale", "termKey", "termSingular", "termPlural" };
 	}
 
 	@Override
 	protected void decorateSearchForm(FormLayout searchForm, Binder<GxTerm> searchBinder) {
 		namespaceComboBox = new ComboBox<>("Namespace");
 		namespaceComboBox.setItemLabelGenerator(GxNamespace::getNamespace);
-		List<GxNamespace> gxNamespaceBeans = namespaceRepo.findAll();
-		namespaceComboBox.setItems(gxNamespaceBeans);
+		List<GxNamespace> namespaceBeans = namespaceRepo.findAll();
+		namespaceComboBox.setItems(namespaceBeans);
 
 		searchForm.add(namespaceComboBox);
 
-		searchBinder.bind(namespaceComboBox, "gxNamespace");
+		searchBinder.bind(namespaceComboBox, "namespace");
 
 		searchBinder.addValueChangeListener(vcl -> {
 			refresh();
@@ -75,21 +78,28 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 	}
 
 	@Override
+	protected void decorateColumn(String propertyName, Column<GxTerm> column) {
+		if (propertyName.matches("supportedLocale")) {
+			column.setHeader("Language");
+		}
+	}
+
+	@Override
 	protected void preEdit(GxTerm entity) {
-		if (getSearchEntity().getGxNamespace() != null) {
-			entity.setGxNamespace(getSearchEntity().getGxNamespace());
+		if (getSearchEntity().getNamespace() != null) {
+			entity.setNamespace(getSearchEntity().getNamespace());
 		}
 	}
 
 	public void initializeWithNamespace(GxNamespace namespace) {
-		getSearchEntity().setGxNamespace(namespace);
+		getSearchEntity().setNamespace(namespace);
 		refresh();
 	}
 
 	@Override
 	protected Stream<GxTerm> getData() {
-		if (getSearchEntity().getGxNamespace() != null) {
-			return termRepo.findByGxNamespaceOid(getSearchEntity().getGxNamespace().getOid()).stream();
+		if (getSearchEntity().getNamespace() != null) {
+			return termRepo.findByNamespace(getSearchEntity().getNamespace(), Sort.by("termKey")).stream();
 		}
 		return Stream.empty();
 	}
@@ -101,13 +111,13 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected void onSave(GxTerm entity) {
-		editorForm.saveGxTermEntities();
+		termRepo.save(entity);
 	}
 
 	@Override
 	protected void onDelete(Collection<GxTerm> entities) {
 		for (GxTerm entity : entities) {
-			termRepo.deleteByTermKeyAndOidNameSpace(entity.getTermKey(), entity.getGxNamespace().getOid());
+			termRepo.deleteByTermKeyAndNamespace(entity.getTermKey(), entity.getNamespace());
 		}
 	}
 

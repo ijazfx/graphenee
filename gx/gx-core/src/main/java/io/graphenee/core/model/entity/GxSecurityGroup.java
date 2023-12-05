@@ -16,149 +16,50 @@
 package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * The persistent class for the gx_security_group database table.
- */
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_security_group")
-@NamedQuery(name = "GxSecurityGroup.findAll", query = "SELECT g FROM GxSecurityGroup g")
-public class GxSecurityGroup implements Serializable {
+public class GxSecurityGroup extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "is_active")
-	private Boolean isActive;
-
-	@Column(name = "is_protected")
-	private Boolean isProtected;
-
-	private Integer priority;
-
-	@Column(name = "security_group_name")
+	private Boolean isActive = true;
+	private Boolean isProtected = false;
+	private Integer priority = 0;
 	private String securityGroupName;
-
-	@Column(name = "security_group_description")
 	private String securityGroupDescription;
 
-	// bi-directional many-to-one association to GxNamespace
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
-	private GxNamespace gxNamespace;
+	private GxNamespace namespace;
 
 	@ManyToMany
 	@JoinTable(name = "gx_security_group_security_policy_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
 			@JoinColumn(name = "oid_security_policy") })
-	private List<GxSecurityPolicy> gxSecurityPolicies = new ArrayList<>();
+	private Set<GxSecurityPolicy> securityPolicies = new HashSet<>();
 
 	@ManyToMany
 	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
 			@JoinColumn(name = "oid_user_account") })
-	private List<GxUserAccount> gxUserAccounts = new ArrayList<>();
+	private Set<GxUserAccount> userAccounts = new HashSet<>();
 
 	@ManyToMany
 	@JoinTable(name = "gx_access_key_security_group_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
 			@JoinColumn(name = "oid_access_key") })
-	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
-
-	public GxSecurityGroup() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public Boolean getIsActive() {
-		return this.isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Boolean getIsProtected() {
-		return this.isProtected;
-	}
-
-	public void setIsProtected(Boolean isProtected) {
-		this.isProtected = isProtected;
-	}
-
-	public Integer getPriority() {
-		return this.priority;
-	}
-
-	public void setPriority(Integer priority) {
-		this.priority = priority;
-	}
-
-	public String getSecurityGroupName() {
-		return this.securityGroupName;
-	}
-
-	public void setSecurityGroupName(String securityGroupName) {
-		this.securityGroupName = securityGroupName;
-	}
-
-	public String getSecurityGroupDescription() {
-		return securityGroupDescription;
-	}
-
-	public void setSecurityGroupDescription(String securityGroupDescription) {
-		this.securityGroupDescription = securityGroupDescription;
-	}
-
-	public GxNamespace getGxNamespace() {
-		return this.gxNamespace;
-	}
-
-	public void setGxNamespace(GxNamespace gxNamespace) {
-		this.gxNamespace = gxNamespace;
-	}
-
-	public List<GxSecurityPolicy> getGxSecurityPolicies() {
-		return this.gxSecurityPolicies;
-	}
-
-	public void setGxSecurityPolicies(List<GxSecurityPolicy> gxSecurityPolicies) {
-		this.gxSecurityPolicies = gxSecurityPolicies;
-	}
-
-	public List<GxUserAccount> getGxUserAccounts() {
-		return this.gxUserAccounts;
-	}
-
-	public void setGxUserAccounts(List<GxUserAccount> gxUserAccounts) {
-		this.gxUserAccounts = gxUserAccounts;
-	}
-
-	public List<GxAccessKey> getGxAccessKeys() {
-		return gxAccessKeys;
-	}
-
-	public void setGxAccessKeys(List<GxAccessKey> gxAccessKeys) {
-		this.gxAccessKeys = gxAccessKeys;
-	}
+	private Set<GxAccessKey> accessKeys = new HashSet<>();
 
 }

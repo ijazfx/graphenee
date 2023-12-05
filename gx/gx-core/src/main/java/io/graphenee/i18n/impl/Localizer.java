@@ -28,7 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxTermBean;
+import io.graphenee.core.model.entity.GxTerm;
 
 final class Localizer {
 
@@ -54,7 +54,7 @@ final class Localizer {
 		singularTerms = CacheBuilder.newBuilder().maximumSize(DEFAULT_SINGULAR_MAP_MAX_SIZE).expireAfterWrite(15, TimeUnit.MINUTES).build();
 		termPlurals = CacheBuilder.newBuilder().maximumSize(DEFAULT_PLURAL_MAP_MAX_SIZE).expireAfterWrite(15, TimeUnit.MINUTES).build();
 
-		List<GxTermBean> terms = dataService.findTermByLocale(locale);
+		List<GxTerm> terms = dataService.findTermByLocale(locale);
 		if (terms.size() > 0) {
 			terms.parallelStream().forEach(term -> {
 				if (term.getTermSingular() != null) {
@@ -111,7 +111,7 @@ final class Localizer {
 				@Override
 				public String call() throws Exception {
 
-					GxTermBean term = dataService.findEffectiveTermByTermKeyAndLocale(termKey, locale);
+					GxTerm term = dataService.findEffectiveTermByTermKeyAndLocale(termKey, locale);
 					if (term != null && term.getTermKey().equals(termKey) && !Strings.isNullOrEmpty(term.getTermSingular())) {
 						return term.getTermSingular();
 					}
@@ -138,7 +138,7 @@ final class Localizer {
 				@Override
 				public String call() throws Exception {
 
-					GxTermBean term = dataService.findEffectiveTermByTermKeyAndLocale(termKey, locale);
+					GxTerm term = dataService.findEffectiveTermByTermKeyAndLocale(termKey, locale);
 					if (term != null && term.getTermKey().equals(termKey) && !Strings.isNullOrEmpty(term.getTermPlural())) {
 						return term.getTermPlural();
 					}

@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.json.JSONObject;
+
+import io.graphenee.core.model.GxMappedSuperclass;
+import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -17,29 +21,18 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-
-import org.json.JSONObject;
-
-import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
-import lombok.EqualsAndHashCode;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode.Include;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-public class GxFolder implements Serializable, GxDocumentExplorerItem {
+@Table(name = "gx_folder")
+public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocumentExplorerItem {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer oid;
-
-	UUID folderId = UUID.randomUUID();
-
-	@Include
 	String name;
 
 	String note;
@@ -49,12 +42,10 @@ public class GxFolder implements Serializable, GxDocumentExplorerItem {
 
 	Integer sortOrder = 0;
 
-	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_folder")
 	GxFolder folder;
 
-	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
 	GxNamespace namespace;
@@ -73,7 +64,7 @@ public class GxFolder implements Serializable, GxDocumentExplorerItem {
 		GxAuditLog log = new GxAuditLog();
 		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
 		log.setAuditEvent(event);
-		log.setGxUserAccount(user);
+		log.setUserAccount(user);
 		auditLogs.add(log);
 	}
 

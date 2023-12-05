@@ -19,86 +19,26 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The persistent class for the gx_currency database table.
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_currency")
-@NamedQuery(name = "GxCurrency.findAll", query = "SELECT g FROM GxCurrency g")
 public class GxCurrency extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
 
 	@Column(name = "alpha3_code")
 	private String alpha3Code;
 
-	@Column(name = "numeric_code")
 	private Integer numericCode;
-
-	@Column(name = "currency_name")
 	private String currencyName;
-
-	@Column(name = "currency_symbol")
 	private String currencySymbol;
-
-	@Column(name = "is_active")
-	private Boolean isActive;
-
-	public Integer getOid() {
-		return oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public Integer getNumericCode() {
-		return numericCode;
-	}
-
-	public void setNumericCode(Integer numericCode) {
-		this.numericCode = numericCode;
-	}
-
-	public String getAlpha3Code() {
-		return alpha3Code;
-	}
-
-	public void setAlpha3Code(String alpha3Code) {
-		this.alpha3Code = alpha3Code;
-	}
-
-	public String getCurrencyName() {
-		return currencyName;
-	}
-
-	public void setCurrencyName(String currencyName) {
-		this.currencyName = currencyName;
-	}
-
-	public String getCurrencySymbol() {
-		return currencySymbol;
-	}
-
-	public void setCurrencySymbol(String currencySymbol) {
-		this.currencySymbol = currencySymbol;
-	}
-
-	public Boolean getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
+	private Boolean isActive = true;
 
 }

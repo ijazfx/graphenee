@@ -26,21 +26,22 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
-public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProviderBean> {
+public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProvider> {
 
 	@Autowired
 	GxDataService dataService;
 
-	GxAbstractEntityForm<GxSmsProviderBean> editorForm;
+	GxAbstractEntityForm<GxSmsProvider> editorForm;
 
 	public GxSmsProviderListPanel() {
-		super(GxSmsProviderBean.class);
+		super(GxSmsProvider.class);
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProviderBe
 	}
 
 	@Override
-	protected void preEdit(GxSmsProviderBean item) {
+	protected void preEdit(GxSmsProvider item) {
 		if (item.getProviderName().equals(SmsProvider.AWS.getProviderName()))
 			editorForm = new GxAwsSmsProviderForm();
 		else if (item.getProviderName().equals(SmsProvider.TWILIO.getProviderName()))
@@ -61,29 +62,29 @@ public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProviderBe
 	}
 
 	@Override
-	protected void onGridItemClicked(ItemClickEvent<GxSmsProviderBean> icl) {
+	protected void onGridItemClicked(ItemClickEvent<GxSmsProvider> icl) {
 		String propertyId = icl.getColumn().getId().orElse(null);
 		if (propertyId != null && !propertyId.equals("isPrimary"))
 			super.onGridItemClicked(icl);
 	}
 
 	@Override
-	protected Stream<GxSmsProviderBean> getData() {
+	protected Stream<GxSmsProvider> getData() {
 		return dataService.findSmsProvider().stream();
 	}
 
 	@Override
-	protected GxAbstractEntityForm<GxSmsProviderBean> getEntityForm(GxSmsProviderBean entity) {
+	protected GxAbstractEntityForm<GxSmsProvider> getEntityForm(GxSmsProvider entity) {
 		return editorForm;
 	}
 
 	@Override
-	protected void onSave(GxSmsProviderBean entity) {
-		dataService.createOrUpdate(entity);
+	protected void onSave(GxSmsProvider entity) {
+		dataService.save(entity);
 	}
 
 	@Override
-	protected void onDelete(Collection<GxSmsProviderBean> entities) {
+	protected void onDelete(Collection<GxSmsProvider> entities) {
 	}
 
 }

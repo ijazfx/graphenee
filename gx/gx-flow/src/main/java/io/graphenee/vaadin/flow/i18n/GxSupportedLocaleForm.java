@@ -26,6 +26,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxSupportedLocaleForm extends GxAbstractEntityForm<GxSupportedLocale> {

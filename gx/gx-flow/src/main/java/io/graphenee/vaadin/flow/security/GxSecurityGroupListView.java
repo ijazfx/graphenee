@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
-import io.graphenee.core.model.bean.GxNamespaceBean;
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
@@ -19,7 +19,7 @@ public class GxSecurityGroupListView extends GxVerticalLayoutView {
 	GxSecurityGroupList list;
 
 	@Autowired(required = false)
-	GxNamespaceBean namespace;
+	GxNamespace namespace;
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {

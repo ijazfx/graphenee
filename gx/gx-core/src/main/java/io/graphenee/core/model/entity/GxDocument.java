@@ -4,50 +4,37 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+import org.json.JSONObject;
+
+import io.graphenee.core.model.GxMappedSuperclass;
+import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
+import io.graphenee.util.TRCalendarUtil;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-
-import org.json.JSONObject;
-
-import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
-import io.graphenee.util.TRCalendarUtil;
-import lombok.EqualsAndHashCode;
-import lombok.EqualsAndHashCode.Include;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-public class GxDocument implements Serializable, GxDocumentExplorerItem {
+@Table(name = "gx_document")
+public class GxDocument extends GxMappedSuperclass implements Serializable, GxDocumentExplorerItem {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer oid;
-
-	UUID documentId = UUID.randomUUID();
-
-	@Include
 	String name;
 
 	String note;
 	String mimeType;
 	Long size;
 
-	@Include
 	Integer versionNo = 0;
 	String path;
 
@@ -59,17 +46,14 @@ public class GxDocument implements Serializable, GxDocumentExplorerItem {
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
 
-	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_document")
 	GxDocument document;
 
-	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_folder")
 	GxFolder folder;
 
-	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
 	GxNamespace namespace;
@@ -85,7 +69,7 @@ public class GxDocument implements Serializable, GxDocumentExplorerItem {
 		GxAuditLog log = new GxAuditLog();
 		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
 		log.setAuditEvent(event);
-		log.setGxUserAccount(user);
+		log.setUserAccount(user);
 		auditLogs.add(log);
 	}
 

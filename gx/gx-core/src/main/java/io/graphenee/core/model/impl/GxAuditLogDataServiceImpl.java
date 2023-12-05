@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,7 +70,7 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 					GxUserAccountBean uab = (GxUserAccountBean) du.getUser();
 					GxUserAccount ua = uaRepo.findById(uab.getOid()).orElse(null);
 					if (ua != null) {
-						l.setGxUserAccount(ua);
+						l.setUserAccount(ua);
 					}
 				}
 			}
@@ -90,13 +89,8 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 	}
 
 	@Override
-	public List<GxAuditLog> fetch(int pageNumber, int pageSize, GxAuditLog se, List<Order> orders) {
-		PageRequest pr = null;
-		if (orders != null && orders.size() > 0) {
-			pr = PageRequest.of(pageNumber, pageSize, Sort.by(orders));
-		} else {
-			pr = PageRequest.of(pageNumber, pageSize);
-		}
+	public List<GxAuditLog> fetch(int pageNumber, int pageSize, GxAuditLog se, Sort sort) {
+		PageRequest pr = PageRequest.of(pageNumber, pageSize, sort);
 		return alRepo.findAll(makeJpaSpec(se), pr).getContent();
 	}
 

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.util.enums;
 
+import java.util.stream.Stream;
+
 public enum GenderEnum {
 	Male("M"),
 	Female("F"),
@@ -28,6 +30,10 @@ public enum GenderEnum {
 
 	public String getGenderCode() {
 		return genderCode;
+	}
+
+	public static GenderEnum genderByGenderCode(String genderCode) {
+		return Stream.of(values()).filter(v -> v.getGenderCode().equals(genderCode)).findFirst().orElse(null);
 	}
 
 }

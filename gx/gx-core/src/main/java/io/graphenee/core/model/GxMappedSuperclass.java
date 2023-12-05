@@ -15,12 +15,47 @@
  *******************************************************************************/
 package io.graphenee.core.model;
 
-import jakarta.persistence.MappedSuperclass;
+import java.util.Objects;
+import java.util.UUID;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @MappedSuperclass
 public class GxMappedSuperclass {
 
 	// @Version
 	// protected Integer version;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer oid;
+
+	@Transient
+	private UUID uuid = UUID.randomUUID();
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		GxMappedSuperclass src = (GxMappedSuperclass) obj;
+		if (oid == null && src.oid == null)
+			return uuid.equals(src.uuid);
+		return oid.equals(src.oid);
+	}
+
+	@Override
+	public int hashCode() {
+		if (oid != null)
+			return Objects.hashCode(oid);
+		return Objects.hashCode(uuid);
+	}
 
 }

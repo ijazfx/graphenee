@@ -17,14 +17,14 @@ package io.graphenee.core.model.api;
 
 import java.util.List;
 
-import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.domain.Sort;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.entity.GxAuditLog;
 
 public interface GxAuditLogDataService {
 
-	List<GxAuditLog> fetch(int pageNumber, int pageSize, GxAuditLog se, List<Order> orders);
+	List<GxAuditLog> fetch(int pageNumber, int pageSize, GxAuditLog se, Sort sort);
 
 	int count(GxAuditLog se);
 

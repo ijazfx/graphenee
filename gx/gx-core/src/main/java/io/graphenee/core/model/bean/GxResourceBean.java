@@ -29,7 +29,7 @@ public class GxResourceBean implements Serializable {
 	private String resourceName;
 	private String resourceDescription;
 	private Boolean isActive = true;
-	private BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault;
+	private BeanFault<Integer, GxNamespaceBean> namespaceBeanFault;
 
 	public Integer getOid() {
 		return oid;
@@ -55,12 +55,12 @@ public class GxResourceBean implements Serializable {
 		this.isActive = isActive;
 	}
 
-	public BeanFault<Integer, GxNamespaceBean> getGxNamespaceBeanFault() {
-		return gxNamespaceBeanFault;
+	public BeanFault<Integer, GxNamespaceBean> getNamespaceBeanFault() {
+		return namespaceBeanFault;
 	}
 
-	public void setGxNamespaceBeanFault(BeanFault<Integer, GxNamespaceBean> gxNamespaceBeanFault) {
-		this.gxNamespaceBeanFault = gxNamespaceBeanFault;
+	public void setNamespaceBeanFault(BeanFault<Integer, GxNamespaceBean> namespaceBeanFault) {
+		this.namespaceBeanFault = namespaceBeanFault;
 	}
 
 	public String getResourceDescription() {

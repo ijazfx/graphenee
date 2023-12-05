@@ -13,6 +13,7 @@ import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
+@SuppressWarnings("serial")
 @Component
 @Scope("prototype")
 public class GxNamespaceList extends GxAbstractEntityList<GxNamespace> {
@@ -50,7 +51,7 @@ public class GxNamespaceList extends GxAbstractEntityList<GxNamespace> {
 	@Override
 	protected void onDelete(Collection<GxNamespace> entities) {
 		if (entities.stream().filter(e -> e.getIsProtected()).count() == 0)
-			repo.deleteInBatch(entities);
+			repo.deleteAllInBatch(entities);
 	}
 
 	@Override

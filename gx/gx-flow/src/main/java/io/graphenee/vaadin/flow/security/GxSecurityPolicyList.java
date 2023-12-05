@@ -7,22 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.data.binder.Binder;
-
-import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.api.GxAuditLogDataService;
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.bean.GxSecurityPolicyBean;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
 @Component
 @Scope("prototype")
-public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicyBean> {
+public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicy> {
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
@@ -34,14 +29,14 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicyB
 	@Autowired
 	GxSecurityPolicyForm securityPolicyForm;
 
-	private GxNamespaceBean namespace;
+	private GxNamespace namespace;
 
 	public GxSecurityPolicyList() {
-		super(GxSecurityPolicyBean.class);
+		super(GxSecurityPolicy.class);
 	}
 
 	@Override
-	protected Stream<GxSecurityPolicyBean> getData() {
+	protected Stream<GxSecurityPolicy> getData() {
 		if (namespace == null)
 			return dataService.findSecurityPolicy().stream();
 		return dataService.findSecurityPolicyByNamespace(namespace).stream();
@@ -53,49 +48,30 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicyB
 	}
 
 	@Override
-	protected GxAbstractEntityForm<GxSecurityPolicyBean> getEntityForm(GxSecurityPolicyBean entity) {
+	protected GxAbstractEntityForm<GxSecurityPolicy> getEntityForm(GxSecurityPolicy entity) {
 		return securityPolicyForm;
 	}
 
 	@Override
-	protected void onSave(GxSecurityPolicyBean entity) {
+	protected void onSave(GxSecurityPolicy entity) {
 		dataService.save(entity);
 	}
 
 	@Override
-	protected void onDelete(Collection<GxSecurityPolicyBean> entities) {
-		for (GxSecurityPolicyBean entity : entities) {
+	protected void onDelete(Collection<GxSecurityPolicy> entities) {
+		for (GxSecurityPolicy entity : entities) {
 			dataService.delete(entity);
 		}
 	}
 
-	protected void preEdit(GxSecurityPolicyBean entity) {
+	protected void preEdit(GxSecurityPolicy entity) {
 		if (entity.getOid() == null) {
-			if (namespace == null) {
-				namespace = dataService.findSystemNamespace();
-			}
-			entity.setNamespaceFault(new BeanFault<>(namespace.getOid(), namespace));
+			entity.setNamespace(namespace);
 		}
 	}
 
-	@Override
-	protected void decorateSearchForm(FormLayout searchForm, Binder<GxSecurityPolicyBean> searchBinder) {
-		ComboBox<GxNamespaceBean> namespaceComboBox = new ComboBox<>("Namespace");
-		namespaceComboBox.setItemLabelGenerator(GxNamespaceBean::getNamespace);
-		namespaceComboBox.setClearButtonVisible(true);
-		namespaceComboBox.setItems(dataService.findNamespace());
-		namespaceComboBox.setValue(namespace);
-
-		namespaceComboBox.addValueChangeListener(vcl -> {
-			namespace = vcl.getValue();
-			refresh();
-		});
-
-		searchForm.add(namespaceComboBox);
-	}
-
-	public void initializeWithNamespace(GxNamespaceBean namespace) {
-		this.namespace = namespace;
+	public void initializeWithNamespace(GxNamespace namespace) {
+		this.namespace = namespace != null ? namespace : dataService.systemNamespace();
 		refresh();
 	}
 
@@ -105,7 +81,7 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicyB
 	}
 
 	@Override
-	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<GxSecurityPolicyBean> entities) {
+	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<GxSecurityPolicy> entities) {
 		entities.forEach(e -> {
 			auditService.log(user, remoteAddress, auditEvent, e.getSecurityPolicyName(), auditEntity, e.getOid());
 		});

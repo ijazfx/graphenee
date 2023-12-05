@@ -1,9 +1,9 @@
 package io.graphenee.core.model.jpa.converter;
 
+import org.json.JSONObject;
+
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-
-import org.json.JSONObject;
 
 @Converter(autoApply = false)
 public class GxStringToJsonConverter implements AttributeConverter<JSONObject, String> {

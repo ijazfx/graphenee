@@ -17,85 +17,35 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The persistent class for the gx_namespace_property database table.
- * 
  */
+@Getter
+@Setter
+
 @Entity
 @Table(name = "gx_namespace_property")
-@NamedQuery(name = "GxNamespaceProperty.findAll", query = "SELECT g FROM GxNamespaceProperty g")
-public class GxNamespaceProperty implements Serializable {
+public class GxNamespaceProperty extends GxMappedSuperclass implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "property_default_value")
 	private String propertyDefaultValue;
-
-	@Column(name = "property_key")
 	private String propertyKey;
-
-	@Column(name = "property_value")
 	private String propertyValue;
 
 	//bi-directional many-to-one association to GxNamespace
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
-	private GxNamespace gxNamespace;
-
-	public GxNamespaceProperty() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public String getPropertyDefaultValue() {
-		return this.propertyDefaultValue;
-	}
-
-	public void setPropertyDefaultValue(String propertyDefaultValue) {
-		this.propertyDefaultValue = propertyDefaultValue;
-	}
-
-	public String getPropertyKey() {
-		return this.propertyKey;
-	}
-
-	public void setPropertyKey(String propertyKey) {
-		this.propertyKey = propertyKey;
-	}
-
-	public String getPropertyValue() {
-		return this.propertyValue;
-	}
-
-	public void setPropertyValue(String propertyValue) {
-		this.propertyValue = propertyValue;
-	}
-
-	public GxNamespace getGxNamespace() {
-		return this.gxNamespace;
-	}
-
-	public void setGxNamespace(GxNamespace gxNamespace) {
-		this.gxNamespace = gxNamespace;
-	}
+	private GxNamespace namespace;
 
 }

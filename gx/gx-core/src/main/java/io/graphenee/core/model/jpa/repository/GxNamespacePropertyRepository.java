@@ -17,16 +17,18 @@ package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxNamespaceProperty;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
 public interface GxNamespacePropertyRepository extends GxJpaRepository<GxNamespaceProperty, Integer> {
 
-	List<GxNamespaceProperty> findAllByGxNamespaceOidOrderByPropertyKey(Integer oidNamespace);
+	List<GxNamespaceProperty> findAllByNamespaceOrderByPropertyKey(GxNamespace namespace, Sort sort);
 
-	GxNamespaceProperty findOneByGxNamespaceOidAndPropertyKey(Integer oidNamespace, String propertyKey);
+	GxNamespaceProperty findOneByNamespaceAndPropertyKey(GxNamespace namespace, String propertyKey);
 
 }

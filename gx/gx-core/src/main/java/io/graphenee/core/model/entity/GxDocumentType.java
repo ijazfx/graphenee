@@ -2,27 +2,25 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
 import org.json.JSONObject;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
-import lombok.Data;
-import lombok.EqualsAndHashCode.Include;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
-public class GxDocumentType implements Serializable {
+@Table(name = "gx_document_type")
+public class GxDocumentType extends GxMappedSuperclass implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer oid;
+	private static final long serialVersionUID = 1L;
 
 	String name;
 	String note;
@@ -30,7 +28,6 @@ public class GxDocumentType implements Serializable {
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
 
-	@Include
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
 	GxNamespace namespace;

@@ -15,11 +15,17 @@
  *******************************************************************************/
 package io.graphenee.core.model.jpa.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Sort;
+
 import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 public interface GxSavedQueryRepository extends GxJpaRepository<GxSavedQuery, Integer> {
 
 	GxSavedQuery findByQueryNameAndTargetUser(String queryName, String targetUser);
+
+	List<GxSavedQuery> findAllByTargetUser(String targetUser, Sort sort);
 
 }

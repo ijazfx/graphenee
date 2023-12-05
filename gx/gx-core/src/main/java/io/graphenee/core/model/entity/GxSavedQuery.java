@@ -17,91 +17,24 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * The persistent class for the gx_saved_query database table.
- */
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_saved_query")
-@NamedQuery(name = "GxSavedQuery.findAll", query = "SELECT s FROM GxSavedQuery s")
-public class GxSavedQuery implements Serializable {
+public class GxSavedQuery extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "query_bean_json")
 	private String queryBeanJson;
-
-	@Column(name = "query_name")
 	private String queryName;
-
-	@Column(name = "target_user")
 	private String targetUser;
-
-	@Column(name = "query_bean_class_name")
 	private String queryBeanClassName;
-
-	@Column(name = "additional_info")
 	private String additionalInfo;
-
-	public GxSavedQuery() {
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public String getQueryBeanJson() {
-		return this.queryBeanJson;
-	}
-
-	public void setQueryBeanJson(String queryBeanJson) {
-		this.queryBeanJson = queryBeanJson;
-	}
-
-	public String getQueryName() {
-		return this.queryName;
-	}
-
-	public void setQueryName(String queryName) {
-		this.queryName = queryName;
-	}
-
-	public String getTargetUser() {
-		return this.targetUser;
-	}
-
-	public void setTargetUser(String targetUser) {
-		this.targetUser = targetUser;
-	}
-
-	public String getQueryBeanClassName() {
-		return queryBeanClassName;
-	}
-
-	public void setQueryBeanClassName(String queryBeanClassName) {
-		this.queryBeanClassName = queryBeanClassName;
-	}
-
-	public String getAdditionalInfo() {
-		return additionalInfo;
-	}
-
-	public void setAdditionalInfo(String additionalInfo) {
-		this.additionalInfo = additionalInfo;
-	}
 
 }

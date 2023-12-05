@@ -11,10 +11,10 @@ import io.graphenee.core.model.jpa.GxJpaRepository;
 @Repository
 public interface GxRegisteredDeviceRepository extends GxJpaRepository<GxRegisteredDevice, Integer>, JpaSpecificationExecutor<GxRegisteredDevice> {
 
-	List<GxRegisteredDevice> findByGxNamespaceNamespace(String namespace);
+	List<GxRegisteredDevice> findByNamespaceNamespace(String namespace);
 
-	GxRegisteredDevice findByGxNamespaceNamespaceAndDeviceToken(String namespace, String deviceToken);
+	GxRegisteredDevice findByNamespaceNamespaceAndDeviceToken(String namespace, String deviceToken);
 
-	GxRegisteredDevice findByGxNamespaceNamespaceAndDeviceTokenAndOwnerId(String namespace, String deviceToken, String ownerId);
+	GxRegisteredDevice findByNamespaceNamespaceAndDeviceTokenAndOwnerId(String namespace, String deviceToken, String ownerId);
 
 }

@@ -15,20 +15,13 @@
  *******************************************************************************/
 package io.graphenee.core;
 
-import javax.sql.DataSource;
-
-import org.flywaydb.core.Flyway;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.google.common.eventbus.EventBus;
-
-import io.graphenee.util.DataSourceUtil;
 
 @Configuration
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
@@ -39,22 +32,6 @@ public class GrapheneeCoreConfiguration {
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core";
 	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
 	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
-
-	@ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", matchIfMissing = false)
-	@Bean
-	FlywayMigrationInitializer flywayInitializer(Flyway flyway) {
-		return new FlywayMigrationInitializer(flyway, f -> {
-			migrate(f);
-		});
-	}
-
-	public void migrate(Flyway flyway) {
-		DataSource dataSource = flyway.getConfiguration().getDataSource();
-		String dbVendor = DataSourceUtil.determineDbVendor(dataSource);
-		Flyway fw = Flyway.configure().dataSource(dataSource).locations("classpath:db/graphenee/migration/" + dbVendor).table("graphenee_schema_version").baselineOnMigrate(true)
-				.baselineVersion("0").load();
-		fw.migrate();
-	}
 
 	@Bean
 	EventBus coreEventBus() {

@@ -2,6 +2,7 @@ package io.graphenee.vaadin.flow.security;
 
 import java.util.List;
 
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,22 +21,22 @@ import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxSecurityGroupBean;
-import io.graphenee.core.model.bean.GxSecurityPolicyBean;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
+import io.graphenee.core.model.entity.GxUserAccount;
+import io.graphenee.security.api.GxPasswordPolicyDataService;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxTabItem;
 import io.graphenee.vaadin.flow.component.FileUploader;
-import io.graphenee.vaadin.flow.converter.BeanCollectionFaultToSetConverter;
 
 @Component
 @Scope("prototype")
-public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
+public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
 	private static final long serialVersionUID = 1L;
 
 	public GxUserAccountForm() {
-		super(GxUserAccountBean.class);
+		super(GxUserAccount.class);
 	}
 
 	private TextField username;
@@ -46,16 +47,19 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 	private Checkbox isLocked;
 	private Checkbox isPasswordChangeRequired;
 	private PasswordField newPassword;
-	private PasswordField password;
+	private PasswordField confirmPassword;
 	FileUploader imageUploader;
-	private TwinColGrid<GxSecurityPolicyBean> securityPolicyCollectionFault;
-	private TwinColGrid<GxSecurityGroupBean> securityGroupCollectionFault;
+	private TwinColGrid<GxSecurityPolicy> securityPolicies;
+	private TwinColGrid<GxSecurityGroup> securityGroups;
 
 	@Autowired
-	GxDataService gxDataService;
+	GxDataService dataService;
 
 	@Autowired
 	private FileStorage storage;
+
+	@Autowired
+	GxPasswordPolicyDataService passwordPolicyService;
 
 	@Override
 	protected void decorateForm(HasComponents entityForm) {
@@ -68,13 +72,13 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 		isActive = new Checkbox("Is Active?");
 		isLocked = new Checkbox("Is Locked?");
 		isPasswordChangeRequired = new Checkbox("Is Password Change Required?");
-		securityPolicyCollectionFault = new TwinColGrid<GxSecurityPolicyBean>().addFilterableColumn(GxSecurityPolicyBean::getSecurityPolicyName, "Policy Name", "Policy Name", true)
-				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-		securityPolicyCollectionFault.setSizeFull();
+		securityPolicies = new TwinColGrid<GxSecurityPolicy>().addFilterableColumn(GxSecurityPolicy::getSecurityPolicyName, "Policy Name", "Policy Name", true)
+				.withAvailableGridCaption("Available").withSelectionGridCaption("Selected").withDragAndDropSupport();
+		securityPolicies.setSizeFull();
 
-		securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>().addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
-				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-		securityGroupCollectionFault.setSizeFull();
+		securityGroups = new TwinColGrid<GxSecurityGroup>().addFilterableColumn(GxSecurityGroup::getSecurityGroupName, "Group Name", "Group Name", true)
+				.withAvailableGridCaption("Available").withSelectionGridCaption("Selected").withDragAndDropSupport();
+		securityGroups.setSizeFull();
 
 		// Radio Buttons for gender
 		// gender = new RadioButtonGroup<>();
@@ -86,12 +90,14 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 		// System.err.println(GenderEnum.valueOf("M"));
 
 		newPassword = new PasswordField("New Password");
+		newPassword.setAutocomplete(null);
 		newPassword.setValueChangeMode(ValueChangeMode.EAGER);
 
-		password = new PasswordField("Confirm Password");
+		confirmPassword = new PasswordField("Confirm Password");
+		confirmPassword.setAutocomplete(null);
 		newPassword.addValueChangeListener(vcl -> {
-			password.clear();
-			password.setEnabled(vcl.getValue().length() > 0);
+			confirmPassword.clear();
+			confirmPassword.setEnabled(vcl.getValue().length() > 0);
 		});
 
 		imageUploader = new FileUploader("Profile Image");
@@ -101,7 +107,7 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 			System.err.println(event.getValue());
 		});
 
-		entityForm.add(firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, username, newPassword, password, imageUploader);
+		entityForm.add(firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, username, newPassword, confirmPassword, imageUploader);
 
 		setColspan(email, 2);
 		setColspan(username, 2);
@@ -110,12 +116,26 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 	}
 
 	@Override
-	protected void bindFields(Binder<GxUserAccountBean> dataBinder) {
+	protected void bindFields(Binder<GxUserAccount> dataBinder) {
 		dataBinder.forMemberField(username).asRequired();
 		dataBinder.forMemberField(email).withValidator(new EmailValidator("Must be a valid email address"));
-		dataBinder.forMemberField(securityPolicyCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityPolicyBean>());
-		dataBinder.forMemberField(securityGroupCollectionFault).withConverter(new BeanCollectionFaultToSetConverter<GxSecurityGroupBean>());
-		dataBinder.forMemberField(password).withValidator(new Validator<String>() {
+		dataBinder.forMemberField(newPassword).withValidator(new Validator<String>() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public ValidationResult apply(String value, ValueContext context) {
+				if (Strings.isBlank(value))
+					return ValidationResult.ok();
+				try {
+					passwordPolicyService.assertPasswordPolicy(getEntity().getNamespace(), getEntity().getUsername(), value);
+					return ValidationResult.ok();
+				} catch (AssertionError e) {
+					return ValidationResult.error(e.getMessage());
+				}
+			}
+		});
+		dataBinder.forMemberField(confirmPassword).withValidator(new Validator<String>() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -132,16 +152,16 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccountBean> {
 
 	@Override
 	protected void addTabsToForm(List<GxTabItem> tabItems) {
-		tabItems.add(GxTabItem.create(1, "Policies", securityPolicyCollectionFault));
-		tabItems.add(GxTabItem.create(2, "Groups", securityGroupCollectionFault));
+		tabItems.add(GxTabItem.create(1, "Policies", securityPolicies));
+		tabItems.add(GxTabItem.create(2, "Groups", securityGroups));
 	}
 
 	@Override
-	protected void preBinding(GxUserAccountBean entity) {
+	protected void preBinding(GxUserAccount entity) {
 		newPassword.clear();
-		password.setEnabled(false);
-		securityPolicyCollectionFault.setItems(gxDataService.findSecurityPolicyByNamespaceActive(entity.getNamespaceFault().getBean()));
-		securityGroupCollectionFault.setItems(gxDataService.findSecurityGroupByNamespaceActive(entity.getNamespaceFault().getBean()));
+		confirmPassword.setEnabled(false);
+		securityPolicies.setItems(dataService.findSecurityPolicyByNamespaceActive(entity.getNamespace()));
+		securityGroups.setItems(dataService.findSecurityGroupByNamespaceActive(entity.getNamespace()));
 	}
 
 }

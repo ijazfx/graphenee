@@ -21,6 +21,7 @@ public class GxLazyComboBox<T> extends ComboBox<T> {
 	}
 
 	public GxLazyComboBox() {
+		@SuppressWarnings("serial")
 		CallbackDataProvider.FetchCallback<T, String> findCallback = new CallbackDataProvider.FetchCallback<T, String>() {
 
 			@Override
@@ -29,6 +30,7 @@ public class GxLazyComboBox<T> extends ComboBox<T> {
 			}
 		};
 
+		@SuppressWarnings("serial")
 		CallbackDataProvider.CountCallback<T, String> countCallback = new CallbackDataProvider.CountCallback<T, String>() {
 
 			@Override

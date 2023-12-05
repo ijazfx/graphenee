@@ -54,7 +54,7 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 	GxTermRepository termRepo;
 
 	@Autowired
-	GxTermTablePanel gxTermTablePanel;
+	GxTermTablePanel termTablePanel;
 
 	@Autowired
 	LocalizerService localizer;
@@ -70,11 +70,11 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 		termKey = new TextField("Term Key");
 		isActive = new Checkbox("Is Active?", true);
 
-		gxTermTablePanel.initializeWithEntity(getEntity());
-		gxTermTablePanel.setHeight("480px");
+		termTablePanel.initializeWithEntity(getEntity());
+		termTablePanel.setHeight("480px");
 
-		entityForm.add(termKey, isActive, gxTermTablePanel);
-		setColspan(gxTermTablePanel, 2);
+		entityForm.add(termKey, isActive, termTablePanel);
+		setColspan(termTablePanel, 2);
 	}
 
 	@Override
@@ -84,13 +84,13 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 
 	@Override
 	protected void postBinding(GxTerm entity) {
-		gxTermTablePanel.initializeWithEntity(entity);
+		termTablePanel.initializeWithEntity(entity);
 	}
 
 	public void saveGxTermEntities() {
-		gxTermTablePanel.availableTerms.forEach(term -> {
+		termTablePanel.availableTerms.forEach(term -> {
 			term.setTermKey(termKey.getValue());
-			term.setGxNamespace(getEntity().getGxNamespace());
+			term.setNamespace(getEntity().getNamespace());
 			term.setIsActive(isActive.getValue());
 			termRepo.save(term);
 			localizer.invalidateTerm(term.getTermKey());

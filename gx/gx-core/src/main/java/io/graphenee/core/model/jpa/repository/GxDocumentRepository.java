@@ -9,8 +9,7 @@ import org.springframework.data.repository.query.Param;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
-public interface GxDocumentRepository
-		extends GxJpaRepository<GxDocument, Integer>, JpaSpecificationExecutor<GxDocument> {
+public interface GxDocumentRepository extends GxJpaRepository<GxDocument, Integer>, JpaSpecificationExecutor<GxDocument> {
 
 	@Query(value = "select max(d.versionNo) from GxDocument d where d.document = :parentDocument")
 	Integer findMaxVersionByDocument(@Param("parentDocument") GxDocument document);

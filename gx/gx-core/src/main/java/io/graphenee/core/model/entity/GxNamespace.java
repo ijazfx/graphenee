@@ -16,51 +16,37 @@
 package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-
-import io.graphenee.core.model.CollectionFault;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.EqualsAndHashCode.Include;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The persistent class for the gx_namespace database table.
  */
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_namespace")
-@NamedQuery(name = "GxNamespace.findAll", query = "SELECT g FROM GxNamespace g")
-public class GxNamespace implements Serializable {
+public class GxNamespace extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
+	public static final String SYSTEM = "io.graphenee.system";
 
-	@Column(name = "is_active")
 	private Boolean isActive = true;
-
-	@Column(name = "is_protected")
 	private Boolean isProtected = false;
 
-	@Include
 	private String namespace;
-
-	@Column(name = "namespace_description")
 	private String namespaceDescription;
 
-	@Transient
-	private CollectionFault<GxNamespaceProperty> namespacePropertyCollectionFault = CollectionFault.emptyCollectionFault();
+	@OneToMany(mappedBy = "namespace", cascade = CascadeType.ALL, orphanRemoval = true)
+	List<GxNamespaceProperty> properties = new ArrayList<>();
 
 }

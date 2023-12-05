@@ -10,7 +10,7 @@ public class GxPasswordHistoryBean implements Serializable {
 	private Integer oid;
 	private String hashedPassword;
 	private Timestamp passwordDate;
-	private BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault;
+	private BeanFault<Integer, GxUserAccountBean> userAccountBeanFault;
 
 	public Integer getOid() {
 		return oid;
@@ -36,12 +36,12 @@ public class GxPasswordHistoryBean implements Serializable {
 		this.passwordDate = passwordDate;
 	}
 
-	public BeanFault<Integer, GxUserAccountBean> getGxUserAccountBeanFault() {
-		return gxUserAccountBeanFault;
+	public BeanFault<Integer, GxUserAccountBean> getUserAccountBeanFault() {
+		return userAccountBeanFault;
 	}
 
-	public void setGxUserAccountBeanFault(BeanFault<Integer, GxUserAccountBean> gxUserAccountBeanFault) {
-		this.gxUserAccountBeanFault = gxUserAccountBeanFault;
+	public void setUserAccountBeanFault(BeanFault<Integer, GxUserAccountBean> userAccountBeanFault) {
+		this.userAccountBeanFault = userAccountBeanFault;
 	}
 
 }

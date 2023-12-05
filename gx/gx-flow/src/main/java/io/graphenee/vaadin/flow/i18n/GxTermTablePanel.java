@@ -64,18 +64,18 @@ public class GxTermTablePanel extends GxAbstractEntityList<GxTerm> {
 
 	private List<GxTerm> findAvailableLocalesAndTerms() {
 		availableLocales = localeRepo.findAll();
-		availableTerms = termRepo.findByGxNamespaceAndTermKey(selectedTerm.getGxNamespace(), selectedTerm.getTermKey());
+		availableTerms = termRepo.findByNamespaceAndTermKey(selectedTerm.getNamespace(), selectedTerm.getTermKey());
 		terms = new HashMap<>();
 		availableTerms.forEach(term -> {
-			terms.put(term.getGxSupportedLocale().getLocaleCode(), term);
+			terms.put(term.getSupportedLocale().getLocaleCode(), term);
 		});
 
 		for (GxSupportedLocale locale : availableLocales) {
 			if (!terms.containsKey(locale.getLocaleCode())) {
 				GxTerm term = new GxTerm();
 				term.setTermKey(selectedTerm.getTermKey());
-				term.setGxNamespace(selectedTerm.getGxNamespace());
-				term.setGxSupportedLocale(locale);
+				term.setNamespace(selectedTerm.getNamespace());
+				term.setSupportedLocale(locale);
 				terms.put(locale.getLocaleCode(), term);
 			}
 		}

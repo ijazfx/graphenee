@@ -30,6 +30,7 @@ import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
@@ -39,8 +40,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
@@ -106,6 +105,7 @@ import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
+import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
@@ -192,7 +192,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 	private String className;
 
 	@Autowired
-	GxDataService gxDataService;
+	GxDataService dataService;
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.className = entityClass.getName();
@@ -243,16 +243,34 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 			dataGrid.setDropFilter(this::onDropFilter);
 
-			dataGrid.addDragStartListener(event -> {
-				onDragStart(event);
+			dataGrid.addDragStartListener(new ComponentEventListener<GridDragStartEvent<T>>() {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onComponentEvent(GridDragStartEvent<T> event) {
+					onDragStart(event);
+				}
 			});
 
-			dataGrid.addDragEndListener(event -> {
-				onDragEnd(event);
+			dataGrid.addDragEndListener(new ComponentEventListener<GridDragEndEvent<T>>() {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onComponentEvent(GridDragEndEvent<T> event) {
+					onDragEnd(event);
+				}
 			});
 
-			dataGrid.addDropListener(event -> {
-				onDrop(event);
+			dataGrid.addDropListener(new ComponentEventListener<GridDropEvent<T>>() {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onComponentEvent(GridDropEvent<T> event) {
+					onDrop(event);
+				}
 			});
 
 			dataGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
@@ -383,7 +401,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 					customizeEditButton(rowEditButton, source);
 					return rowEditButton;
 				});
-				editColumn.setKey("__gxEditColumn");
+				editColumn.setKey("__editColumn");
 				editColumn.setWidth("50px");
 				editColumn.setTextAlign(ColumnTextAlign.CENTER);
 				editColumn.setResizable(false);
@@ -505,7 +523,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 				public void onClick(ClickEvent<Button> event) {
 					loggedInUser().setPreference(className, userPreferences.stream().collect(Collectors.joining(",")));
 					coreEventBus.post(loggedInUser().getUser());
-					// gxDataService.save(loggedInUser().getUser());
+					// dataService.save(loggedInUser().getUser());
 					menuDialog.close();
 					UI.getCurrent().getPage().reload();
 				}
@@ -841,9 +859,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 	}
 
 	protected void onDragEnd(GridDragEndEvent<T> event) {
+		System.out.println("onDragEnd ...");
 	}
 
 	protected void onDragStart(GridDragStartEvent<T> event) {
+		System.out.println("onDragStart ...");
 	}
 
 	protected boolean onDropFilter(T item) {
@@ -933,7 +953,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 	private void deleteRows(Collection<T> selectedItems) {
 		if (shouldShowDeleteConfirmation()) {
-			ConfirmDialog dialog = new ConfirmDialog("Confirmation", "Are you sure to delete selected record(s)?", "YES", dlg -> {
+			DialogFactory.questionDialog("Confirmation", "Are you sure to delete selected record(s)?", dlg -> {
 				try {
 					onDelete(selectedItems);
 					if (isAuditLogEnabled()) {
@@ -949,8 +969,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 					log.warn(e.getMessage(), e);
 					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 				}
-			});
-			dialog.open();
+			}).open();
 		} else {
 			try {
 				onDelete(selectedItems);
@@ -1350,7 +1369,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		build();
 		entityGrid().deselectAll();
 		crudMenuBar.setVisible(isEditable());
-		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__gxEditColumn")).forEach(c -> c.setVisible(isEditable()));
+		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__editColumn")).forEach(c -> c.setVisible(isEditable()));
 		if (isDragAndDropEnabled()) {
 			dataGrid.setRowsDraggable(isRowDraggable());
 			dataGrid.setDropMode(GridDropMode.ON_TOP_OR_BETWEEN);
@@ -1417,7 +1436,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 						listeners.forEach(l -> {
 							l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
 						});
-						if (!shouldShowFormInDialog()) {
+						if (!shouldShowFormInDialog() || dialog == null) {
 							hideSecondaryComponent();
 						} else {
 							dialog.close();
@@ -1432,7 +1451,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 				@Override
 				public void onDismiss(T entity) {
-					if (!shouldShowFormInDialog()) {
+					if (!shouldShowFormInDialog() || dialog == null) {
 						hideSecondaryComponent();
 					} else {
 						dialog.close();
@@ -1596,31 +1615,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		}
 
 		void onEvent(GxEntityListEvent event, Collection<T> entity);
-	}
-
-	public static ConfirmDialog createYesNoComponentDialog(String title, Component component, TRParamCallback<ConfirmEvent> confirmCallback) {
-		return createComponentDialog(title, component, "YES", "NO", confirmCallback);
-	}
-
-	public static ConfirmDialog createComponentDialog(String title, Component component, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
-		ConfirmDialog d = new ConfirmDialog(title, null, confirmText, dlg -> {
-			callback.execute(dlg);
-		});
-		d.setText(component);
-		d.setRejectText(cancelText);
-		return d;
-	}
-
-	public static ConfirmDialog createYesNoDialog(String title, String message, TRParamCallback<ConfirmEvent> confirmCallback) {
-		return createDialog(title, message, "YES", "NO", confirmCallback);
-	}
-
-	public static ConfirmDialog createDialog(String title, String message, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
-		ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
-			callback.execute(dlg);
-		});
-		d.setRejectText(cancelText);
-		return d;
 	}
 
 }

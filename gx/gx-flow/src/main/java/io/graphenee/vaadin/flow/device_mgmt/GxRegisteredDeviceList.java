@@ -1,6 +1,7 @@
 package io.graphenee.vaadin.flow.device_mgmt;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,20 +13,26 @@ import org.springframework.stereotype.Component;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.QuerySortOrder;
 
-import io.graphenee.core.model.api.GxRegisteredDeviceDataService;
+import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
+import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
 
+@SuppressWarnings("serial")
 @Component
 @Scope("prototype")
 public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegisteredDevice> {
 
 	@Autowired
-	private GxRegisteredDeviceDataService registeredDeviceDataService;
+	private GxDataService dataService;
+
+	@Autowired
+	private GxRegisteredDeviceRepository repo;
 
 	@Autowired
 	private GxRegisteredDeviceForm form;
@@ -39,15 +46,15 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 
 	@Override
 	protected int getTotalCount(GxRegisteredDevice searchEntity) {
-		if (searchEntity.getGxNamespace() == null)
+		if (searchEntity.getNamespace() == null)
 			return 0;
-		return registeredDeviceDataService.countAll(searchEntity);
+		return (int) repo.count();
 	}
 
 	@Override
-	protected Stream<GxRegisteredDevice> getData(int pageNumber, int pageSize, GxRegisteredDevice searchEntity) {
-		PageRequest request = PageRequest.of(pageNumber, pageSize);
-		return registeredDeviceDataService.findRegisteredDevice(searchEntity, request).stream();
+	protected Stream<GxRegisteredDevice> getData(int pageNumber, int pageSize, GxRegisteredDevice searchEntity, List<QuerySortOrder> sortOrders) {
+		PageRequest request = PageRequest.of(pageNumber, pageSize, createSort(sortOrders, Sort.by("deviceToken")));
+		return dataService.findRegisteredDevice(searchEntity, request).stream();
 	}
 
 	@Override
@@ -58,7 +65,7 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 	@Override
 	protected void preEdit(GxRegisteredDevice entity) {
 		if (entity.getOid() == null) {
-			entity.setGxNamespace(getSearchEntity().getGxNamespace());
+			entity.setNamespace(getSearchEntity().getNamespace());
 		}
 	}
 
@@ -69,16 +76,18 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 
 	@Override
 	protected void onSave(GxRegisteredDevice entity) {
-		registeredDeviceDataService.save(entity);
+		dataService.save(entity);
 	}
 
 	@Override
 	protected void onDelete(Collection<GxRegisteredDevice> entities) {
-		registeredDeviceDataService.delete(entities);
+		entities.forEach(e -> {
+			dataService.delete(e);
+		});
 	}
 
 	public void initializeWithNamespace(GxNamespace namespace) {
-		getSearchEntity().setGxNamespace(namespace);
+		getSearchEntity().setNamespace(namespace);
 		refresh();
 	}
 
@@ -90,7 +99,7 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 
 		searchForm.add(namespace);
 
-		searchBinder.bind(namespace, "gxNamespace");
+		searchBinder.bind(namespace, "namespace");
 		searchBinder.addValueChangeListener(vcl -> {
 			refresh();
 		});

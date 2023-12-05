@@ -17,68 +17,44 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.EqualsAndHashCode.Include;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * The persistent class for the gx_email_template database table.
  * 
  */
-@Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Getter
+@Setter
+
 @Entity
 @Table(name = "gx_email_template")
-@NamedQuery(name = "GxEmailTemplate.findAll", query = "SELECT g FROM GxEmailTemplate g")
-public class GxEmailTemplate implements Serializable {
+public class GxEmailTemplate extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@Include
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "bcc_list")
 	private String bccList;
-
 	private String body;
-
-	@Column(name = "sms_body")
 	private String smsBody;
-
-	@Column(name = "cc_list")
 	private String ccList;
-
-	@Column(name = "is_active")
 	private Boolean isActive;
-
-	@Column(name = "is_protected")
 	private Boolean isProtected = false;
-
 	private String subject;
-
-	@Column(name = "template_name")
 	private String templateName;
-
-	@Column(name = "template_code")
 	private String templateCode;
+	private String senderEmailAddress;
 
 	//bi-directional many-to-one association to GxNamespace
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
-	private GxNamespace gxNamespace;
-
-	@Column(name = "sender_email_address")
-	private String senderEmailAddress;
+	private GxNamespace namespace;
 
 }

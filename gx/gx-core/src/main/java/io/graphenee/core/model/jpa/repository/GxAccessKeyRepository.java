@@ -19,19 +19,22 @@ import java.util.List;
 import java.util.UUID;
 
 import io.graphenee.core.model.entity.GxAccessKey;
+import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 public interface GxAccessKeyRepository extends GxJpaRepository<GxAccessKey, Integer> {
 
-	List<GxAccessKey> findAllByGxSecurityPolicysOidEquals(Integer oidSecurityPolicy);
+	List<GxAccessKey> findAllBySecurityPoliciesEquals(GxSecurityPolicy securityPolicy);
 
 	GxAccessKey findByAccessKey(UUID accessKey);
 
 	List<GxAccessKey> findAllByIsActive(Boolean isActive);
 
-	List<GxAccessKey> findAllByGxSecurityGroupsOidEquals(Integer oidSecurityGroup);
+	List<GxAccessKey> findAllBySecurityGroupsEquals(GxSecurityGroup securityGroup);
 
-	List<GxAccessKey> findAllByGxUserAccountOidEquals(Integer oidUserAccount);
+	List<GxAccessKey> findAllByUserAccountEquals(GxUserAccount userAccount);
 
-	List<GxAccessKey> findAllByIsActiveAndGxUserAccountIsNull(Boolean isActive);
+	List<GxAccessKey> findAllByIsActiveAndUserAccountIsNull(Boolean isActive);
 }

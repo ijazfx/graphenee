@@ -9,6 +9,7 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
+@SuppressWarnings("serial")
 @GxSecuredView(GxEmailTemplateListView.VIEW_NAME)
 public class GxEmailTemplateListView extends GxVerticalLayoutView {
 

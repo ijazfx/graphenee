@@ -33,26 +33,26 @@ import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouteData;
 
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxSecurityGroupBean;
-import io.graphenee.core.model.bean.GxSecurityPolicyBean;
-import io.graphenee.core.model.bean.GxSecurityPolicyDocumentBean;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
+import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxTabItem;
 
 @Component
 @Scope("prototype")
-public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyBean> {
+public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicy> {
 	private static final long serialVersionUID = 1L;
 
 	private TextField securityPolicyName;
 	private TextField securityPolicyDescription;
 	private TextField priority;
 	private Checkbox isActive;
-	private ComboBox<GxSecurityPolicyDocumentBean> securityPolicyDocumentComboBox;
+	private ComboBox<GxSecurityPolicyDocument> securityPolicyDocumentComboBox;
 	private TextArea jsonDocumentTextArea;
-	private TwinColGrid<GxSecurityGroupBean> securityGroupCollectionFault;
-	private TwinColGrid<GxUserAccountBean> userAccountCollectionFault;
+	private TwinColGrid<GxSecurityGroup> securityGroups;
+	private TwinColGrid<GxUserAccount> userAccounts;
 	Tab sourceTab;
 	Tab resourcesTab;
 	Tabs tabs;
@@ -62,13 +62,13 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 
 	Grid<GxStatementBean> resourceTable;
 
-	GxSecurityPolicyDocumentBean selectedDocumentBean;
+	GxSecurityPolicyDocument selectedDocument;
 
 	@Autowired
-	GxDataService gxDataService;
+	GxDataService dataService;
 
 	public GxSecurityPolicyForm() {
-		super(GxSecurityPolicyBean.class);
+		super(GxSecurityPolicy.class);
 	}
 
 	@Override
@@ -233,32 +233,31 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 
 		Button createButton = new Button("Create");
 		createButton.addClickListener(event -> {
-			selectedDocumentBean = new GxSecurityPolicyDocumentBean();
-			selectedDocumentBean.setIsDefault(false);
+			selectedDocument = new GxSecurityPolicyDocument();
+			selectedDocument.setIsDefault(false);
 			// selectedDocumentBean.setDocumentJson("");
-			getEntity().getSecurityPolicyDocumentCollectionFault().add(selectedDocumentBean);
-			securityPolicyDocumentComboBox.setItems(getEntity().getSecurityPolicyDocumentCollectionFault().getBeans());
-			securityPolicyDocumentComboBox.setValue(selectedDocumentBean);
+			getEntity().addSecurityPolicyDocument(selectedDocument);
+			securityPolicyDocumentComboBox.setItems(getEntity().getSecurityPolicyDocuments());
+			securityPolicyDocumentComboBox.setValue(selectedDocument);
 		});
 
 		Button cloneButton = new Button("Clone");
 		cloneButton.addClickListener(event -> {
-			if (selectedDocumentBean.getOid() != null) {
-				GxSecurityPolicyDocumentBean cloned = new GxSecurityPolicyDocumentBean();
+			if (selectedDocument.getOid() != null) {
+				GxSecurityPolicyDocument cloned = new GxSecurityPolicyDocument();
 				cloned.setIsDefault(false);
-				cloned.setDocumentJson(selectedDocumentBean.getDocumentJson());
-				selectedDocumentBean = cloned;
-				getEntity().getSecurityPolicyDocumentCollectionFault().add(selectedDocumentBean);
-				securityPolicyDocumentComboBox.setValue(selectedDocumentBean);
+				cloned.setDocumentJson(selectedDocument.getDocumentJson());
+				selectedDocument = cloned;
+				getEntity().addSecurityPolicyDocument(selectedDocument);
+				securityPolicyDocumentComboBox.setValue(selectedDocument);
 			}
 		});
 
 		Button deleteButton = new Button("Delete");
 		deleteButton.addClickListener(event -> {
-			if (selectedDocumentBean != null) {
-				getEntity().getSecurityPolicyDocumentCollectionFault().remove(selectedDocumentBean);
-				securityPolicyDocumentComboBox
-						.setItems(getEntity().getSecurityPolicyDocumentCollectionFault().getBeans());
+			if (selectedDocument != null) {
+				getEntity().removeSecurityPolicyDocument(selectedDocument);
+				securityPolicyDocumentComboBox.setItems(getEntity().getSecurityPolicyDocuments());
 				securityPolicyDocumentComboBox.clear();
 				jsonDocumentTextArea.clear();
 			}
@@ -266,20 +265,17 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 
 		Button makeDefaultButton = new Button("Make Default");
 		makeDefaultButton.addClickListener(event -> {
-			if (selectedDocumentBean != null) {
-				List<GxSecurityPolicyDocumentBean> documents = new ArrayList<>(
-						getEntity().getSecurityPolicyDocumentCollectionFault().getBeans());
+			if (selectedDocument != null) {
+				List<GxSecurityPolicyDocument> documents = new ArrayList<>(getEntity().getSecurityPolicyDocuments());
 				documents.forEach(bean -> {
 					bean.setIsDefault(false);
-					getEntity().getSecurityPolicyDocumentCollectionFault().update(bean);
 				});
-				selectedDocumentBean.setIsDefault(true);
-				getEntity().getSecurityPolicyDocumentCollectionFault().update(selectedDocumentBean);
+				selectedDocument.setIsDefault(true);
 				makeDefaultButton.setEnabled(false);
 			}
 		});
 
-		securityPolicyDocumentComboBox = new ComboBox<GxSecurityPolicyDocumentBean>();
+		securityPolicyDocumentComboBox = new ComboBox<>();
 
 		createButton.setEnabled(true);
 		cloneButton.setEnabled(false);
@@ -287,19 +283,19 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 		deleteButton.setEnabled(false);
 
 		securityPolicyDocumentComboBox.addValueChangeListener(event -> {
-			selectedDocumentBean = (GxSecurityPolicyDocumentBean) securityPolicyDocumentComboBox.getValue();
-			if (selectedDocumentBean != null) {
-				makeDefaultButton.setEnabled(!selectedDocumentBean.getIsDefault());
+			selectedDocument = (GxSecurityPolicyDocument) securityPolicyDocumentComboBox.getValue();
+			if (selectedDocument != null) {
+				makeDefaultButton.setEnabled(!selectedDocument.getIsDefault());
 				deleteButton.setEnabled(true);
-				if (selectedDocumentBean.getOid() != null) {
+				if (selectedDocument.getOid() != null) {
 					cloneButton.setEnabled(true);
 				} else {
 					cloneButton.setEnabled(false);
 				}
 				jsonDocumentTextArea.setEnabled(true);
 				jsonDocumentTextArea.setRequired(true);
-				if (selectedDocumentBean.getDocumentJson() != null)
-					jsonDocumentTextArea.setValue(selectedDocumentBean.getDocumentJson());
+				if (selectedDocument.getDocumentJson() != null)
+					jsonDocumentTextArea.setValue(selectedDocument.getDocumentJson());
 				jsonDocumentTextArea.focus();
 			} else {
 				makeDefaultButton.setEnabled(false);
@@ -309,8 +305,7 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 			}
 		});
 
-		HorizontalLayout policyDocumentToolbar = new HorizontalLayout(securityPolicyDocumentComboBox, createButton,
-				cloneButton, makeDefaultButton, deleteButton);
+		HorizontalLayout policyDocumentToolbar = new HorizontalLayout(securityPolicyDocumentComboBox, createButton, cloneButton, makeDefaultButton, deleteButton);
 		jsonDocumentTextArea = new TextArea("Statements");
 		jsonDocumentTextArea.getStyle().set("padding-top", "0px");
 		jsonDocumentTextArea.setEnabled(true);
@@ -318,9 +313,8 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 		jsonDocumentTextArea.setHeight("250px");
 		jsonDocumentTextArea.addValueChangeListener(event -> {
 			if (isEntityBound()) {
-				if (selectedDocumentBean != null) {
-					selectedDocumentBean.setDocumentJson(event.getValue());
-					getEntity().getSecurityPolicyDocumentCollectionFault().update(selectedDocumentBean);
+				if (selectedDocument != null) {
+					selectedDocument.setDocumentJson(event.getValue());
 				}
 			}
 		});
@@ -328,16 +322,14 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 		resourceTable.setVisible(false);
 		crudMenuBar.setVisible(false);
 
-		VerticalLayout policyDocumentLayout = new VerticalLayout(policyDocumentToolbar, tabs, jsonDocumentTextArea,
-				crudMenuBar, resourceTable);
+		VerticalLayout policyDocumentLayout = new VerticalLayout(policyDocumentToolbar, tabs, jsonDocumentTextArea, crudMenuBar, resourceTable);
 		policyDocumentLayout.setWidthFull();
 		policyDocumentLayout.setPadding(false);
 		setColspan(policyDocumentLayout, 2);
 		tabs.addSelectedChangeListener(event -> {
 			if (event.getSelectedTab().equals(sourceTab)) {
 				jsonDocumentTextArea.clear();
-				Map<String, List<GxStatementBean>> groupedBeans = statementBeans.stream()
-						.collect(Collectors.groupingBy(sb -> sb.getPath()));
+				Map<String, List<GxStatementBean>> groupedBeans = statementBeans.stream().collect(Collectors.groupingBy(sb -> sb.getPath()));
 				List<String> keys = groupedBeans.keySet().stream().collect(Collectors.toList());
 				statementBeans.clear();
 				jsonDocumentTextArea.setValue(jsonDocumentTextArea.getValue().concat("revoke all on all\n"));
@@ -355,25 +347,20 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 					});
 					statementBeans.add(gBean);
 					if (gBean.isAll()) {
-						jsonDocumentTextArea.setValue(
-								jsonDocumentTextArea.getValue().concat("grant all on " + gBean.getPath() + "\n"));
+						jsonDocumentTextArea.setValue(jsonDocumentTextArea.getValue().concat("grant all on " + gBean.getPath() + "\n"));
 						continue;
 					}
 					if (gBean.isDelete()) {
-						jsonDocumentTextArea.setValue(
-								jsonDocumentTextArea.getValue().concat("grant delete on " + gBean.getPath() + "\n"));
+						jsonDocumentTextArea.setValue(jsonDocumentTextArea.getValue().concat("grant delete on " + gBean.getPath() + "\n"));
 					}
 					if (gBean.isEdit()) {
-						jsonDocumentTextArea.setValue(
-								jsonDocumentTextArea.getValue().concat("grant edit on " + gBean.getPath() + "\n"));
+						jsonDocumentTextArea.setValue(jsonDocumentTextArea.getValue().concat("grant edit on " + gBean.getPath() + "\n"));
 					}
 					if (gBean.isView()) {
-						jsonDocumentTextArea.setValue(
-								jsonDocumentTextArea.getValue().concat("grant view on " + gBean.getPath() + "\n"));
+						jsonDocumentTextArea.setValue(jsonDocumentTextArea.getValue().concat("grant view on " + gBean.getPath() + "\n"));
 					}
 					if (gBean.isExecute()) {
-						jsonDocumentTextArea.setValue(
-								jsonDocumentTextArea.getValue().concat("grant execute on " + gBean.getPath() + "\n"));
+						jsonDocumentTextArea.setValue(jsonDocumentTextArea.getValue().concat("grant execute on " + gBean.getPath() + "\n"));
 					}
 				}
 				jsonDocumentTextArea.setVisible(true);
@@ -388,8 +375,7 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 					statementBeans.clear();
 					resourceTable.getDataProvider().refreshAll();
 					for (String st : statements) {
-						Pattern pattern = Pattern.compile(
-								"(?<permission>grant|revoke)\\s+(?<action>\\w+)\\s+on\\s+(?<resource>[\\w-]+)");
+						Pattern pattern = Pattern.compile("(?<permission>grant|revoke)\\s+(?<action>\\w+)\\s+on\\s+(?<resource>[\\w-]+)");
 
 						Matcher matcher = pattern.matcher(st);
 						if (matcher.find()) {
@@ -400,8 +386,7 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 						}
 					}
 					List<GxStatementBean> mybeans = new ArrayList<>();
-					Map<String, List<GxStatementBean>> groupedBeans = statementBeans.stream()
-							.collect(Collectors.groupingBy(sb -> sb.getPath()));
+					Map<String, List<GxStatementBean>> groupedBeans = statementBeans.stream().collect(Collectors.groupingBy(sb -> sb.getPath()));
 					List<String> keys = groupedBeans.keySet().stream().collect(Collectors.toList());
 					for (String key : keys) {
 						List<GxStatementBean> beans = new ArrayList<>();
@@ -431,36 +416,32 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicyB
 		});
 		entityForm.add(securityPolicyName, securityPolicyDescription, priority, isActive, policyDocumentLayout);
 
-		securityGroupCollectionFault = new TwinColGrid<GxSecurityGroupBean>()
-				.addFilterableColumn(GxSecurityGroupBean::getSecurityGroupName, "Group Name", "Group Name", true)
-				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-		securityGroupCollectionFault.setSizeFull();
+		securityGroups = new TwinColGrid<GxSecurityGroup>().addFilterableColumn(GxSecurityGroup::getSecurityGroupName, "Group Name", "Group Name", true)
+				.withAvailableGridCaption("Available").withSelectionGridCaption("Selected").withDragAndDropSupport();
+		securityGroups.setSizeFull();
 
-		userAccountCollectionFault = new TwinColGrid<GxUserAccountBean>()
-				.addFilterableColumn(GxUserAccountBean::getUsername, "User Name", "User Name", true)
-				.withLeftColumnCaption("Available").withRightColumnCaption("Selected");
-		userAccountCollectionFault.setSizeFull();
+		userAccounts = new TwinColGrid<GxUserAccount>().addFilterableColumn(GxUserAccount::getUsername, "User Name", "User Name", true).withAvailableGridCaption("Available")
+				.withSelectionGridCaption("Selected").withDragAndDropSupport();
+		userAccounts.setSizeFull();
 	}
 
 	@Override
-	protected void preBinding(GxSecurityPolicyBean entity) {
+	protected void preBinding(GxSecurityPolicy entity) {
 		jsonDocumentTextArea.clear();
-		securityGroupCollectionFault
-				.setItems(gxDataService.findSecurityGroupByNamespaceActive(entity.getNamespaceFault().getBean()));
-		userAccountCollectionFault
-				.setItems(gxDataService.findUserAccountByNamespace(entity.getNamespaceFault().getBean()));
-		securityPolicyDocumentComboBox.setItems(entity.getSecurityPolicyDocumentCollectionFault().getBeans());
-		if (entity.getOid() != null && entity.getDefaultSecurityPolicyDocumentBean() != null) {
-			securityPolicyDocumentComboBox.setValue(entity.getDefaultSecurityPolicyDocumentBean());
-			jsonDocumentTextArea.setValue(entity.getDefaultSecurityPolicyDocumentBean().getDocumentJson());
+		securityGroups.setItems(dataService.findSecurityGroupByNamespaceActive(entity.getNamespace()));
+		userAccounts.setItems(dataService.findUserAccountByNamespace(entity.getNamespace()));
+		securityPolicyDocumentComboBox.setItems(entity.getSecurityPolicyDocuments());
+		if (entity.getOid() != null && entity.defaultDocument() != null) {
+			securityPolicyDocumentComboBox.setValue(entity.defaultDocument());
+			jsonDocumentTextArea.setValue(entity.defaultDocument().getDocumentJson());
 		}
 		tabs.setSelectedTab(sourceTab);
 	}
 
 	@Override
 	protected void addTabsToForm(List<GxTabItem> tabItems) {
-		tabItems.add(GxTabItem.create(1, "Users", userAccountCollectionFault));
-		tabItems.add(GxTabItem.create(2, "Groups", securityGroupCollectionFault));
+		tabItems.add(GxTabItem.create(1, "Users", userAccounts));
+		tabItems.add(GxTabItem.create(2, "Groups", securityGroups));
 	}
 
 	@Override

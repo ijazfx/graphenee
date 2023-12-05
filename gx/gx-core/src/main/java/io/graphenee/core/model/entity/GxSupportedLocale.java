@@ -19,121 +19,33 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-/**
- * The persistent class for the gx_supported_locale database table.
- */
+@Getter
+@Setter
 @Entity
 @Table(name = "gx_supported_locale")
-@NamedQuery(name = "GxSupportedLocale.findAll", query = "SELECT g FROM GxSupportedLocale g")
-public class GxSupportedLocale implements Serializable {
+public class GxSupportedLocale extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "is_active")
 	private Boolean isActive;
-
-	@Column(name = "is_left_to_right")
 	private Boolean isLeftToRight;
-
-	@Column(name = "is_protected")
 	private Boolean isProtected;
-
-	@Column(name = "locale_code")
 	private String localeCode;
-
-	@Column(name = "locale_name")
 	private String localeName;
 
-	// bi-directional many-to-one association to GxTerm
-	@OneToMany(mappedBy = "gxSupportedLocale")
-	private List<GxTerm> gxTerms = new ArrayList<>();
+	@OneToMany(mappedBy = "supportedLocale")
+	private List<GxTerm> terms = new ArrayList<>();
 
-	public GxSupportedLocale() {
-		isActive = true;
-		isProtected = false;
-		isLeftToRight = true;
-	}
-
-	public Integer getOid() {
-		return this.oid;
-	}
-
-	public void setOid(Integer oid) {
-		this.oid = oid;
-	}
-
-	public Boolean getIsActive() {
-		return this.isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
-	}
-
-	public Boolean getIsLeftToRight() {
-		return this.isLeftToRight;
-	}
-
-	public void setIsLeftToRight(Boolean isLeftToRight) {
-		this.isLeftToRight = isLeftToRight;
-	}
-
-	public Boolean getIsProtected() {
-		return this.isProtected;
-	}
-
-	public void setIsProtected(Boolean isProtected) {
-		this.isProtected = isProtected;
-	}
-
-	public String getLocaleCode() {
-		return this.localeCode;
-	}
-
-	public void setLocaleCode(String localeCode) {
-		this.localeCode = localeCode;
-	}
-
-	public String getLocaleName() {
-		return this.localeName;
-	}
-
-	public void setLocaleName(String localeName) {
-		this.localeName = localeName;
-	}
-
-	public List<GxTerm> getGxTerms() {
-		return this.gxTerms;
-	}
-
-	public void setGxTerms(List<GxTerm> gxTerms) {
-		this.gxTerms = gxTerms;
-	}
-
-	public GxTerm addGxTerm(GxTerm gxTerm) {
-		getGxTerms().add(gxTerm);
-		gxTerm.setGxSupportedLocale(this);
-
-		return gxTerm;
-	}
-
-	public GxTerm removeGxTerm(GxTerm gxTerm) {
-		getGxTerms().remove(gxTerm);
-		gxTerm.setGxSupportedLocale(null);
-
-		return gxTerm;
+	@Override
+	public String toString() {
+		return localeName;
 	}
 
 }

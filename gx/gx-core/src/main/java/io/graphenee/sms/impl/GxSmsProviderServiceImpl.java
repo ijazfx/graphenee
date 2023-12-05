@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.graphenee.core.enums.SmsProvider;
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.api.GxSmsProviderService;
 import io.graphenee.sms.api.GxSmsService;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
@@ -32,7 +32,7 @@ public class GxSmsProviderServiceImpl implements GxSmsProviderService {
 
 	@Override
 	public GxSmsService getSmsProviderServiceBySmsProviderName(String providerName) {
-		GxSmsProviderBean bean = dataService.findSmsProviderByProviderName(providerName);
+		GxSmsProvider bean = dataService.findSmsProviderByProviderName(providerName);
 		if (bean == null) {
 			L.warn("No SMS provider found with name " + providerName + ".");
 			throw new IllegalStateException("No SMS provider found with name " + providerName + ".");
@@ -42,7 +42,7 @@ public class GxSmsProviderServiceImpl implements GxSmsProviderService {
 
 	@Override
 	public GxSmsService getPrimarySmsProviderService() {
-		GxSmsProviderBean bean = dataService.findSmsProviderPrimary();
+		GxSmsProvider bean = dataService.findSmsProviderPrimary();
 		if (bean == null) {
 			L.warn("No primary SMS provider found.");
 			throw new IllegalStateException("No primary SMS provider found.");
@@ -50,39 +50,39 @@ public class GxSmsProviderServiceImpl implements GxSmsProviderService {
 		return makeSmsProviderService(bean);
 	}
 
-	public GxSmsService makeSmsProviderService(GxSmsProviderBean bean) {
+	public GxSmsService makeSmsProviderService(GxSmsProvider smsProvider) {
 		// Aws
-		if (bean.getProviderName().equals(SmsProvider.AWS.getProviderName())) {
+		if (smsProvider.getProviderName().equals(SmsProvider.AWS.getProviderName())) {
 			AwsSmsConfig config;
 			try {
-				config = GxSmsConfigProtos.AwsSmsConfig.parseFrom(bean.getConfigData());
+				config = GxSmsConfigProtos.AwsSmsConfig.parseFrom(smsProvider.getConfigData());
 				return new AwsSmsServiceImpl(config);
 			} catch (Exception e) {
 				L.warn(e.getMessage(), e);
 			}
 		}
 		// Twilio
-		if (bean.getProviderName().equals(SmsProvider.TWILIO.getProviderName())) {
+		if (smsProvider.getProviderName().equals(SmsProvider.TWILIO.getProviderName())) {
 			TwilioConfig config;
 			try {
-				config = GxSmsConfigProtos.TwilioConfig.parseFrom(bean.getConfigData());
+				config = GxSmsConfigProtos.TwilioConfig.parseFrom(smsProvider.getConfigData());
 				return new TwilioSmsServiceImpl(config);
 			} catch (Exception e) {
 				L.warn(e.getMessage(), e);
 			}
 		}
 		// Eocean
-		if (bean.getProviderName().equals(SmsProvider.EOCEAN.getProviderName())) {
+		if (smsProvider.getProviderName().equals(SmsProvider.EOCEAN.getProviderName())) {
 			EoceanConfig config;
 			try {
-				config = GxSmsConfigProtos.EoceanConfig.parseFrom(bean.getConfigData());
+				config = GxSmsConfigProtos.EoceanConfig.parseFrom(smsProvider.getConfigData());
 				return new EoceanSmsServiceImpl(config);
 			} catch (Exception e) {
 				L.warn(e.getMessage(), e);
 			}
 		}
 		// No service.
-		throw new IllegalStateException(bean.getProviderName() + " does not provide SMS service implementation.");
+		throw new IllegalStateException(smsProvider.getProviderName() + " does not provide SMS service implementation.");
 	}
 
 }

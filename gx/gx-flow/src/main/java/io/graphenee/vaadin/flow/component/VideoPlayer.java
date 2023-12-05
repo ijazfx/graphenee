@@ -7,6 +7,7 @@ import com.vaadin.flow.server.StreamResource;
 
 import lombok.Setter;
 
+@SuppressWarnings("serial")
 @Tag("video")
 public class VideoPlayer extends Component implements HasSize {
 

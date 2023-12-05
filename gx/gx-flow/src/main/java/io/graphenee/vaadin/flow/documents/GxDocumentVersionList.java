@@ -32,6 +32,7 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {

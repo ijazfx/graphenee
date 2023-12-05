@@ -120,6 +120,7 @@ public class GxDownloadButton extends Button {
 		return registration;
 	}
 
+	@SuppressWarnings("serial")
 	public static class DownloadStartEvent extends ComponentEvent<GxDownloadButton> {
 
 		private final DomEvent clientSideEvent;

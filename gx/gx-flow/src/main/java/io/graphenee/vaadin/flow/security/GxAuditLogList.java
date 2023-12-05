@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.data.provider.QuerySortOrder;
@@ -36,8 +36,8 @@ public class GxAuditLogList extends GxAbstractEntityLazyList<GxAuditLog> {
 
 	@Override
 	protected Stream<GxAuditLog> getData(int pageNumber, int pageSize, GxAuditLog searchEntity, List<QuerySortOrder> sortOrders) {
-		List<Order> orders = sortOrdersToSpringOrders(sortOrders);
-		return dataService.fetch(pageNumber, pageSize, searchEntity, orders).stream();
+		Sort sort = createSort(sortOrders, Sort.by("auditDate").descending());
+		return dataService.fetch(pageNumber, pageSize, searchEntity, sort).stream();
 	}
 
 	@Override

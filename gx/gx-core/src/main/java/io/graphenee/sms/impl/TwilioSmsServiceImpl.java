@@ -50,13 +50,13 @@ public class TwilioSmsServiceImpl implements GxSmsService {
 			if (fromPhoneNumber != null)
 				twilioMessage = Message.creator(new PhoneNumber(phone), new PhoneNumber(fromPhoneNumber), message).create();
 			if (twilioMessage != null) {
-				GxSmsResponse gxSmsResponse = new GxSmsResponse();
-				gxSmsResponse.setDetail(twilioMessage.getSid());
+				GxSmsResponse smsResponse = new GxSmsResponse();
+				smsResponse.setDetail(twilioMessage.getSid());
 				int smsCount = message.length() / perSMSMaxLength;
 				if (message.length() % perSMSMaxLength != 0)
 					smsCount += 1;
-				gxSmsResponse.setSmsCount(smsCount);
-				return gxSmsResponse;
+				smsResponse.setSmsCount(smsCount);
+				return smsResponse;
 			}
 		} catch (Exception e) {
 			throw new GxSmsSendException(e.getMessage(), e);

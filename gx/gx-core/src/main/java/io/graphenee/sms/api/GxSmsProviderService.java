@@ -1,13 +1,13 @@
 package io.graphenee.sms.api;
 
 import io.graphenee.core.enums.SmsProvider;
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 
 public interface GxSmsProviderService {
 
 	GxSmsService getPrimarySmsProviderService();
 
-	GxSmsService makeSmsProviderService(GxSmsProviderBean smsProviderBean);
+	GxSmsService makeSmsProviderService(GxSmsProvider smsProvider);
 
 	GxSmsService getSmsProviderServiceBySmsProvider(SmsProvider provider);
 

@@ -8,27 +8,21 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.data.binder.Binder;
 
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.api.GxEmailTemplateDataService;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
 
+@SuppressWarnings("serial")
 @Component
 @Scope("prototype")
 public class GxEmailTemplateList extends GxAbstractEntityLazyList<GxEmailTemplate> {
 
 	@Autowired
 	private GxEmailTemplateDataService emailTemplateDataService;
-
-	@Autowired
-	private GxDataService gxDataService;
 
 	@Autowired
 	private GxEmailTemplateForm form;
@@ -85,26 +79,13 @@ public class GxEmailTemplateList extends GxAbstractEntityLazyList<GxEmailTemplat
 	protected void preEdit(GxEmailTemplate entity) {
 		if (entity.getOid() == null) {
 			entity.setIsActive(true);
-			entity.setGxNamespace(getSearchEntity().getGxNamespace());
+			entity.setNamespace(getSearchEntity().getNamespace());
 		}
 	}
 
 	public void initializeWithNamespace(GxNamespace namespace) {
-		getSearchEntity().setGxNamespace(namespace);
+		getSearchEntity().setNamespace(namespace);
 		refresh();
 	}
 
-	@Override
-	protected void decorateSearchForm(FormLayout searchForm, Binder<GxEmailTemplate> searchBinder) {
-		ComboBox<GxNamespace> namespace = new ComboBox<>("Namespace");
-		namespace.setItemLabelGenerator(GxNamespace::getNamespace);
-		namespace.setItems(gxDataService.findNamespaceEntity());
-
-		searchForm.add(namespace);
-
-		searchBinder.bind(namespace, "gxNamespace");
-		searchBinder.addValueChangeListener(vcl -> {
-			refresh();
-		});
-	}
 }

@@ -16,8 +16,6 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog.ConfirmEvent;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
@@ -32,7 +30,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.util.KeyValueWrapper;
-import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
@@ -160,9 +157,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 					}
 				});
 
-				resetButton.getElement().getStyle().set("margin-left", "auto");
+				saveButton.getElement().getStyle().set("margin-left", "auto");
 				customizeDismissButton(dismissButton);
-				c.add(saveButton, resetButton, dismissButton);
+				c.add(dismissButton, resetButton, saveButton);
 
 			}
 
@@ -525,31 +522,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 
 		void onEvent(GxEntityFormEvent event, T entity);
-	}
-
-	public static ConfirmDialog createYesNoComponentDialog(String title, Component component, TRParamCallback<ConfirmEvent> confirmCallback) {
-		return createComponentDialog(title, component, "YES", "NO", confirmCallback);
-	}
-
-	public static ConfirmDialog createComponentDialog(String title, Component component, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
-		ConfirmDialog d = new ConfirmDialog(title, null, confirmText, dlg -> {
-			callback.execute(dlg);
-		});
-		d.setText(component);
-		d.setRejectText(cancelText);
-		return d;
-	}
-
-	public static ConfirmDialog createYesNoDialog(String title, String message, TRParamCallback<ConfirmEvent> confirmCallback) {
-		return createDialog(title, message, "YES", "NO", confirmCallback);
-	}
-
-	public static ConfirmDialog createDialog(String title, String message, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
-		ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
-			callback.execute(dlg);
-		});
-		d.setRejectText(cancelText);
-		return d;
 	}
 
 }

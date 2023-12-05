@@ -7,24 +7,24 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxUserAccount;
 import jakarta.annotation.PostConstruct;
 
 @Service
 public class CoreEventBusListener {
-    @Autowired
-    EventBus coreEventBus;
+	@Autowired
+	EventBus coreEventBus;
 
-    @Autowired
-    GxDataService gxDataService;
+	@Autowired
+	GxDataService dataService;
 
-    @PostConstruct
-    void postConstruct() {
-        coreEventBus.register(this);
-    }
+	@PostConstruct
+	void postConstruct() {
+		coreEventBus.register(this);
+	}
 
-    @Subscribe
-    public void onUserChanged(GxUserAccountBean user) {
-        gxDataService.save(user);
-    }
+	@Subscribe
+	public void onUserChanged(GxUserAccount user) {
+		dataService.save(user);
+	}
 }

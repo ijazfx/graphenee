@@ -25,14 +25,14 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.ValidationException;
 
-import io.graphenee.core.model.bean.GxSmsProviderBean;
+import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
-public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderBean> {
+public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProvider> {
 
 	public GxEoceanSmsProviderForm() {
-		super(GxSmsProviderBean.class);
+		super(GxSmsProvider.class);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class GxEoceanSmsProviderForm extends GxAbstractEntityForm<GxSmsProviderB
 	private TextField senderId;
 
 	@Override
-	protected void postBinding(GxSmsProviderBean entity) {
+	protected void postBinding(GxSmsProvider entity) {
 		try {
 			configBuilder = GxSmsConfigProtos.EoceanConfig.parseFrom(entity.getConfigData()).toBuilder();
 			baseUrl.setValue(configBuilder.getBaseUrl());

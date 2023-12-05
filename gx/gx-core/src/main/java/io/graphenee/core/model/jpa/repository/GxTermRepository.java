@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,28 +32,30 @@ import io.graphenee.core.model.jpa.GxJpaRepository;
 @Repository
 public interface GxTermRepository extends GxJpaRepository<GxTerm, Integer> {
 
-	List<GxTerm> findByTermKeyAndGxSupportedLocaleLocaleCodeStartingWith(String termKey, String localeCode);
+	List<GxTerm> findByTermKeyAndSupportedLocaleLocaleCodeStartingWith(String termKey, String localeCode);
 
-	GxTerm findTopByTermKeyAndGxSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(String termKey, String localeCode);
+	GxTerm findTopByTermKeyAndSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(String termKey, String localeCode);
 
 	List<GxTerm> findByTermKey(String termKey);
 
-	List<GxTerm> findByGxNamespaceAndTermKey(GxNamespace namespace, String termKey);
+	List<GxTerm> findByNamespace(GxNamespace namespace, Sort sort);
+
+	List<GxTerm> findByNamespaceAndTermKey(GxNamespace namespace, String termKey);
 
 	@Modifying
-	@Query("Delete from GxTerm t WHERE t.termKey = :termKey AND t.gxNamespace.oid = :oidNamespace")
-	void deleteByTermKeyAndOidNameSpace(@Param("termKey") String termKey, @Param("oidNamespace") Integer oidNamespace);
+	@Query("Delete from GxTerm t WHERE t.termKey = :termKey AND t.namespace = :namespace")
+	void deleteByTermKeyAndNamespace(@Param("termKey") String termKey, @Param("namespace") GxNamespace namespace);
 
-	Page<GxTerm> findByGxNamespaceOid(Pageable pageable, Integer oidNamespace);
+	Page<GxTerm> findByNamespaceOid(Pageable pageable, Integer oidNamespace);
 
-	List<GxTerm> findByGxNamespaceOid(Integer oidNamespace);
+	List<GxTerm> findByNamespaceOid(Integer oidNamespace);
 
-	Page<GxTerm> findByGxSupportedLocaleOid(Pageable pageable, Integer oidSupportedLocale);
+	Page<GxTerm> findBySupportedLocaleOid(Pageable pageable, Integer oidSupportedLocale);
 
-	List<GxTerm> findByGxSupportedLocaleOid(Integer oidSupportedLocale);
+	List<GxTerm> findBySupportedLocaleOid(Integer oidSupportedLocale);
 
-	Page<GxTerm> findByGxNamespaceOidAndGxSupportedLocaleOid(Pageable pageable, Integer oidNamespace, Integer oidSupportedLocale);
+	Page<GxTerm> findByNamespaceOidAndSupportedLocaleOid(Pageable pageable, Integer oidNamespace, Integer oidSupportedLocale);
 
-	List<GxTerm> findByGxNamespaceOidAndGxSupportedLocaleOid(Integer oidNamespace, Integer oidSupportedLocale);
+	List<GxTerm> findByNamespaceOidAndSupportedLocaleOid(Integer oidNamespace, Integer oidSupportedLocale);
 
 }

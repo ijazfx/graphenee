@@ -62,10 +62,8 @@ public class GxUserAccountBean implements Serializable {
 	private Timestamp verificationTokenExpiryDate;
 	private String preferences = "{}";
 	private BeanCollectionFault<GxAuditLogBean> auditLogCollectionFault = BeanCollectionFault.emptyCollectionFault();
-	private BeanCollectionFault<GxSecurityGroupBean> securityGroupCollectionFault = BeanCollectionFault
-			.emptyCollectionFault();
-	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault
-			.emptyCollectionFault();
+	private BeanCollectionFault<GxSecurityGroupBean> securityGroupCollectionFault = BeanCollectionFault.emptyCollectionFault();
+	private BeanCollectionFault<GxSecurityPolicyBean> securityPolicyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanCollectionFault<GxAccessKeyBean> accessKeyCollectionFault = BeanCollectionFault.emptyCollectionFault();
 	private BeanFault<Integer, GxNamespaceBean> namespaceFault;
 
@@ -141,8 +139,7 @@ public class GxUserAccountBean implements Serializable {
 
 			@Override
 			public int compare(GxSecurityPolicyDocumentBean doc1, GxSecurityPolicyDocumentBean doc2) {
-				return doc1.getSecurityPolicyBeanFault().getBean().getPriority().intValue() < doc2
-						.getSecurityPolicyBeanFault().getBean().getPriority().intValue() ? -1 : 1;
+				return doc1.getSecurityPolicyBeanFault().getBean().getPriority().intValue() < doc2.getSecurityPolicyBeanFault().getBean().getPriority().intValue() ? -1 : 1;
 			}
 		});
 
@@ -205,13 +202,11 @@ public class GxUserAccountBean implements Serializable {
 	}
 
 	public String getFullName() {
-		return String.format("%s %s", getFirstName() != null ? getFirstName().trim() : "",
-				getLastName() != null ? getLastName().trim() : "").trim();
+		return String.format("%s %s", getFirstName() != null ? getFirstName().trim() : "", getLastName() != null ? getLastName().trim() : "").trim();
 	}
 
 	public String getLastNameFirstName() {
-		return String.format("%s %s", getLastName() != null ? getLastName().trim() : "",
-				getFirstName() != null ? getFirstName().trim() : "").trim();
+		return String.format("%s %s", getLastName() != null ? getLastName().trim() : "", getFirstName() != null ? getFirstName().trim() : "").trim();
 	}
 
 	public BeanCollectionFault<GxAccessKeyBean> getAccessKeyCollectionFault() {

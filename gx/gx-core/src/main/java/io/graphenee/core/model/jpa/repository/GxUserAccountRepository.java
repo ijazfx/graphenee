@@ -18,32 +18,44 @@ package io.graphenee.core.model.jpa.repository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
 public interface GxUserAccountRepository extends GxJpaRepository<GxUserAccount, Integer> {
 
-	List<GxUserAccount> findAllByGxNamespaceOid(Integer oidNamespace);
+	List<GxUserAccount> findAllByIsActive(Boolean isActive, Sort sort);
 
-	List<GxUserAccount> findAllByGxSecurityGroupsOidEquals(Integer oidSecurityGroup);
+	List<GxUserAccount> findAllByNamespaceAndIsActive(GxNamespace namespace, Boolean isActive, Sort sort);
 
-	List<GxUserAccount> findAllByGxSecurityPoliciesOidEquals(Integer oidSecurityPolicy);
+	List<GxUserAccount> findAllByNamespace(GxNamespace namespace, Sort sort);
 
-	GxUserAccount findByUsernameAndGxNamespaceOid(String username, Integer oidNamespace);
+	List<GxUserAccount> findAllBySecurityGroupsEquals(GxSecurityGroup securityGroup, Sort sort);
 
-	GxUserAccount findByUsernameAndGxNamespaceIsNull(String username);
+	List<GxUserAccount> findAllBySecurityGroupsEqualsAndIsActive(GxSecurityGroup securityGroup, Boolean isActive, Sort sort);
+
+	List<GxUserAccount> findAllBySecurityPoliciesEquals(GxSecurityPolicy securityPolicy, Sort sort);
+
+	List<GxUserAccount> findAllBySecurityPoliciesEqualsAndIsActive(GxSecurityPolicy securityPolicy, Boolean isActive, Sort sort);
+
+	GxUserAccount findByUsernameAndNamespace(String username, GxNamespace namespace);
+
+	GxUserAccount findByUsernameAndNamespaceIsNull(String username);
 
 	GxUserAccount findByUsername(String username);
 
-	GxUserAccount findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrue(UUID accessKey);
+	GxUserAccount findByAccessKeysAccessKeyAndAccessKeysIsActiveTrue(UUID accessKey);
 
 	GxUserAccount findByUsernameAndPassword(String username, String password);
 
-	GxUserAccount findByUsernameAndPasswordAndGxNamespaceOid(String username, String password, Integer oidNamespace);
+	GxUserAccount findByUsernameAndPasswordAndNamespace(String username, String password, GxNamespace namespace);
 
-	GxUserAccount findByUsernameAndPasswordAndGxNamespaceIsNull(String username, String password);
+	GxUserAccount findByUsernameAndPasswordAndNamespaceIsNull(String username, String password);
 
 }

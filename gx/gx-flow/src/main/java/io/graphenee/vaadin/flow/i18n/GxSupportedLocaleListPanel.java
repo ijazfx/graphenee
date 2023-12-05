@@ -28,6 +28,7 @@ import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxSupportedLocaleListPanel extends GxAbstractEntityList<GxSupportedLocale> {
@@ -64,7 +65,7 @@ public class GxSupportedLocaleListPanel extends GxAbstractEntityList<GxSupported
 
 	@Override
 	protected void onDelete(Collection<GxSupportedLocale> entities) {
-		repo.deleteInBatch(entities);
+		repo.deleteAllInBatch(entities);
 	}
 
 }

@@ -24,8 +24,8 @@ public class GxAccessLogBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Integer oid;
-	private BeanFault<Integer, GxAccessKeyBean> gxAccessKeyBeanFault;
-	private BeanFault<Integer, GxResourceBean> gxResourceBeanFault;
+	private BeanFault<Integer, GxAccessKeyBean> accessKeyBeanFault;
+	private BeanFault<Integer, GxResourceBean> resourceBeanFault;
 	private Timestamp accessTime;
 	private Boolean isSuccess;
 	private Integer accessType;
@@ -38,20 +38,20 @@ public class GxAccessLogBean implements Serializable {
 		this.oid = oid;
 	}
 
-	public BeanFault<Integer, GxAccessKeyBean> getGxAccessKeyBeanFault() {
-		return gxAccessKeyBeanFault;
+	public BeanFault<Integer, GxAccessKeyBean> getAccessKeyBeanFault() {
+		return accessKeyBeanFault;
 	}
 
-	public void setGxAccessKeyBeanFault(BeanFault<Integer, GxAccessKeyBean> gxAccessKeyBeanFault) {
-		this.gxAccessKeyBeanFault = gxAccessKeyBeanFault;
+	public void setAccessKeyBeanFault(BeanFault<Integer, GxAccessKeyBean> accessKeyBeanFault) {
+		this.accessKeyBeanFault = accessKeyBeanFault;
 	}
 
-	public BeanFault<Integer, GxResourceBean> getGxResourceBeanFault() {
-		return gxResourceBeanFault;
+	public BeanFault<Integer, GxResourceBean> getResourceBeanFault() {
+		return resourceBeanFault;
 	}
 
-	public void setGxResourceBeanFault(BeanFault<Integer, GxResourceBean> gxResourceBeanFault) {
-		this.gxResourceBeanFault = gxResourceBeanFault;
+	public void setResourceBeanFault(BeanFault<Integer, GxResourceBean> resourceBeanFault) {
+		this.resourceBeanFault = resourceBeanFault;
 	}
 
 	public Timestamp getAccessTime() {

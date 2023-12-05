@@ -20,6 +20,8 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import io.graphenee.core.model.entity.GxCity;
+import io.graphenee.core.model.entity.GxCountry;
+import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
@@ -27,13 +29,13 @@ public interface GxCityRepository extends GxJpaRepository<GxCity, Integer> {
 
 	List<GxCity> findAllByIsActiveTrueOrderByCityNameAsc();
 
-	List<GxCity> findAllByIsActiveTrueAndGxCountryOidOrderByCityNameAsc(Integer oidCountry);
+	List<GxCity> findAllByIsActiveTrueAndCountryOrderByCityNameAsc(GxCountry country);
 
-	List<GxCity> findAllByIsActiveTrueAndGxCountryNumericCodeOrderByCityNameAsc(Integer numericCode);
+	List<GxCity> findAllByIsActiveTrueAndCountryNumericCodeOrderByCityNameAsc(Integer numericCode);
 
-	List<GxCity> findAllByIsActiveTrueAndGxStateOidOrderByCityNameAsc(Integer oidState);
+	List<GxCity> findAllByIsActiveTrueAndStateOrderByCityNameAsc(GxState state);
 
-	List<GxCity> findAllByIsActiveTrueAndGxStateStateCodeOrderByCityNameAsc(String stateCode);
+	List<GxCity> findAllByIsActiveTrueAndStateStateCodeOrderByCityNameAsc(String stateCode);
 
 	GxCity findOneByCityName(String cityName);
 }

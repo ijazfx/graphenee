@@ -21,12 +21,13 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
-import io.graphenee.core.api.GxNamespaceService;
+import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.base.GxSecuredView;
 import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
 
+@SuppressWarnings("serial")
 @GxSecuredView(GxDocumentExplorerView.VIEW_NAME)
 @Scope("prototype")
 public class GxDocumentExplorerView extends GxVerticalLayoutView {
@@ -40,7 +41,10 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 	FileStorage storage;
 
 	@Autowired
-	GxNamespaceService namespaceService;
+	GxDataService dataService;
+
+	@Autowired(required = false)
+	GxNamespace namespace;
 
 	@Override
 	protected String getCaption() {
@@ -54,7 +58,9 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		GxNamespace namespace = namespaceService.systemNamespaceEntity();
+		if (namespace == null) {
+			namespace = dataService.systemNamespace();
+		}
 		list.initializeWithNamespaceAndStorage(namespace, storage);
 	}
 

@@ -20,25 +20,28 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxAccessKey;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxSecurityGroup;
+import io.graphenee.core.model.entity.GxSecurityPolicy;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
 public interface GxSecurityGroupRepository extends GxJpaRepository<GxSecurityGroup, Integer> {
 
-	List<GxSecurityGroup> findAllByGxUserAccountsOidEquals(Integer oidUserAccount);
+	List<GxSecurityGroup> findAllByUserAccountsEquals(GxUserAccount userAccount);
 
-	List<GxSecurityGroup> findAllByGxSecurityPoliciesOidEquals(Integer oidSecurityPolicy);
+	List<GxSecurityGroup> findAllBySecurityPoliciesEquals(GxSecurityPolicy securityPolicy);
 
 	List<GxSecurityGroup> findAllByIsActive(Boolean isActive);
 
-	GxSecurityGroup findOneBySecurityGroupNameAndGxNamespaceNamespace(String groupName, String namespace);
+	GxSecurityGroup findOneBySecurityGroupNameAndNamespace(String groupName, GxNamespace namespace);
 
-	List<GxSecurityGroup> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
+	List<GxSecurityGroup> findAllByAccessKeysEquals(GxAccessKey accessKey);
 
-	GxSecurityGroup findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
+	GxSecurityGroup findByAccessKeysAccessKeyAndAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
 
-	List<GxSecurityGroup> findByGxNamespace(GxNamespace gxNamespace);
+	List<GxSecurityGroup> findByNamespace(GxNamespace namespace);
 
 }

@@ -43,8 +43,8 @@ public class GxEmailTemplateDataServiceImpl implements GxEmailTemplateDataServic
 
 	private Specification<GxEmailTemplate> makeEmailTemplateSpec(GxEmailTemplate searchEntity) {
 		JpaSpecificationBuilder<GxEmailTemplate> sb = JpaSpecificationBuilder.get();
-		if (searchEntity.getGxNamespace() != null) {
-			sb.eq("gxNamespace", searchEntity.getGxNamespace());
+		if (searchEntity.getNamespace() != null) {
+			sb.eq("namespace", searchEntity.getNamespace());
 		}
 		sb.eq("isActive", searchEntity.getIsActive());
 		sb.like("templateCode", searchEntity.getTemplateCode());

@@ -10,6 +10,7 @@ import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 
+@SuppressWarnings("serial")
 public class ListToSetConverter<T> implements Converter<Set<T>, List<T>> {
 
 	@Override

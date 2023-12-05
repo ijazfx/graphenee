@@ -57,13 +57,13 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 		try {
 			Response<String> response = call.execute();
 			if (response.isSuccessful()) {
-				GxSmsResponse gxSmsResponse = new GxSmsResponse();
-				gxSmsResponse.setDetail(response.message());
+				GxSmsResponse smsResponse = new GxSmsResponse();
+				smsResponse.setDetail(response.message());
 				int smsCount = message.length() / perSMSMaxLength;
 				if (message.length() % perSMSMaxLength != 0)
 					smsCount += 1;
-				gxSmsResponse.setSmsCount(smsCount);
-				return gxSmsResponse;
+				smsResponse.setSmsCount(smsCount);
+				return smsResponse;
 			}
 		} catch (Exception e) {
 			L.warn(e.getMessage());

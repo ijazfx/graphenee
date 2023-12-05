@@ -95,12 +95,12 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 
 	@Override
 	public void deleteFolder(List<GxFolder> folders) {
-		folderRepo.deleteInBatch(folders);
+		folderRepo.deleteAllInBatch(folders);
 	}
 
 	@Override
 	public void deleteDocument(List<GxDocument> documents) {
-		docRepo.deleteInBatch(documents);
+		docRepo.deleteAllInBatch(documents);
 	}
 
 	@Override
@@ -129,8 +129,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent,
-			GxDocumentExplorerItem searchEntity, String... sortKey) {
+	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, String... sortKey) {
 
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 		if (parent.isFile()) {
@@ -165,8 +164,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent,
-			List<GxDocumentExplorerItem> items) {
+	public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> items) {
 		if (items != null) {
 			for (GxDocumentExplorerItem item : items) {
 				if (item.isFile()) {
@@ -202,8 +200,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	private void resetSortOrder(List<GxDocumentExplorerItem> sortList) {
-		AtomicInteger min = new AtomicInteger(
-				sortList.stream().mapToInt(GxDocumentExplorerItem::getSortOrder).min().orElse(999999));
+		AtomicInteger min = new AtomicInteger(sortList.stream().mapToInt(GxDocumentExplorerItem::getSortOrder).min().orElse(999999));
 		List<GxFolder> folders = new ArrayList<>();
 		List<GxDocument> documents = new ArrayList<>();
 		sortList.forEach(i -> {

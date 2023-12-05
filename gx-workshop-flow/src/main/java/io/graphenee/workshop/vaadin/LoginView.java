@@ -9,7 +9,8 @@ import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.base.GxAbstractLoginView;
 import io.graphenee.vaadin.flow.security.GxUserAccountAuthenticatedUser;
@@ -30,11 +31,17 @@ public class LoginView extends GxAbstractLoginView {
 		return flowSetup;
 	}
 
+	@Autowired
+	GxNamespace namespace;
+
 	@Override
 	protected GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException {
 		String username = event.getUsername();
 		String password = event.getPassword();
-		GxUserAccountBean user = dataService.findUserAccountByUsernameAndPassword(username, password);
+		GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);
+		if (user == null) {
+			user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, dataService.systemNamespace());
+		}
 		if (user == null) {
 			throw new AuthenticationFailedException("Invalid credentials, please try again.");
 		}

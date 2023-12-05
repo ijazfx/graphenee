@@ -12,6 +12,7 @@ import com.vaadin.flow.data.binder.Binder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
+@SuppressWarnings("serial")
 @Component
 @Scope("prototype")
 public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
@@ -25,6 +24,7 @@ import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
 import io.graphenee.jbpm.embedded.flow.GxSelectAssigneeForm.GxAssigneeHolder;
 import io.graphenee.vaadin.flow.GxFlowNotification;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.component.DialogFactory;
 
 public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
@@ -189,7 +189,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 						@Override
 						public void onSave(GxAssigneeHolder holder) {
 							String msg = "Are you sure to assign the task to " + holder.getAssignee() + "?";
-							ConfirmDialog dialog = new ConfirmDialog("Confirmation", msg, "Yes", dlg -> {
+							DialogFactory.questionDialog("Confirmation", msg, dlg -> {
 								GxAssignee assignee = holder.getAssignee();
 								try {
 									getUserTask().assign(assignee.getUsername());
@@ -201,7 +201,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 									GxFlowNotification.alert(ex.getMessage()).open();
 									L.error(ex.getMessage(), ex);
 								}
-							});
+							}).open();
 						}
 
 					});

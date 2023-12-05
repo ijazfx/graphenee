@@ -18,131 +18,98 @@ package io.graphenee.core.model.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
-import jakarta.persistence.Column;
+import org.json.JSONObject;
+
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-
-import org.json.JSONObject;
-
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @Setter
 @Entity
 @Table(name = "gx_user_account")
-@NamedQuery(name = "GxUserAccount.findAll", query = "SELECT g FROM GxUserAccount g")
-public class GxUserAccount implements Serializable {
+public class GxUserAccount extends GxMappedSuperclass implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer oid;
-
-	@Column(name = "account_activation_date")
 	private Timestamp accountActivationDate;
-
-	@Column(name = "count_login_failed")
-	private Integer countLoginFailed;
-
+	private Integer countLoginFailed = 0;
 	private String email;
-
-	@Column(name = "first_name")
 	private String firstName;
-
-	@Column(name = "full_name_native")
 	private String fullNameNative;
-
-	@Column(name = "is_active")
-	private Boolean isActive;
-
-	@Column(name = "is_locked")
-	private Boolean isLocked;
-
-	@Column(name = "is_password_change_required")
-	private Boolean isPasswordChangeRequired;
-
-	@Column(name = "is_protected")
-	private Boolean isProtected;
-
-	@Column(name = "last_login_date")
+	private Boolean isActive = true;
+	private Boolean isLocked = false;
+	private Boolean isPasswordChangeRequired = true;
+	private Boolean isProtected = false;
 	private Timestamp lastLoginDate;
-
-	@Column(name = "last_login_failed_date")
 	private Timestamp lastLoginFailedDate;
-
-	@Column(name = "last_name")
 	private String lastName;
-
 	private String password;
-
-	@Column(name = "profile_image")
 	private byte[] profileImage;
-
 	private String username;
-
-	@Column(name = "verification_token")
 	private String verificationToken;
-
-	@Column(name = "preferences")
 	private String preferences = "{}";
-
-	@Column(name = "verification_token_expiry_date")
 	private Timestamp verificationTokenExpiryDate;
 
-	// bi-directional many-to-one association to GxAuditLog
-	@OneToMany(mappedBy = "gxUserAccount")
+	@Transient
+	private String newPassword;
+
+	@Transient
+	private String confirmPassword;
+
+	@OneToMany(mappedBy = "userAccount")
 	private List<GxAuditLog> gxAuditLogs = new ArrayList<>();
 
-	// bi-directional many-to-one association to GxGender
 	@ManyToOne
 	@JoinColumn(name = "oid_gender")
-	private GxGender gxGender;
+	private GxGender gender;
 
-	// bi-directional many-to-many association to GxSecurityGroup
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = {
-			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
-					@JoinColumn(name = "oid_security_group") })
-	private List<GxSecurityGroup> gxSecurityGroups = new ArrayList<>();
+	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
+			@JoinColumn(name = "oid_security_group") })
+	private Set<GxSecurityGroup> securityGroups = new HashSet<>();
 
-	// bi-directional many-to-many association to GxSecurityPolicy
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = {
-			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
-					@JoinColumn(name = "oid_security_policy") })
-	private List<GxSecurityPolicy> gxSecurityPolicies = new ArrayList<>();
+	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
+			@JoinColumn(name = "oid_security_policy") })
+	private Set<GxSecurityPolicy> securityPolicies = new HashSet<>();
 
 	@OneToMany
-	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = {
-			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
-	private List<GxAccessKey> gxAccessKeys = new ArrayList<>();
+	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
+	private List<GxAccessKey> accessKeys = new ArrayList<>();
 
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
-	private GxNamespace gxNamespace;
+	private GxNamespace namespace;
 
 	public GxAuditLog addGxAuditLog(GxAuditLog gxAuditLog) {
 		getGxAuditLogs().add(gxAuditLog);
-		gxAuditLog.setGxUserAccount(this);
+		gxAuditLog.setUserAccount(this);
 
 		return gxAuditLog;
 	}
 
 	public GxAuditLog removeGxAuditLog(GxAuditLog gxAuditLog) {
 		getGxAuditLogs().remove(gxAuditLog);
-		gxAuditLog.setGxUserAccount(null);
+		gxAuditLog.setUserAccount(null);
 
 		return gxAuditLog;
 	}
@@ -165,6 +132,138 @@ public class GxUserAccount implements Serializable {
 
 	public void createAllPreferences() {
 		preferences = "{}";
+	}
+
+	@Transient
+	private Map<String, Set<String>> grantMap;
+
+	@Transient
+	private Map<String, Set<String>> revokeMap;
+
+	public boolean canDoAction(String resource, String action) {
+		return canDoAction(resource, action, false);
+	}
+
+	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+		if (forceRefresh) {
+			loadMaps();
+		}
+
+		String checkForResource = resource != null ? resource.toLowerCase() : "all";
+		String actionLowerCase = action.toLowerCase();
+		Set<String> grantActionSet = grantMap().get(checkForResource);
+		Set<String> revokeActionSet = revokeMap().get(checkForResource);
+
+		if (revokeActionSet != null && revokeActionSet.contains(actionLowerCase))
+			return false;
+
+		if (revokeActionSet != null && revokeActionSet.contains("all"))
+			return false;
+
+		if (grantActionSet != null && grantActionSet.contains(actionLowerCase))
+			return true;
+
+		if (grantActionSet != null && grantActionSet.contains("all"))
+			return true;
+
+		if (resource.contains("/")) {
+			resource = resource.substring(0, resource.lastIndexOf('/') - 1);
+			return canDoAction(resource, actionLowerCase, false);
+		}
+
+		grantActionSet = grantMap().get("all");
+		revokeActionSet = revokeMap().get("all");
+
+		if (revokeActionSet != null && revokeActionSet.contains("all"))
+			return false;
+
+		if (grantActionSet != null && grantActionSet.contains("all"))
+			return true;
+
+		return false;
+	}
+
+	protected Map<String, Set<String>> grantMap() {
+		if (grantMap == null) {
+			loadMaps();
+		}
+		return grantMap;
+	}
+
+	protected Map<String, Set<String>> revokeMap() {
+		if (revokeMap == null) {
+			loadMaps();
+		}
+		return revokeMap;
+	}
+
+	private void loadMaps() {
+		grantMap = new ConcurrentHashMap<>();
+		revokeMap = new ConcurrentHashMap<>();
+		TreeSet<GxSecurityPolicyDocument> documents = new TreeSet<>(new Comparator<GxSecurityPolicyDocument>() {
+
+			@Override
+			public int compare(GxSecurityPolicyDocument doc1, GxSecurityPolicyDocument doc2) {
+				return doc1.getSecurityPolicy().getPriority().intValue() < doc2.getSecurityPolicy().getPriority().intValue() ? -1 : 1;
+			}
+		});
+
+		securityGroups.forEach(group -> {
+			group.getSecurityPolicies().forEach(policy -> {
+				if (policy.defaultDocument() != null) {
+					documents.add(policy.defaultDocument());
+				}
+			});
+		});
+
+		securityPolicies.forEach(policy -> {
+			if (policy.defaultDocument() != null) {
+				documents.add(policy.defaultDocument());
+			}
+		});
+
+		documents.forEach(document -> {
+			String documentJson = document.getDocumentJson();
+			String[] statements = documentJson.split("(;|\n)");
+			for (String statement : statements) {
+				String[] parts = statement.trim().toLowerCase().split("\\s");
+				if (parts.length == 4) {
+					String resourceName = parts[3];
+					// initialize action set for grants
+					Set<String> grantActionSet = grantMap.get(resourceName);
+					if (grantActionSet == null) {
+						grantActionSet = new HashSet<>();
+						grantMap.put(resourceName, grantActionSet);
+					}
+					// initialize action set for revokes
+					Set<String> revokeActionSet = revokeMap.get(resourceName);
+					if (revokeActionSet == null) {
+						revokeActionSet = new HashSet<>();
+						revokeMap.put(resourceName, revokeActionSet);
+					}
+					// update grants and revokes such that if statement starts
+					// with grant, add to grants map and remove from revokes map
+					// and if statement starts with revoke, add to revokes map
+					// and remove from grants map.
+					String[] actions = parts[1].split(",");
+					if (parts[0].equalsIgnoreCase("grant")) {
+						for (String action : actions) {
+							grantActionSet.add(action);
+							revokeActionSet.remove(action);
+						}
+					} else if (parts[0].equalsIgnoreCase("revoke")) {
+						for (String action : actions) {
+							revokeActionSet.add(action);
+							grantActionSet.remove(action);
+						}
+					} else {
+						log.warn(String.format("%s is not a valid permission type.", parts[0]));
+					}
+				} else {
+					log.warn(String.format("[%s] is not a valid statement.", statement));
+				}
+			}
+		});
 	}
 
 }

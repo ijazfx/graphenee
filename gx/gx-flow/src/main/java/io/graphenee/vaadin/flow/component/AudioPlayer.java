@@ -6,6 +6,7 @@ import com.vaadin.flow.server.StreamResource;
 
 import lombok.Setter;
 
+@SuppressWarnings("serial")
 @Tag("audio")
 public class AudioPlayer extends Component {
 

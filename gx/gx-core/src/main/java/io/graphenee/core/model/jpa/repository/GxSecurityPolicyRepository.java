@@ -18,25 +18,39 @@ package io.graphenee.core.model.jpa.repository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import io.graphenee.core.model.entity.GxAccessKey;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 @Repository
 public interface GxSecurityPolicyRepository extends GxJpaRepository<GxSecurityPolicy, Integer> {
 
-	List<GxSecurityPolicy> findAllByGxSecurityGroupsOidEquals(Integer oidSecurityGroup);
+	List<GxSecurityPolicy> findAllByIsActive(Boolean isActive, Sort sort);
 
-	List<GxSecurityPolicy> findAllByGxUserAccountsOidEquals(Integer oidUserAccount);
+	List<GxSecurityPolicy> findAllByNamespaceAndIsActive(GxNamespace namespace, Boolean isActive, Sort sort);
 
-	GxSecurityPolicy findAllBySecurityPolicyNameAndGxNamespaceNamespace(String policyName, String namespace);
+	List<GxSecurityPolicy> findAllByNamespace(GxNamespace namespace, Sort sort);
 
-	List<GxSecurityPolicy> findAllByGxAccessKeysOidEquals(Integer oidAccessKey);
+	List<GxSecurityPolicy> findAllBySecurityGroupsEquals(GxSecurityGroup securityGroup, Sort sort);
 
-	GxSecurityPolicy findByGxAccessKeysAccessKeyAndGxAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
+	List<GxSecurityPolicy> findAllBySecurityGroupsEqualsAndIsActive(GxSecurityGroup securityGroup, Boolean isActive, Sort sort);
 
-	List<GxSecurityPolicy> findByGxNamespace(GxNamespace gxNamespace);
+	List<GxSecurityPolicy> findAllByUserAccountsEquals(GxUserAccount userAccount, Sort sort);
+
+	List<GxSecurityPolicy> findAllByUserAccountsEqualsAndIsActive(GxUserAccount userAccount, Boolean isActive, Sort sort);
+
+	GxSecurityPolicy findAllBySecurityPolicyNameAndNamespace(String policyName, GxNamespace namespace);
+
+	List<GxSecurityPolicy> findAllByAccessKeysEquals(GxAccessKey accessKey, Sort sort);
+
+	GxSecurityPolicy findByAccessKeysAccessKeyAndAccessKeysIsActiveTrueAndIsActiveTrue(UUID accessKey);
+
+	List<GxSecurityPolicy> findByNamespace(GxNamespace namespace, Sort sort);
 
 }

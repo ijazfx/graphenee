@@ -7,6 +7,7 @@ import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 
+@SuppressWarnings("serial")
 public class LocalDateToSqlDateConverter implements Converter<LocalDate, Date> {
 
 	@Override

@@ -17,13 +17,16 @@ package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 public interface GxResourceRepository extends GxJpaRepository<GxResource, Integer> {
 
-	GxResource findOneByResourceNameAndGxNamespaceNamespaceAndIsActiveTrue(String resourceName, String namespace);
+	GxResource findOneByResourceNameAndNamespaceAndIsActiveTrue(String resourceName, GxNamespace namespace);
 
-	List<GxResource> findAllByGxNamespaceNamespace(String namespace);
+	List<GxResource> findAllByNamespace(GxNamespace namespace, Sort sort);
 
 }

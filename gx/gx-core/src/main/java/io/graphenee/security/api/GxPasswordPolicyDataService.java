@@ -3,29 +3,29 @@ package io.graphenee.security.api;
 import java.util.List;
 
 import io.graphenee.core.exception.ChangePasswordFailedException;
-import io.graphenee.core.model.bean.GxNamespaceBean;
-import io.graphenee.core.model.bean.GxPasswordPolicyBean;
-import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxPasswordPolicy;
+import io.graphenee.core.model.entity.GxUserAccount;
 
 public interface GxPasswordPolicyDataService {
 
-	public List<GxPasswordPolicyBean> findAllPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean);
+	public List<GxPasswordPolicy> findAllPasswordPolicyByNamespace(GxNamespace namespace);
 
-	public GxPasswordPolicyBean findPasswordPolicyByNamespace(GxNamespaceBean gxNamespaceBean);
+	public GxPasswordPolicy findPasswordPolicyByNamespace(GxNamespace namespace);
 
-	public GxPasswordPolicyBean findPasswordPolicyByNamespace(String namespace);
+	public GxPasswordPolicy save(GxPasswordPolicy entity);
 
-	public GxPasswordPolicyBean createOrUpdate(GxPasswordPolicyBean bean);
+	public void delete(GxPasswordPolicy entity);
 
-	public void delete(GxPasswordPolicyBean bean);
+	Boolean findPasswordIsValid(GxNamespace namespace, String username, String password);
 
-	Boolean findPasswordIsValid(String namespace, String username, String password);
+	void assertPasswordPolicy(GxNamespace namespace, String username, String password) throws AssertionError;
 
-	void assertPasswordPolicy(String namespace, String username, String password) throws AssertionError;
+	void assertPasswordPolicy(GxPasswordPolicy entity, String username, String password) throws AssertionError;
 
-	void assertPasswordPolicy(GxPasswordPolicyBean entity, String username, String password) throws AssertionError;
+	void changePassword(GxNamespace namespace, String username, String oldPassword, String newPassword) throws ChangePasswordFailedException;
 
-	void changePassword(String namespace, String username, String oldPassword, String newPassword) throws ChangePasswordFailedException;
+	void changePassword(GxNamespace namespace, String username, String newPassword) throws ChangePasswordFailedException;
 
-	Boolean isPasswordExpired(String namespace, GxUserAccountBean usAccountBean);
+	Boolean isPasswordExpired(GxNamespace namespace, GxUserAccount usAccount);
 }
