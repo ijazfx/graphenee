@@ -665,7 +665,7 @@ public class GxDataServiceImpl implements GxDataService {
 			entity.setIsProtected(false);
 			entity.setNamespace(namespace);
 			entity.setNamespaceDescription("-- Auto Generated --");
-			namespaceRepo.save(entity);
+			entity = namespaceRepo.save(entity);
 		}
 		return entity;
 	}
@@ -678,6 +678,7 @@ public class GxDataServiceImpl implements GxDataService {
 			entity.setIsActive(true);
 			entity.setIsProtected(false);
 			entity.setSecurityGroupName(groupName);
+			entity.setNamespace(namespace);
 			entity = securityGroupRepo.save(entity);
 		}
 		return entity;
@@ -692,6 +693,7 @@ public class GxDataServiceImpl implements GxDataService {
 			entity.setIsProtected(false);
 			entity.setSecurityPolicyName(policyName);
 			entity.setNamespace(namespace);
+			entity = securityPolicyRepo.save(entity);
 		}
 		return entity;
 	}

@@ -36,6 +36,7 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	String name;
 
 	String note;
+	UUID folderId = UUID.randomUUID();
 
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;

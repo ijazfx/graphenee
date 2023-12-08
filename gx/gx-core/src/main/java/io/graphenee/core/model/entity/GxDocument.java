@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.JSONObject;
 
@@ -34,6 +35,8 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 	String note;
 	String mimeType;
 	Long size;
+
+	UUID documentId = UUID.randomUUID();
 
 	Integer versionNo = 0;
 	String path;

@@ -17,6 +17,7 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -31,7 +32,9 @@ import lombok.Setter;
 public class GxCity extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Column(name = "city_name")
 	private String cityName;
+
 	private Boolean isActive = true;
 
 	@ManyToOne

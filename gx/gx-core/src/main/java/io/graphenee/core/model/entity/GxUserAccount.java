@@ -57,7 +57,7 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 	private String fullNameNative;
 	private Boolean isActive = true;
 	private Boolean isLocked = false;
-	private Boolean isPasswordChangeRequired = true;
+	private Boolean isPasswordChangeRequired = false;
 	private Boolean isProtected = false;
 	private Timestamp lastLoginDate;
 	private Timestamp lastLoginFailedDate;
