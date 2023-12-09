@@ -18,7 +18,7 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 
 import io.graphenee.core.model.BeanFault;
-import lombok.EqualsAndHashCode.Include;
+import io.graphenee.core.model.entity.GxNamespace;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,7 +39,7 @@ public class GxEmailTemplateBean implements Serializable {
 	private String subject;
 	private String templateName;
 	private String templateCode;
-	private BeanFault<Integer, GxNamespaceBean> namespaceBeanFault;
+	private BeanFault<Integer, GxNamespace> namespaceBeanFault;
 	private String senderEmailAddress;
 
 	public String getNamespace() {

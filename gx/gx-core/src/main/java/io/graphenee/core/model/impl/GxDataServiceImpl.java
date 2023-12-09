@@ -1030,7 +1030,7 @@ public class GxDataServiceImpl implements GxDataService {
 	public GxUserAccount findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespace namespace) {
 		GxUserAccount userAccount = userAccountRepo.findByUsernameAndNamespace(username, namespace);
 		if (userAccount == null) {
-			userAccount = userAccountRepo.findByUsernameAndNamespaceIsNull(username);
+			userAccount = userAccountRepo.findByUsernameAndNamespace(username, systemNamespace());
 			if (userAccount == null)
 				return null;
 		}

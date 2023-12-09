@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.eventbus.EventBus;
@@ -31,6 +33,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
@@ -355,7 +358,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 			decorateMenuBar(customMenuBar);
 
-			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.MENU.create());
+			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.TASKS.create());
 			decorateColumnMenuBar(columnMenuBar);
 
 			H2 menuHeading = new H2("Column Menu");
@@ -1297,7 +1300,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 	 * @return
 	 */
 	protected double defaultSplitterPosition() {
-		return 60.0;
+		return 50.0;
 	}
 
 	private void openForm(T entity) {

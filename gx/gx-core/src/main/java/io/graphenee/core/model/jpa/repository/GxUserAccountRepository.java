@@ -46,8 +46,6 @@ public interface GxUserAccountRepository extends GxJpaRepository<GxUserAccount, 
 
 	GxUserAccount findByUsernameAndNamespace(String username, GxNamespace namespace);
 
-	GxUserAccount findByUsernameAndNamespaceIsNull(String username);
-
 	GxUserAccount findByUsername(String username);
 
 	GxUserAccount findByAccessKeysAccessKeyAndAccessKeysIsActiveTrue(UUID accessKey);

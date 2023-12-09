@@ -3,13 +3,14 @@ package io.graphenee.core.model;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.graphenee.core.model.bean.GxUserAccountBean;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.util.enums.GenderEnum;
 
-public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
+public class GxDashboardUser extends AbstractDashboardUser<GxUserAccount> {
 
 	private AtomicInteger notificationCount = new AtomicInteger();
 
-	public GxDashboardUser(GxUserAccountBean user) {
+	public GxDashboardUser(GxUserAccount user) {
 		super(user);
 	}
 
@@ -60,12 +61,12 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 
 	@Override
 	public GenderEnum getGender() {
-		return getUser().getGender();
+		return GenderEnum.genderByGenderCode(getUser().getGender().getGenderCode());
 	}
 
 	@Override
 	public void setGender(GenderEnum gender) {
-		getUser().setGender(gender);
+		//		getUser().setGender(gender);
 	}
 
 	@Override

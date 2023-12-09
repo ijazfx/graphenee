@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,7 +30,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
-public class GxMappedSuperclass {
+public class GxMappedSuperclass implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	// @Version
 	// protected Integer version;
