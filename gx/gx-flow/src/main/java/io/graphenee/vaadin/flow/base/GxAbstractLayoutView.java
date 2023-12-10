@@ -22,7 +22,6 @@ import com.vaadin.flow.server.VaadinSession;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import jakarta.annotation.PostConstruct;
 
-@CssImport("./styles/graphenee.css")
 public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver {
 
 	private static final long serialVersionUID = 1L;
@@ -102,6 +101,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 		if (getCaption() == null)
 			return null;
 		H3 lblCaption = new H3(getCaption());
+		lblCaption.addClassName("gx-layout-title");
 		lblCaption.getElement().getStyle().set("padding", "0.75rem");
 		lblCaption.getElement().getStyle().set("font-size", "var(--lumo-font-size-xl");
 		lblCaption.getElement().getStyle().set("color", "var(--lumo-primary-color");

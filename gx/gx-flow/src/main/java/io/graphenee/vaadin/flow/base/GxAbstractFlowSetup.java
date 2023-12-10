@@ -35,7 +35,9 @@ public abstract class GxAbstractFlowSetup {
 	public abstract List<GxMenuItem> menuItems();
 
 	public Image appLogo() {
-		return null;
+		Image i = new Image();
+		i.setSrc("frontend/images/graphenee.png");
+		return i;
 	}
 
 }

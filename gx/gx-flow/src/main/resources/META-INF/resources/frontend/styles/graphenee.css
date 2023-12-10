@@ -144,3 +144,93 @@ vaadin-app-layout::part(navbar) {
 .gx-grid-search-layout {
     margin: 0.75rem;
 }
+
+.gx-login-logo {
+	margin-bottom: 1rem;
+}
+
+.gx-login-title {
+	font-size: 1.5rem;
+	text-transform: uppercase;
+}
+
+.gx-login-title-layout * {
+    color: white;
+}
+
+::part(label) {
+    text-transform: uppercase;
+}
+
+::part(error-message) {
+    font-size: var(--lumo-font-size-s);
+    text-align: end;
+}
+
+vaadin-button[theme~="primary"] {
+    color: white;
+}
+
+vaadin-login-form-wrapper {
+	border-radius: 0 0 var(--lumo-border-radius) var(--lumo-border-radius);
+}
+
+.gx-login-title-layout {
+	background: var(--lumo-primary-color);
+	padding: 1rem;
+	border-radius: var(--lumo-border-radius) var(--lumo-border-radius) 0 0;
+}
+
+vaadin-avatar {
+    text-transform: uppercase;
+}
+
+.gx-app-layout-logout {
+    background: white;
+    height: 100%;
+    margin-left: 0.4rem !important;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 0rem;
+}
+
+.gx-app-layout-logout::part(label) {
+    color: red;
+    font-size: medium;
+    font-weight: bold;
+}
+
+vaadin-app-layout::part(drawer) {
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+}
+
+vaadin-side-nav-item::part(link) {
+    padding: 0.5rem 1rem;
+}
+
+vaadin-icon {
+    color: var(--background-color);
+}
+
+vaadin-menu-bar-button {
+    padding: 0rem;
+    border-radius: .5rem;
+}
+
+vaadin-tab {
+    text-transform: uppercase;
+    font-size: small;
+    font-weight: bold;
+}
+
+.gx-nav-menuitem {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: var(--lumo-font-size-xs);
+    background: white;
+}
+
+.gx-layout-title {
+    text-transform: uppercase;
+}

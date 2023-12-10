@@ -5,8 +5,9 @@ import java.util.List;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.AbstractLogin.ForgotPasswordEvent;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.component.login.LoginForm;
@@ -14,7 +15,7 @@ import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
@@ -28,65 +29,46 @@ import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/graphenee.css")
-public abstract class GxAbstractLoginView extends VerticalLayout implements HasUrlParameter<String> {
+public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlParameter<String> {
 
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
 	private Image appLogo;
 
 	public GxAbstractLoginView() {
+		addClassName("gx-login-view");
 		setSizeFull();
-		setClassName("gx-login-view");
-		setJustifyContentMode(JustifyContentMode.CENTER);
+		setFlexDirection(FlexDirection.COLUMN);
 		setAlignItems(Alignment.CENTER);
+		setJustifyContentMode(JustifyContentMode.CENTER);
 	}
 
 	@PostConstruct
 	private void postBuild() {
-		FlexLayout headingLayout = new FlexLayout();
-		headingLayout.setAlignItems(Alignment.BASELINE);
-		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-		headingLayout.setWidth("328px");
-		Span heading = new Span(appTitle());
-		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
-		Span version = new Span(appVersion());
-		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
-		headingLayout.add(heading, version);
+		FlexLayout loginFormLayout = new FlexLayout();
+		loginFormLayout.addClassName("gx-login-form-layout");
+		loginFormLayout.setFlexDirection(FlexDirection.COLUMN);
+		loginFormLayout.setAlignItems(Alignment.CENTER);
+		loginFormLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
-		add(headingLayout);
-
-		VerticalLayout rootLayout = new VerticalLayout();
-		rootLayout.setSpacing(false);
-		rootLayout.setPadding(false);
-		rootLayout.setWidth("-1px");
-		rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		rootLayout.getElement().getStyle().set("background", backgoundColor());
-
-		appLogo = appLogo();
-		if (appLogo != null) {
-			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-			appLogo.setWidth("100px");
-			rootLayout.add(appLogo);
-			rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
-		}
-
-		add(rootLayout);
+		HorizontalLayout titleVersionLayout = new HorizontalLayout();
+		titleVersionLayout.setWidthFull();
+		titleVersionLayout.addClassName("gx-login-title-layout");
+		H1 title = new H1(appTitle());
+		title.addClassName("gx-login-title");
+		H5 version = new H5(appVersion());
+		titleVersionLayout.add(title, version);
+		titleVersionLayout.setAlignItems(Alignment.BASELINE);
 
 		LoginForm loginForm = new LoginForm();
-		loginForm.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		loginForm.getElement().getStyle().set("background", backgoundColor());
+		loginForm.addClassName("gx-login-form");
 		loginForm.setForgotPasswordButtonVisible(true);
 		LoginI18n loginI18n = LoginI18n.createDefault();
 		loginI18n.getForm().setSubmit("Sign In");
-		loginI18n.getForm().setTitle("Enter Credentials");
 		loginI18n.getForm().setForgotPassword("Forgot Password? Click here to Reset!");
 		loginI18n.getForm().setUsername("Username");
 		loginI18n.getForm().setPassword("Password");
 		loginForm.setI18n(loginI18n);
-
-		rootLayout.add(loginForm);
 
 		loginForm.addLoginListener(e -> {
 			try {
@@ -119,6 +101,16 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 			onForgotPassword(e);
 		});
 
+		Image logo = appLogo();
+		if (logo != null) {
+			logo.addClassName("gx-login-logo");
+			logo.setWidth("6rem");
+			loginFormLayout.addComponentAsFirst(logo);
+			loginFormLayout.getStyle().set("margin-bottom", "12rem");
+		}
+
+		loginFormLayout.add(titleVersionLayout, loginForm);
+		add(loginFormLayout);
 	}
 
 	protected String backgoundColor() {
