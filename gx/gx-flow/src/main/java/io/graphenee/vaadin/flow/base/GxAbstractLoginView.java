@@ -57,15 +57,18 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		H1 title = new H1(appTitle());
 		title.addClassName("gx-login-title");
 		H5 version = new H5(appVersion());
+		version.addClassName("gx-login-version");
 		titleVersionLayout.add(title, version);
-		titleVersionLayout.setAlignItems(Alignment.BASELINE);
+		titleVersionLayout.setAlignItems(Alignment.START);
+		titleVersionLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.addClassName("gx-login-form");
 		loginForm.setForgotPasswordButtonVisible(true);
 		LoginI18n loginI18n = LoginI18n.createDefault();
 		loginI18n.getForm().setSubmit("Sign In");
-		loginI18n.getForm().setForgotPassword("Forgot Password? Click here to Reset!");
+		loginI18n.getForm().setTitle("Enter Credentials");
+		loginI18n.getForm().setForgotPassword("Forgot Password? Click here!");
 		loginI18n.getForm().setUsername("Username");
 		loginI18n.getForm().setPassword("Password");
 		loginForm.setI18n(loginI18n);
@@ -110,6 +113,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		}
 
 		loginFormLayout.add(titleVersionLayout, loginForm);
+		//loginFormLayout.setWidth("400px");
 		add(loginFormLayout);
 	}
 

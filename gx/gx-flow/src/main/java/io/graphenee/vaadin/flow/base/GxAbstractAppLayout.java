@@ -14,8 +14,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.ContentAlignment;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
@@ -61,10 +61,12 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 
 		generateMenuItems(drawer);
 
-		VerticalLayout drawerLayout = new VerticalLayout();
+		FlexLayout drawerLayout = new FlexLayout();
+		drawerLayout.setFlexDirection(FlexDirection.COLUMN);
+		drawerLayout.setAlignItems(Alignment.CENTER);
 		drawerLayout.addClassName("gx-app-layout-drawer-layout");
-		drawerLayout.setMargin(false);
-		drawerLayout.setPadding(false);
+		// drawerLayout.setMargin(false);
+		// drawerLayout.setPadding(false);
 		drawerLayout.setWidthFull();
 		drawerLayout.add(drawer);
 
@@ -90,7 +92,6 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 		if (flowSetup().loggedInUser() != null) {
 			GxAuthenticatedUser user = flowSetup().loggedInUser();
 			avatar = new Avatar(user.getFirstNameLastName());
-			avatar.addClassName("gx-app-layout-avatar");
 			avatar.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin", "0");
 			avatar.getStyle().set("background", "var(--lumo-base-color)");
 			avatar.getStyle().set("color", "var(--lumo-primary-color)");
@@ -116,7 +117,16 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 			HorizontalLayout hl = new HorizontalLayout();
 			hl.add(avatar, logout);
 			hl.setMargin(true);
-			navbarLayout.add(avatar, logout);
+
+			if (logoPosition() == LogoPosition.TITLE_BAR) {
+				avatar.addClassName("gx-avatar-small");
+				navbarLayout.add(avatar, logout);
+			} else {
+				avatar.addClassName("gx-avatar-large");
+				drawerLayout.addComponentAsFirst(avatar);
+			}
+
+			navbarLayout.add(logout);
 		}
 
 		addToNavbar(navbarLayout);
@@ -160,6 +170,15 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 	}
 
 	protected abstract GxAbstractFlowSetup flowSetup();
+
+	public static enum LogoPosition {
+		TITLE_BAR,
+		DRAWER
+	}
+
+	protected LogoPosition logoPosition() {
+		return LogoPosition.TITLE_BAR;
+	}
 
 	public static interface GxAbstractAppLayoutDelegate {
 		default void onLogout(UI ui) {

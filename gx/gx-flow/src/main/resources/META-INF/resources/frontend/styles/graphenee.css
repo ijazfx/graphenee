@@ -152,7 +152,9 @@ vaadin-app-layout::part(navbar) {
 .gx-login-title {
 	font-size: 1.5rem;
 	text-transform: uppercase;
+	max-width: min-content;
 }
+
 
 .gx-login-title-layout * {
     color: white;
@@ -181,8 +183,17 @@ vaadin-login-form-wrapper {
 	border-radius: var(--lumo-border-radius) var(--lumo-border-radius) 0 0;
 }
 
-vaadin-avatar {
+.gx-avatar-small {
+	text-transform: uppercase;
+    width: 1rem;
+    height: 1rem;
+}
+
+.gx-avatar-large {
     text-transform: uppercase;
+    width: 6.5rem;
+    height: 6.5rem;
+    margin: 2rem !important;
 }
 
 .gx-app-layout-logout {
