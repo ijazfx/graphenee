@@ -1,6 +1,7 @@
 package io.graphenee.vaadin.flow.base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,10 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.PropertyFilterDefinition;
+import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.util.KeyValueWrapper;
@@ -184,7 +188,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 			add(toolbar);
 
-			dataBinder = new Binder<>(entityClass, true);
+			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+			dataBinder = Binder.withPropertySet(bps);
 			bindFields(dataBinder);
 			try {
 				dataBinder.bindInstanceFields(GxAbstractEntityForm.this);

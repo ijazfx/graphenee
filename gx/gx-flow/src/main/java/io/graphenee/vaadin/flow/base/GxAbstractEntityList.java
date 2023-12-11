@@ -84,6 +84,7 @@ import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
+import com.vaadin.flow.data.binder.PropertyFilterDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -194,7 +195,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.className = entityClass.getName();
 		this.entityClass = entityClass;
-		this.searchBinder = new Binder<>(entityClass);
+		PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+		this.searchBinder = Binder.withPropertySet(bps);
 		setSizeFull();
 		setMargin(false);
 		setPadding(false);
@@ -810,7 +812,8 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	protected Grid<T> dataGrid(Class<T> entityClass) {
 		Grid<T> dataGrid = new Grid<>(entityClass, true);
 		if (isGridInlineEditingEnabled()) {
-			Binder<T> editBinder = new Binder<>(entityClass);
+			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+			Binder<T> editBinder = Binder.withPropertySet(bps);
 			dataGrid.getEditor().setBinder(editBinder);
 			dataGrid.getEditor().setBuffered(false);
 			editBinder.addValueChangeListener(l -> {
