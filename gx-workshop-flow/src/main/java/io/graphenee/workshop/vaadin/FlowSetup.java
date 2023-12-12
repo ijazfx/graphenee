@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
@@ -18,23 +17,6 @@ import io.graphenee.vaadin.flow.documents.GxDocumentExplorerView;
 @Component
 @VaadinSessionScope
 public class FlowSetup extends GxAbstractFlowSetup {
-
-	@Override
-	public String appTitle() {
-		return "Graphenee";
-	}
-
-	@Override
-	public Image appLogo() {
-		Image i = new Image();
-		i.setSrc("frontend/images/graphenee.jpg");
-		return i;
-	}
-
-	@Override
-	public String appVersion() {
-		return "1.0";
-	}
 
 	@Override
 	public List<GxMenuItem> menuItems() {
