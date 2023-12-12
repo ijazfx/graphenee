@@ -11,7 +11,7 @@ import io.graphenee.vaadin.flow.utils.DashboardUtils;
 public abstract class GxAbstractFlowSetup {
 
 	public String appTitle() {
-		return "Flow Application";
+		return "Graphenee";
 	}
 
 	public String appVersion() {

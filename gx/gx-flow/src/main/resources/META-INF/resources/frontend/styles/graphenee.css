@@ -98,7 +98,7 @@ vaadin-app-layout::part(navbar) {
 }
 
 .gx-right-drawer {
-  box-shadow: -0.75rem 0 0.75rem rgba(0, 0, 0, 0.2); /* Adjust the values for your shadow effect */
+  box-shadow: -0.5rem 0.5rem 0.25rem #0001;
   z-index: 100;
 }
 
@@ -185,8 +185,8 @@ vaadin-login-form-wrapper {
 
 .gx-avatar-small {
 	text-transform: uppercase;
-    width: 1rem;
-    height: 1rem;
+    width: 2rem;
+    height: 2rem;
 }
 
 .gx-avatar-large {
@@ -197,7 +197,6 @@ vaadin-login-form-wrapper {
 }
 
 .gx-app-layout-logout {
-    background: white;
     height: 100%;
     margin-left: 0.4rem !important;
     padding-left: 1rem;
@@ -212,7 +211,7 @@ vaadin-login-form-wrapper {
 }
 
 vaadin-app-layout::part(drawer) {
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0.5rem 0.5rem 0.25rem #0001;
     z-index: 100;
 }
 
@@ -244,4 +243,47 @@ vaadin-tab {
 
 .gx-layout-title {
     text-transform: uppercase;
+}
+
+vaadin-side-nav-item::part(link) {
+    margin: 0.2rem;
+    border-radius: 0 1rem 1rem 0;
+}
+
+vaadin-side-nav-item::part(link):hover {
+    color: var(--lumo-primary-color);
+    background: var(--lumo-primary-color-10pct);
+}
+
+vaadin-side-nav-item:hover {
+    background: var(--lumo-primary-color-10pct);
+}
+
+vaadin-checkbox::part(checkbox) {
+    background: var(--background-color)
+}
+
+vaadin-button {
+    font-weight: bold;
+}
+
+vaadin-button[theme~="error"] {
+    border: 0.1rem solid;
+    font-weight: bold
+}
+
+vaadin-button[theme~="success"] {
+    border: 0.1rem solid;
+    font-weight: bold;
+}
+
+vaadin-context-menu-item {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: var(--lumo-font-size-xs);
+}
+
+vaadin-context-menu-item vaadin-icon {
+    margin-right: 0.5rem;
+    width: 1rem;
 }

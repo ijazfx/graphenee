@@ -52,10 +52,10 @@ public class GxDownloadButton extends Button {
 		super(text);
 
 		if (isIconVisible())
-			setIcon(VaadinIcon.DOWNLOAD.create());
+			setIcon(VaadinIcon.FILE_ZIP.create());
 
 		setDisableOnClick(true);
-		addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		addThemeVariants(ButtonVariant.LUMO_ICON);
 
 		addClickListener(event -> {
 			Button button = event.getSource();

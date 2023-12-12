@@ -293,7 +293,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected Component getFormComponent() {
 		FormLayout formLayout = new FormLayout();
-		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("480px", 2))); //, new ResponsiveStep("640px", 3)));
+		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("600px", 2))); //, new ResponsiveStep("640px", 3)));
 		formLayout.setSizeFull();
 		return formLayout;
 	}

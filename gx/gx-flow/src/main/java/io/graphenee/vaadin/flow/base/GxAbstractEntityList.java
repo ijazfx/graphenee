@@ -638,11 +638,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 	}
 
 	protected void decorateContextMenu(GridContextMenu<T> contextMenu) {
-		GridMenuItem<T> addItem = contextMenu.addItem(new Span(VaadinIcon.PLUS.create(), new Text("Add New Record")));
+		GridMenuItem<T> addItem = contextMenu.addItem(new Span(VaadinIcon.PLUS.create(), new Text("New...")));
 		customizeAddContextMenuItem(addItem);
-		GridMenuItem<T> editItem = contextMenu.addItem(new Span(VaadinIcon.PENCIL.create(), new Text("Edit Record")));
+		GridMenuItem<T> editItem = contextMenu.addItem(new Span(VaadinIcon.EDIT.create(), new Text("Edit")));
 		customizeEditContextMenuItem(editItem);
-		GridMenuItem<T> deleteItem = contextMenu.addItem(new Span(VaadinIcon.TRASH.create(), new Text("Delete Record")));
+		GridMenuItem<T> deleteItem = contextMenu.addItem(new Span(VaadinIcon.TRASH.create(), new Text("Delete")));
 		customizeDeleteContextMenuItem(deleteItem);
 		contextMenu.addGridContextMenuOpenedListener(e -> {
 			boolean present = e.getItem().isPresent();
