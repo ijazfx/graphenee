@@ -33,7 +33,6 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
-	private Image appLogo;
 
 	public GxAbstractLoginView() {
 		addClassName("gx-login-view");
@@ -59,8 +58,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		H5 version = new H5(appVersion());
 		version.addClassName("gx-login-version");
 		titleVersionLayout.add(title, version);
-		titleVersionLayout.setAlignItems(Alignment.START);
-		titleVersionLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+		titleVersionLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.addClassName("gx-login-form");
@@ -106,10 +104,10 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 		Image logo = appLogo();
 		if (logo != null) {
-			logo.addClassName("gx-login-logo");
-			logo.setWidth("6rem");
-			loginFormLayout.addComponentAsFirst(logo);
-			loginFormLayout.getStyle().set("margin-bottom", "12rem");
+			logo.setHeight("3.5rem");
+			logo.getStyle().set("border-radius", "0.5rem");
+			titleVersionLayout.add(logo);
+			titleVersionLayout.expand(version);
 		}
 
 		loginFormLayout.add(titleVersionLayout, loginForm);

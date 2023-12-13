@@ -213,6 +213,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	private void buildFormTitle() {
 		if (formTitleLabel == null) {
 			formTitleLabel = new NativeLabel();
+			formTitleLabel.getStyle().set("text-transform", "uppercase");
 			formTitleLabel.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
 			formTitleLabel.getStyle().set("font-weight", "bold");
 			formTitleLabel.getStyle().set("color", "var(--lumo-primary-color)");

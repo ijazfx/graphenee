@@ -37,7 +37,7 @@ public class FileUploader extends CustomField<String> {
 
 	private String[] allowedFileTypes = null;
 	private Boolean autoUpload = true;
-	private String dropFileLabel = "Drop files here";
+	private String dropFileLabel = "Drop file(s) here";
 
 	// 5MB
 	private int maxFileSize = 5048576;

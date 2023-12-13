@@ -394,6 +394,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 			searchForm.setResponsiveSteps(new ResponsiveStep("100px", 6));
 
 			decorateSearchForm(searchForm, searchBinder);
+			searchForm.setVisible(searchForm.getChildren().count() > 0);
+
 			gridLayout.addComponentAsFirst(searchForm);
 
 			List<Column<T>> columns = new ArrayList<>();

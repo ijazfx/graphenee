@@ -1,95 +1,100 @@
 @font-face {
-  font-family: "Roboto Condensed";
-  src: url("/frontend/fonts/RobotoCondensed-Regular.ttf");
+	font-family: "Roboto Condensed";
+	src: url("/frontend/fonts/RobotoCondensed-Regular.ttf");
+}
+
+@font-face {
+	font-family: "Nanum Bold";
+	src: url("/frontend/fonts/NanumGothic-Bold.ttf");
 }
 
 html {
-  --lumo-font-family: "Roboto Condensed";
-  --lumo-font-size: 1rem;
-  --lumo-font-size-xxxl: 1.75rem;
-  --lumo-font-size-xxl: 1.375rem;
-  --lumo-font-size-xl: 1.125rem;
-  --lumo-font-size-l: 1rem;
-  --lumo-font-size-m: 0.875rem;
-  --lumo-font-size-s: 0.8125rem;
-  --lumo-font-size-xs: 0.75rem;
-  --lumo-font-size-xxs: 0.6875rem;
-  --lumo-border-radius: 0.1rem;
-  --lumo-size-xl: 3rem;
-  --lumo-size-l: 2.5rem;
-  --lumo-size-m: 2rem;
-  --lumo-size-s: 1.75rem;
-  --lumo-size-xs: 1.5rem;
-  --lumo-space-xl: 1.875rem;
-  --lumo-space-l: 1.25rem;
-  --lumo-space-m: 0.625rem;
-  --lumo-space-s: 0.3125rem;
-  --lumo-space-xs: 0.1875rem;
-  --lumo-primary-text-color: rgb(114, 22, 243);
-  --lumo-primary-color-50pct: rgba(114, 22, 243, 0.5);
-  --lumo-primary-color-10pct: rgba(114, 22, 243, 0.1);
-  --lumo-error-text-color: rgb(255, 56, 103);
-  --lumo-error-color-50pct: rgba(255, 56, 103, 0.5);
-  --lumo-error-color-10pct: rgba(255, 56, 103, 0.1);
-  --lumo-success-text-color: rgb(20, 184, 143);
-  --lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
-  --lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
-  --lumo-primary-color: hsl(265, 90%, 52%);
-  --lumo-error-color: hsl(346, 100%, 61%);
-  --lumo-success-color: hsl(165, 80%, 40%);
-  --lumo-header-text-color: hsl(285, 35%, 15%);
-  --lumo-body-text-color: hsla(285, 40%, 16%, 0.94);
-  --lumo-secondary-text-color: hsla(285, 42%, 18%, 0.72);
-  --lumo-tertiary-text-color: hsla(285, 45%, 20%, 0.5);
-  --lumo-disabled-text-color: hsla(285, 50%, 22%, 0.26);
-  --background-color: #444444;
-  --background-text-color: white;
+	--lumo-font-family: "Nanum Bold", "Roboto Condensed";
+	--lumo-font-size: 1rem;
+	--lumo-font-size-xxxl: 1.75rem;
+	--lumo-font-size-xxl: 1.375rem;
+	--lumo-font-size-xl: 1.125rem;
+	--lumo-font-size-l: 1rem;
+	--lumo-font-size-m: 0.875rem;
+	--lumo-font-size-s: 0.8125rem;
+	--lumo-font-size-xs: 0.75rem;
+	--lumo-font-size-xxs: 0.6875rem;
+	--lumo-border-radius: 0.1rem;
+	--lumo-size-xl: 3rem;
+	--lumo-size-l: 2.5rem;
+	--lumo-size-m: 2rem;
+	--lumo-size-s: 1.75rem;
+	--lumo-size-xs: 1.5rem;
+	--lumo-space-xl: 1.875rem;
+	--lumo-space-l: 1.25rem;
+	--lumo-space-m: 0.625rem;
+	--lumo-space-s: 0.3125rem;
+	--lumo-space-xs: 0.1875rem;
+	--lumo-primary-text-color: rgb(0, 0, 0);
+	--lumo-primary-color-50pct: rgba(0, 0, 0, 0.5);
+	--lumo-primary-color-10pct: rgba(0, 0, 0, 0.1);
+	--lumo-error-text-color: rgb(255, 56, 103);
+	--lumo-error-color-50pct: rgba(255, 56, 103, 0.5);
+	--lumo-error-color-10pct: rgba(255, 56, 103, 0.1);
+	--lumo-success-text-color: rgb(20, 184, 143);
+	--lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
+	--lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
+	--lumo-primary-color: rgb(0, 0, 0);
+	--lumo-error-color: hsl(346, 100%, 61%);
+	--lumo-success-color: hsl(165, 80%, 40%);
+	--lumo-header-text-color: hsl(285, 35%, 15%);
+	--lumo-body-text-color: hsla(285, 40%, 16%, 0.94);
+	--lumo-secondary-text-color: hsla(285, 42%, 18%, 0.72);
+	--lumo-tertiary-text-color: hsla(285, 45%, 20%, 0.5);
+	--lumo-disabled-text-color: hsla(285, 50%, 22%, 0.26);
+	--background-color: rgb(0, 0, 0);
+	--background-text-color: white;
 }
 
 [theme~="dark"] {
-  --lumo-font-family: "Roboto Condensed";
-  --lumo-tint-5pct: rgba(252, 245, 255, 0.05);
-  --lumo-tint-10pct: rgba(252, 245, 255, 0.1);
-  --lumo-tint-20pct: rgba(252, 245, 255, 0.2);
-  --lumo-tint-30pct: rgba(252, 245, 255, 0.3);
-  --lumo-tint-40pct: rgba(252, 245, 255, 0.4);
-  --lumo-tint-50pct: rgba(252, 245, 255, 0.5);
-  --lumo-tint-60pct: rgba(252, 245, 255, 0.6);
-  --lumo-tint-70pct: rgba(252, 245, 255, 0.7);
-  --lumo-tint-80pct: rgba(252, 245, 255, 0.8);
-  --lumo-tint-90pct: rgba(252, 245, 255, 0.9);
-  --lumo-shade-5pct: rgba(7, 6, 15, 0.05);
-  --lumo-shade-10pct: rgba(7, 6, 15, 0.1);
-  --lumo-shade-20pct: rgba(7, 6, 15, 0.2);
-  --lumo-shade-30pct: rgba(7, 6, 15, 0.3);
-  --lumo-shade-40pct: rgba(7, 6, 15, 0.4);
-  --lumo-shade-50pct: rgba(7, 6, 15, 0.5);
-  --lumo-shade-60pct: rgba(7, 6, 15, 0.6);
-  --lumo-shade-70pct: rgba(7, 6, 15, 0.7);
-  --lumo-shade-80pct: rgba(7, 6, 15, 0.8);
-  --lumo-shade-90pct: rgba(7, 6, 15, 0.9);
-  --lumo-primary-text-color: rgb(124, 42, 239);
-  --lumo-primary-color-50pct: rgba(124, 42, 239, 0.5);
-  --lumo-primary-color-10pct: rgba(124, 42, 239, 0.1);
-  --lumo-error-text-color: rgb(255, 56, 103);
-  --lumo-error-color-50pct: rgba(255, 56, 103, 0.5);
-  --lumo-error-color-10pct: rgba(255, 56, 103, 0.1);
-  --lumo-success-text-color: rgb(20, 184, 143);
-  --lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
-  --lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
-  --lumo-base-color: hsl(255, 35%, 23%);
-  --lumo-tint: hsl(285, 100%, 98%);
-  --lumo-shade: hsl(249, 46%, 4%);
-  --lumo-primary-color: hsl(265, 86%, 55%);
-  --lumo-error-color: hsl(346, 100%, 61%);
-  --lumo-success-color: hsl(165, 80%, 40%);
-  --lumo-header-text-color: hsl(285, 100%, 98%);
-  --lumo-body-text-color: hsla(285, 96%, 96%, 0.9);
-  --lumo-secondary-text-color: hsla(285, 87%, 92%, 0.7);
-  --lumo-tertiary-text-color: hsla(285, 78%, 88%, 0.5);
-  --lumo-disabled-text-color: hsla(285, 69%, 84%, 0.32);
-  --background-color: #444444;
-  --background-text-color: white;
+	--lumo-font-family: "Nanum Gothic", "Roboto Condensed";
+	--lumo-tint-5pct: rgba(252, 245, 255, 0.05);
+	--lumo-tint-10pct: rgba(252, 245, 255, 0.1);
+	--lumo-tint-20pct: rgba(252, 245, 255, 0.2);
+	--lumo-tint-30pct: rgba(252, 245, 255, 0.3);
+	--lumo-tint-40pct: rgba(252, 245, 255, 0.4);
+	--lumo-tint-50pct: rgba(252, 245, 255, 0.5);
+	--lumo-tint-60pct: rgba(252, 245, 255, 0.6);
+	--lumo-tint-70pct: rgba(252, 245, 255, 0.7);
+	--lumo-tint-80pct: rgba(252, 245, 255, 0.8);
+	--lumo-tint-90pct: rgba(252, 245, 255, 0.9);
+	--lumo-shade-5pct: rgba(7, 6, 15, 0.05);
+	--lumo-shade-10pct: rgba(7, 6, 15, 0.1);
+	--lumo-shade-20pct: rgba(7, 6, 15, 0.2);
+	--lumo-shade-30pct: rgba(7, 6, 15, 0.3);
+	--lumo-shade-40pct: rgba(7, 6, 15, 0.4);
+	--lumo-shade-50pct: rgba(7, 6, 15, 0.5);
+	--lumo-shade-60pct: rgba(7, 6, 15, 0.6);
+	--lumo-shade-70pct: rgba(7, 6, 15, 0.7);
+	--lumo-shade-80pct: rgba(7, 6, 15, 0.8);
+	--lumo-shade-90pct: rgba(7, 6, 15, 0.9);
+	--lumo-primary-text-color: rgb(124, 42, 239);
+	--lumo-primary-color-50pct: rgba(124, 42, 239, 0.5);
+	--lumo-primary-color-10pct: rgba(124, 42, 239, 0.1);
+	--lumo-error-text-color: rgb(255, 56, 103);
+	--lumo-error-color-50pct: rgba(255, 56, 103, 0.5);
+	--lumo-error-color-10pct: rgba(255, 56, 103, 0.1);
+	--lumo-success-text-color: rgb(20, 184, 143);
+	--lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
+	--lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
+	--lumo-base-color: hsl(255, 35%, 23%);
+	--lumo-tint: hsl(285, 100%, 98%);
+	--lumo-shade: hsl(249, 46%, 4%);
+	--lumo-primary-color: hsl(265, 86%, 55%);
+	--lumo-error-color: hsl(346, 100%, 61%);
+	--lumo-success-color: hsl(165, 80%, 40%);
+	--lumo-header-text-color: hsl(285, 100%, 98%);
+	--lumo-body-text-color: hsla(285, 96%, 96%, 0.9);
+	--lumo-secondary-text-color: hsla(285, 87%, 92%, 0.7);
+	--lumo-tertiary-text-color: hsla(285, 78%, 88%, 0.5);
+	--lumo-disabled-text-color: hsla(285, 69%, 84%, 0.32);
+	--background-color: #444444;
+	--background-text-color: white;
 }
 
 vaadin-app-layout::part(navbar) {
@@ -98,8 +103,8 @@ vaadin-app-layout::part(navbar) {
 }
 
 .gx-right-drawer {
-  box-shadow: -0.5rem 0.5rem 0.25rem #0001;
-  z-index: 100;
+	box-shadow: -0.5rem 0.5rem 0.25rem #0001;
+	z-index: 100;
 }
 
 .gx-login-view {
@@ -117,36 +122,32 @@ vaadin-app-layout::part(navbar) {
 }
 
 ::-webkit-scrollbar {
-  width: 0.4rem;
-  background-color: transparent;
-  display: block;
-  overflow: auto;
+	width: 0.4rem;
+	background-color: transparent;
+	display: block;
+	overflow: auto;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #eee;
+	background-color: #eee;
 }
 
-.gx-entity-list > * {
-    margin: 0px;
-    padding: 0px;
+.gx-entity-list>* {
+	margin: 0px;
+	padding: 0px;
 }
 
 .gx-grid {
-    border-left: none;
-    border-right: none;
+	border-left: none;
+	border-right: none;
 }
 
 .gx-grid-footer {
-    margin: 0.75rem
+	margin: 0.75rem
 }
 
 .gx-grid-search-layout {
-    margin: 0.75rem;
-}
-
-.gx-login-logo {
-	margin-bottom: 1rem;
+	margin: 0.75rem;
 }
 
 .gx-login-title {
@@ -155,22 +156,21 @@ vaadin-app-layout::part(navbar) {
 	max-width: min-content;
 }
 
-
 .gx-login-title-layout * {
-    color: white;
+	color: white;
 }
 
 ::part(label) {
-    text-transform: uppercase;
+	text-transform: uppercase;
 }
 
 ::part(error-message) {
-    font-size: var(--lumo-font-size-s);
-    text-align: end;
+	font-size: var(--lumo-font-size-s);
+	text-align: end;
 }
 
 vaadin-button[theme~="primary"] {
-    color: white;
+	color: white;
 }
 
 vaadin-login-form-wrapper {
@@ -185,105 +185,109 @@ vaadin-login-form-wrapper {
 
 .gx-avatar-small {
 	text-transform: uppercase;
-    width: 2rem;
-    height: 2rem;
+	width: 2rem;
+	height: 2rem;
 }
 
 .gx-avatar-large {
-    text-transform: uppercase;
-    width: 6.5rem;
-    height: 6.5rem;
-    margin: 2rem !important;
+	text-transform: uppercase;
+	width: 6.5rem;
+	height: 6.5rem;
+	margin: 2rem !important;
+}
+
+.gxvaadin-app-layout-title {
+	text-transform: uppercase;
 }
 
 .gx-app-layout-logout {
-    height: 100%;
-    margin-left: 0.4rem !important;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    border-radius: 0rem;
+	height: 100%;
+	margin-left: 0.4rem !important;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	border-radius: 0rem;
 }
 
 .gx-app-layout-logout::part(label) {
-    color: red;
-    font-size: medium;
-    font-weight: bold;
+	color: var(--background-text-color);
+	font-size: medium;
+	font-weight: bold;
 }
 
 vaadin-app-layout::part(drawer) {
-    box-shadow: 0.5rem 0.5rem 0.25rem #0001;
-    z-index: 100;
+	box-shadow: 0.5rem 0.5rem 0.25rem #0001;
+	z-index: 100;
 }
 
 vaadin-side-nav-item::part(link) {
-    padding: 0.5rem 1rem;
+	padding: 0.5rem 1rem;
 }
 
 vaadin-icon {
-    color: var(--background-color);
+	color: var(--background-color);
 }
 
 vaadin-menu-bar-button {
-    padding: 0rem;
-    border-radius: .5rem;
+	padding: 0rem;
+	border-radius: .5rem;
 }
 
 vaadin-tab {
-    text-transform: uppercase;
-    font-size: small;
-    font-weight: bold;
+	text-transform: uppercase;
+	font-size: small;
+	font-weight: bold;
 }
 
 .gx-nav-menuitem {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: var(--lumo-font-size-xs);
-    background: white;
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: var(--lumo-font-size-xs);
+	background: white;
 }
 
 .gx-layout-title {
-    text-transform: uppercase;
+	text-transform: uppercase;
 }
 
 vaadin-side-nav-item::part(link) {
-    margin: 0.2rem;
-    border-radius: 0 1rem 1rem 0;
+	margin: 0.2rem;
+	border-radius: 0 1rem 1rem 0;
 }
 
 vaadin-side-nav-item::part(link):hover {
-    color: var(--lumo-primary-color);
-    background: var(--lumo-primary-color-10pct);
+	color: var(--lumo-primary-color);
+	background: var(--lumo-primary-color-10pct);
 }
 
 vaadin-side-nav-item:hover {
-    background: var(--lumo-primary-color-10pct);
+	background: var(--lumo-primary-color-10pct);
 }
 
 vaadin-checkbox::part(checkbox) {
-    background: var(--background-color)
+	background: var(--background-color)
 }
 
 vaadin-button {
-    font-weight: bold;
+	font-weight: bold;
 }
 
 vaadin-button[theme~="error"] {
-    border: 0.1rem solid;
-    font-weight: bold
+	border: 0.1rem solid;
+	font-weight: bold
 }
 
 vaadin-button[theme~="success"] {
-    border: 0.1rem solid;
-    font-weight: bold;
+	border: 0.1rem solid;
+	font-weight: bold;
 }
 
 vaadin-context-menu-item {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: var(--lumo-font-size-xs);
+	font-weight: bold;
+	text-transform: uppercase;
+	font-size: var(--lumo-font-size-xs);
 }
 
 vaadin-context-menu-item vaadin-icon {
-    margin-right: 0.5rem;
-    width: 1rem;
+	margin-right: 0.5rem;
+	width: 1rem;
 }
