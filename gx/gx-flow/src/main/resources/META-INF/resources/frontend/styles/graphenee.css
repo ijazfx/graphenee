@@ -160,15 +160,6 @@ vaadin-app-layout::part(navbar) {
 	color: white;
 }
 
-::part(label) {
-	text-transform: uppercase;
-}
-
-::part(error-message) {
-	font-size: var(--lumo-font-size-s);
-	text-align: end;
-}
-
 vaadin-button[theme~="primary"] {
 	color: white;
 }
@@ -196,8 +187,8 @@ vaadin-login-form-wrapper {
 	margin: 2rem !important;
 }
 
-.gxvaadin-app-layout-title {
-	text-transform: uppercase;
+.gx-app-layout-title {
+    text-transform: uppercase
 }
 
 .gx-app-layout-logout {
@@ -212,6 +203,8 @@ vaadin-login-form-wrapper {
 	color: var(--background-text-color);
 	font-size: medium;
 	font-weight: bold;
+	text-transform: uppercase;
+	padding: 0.5rem;
 }
 
 vaadin-app-layout::part(drawer) {
@@ -225,11 +218,6 @@ vaadin-side-nav-item::part(link) {
 
 vaadin-icon {
 	color: var(--background-color);
-}
-
-vaadin-menu-bar-button {
-	padding: 0rem;
-	border-radius: .5rem;
 }
 
 vaadin-tab {
@@ -281,7 +269,7 @@ vaadin-button[theme~="success"] {
 	font-weight: bold;
 }
 
-vaadin-context-menu-item {
+vaadin-context-menu-item, vaadin-menu-bar-button {
 	font-weight: bold;
 	text-transform: uppercase;
 	font-size: var(--lumo-font-size-xs);
@@ -290,4 +278,8 @@ vaadin-context-menu-item {
 vaadin-context-menu-item vaadin-icon {
 	margin-right: 0.5rem;
 	width: 1rem;
+}
+
+vaadin-confirm-dialog-overlay::part(content) {
+	padding: 0;
 }

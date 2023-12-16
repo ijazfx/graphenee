@@ -2,11 +2,12 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -50,6 +51,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 	}
 
 	private void addTabs(HasComponents rootLayout, List<GxTabItem> tabItems) {
+		Map<Integer, Integer> tabIndexMap = new HashMap<>();
 		if (tabItems.size() == 0)
 			return;
 		Div selectedTab = new Div();
@@ -64,6 +66,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 			GxTabItem tabItem = tabItems.get(i);
 			Tab tab = new Tab(tabItem.getLabel());
 			tabs.add(tab);
+			tabIndexMap.put(i, tabItem.getIndex());
 			Component component = tabItem.getComponent();
 			tabComponents[i] = component;
 			if (i == 0) {
@@ -76,7 +79,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 			Component selectedComponent = tabComponents[selectedIndex];
 			selectedTab.removeAll();
 			selectedTab.add(selectedComponent);
-			onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), selectedComponent);
+			onTabChange(tabIndexMap.get(selectedIndex), tabs.getSelectedTab(), selectedComponent);
 		});
 
 		rootLayout.add(tabs, selectedTab);

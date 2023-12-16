@@ -3,13 +3,14 @@ package io.graphenee.util;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import jakarta.persistence.criteria.Join;
-
 import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.Join;
 
 public class JpaSpecificationBuilder<T> {
 
@@ -244,7 +245,7 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
-	public JpaSpecificationBuilder<T> between(String key, Timestamp value1, Timestamp value2) {
+	public JpaSpecificationBuilder<T> between(String key, Date value1, Date value2) {
 		if (value1 == null || value2 == null)
 			return this;
 		Specification<T> spec = (root, cq, cb) -> {
@@ -262,7 +263,7 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
-	public JpaSpecificationBuilder<T> before(String key, Timestamp value) {
+	public JpaSpecificationBuilder<T> before(String key, Date value) {
 		if (value == null)
 			return this;
 		Timestamp fromValue = new Timestamp(0);
@@ -281,7 +282,17 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
-	public JpaSpecificationBuilder<T> after(String key, Timestamp value) {
+	public JpaSpecificationBuilder<T> day(String key, Date value) {
+		if (value == null)
+			return this;
+		Date startOfDay = TRCalendarUtil.startOfDay(value);
+		Date endOfDay = TRCalendarUtil.endOfDay(value);
+		Specification<T> spec = between(key, startOfDay, endOfDay).build();
+		specsQueue.add(spec);
+		return this;
+	}
+
+	public JpaSpecificationBuilder<T> after(String key, Date value) {
 		if (value == null)
 			return this;
 		Timestamp toValue = Timestamp.valueOf(LocalDateTime.now().plusYears(1000));

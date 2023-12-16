@@ -83,6 +83,7 @@ import com.vaadin.flow.component.page.BrowserWindowResizeEvent;
 import com.vaadin.flow.component.page.BrowserWindowResizeListener;
 import com.vaadin.flow.component.page.PendingJavaScriptResult;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayoutVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -98,6 +99,7 @@ import com.vaadin.flow.data.provider.InMemoryDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
@@ -282,6 +284,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 			dataGrid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
 			mainLayout = new SplitLayout();
+			mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
 			mainLayout.setSizeFull();
 			mainLayout.addClassName("gx-main-split-layout");
 
@@ -1192,17 +1195,19 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
 			}
 			if (renderer == null && (propertyDefinition.getType().equals(List.class) || propertyDefinition.getType().equals(Set.class))) {
-				renderer = new ComponentRenderer<>(s -> {
-					MultiComboBox<Object> c = new MultiComboBox<>();
-					c.setItems(propertyDefinition.getGetter().apply((T) s));
-					Collection<Object> bag = (Collection<Object>) propertyDefinition.getGetter().apply((T) s);
-					Set<Object> value = new HashSet<>(bag);
-					c.setItems(value);
-					c.setValue(value);
-					c.setWidthFull();
-					c.setReadOnly(true);
-					return c;
-				});
+				//				renderer = new ComponentRenderer<>(s -> {					
+				//					MultiComboBox<Object> c = new MultiComboBox<>();
+				//					c.setItems(propertyDefinition.getGetter().apply((T) s));
+				//					Collection<Object> bag = (Collection<Object>) propertyDefinition.getGetter().apply((T) s);
+				//					Set<Object> value = new HashSet<>(bag);
+				//					c.setItems(value);
+				//					c.setValue(value);
+				//					c.setWidthFull();
+				//					c.setReadOnly(true);
+				//					return c;
+				//				});
+
+				renderer = new TextRenderer<>();
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Date.class)) {
 				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);

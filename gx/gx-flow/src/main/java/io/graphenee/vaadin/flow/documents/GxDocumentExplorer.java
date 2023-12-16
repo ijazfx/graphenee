@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -27,7 +29,9 @@ import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -41,10 +45,12 @@ import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.documents.GxDocumentExplorerService;
+import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityTreeList;
+import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDownloadButton;
 import io.graphenee.vaadin.flow.component.GxNotification;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
@@ -80,9 +86,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	private GxNamespace namespace;
 
-	private GxFolder selectedFolder;
+	private GxFolder topFolder, selectedFolder;
 
-	private HorizontalLayout breadcrumbLayout;
+	private FlexLayout breadcrumbLayout;
 
 	private GxDownloadButton downloadButton;
 
@@ -118,13 +124,16 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	private void generateBreadcrumb(GxDocumentExplorerItem parent) {
 		if (breadcrumbLayout == null) {
-			breadcrumbLayout = new HorizontalLayout();
+			breadcrumbLayout = new FlexLayout();
+			breadcrumbLayout.setAlignItems(Alignment.CENTER);
 		}
 		breadcrumbLayout.removeAll();
 		GxDocumentExplorerItem current = parent != null ? parent : selectedFolder;
 		LinkedList<GxDocumentExplorerItem> list = new LinkedList<>();
 		while (current != null) {
 			list.addFirst(current);
+			if (current.equals(topFolder))
+				break;
 			current = current.getParent();
 		}
 		for (int i = 0; i < list.size(); i++) {
@@ -133,7 +142,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				breadcrumbLayout.add(VaadinIcon.ANGLE_RIGHT.create());
 			}
 			Button button;
-			if (f.getParent() == null) {
+			if (f.getParent() == null || f.equals(topFolder)) {
 				button = new Button(VaadinIcon.HOME.create());
 				button.addThemeVariants(ButtonVariant.LUMO_ICON);
 			} else {
@@ -327,14 +336,17 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	public void initializeWithNamespaceAndStorage(GxNamespace namespace, FileStorage storage) {
 		this.namespace = namespace;
-		this.selectedFolder = documentService.findOrCreateNamespaceFolder(namespace);
+		this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
+		this.selectedFolder = this.topFolder;
 		this.storage = storage;
 		generateBreadcrumb(this.selectedFolder);
 		refresh();
 	}
 
 	public void initializeWithFolderAndStorage(GxDocumentExplorerItem parent, FileStorage storage) {
-		this.selectedFolder = parent.isFile() ? ((GxDocument) parent).getFolder() : (GxFolder) parent;
+		this.topFolder = parent.isFile() ? ((GxDocument) parent).getFolder() : (GxFolder) parent;
+		this.selectedFolder = this.topFolder;
+		this.namespace = this.topFolder.getNamespace();
 		this.storage = storage;
 		generateBreadcrumb(parent);
 		refresh();
@@ -358,13 +370,18 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				refresh();
 			});
 		} else {
-			initializeWithFolderAndStorage(icl.getItem(), storage);
+			select(icl.getItem());
 		}
+	}
+
+	private void select(GxDocumentExplorerItem item) {
+		this.selectedFolder = (item instanceof GxDocument) ? (GxFolder) item.getParent() : (GxFolder) item;
+		generateBreadcrumb(item);
+		refresh();
 	}
 
 	@Override
 	protected void decorateSearchForm(FormLayout searchForm, Binder<GxDocumentExplorerItem> searchBinder) {
-		breadcrumbLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 		searchForm.add(breadcrumbLayout, 10);
 	}
 
@@ -430,19 +447,16 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	private void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
-		System.out.println("Moving Before " + targetItem.getName());
 		documentService.positionBefore(items, targetItem);
 		refresh();
 	}
 
 	private void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
-		System.out.println("Moving After " + targetItem.getName());
 		documentService.positionAfter(items, targetItem);
 		refresh();
 	}
 
 	private void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem) {
-		System.out.println("Moving In " + targetItem.getName());
 		documentService.changeParent(items, targetItem);
 		refresh();
 	}
@@ -455,6 +469,26 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	public boolean isDragAndDropEnabled() {
 		return true;
+	}
+
+	public void chooseSingle(TRParamCallback<GxDocument> onChoose) {
+		VerticalLayout fl = new VerticalLayout();
+		fl.setPadding(false);
+		fl.setSpacing(false);
+		fl.setMargin(false);
+		fl.setHeight("600px");
+		//		fl.add(this);
+		setWidthFull();
+		setHeight("600px");
+		ConfirmDialog dlg = DialogFactory.customDialog("Choose a Document", this, "Choose", "Dismiss", cb -> {
+			Optional<GxDocumentExplorerItem> document = entityGrid().getSelectedItems().stream().findFirst();
+			GxDocumentExplorerItem item = document.orElse(null);
+			if (item == null || item.isFile()) {
+				onChoose.execute((GxDocument) item);
+			}
+		});
+		dlg.setWidth("900px");
+		dlg.open();
 	}
 
 }

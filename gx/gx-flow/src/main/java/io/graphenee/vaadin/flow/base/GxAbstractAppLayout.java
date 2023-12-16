@@ -1,5 +1,7 @@
 package io.graphenee.vaadin.flow.base;
 
+import org.apache.logging.log4j.util.Strings;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -10,7 +12,6 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -22,6 +23,7 @@ import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinSession;
 
@@ -60,7 +62,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 		drawer.addClassName("gx-app-layout-drawer");
 		drawer.setWidthFull();
 
-		generateMenuItems(drawer);
+		generateMenuItems(drawer, flowSetup().loggedInUser());
 
 		FlexLayout drawerLayout = new FlexLayout();
 		drawerLayout.setFlexDirection(FlexDirection.COLUMN);
@@ -133,40 +135,67 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 		addToNavbar(navbarLayout);
 	}
 
-	private void generateMenuItems(SideNav drawer) {
+	private boolean canDoAction(GxAuthenticatedUser user, String action, GxMenuItem mi) {
+		if (user == null)
+			return false;
+		String route = mi.getRoute();
+		if (Strings.isBlank(route) && mi.getComponentClass() != null) {
+			Class<?> klass = mi.getComponentClass();
+			if (klass.isAnnotationPresent(GxSecuredView.class)) {
+				GxSecuredView annotation = klass.getAnnotation(GxSecuredView.class);
+				if (annotation.value() != null) {
+					route = annotation.value();
+				} else if (klass.isAnnotationPresent(Route.class)) {
+					Route routeAnnotation = this.getClass().getAnnotation(Route.class);
+					route = routeAnnotation.value();
+				}
+			}
+		}
+		if (Strings.isBlank(route))
+			return true;
+		return user.canDoAction(route, action);
+	}
+
+	private void generateMenuItems(SideNav drawer, GxAuthenticatedUser user) {
 		flowSetup().menuItems().forEach(mi -> {
-			SideNavItem i = new SideNavItem(mi.getLabel());
-			i.addClassName("gx-nav-menuitem");
-			i.addClassName("gx-nav-menuitem-root");
-			i.setPrefixComponent(mi.getIcon());
-			if (mi.getRoute() != null) {
-				i.setPath(mi.getRoute());
-			} else if (mi.getComponentClass() != null) {
-				i.setPath(mi.getComponentClass());
+			if (canDoAction(user, "view", mi)) {
+				SideNavItem i = new SideNavItem(mi.getLabel());
+				i.addClassName("gx-nav-menuitem");
+				i.addClassName("gx-nav-menuitem-root");
+				i.setPrefixComponent(mi.getIcon());
+				if (mi.getRoute() != null) {
+					i.setPath(mi.getRoute());
+				} else if (mi.getComponentClass() != null) {
+					i.setPath(mi.getComponentClass());
+				}
+				if (mi.hasChildren()) {
+					i.addClassName("gx-nav-menuitem-parent");
+					generateMenuItems(i, mi, user);
+				}
+				if (i.getChildren().count() > 0)
+					drawer.addItem(i);
 			}
-			if (mi.hasChildren()) {
-				i.addClassName("gx-nav-menuitem-parent");
-				generateMenuItems(i, mi);
-			}
-			drawer.addItem(i);
 		});
 	}
 
-	private void generateMenuItems(SideNavItem parent, GxMenuItem pmi) {
+	private void generateMenuItems(SideNavItem parent, GxMenuItem pmi, GxAuthenticatedUser user) {
 		pmi.getChildren().forEach(mi -> {
-			SideNavItem i = new SideNavItem(mi.getLabel());
-			i.addClassName("gx-nav-menuitem");
-			i.setPrefixComponent(mi.getIcon());
-			if (mi.getRoute() != null) {
-				i.setPath(mi.getRoute());
-			} else if (mi.getComponentClass() != null) {
-				i.setPath(mi.getComponentClass());
+			if (canDoAction(user, "view", mi)) {
+				SideNavItem i = new SideNavItem(mi.getLabel());
+				i.addClassName("gx-nav-menuitem");
+				i.setPrefixComponent(mi.getIcon());
+				if (mi.getRoute() != null) {
+					i.setPath(mi.getRoute());
+				} else if (mi.getComponentClass() != null) {
+					i.setPath(mi.getComponentClass());
+				}
+				if (mi.hasChildren()) {
+					i.addClassName("gx-nav-menuitem-parent");
+					generateMenuItems(i, mi, user);
+				}
+				if (i.getChildren().count() > 0)
+					parent.addItem(i);
 			}
-			if (mi.hasChildren()) {
-				i.addClassName("gx-nav-menuitem-parent");
-				generateMenuItems(i, mi);
-			}
-			parent.addItem(i);
 		});
 	}
 

@@ -441,6 +441,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	private Map<Integer, Tab> tabMap = new HashMap<>();
 
 	private void addTab(List<GxTabItem> tabItems) {
+		Map<Integer, Integer> tabIndexMap = new HashMap<>();
 		Div selectedTab = new Div();
 		selectedTab.setSizeFull();
 		selectedTab.getStyle().set("overflow-x", "hidden");
@@ -453,6 +454,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			GxTabItem tabItem = tabItems.get(i);
 			Tab tab = new Tab(tabItem.getLabel());
 			tabs.add(tab);
+			tabIndexMap.put(i, tabItem.getIndex());
 			tabMap.put(tabItem.getIndex(), tab);
 			Component component = tabItem.getComponent();
 			if (i != 0) {
@@ -469,7 +471,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			Component selectedComponent = tabComponents[selectedIndex];
 			selectedTab.removeAll();
 			selectedTab.add(selectedComponent);
-			onTabChange(tabs.getSelectedIndex(), tabs.getSelectedTab(), selectedComponent);
+			onTabChange(tabIndexMap.get(selectedIndex), tabs.getSelectedTab(), selectedComponent);
 		});
 
 		add(tabs, selectedTab);
