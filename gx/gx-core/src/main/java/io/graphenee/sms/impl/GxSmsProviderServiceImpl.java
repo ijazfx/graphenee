@@ -50,6 +50,7 @@ public class GxSmsProviderServiceImpl implements GxSmsProviderService {
 		return makeSmsProviderService(bean);
 	}
 
+	@Override
 	public GxSmsService makeSmsProviderService(GxSmsProvider smsProvider) {
 		// Aws
 		if (smsProvider.getProviderName().equals(SmsProvider.AWS.getProviderName())) {

@@ -1,13 +1,9 @@
 package io.graphenee.core.model;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.util.enums.GenderEnum;
 
 public class GxDashboardUser extends AbstractDashboardUser<GxUserAccount> {
-
-	private AtomicInteger notificationCount = new AtomicInteger();
 
 	public GxDashboardUser(GxUserAccount user) {
 		super(user);
@@ -97,18 +93,9 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccount> {
 	public void setMobileNumber(String mobileNumber) {
 	}
 
+	@Override
 	public byte[] getProfilePhoto() {
 		return getUser().getProfileImage();
-	}
-
-	@Override
-	public int getUnreadNotificationCount() {
-		return notificationCount.get();
-	}
-
-	@Override
-	public void setUnreadNotificationCount(int count) {
-		notificationCount.set(count);
 	}
 
 	public <T> T getPreference(String key) {

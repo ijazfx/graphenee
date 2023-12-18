@@ -17,8 +17,13 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+
+import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.sms.proto.GxSmsConfigProtos.AwsSmsConfig;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,5 +40,36 @@ public class GxSmsProvider extends io.graphenee.core.model.GxMappedSuperclass im
 	private byte[] configData;
 	private Boolean isPrimary;
 	private Boolean isActive;
+
+	@Transient
+	private String senderId;
+
+	public String getSenderId() {
+		if (senderId == null && providerName != null) {
+			if (providerName.equals(SmsProvider.AWS.getProviderName())) {
+				try {
+					AwsSmsConfig cfg = AwsSmsConfig.parseFrom(configData);
+					senderId = cfg.getSenderId();
+				} catch (InvalidProtocolBufferException e) {
+					// ignore.
+				}
+			} else if (providerName.equals(SmsProvider.TWILIO.getProviderName())) {
+				try {
+					AwsSmsConfig cfg = AwsSmsConfig.parseFrom(configData);
+					senderId = cfg.getSenderId();
+				} catch (InvalidProtocolBufferException e) {
+					// ignore.
+				}
+			} else if (providerName.equals(SmsProvider.EOCEAN.getProviderName())) {
+				try {
+					AwsSmsConfig cfg = AwsSmsConfig.parseFrom(configData);
+					senderId = cfg.getSenderId();
+				} catch (InvalidProtocolBufferException e) {
+					// ignore.
+				}
+			}
+		}
+		return senderId;
+	}
 
 }

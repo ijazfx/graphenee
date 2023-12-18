@@ -1,7 +1,5 @@
 package io.graphenee.core.model;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import io.graphenee.util.enums.GenderEnum;
 
 public final class MockUser extends AbstractDashboardUser<String> {
@@ -11,8 +9,6 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	String username;
 	String password;
 	GenderEnum gender;
-
-	private AtomicInteger notificationCount = new AtomicInteger();
 
 	public MockUser() {
 		super("Mock User");
@@ -89,16 +85,6 @@ public final class MockUser extends AbstractDashboardUser<String> {
 
 	@Override
 	public void setMobileNumber(String mobileNumber) {
-	}
-
-	@Override
-	public int getUnreadNotificationCount() {
-		return notificationCount.get();
-	}
-
-	@Override
-	public void setUnreadNotificationCount(int count) {
-		notificationCount.set(count);
 	}
 
 }

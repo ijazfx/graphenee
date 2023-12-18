@@ -4,10 +4,6 @@ import io.graphenee.util.enums.GenderEnum;
 
 public interface GxAuthenticatedUser {
 
-	int getUnreadNotificationCount();
-
-	void setUnreadNotificationCount(int count);
-
 	byte[] getProfilePhoto();
 
 	String getFirstName();
