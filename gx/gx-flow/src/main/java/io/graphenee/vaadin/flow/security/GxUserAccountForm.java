@@ -11,6 +11,7 @@ import com.flowingcode.vaadin.addons.twincolgrid.TwinColGrid;
 //import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -51,6 +52,9 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
 	FileUploader imageUploader;
 	private TwinColGrid<GxSecurityPolicy> securityPolicies;
 	private TwinColGrid<GxSecurityGroup> securityGroups;
+
+	@Autowired
+	private GxAccessKeyList accessKeyList;
 
 	@Autowired
 	GxDataService dataService;
@@ -154,6 +158,14 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
 	protected void addTabsToForm(List<GxTabItem> tabItems) {
 		tabItems.add(GxTabItem.create(1, "Policies", securityPolicies));
 		tabItems.add(GxTabItem.create(2, "Groups", securityGroups));
+		tabItems.add(GxTabItem.create(3, "Access Keys", accessKeyList));
+	}
+
+	@Override
+	protected void onTabChange(Integer index, Tab tab, com.vaadin.flow.component.Component component) {
+		if (index == 3) {
+			accessKeyList.initializeWithUserAccount(getEntity());
+		}
 	}
 
 	@Override

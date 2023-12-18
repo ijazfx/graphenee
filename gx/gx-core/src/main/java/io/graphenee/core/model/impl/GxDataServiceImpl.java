@@ -1254,4 +1254,19 @@ public class GxDataServiceImpl implements GxDataService {
 		registeredDeviceRepo.deleteById(device.getOid());
 	}
 
+	@Override
+	public List<GxAccessKey> findAccessKeyByUserAccount(GxUserAccount user) {
+		return accessKeyRepo.findAllByUserAccountEquals(user);
+	}
+
+	@Override
+	public List<GxAccessKey> findAccessKeyBySecurityGroup(GxSecurityGroup group) {
+		return accessKeyRepo.findAllBySecurityGroupsEquals(group);
+	}
+
+	@Override
+	public List<GxAccessKey> findAccessKeyBySecurityPolicy(GxSecurityPolicy policy) {
+		return accessKeyRepo.findAllBySecurityPoliciesEquals(policy);
+	}
+
 }

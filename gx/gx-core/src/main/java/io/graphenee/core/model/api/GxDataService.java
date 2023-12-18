@@ -366,4 +366,10 @@ public interface GxDataService {
 
 	boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
 
+	List<GxAccessKey> findAccessKeyByUserAccount(GxUserAccount user);
+
+	List<GxAccessKey> findAccessKeyBySecurityGroup(GxSecurityGroup group);
+
+	List<GxAccessKey> findAccessKeyBySecurityPolicy(GxSecurityPolicy policy);
+
 }

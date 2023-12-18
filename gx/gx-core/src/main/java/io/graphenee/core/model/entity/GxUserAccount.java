@@ -94,7 +94,7 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 
 	@OneToMany
 	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
-	private List<GxAccessKey> accessKeys = new ArrayList<>();
+	private Set<GxAccessKey> accessKeys = new HashSet<>();
 
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
