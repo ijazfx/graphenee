@@ -8,12 +8,12 @@ import com.vaadin.flow.router.Route;
 import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.model.GxDashboardUser;
 import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.base.GxAbstractLoginView;
-import io.graphenee.vaadin.flow.security.GxUserAccountAuthenticatedUser;
 
 @Route(value = "login")
 public class LoginView extends GxAbstractLoginView {
@@ -51,7 +51,7 @@ public class LoginView extends GxAbstractLoginView {
 		if (user.getIsPasswordChangeRequired()) {
 			throw new PasswordChangeRequiredException();
 		}
-		return new GxUserAccountAuthenticatedUser(user);
+		return new GxDashboardUser(user);
 	}
 
 }

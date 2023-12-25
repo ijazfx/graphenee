@@ -1,7 +1,15 @@
 package io.graphenee.vaadin.flow.base;
 
-import org.apache.logging.log4j.util.Strings;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.eventbus.Subscribe;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -28,6 +36,12 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.vaadin.flow.GxEventBus;
+import io.graphenee.vaadin.flow.GxEventBus.RemoveComponentEvent;
+import io.graphenee.vaadin.flow.GxEventBus.ResizeComponentEvent;
+import io.graphenee.vaadin.flow.GxEventBus.ShowComponentEvent;
+import io.graphenee.vaadin.flow.GxEventBus.TargetArea;
+import io.graphenee.vaadin.flow.component.GxStackLayout;
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
 
@@ -40,6 +54,24 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 
 	@Setter
 	private GxAbstractAppLayoutDelegate delegate;
+
+	@Autowired
+	GxEventBus eventBus;
+
+	private HorizontalLayout contentLayout;
+	private GxStackLayout rightDrawerLayout;
+
+	@Override
+	protected void onAttach(AttachEvent attachEvent) {
+		eventBus.register(this);
+		super.onAttach(attachEvent);
+	}
+
+	@Override
+	protected void onDetach(DetachEvent detachEvent) {
+		eventBus.unregister(this);
+		super.onDetach(detachEvent);
+	}
 
 	@PostConstruct
 	private void postBuild() {
@@ -175,6 +207,67 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 				if (i.getChildren().count() > 0)
 					drawer.addItem(i);
 			}
+		});
+	}
+
+	@Override
+	public void setContent(Component content) {
+		if (contentLayout == null) {
+			contentLayout = new HorizontalLayout();
+			contentLayout.setPadding(false);
+			contentLayout.setSpacing(false);
+			contentLayout.setMargin(false);
+			contentLayout.setSizeFull();
+			rightDrawerLayout = new GxStackLayout();
+			rightDrawerLayout.addClassName("gx-right-drawer");
+			rightDrawerLayout.setSizeFull();
+			rightDrawerLayout.setVisible(false);
+		}
+		contentLayout.removeAll();
+		contentLayout.add(content, rightDrawerLayout);
+		super.setContent(contentLayout);
+	}
+
+	Map<Component, TargetArea> targetAreaMap = new HashMap<>();
+	boolean rightDrawerMaximized = false;
+
+	@Subscribe
+	public void showComponent(ShowComponentEvent event) {
+		UI.getCurrent().access(() -> {
+			Component c = event.getComponent();
+			targetAreaMap.put(c, event.getArea());
+			if (event.getArea() == TargetArea.END_DRAWER) {
+				rightDrawerLayout.push(c);
+				if (!rightDrawerMaximized) {
+					rightDrawerLayout.setWidth(event.getWidth());
+				}
+			}
+			UI.getCurrent().push();
+		});
+	}
+
+	@Subscribe
+	public void removeComponent(RemoveComponentEvent event) {
+		UI.getCurrent().access(() -> {
+			Component c = event.getComponent();
+			TargetArea area = targetAreaMap.get(c);
+			if (area == TargetArea.END_DRAWER && c.equals(rightDrawerLayout.top())) {
+				rightDrawerLayout.pop();
+			}
+			UI.getCurrent().push();
+		});
+	}
+
+	@Subscribe
+	public void resizeComponent(ResizeComponentEvent event) {
+		UI.getCurrent().access(() -> {
+			Component c = event.getComponent();
+			TargetArea area = targetAreaMap.get(c);
+			if (area == TargetArea.END_DRAWER && c.equals(rightDrawerLayout.top())) {
+				rightDrawerLayout.setWidth(event.getWidth());
+				rightDrawerMaximized = event.getWidth().matches("(auto|100%)");
+			}
+			UI.getCurrent().push();
 		});
 	}
 

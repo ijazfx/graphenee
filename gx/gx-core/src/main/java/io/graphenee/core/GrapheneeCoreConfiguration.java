@@ -16,12 +16,9 @@
 package io.graphenee.core;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import com.google.common.eventbus.EventBus;
 
 @Configuration
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
@@ -32,10 +29,5 @@ public class GrapheneeCoreConfiguration {
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core";
 	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
 	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
-
-	@Bean
-	EventBus coreEventBus() {
-		return new EventBus("coreEventBus");
-	}
 
 }

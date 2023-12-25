@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,14 +25,10 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.eventbus.EventBus;
-import com.vaadin.componentfactory.multiselect.MultiComboBox;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
@@ -67,8 +62,6 @@ import com.vaadin.flow.component.grid.dnd.GridDragEndEvent;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropMode;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -78,12 +71,6 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.BrowserWindowResizeEvent;
-import com.vaadin.flow.component.page.BrowserWindowResizeListener;
-import com.vaadin.flow.component.page.PendingJavaScriptResult;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.component.splitlayout.SplitLayoutVariant;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -104,11 +91,15 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
-import io.graphenee.core.model.GxDashboardUser;
 import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.model.api.GxPreferenceManager;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
+import io.graphenee.vaadin.flow.GxEventBus;
+import io.graphenee.vaadin.flow.GxEventBus.RemoveComponentEvent;
+import io.graphenee.vaadin.flow.GxEventBus.ShowComponentEvent;
+import io.graphenee.vaadin.flow.GxEventBus.TargetArea;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
 import io.graphenee.vaadin.flow.component.DialogFactory;
@@ -116,6 +107,7 @@ import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
+import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.event.TRDelayEventListener;
 import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
@@ -130,15 +122,16 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends FlexLayout implements BrowserWindowResizeListener {
+public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-	EventBus coreEventBus;
+	GxEventBus eventBus;
 
-	private SplitLayout mainLayout;
-	private GxDialog dialog;
+	@Autowired
+	GxPreferenceManager prefMan;
+
 	private Grid<T> dataGrid;
 	private Class<T> entityClass;
 
@@ -168,14 +161,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 	private HorizontalLayout menuBarLayout;
 
-	private VerticalLayout formLayout;
-
 	private HeaderRow headerRow;
 
 	private List<T> items;
 
 	private Map<String, Checkbox> hidingColumnMap = new HashMap<>();
-	private Map<String, Boolean> changesMap = new HashMap<>();
 	private Map<String, AbstractField<?, ?>> editorComponentMap = new HashMap<>();
 
 	private T searchEntity;
@@ -195,13 +185,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 	private Text totalCountFooterText;
 	private FlexLayout footerTextLayout;
 
-	private String className;
+	private JSONObject preferenceJson = new JSONObject();
 
 	@Autowired
 	GxDataService dataService;
 
 	public GxAbstractEntityList(Class<T> entityClass) {
-		this.className = entityClass.getName();
 		this.entityClass = entityClass;
 		PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
 		this.searchBinder = Binder.withPropertySet(bps);
@@ -236,6 +225,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		if (!isBuilt) {
 			FlexLayout gridLayout = new FlexLayout();
 			gridLayout.setFlexDirection(FlexDirection.COLUMN);
+			gridLayout.setSizeFull();
 			gridLayout.addClassName("gx-grid-layout");
 			dataGrid = dataGrid(entityClass);
 			dataGrid.setSizeFull();
@@ -282,11 +272,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 			dataGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
 			dataGrid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
-
-			mainLayout = new SplitLayout();
-			mainLayout.addThemeVariants(SplitLayoutVariant.LUMO_SMALL);
-			mainLayout.setSizeFull();
-			mainLayout.addClassName("gx-main-split-layout");
 
 			crudMenuBar = new MenuBar();
 			columnMenuBar = new MenuBar();
@@ -364,29 +349,37 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.TASKS.create());
 			decorateColumnMenuBar(columnMenuBar);
 
-			H2 menuHeading = new H2("Column Menu");
-			menuHeading.getElement().getStyle().set("padding-top", "0px");
-			menuHeading.getElement().getStyle().set("margin-top", "0px");
-
-			FormLayout dialogLayout = new FormLayout();
-
-			dialogLayout.add(menuHeading, 2);
-			dialogLayout.add(new Hr(), 2);
-
-			Dialog menuDialog = new Dialog();
-			menuDialog.setWidth("40%");
-			menuDialog.getElement().getStyle().set("padding-bottom", "0px");
-			menuDialog.getElement().getStyle().set("margin-bottom", "0px");
-			menuDialog.setModal(false);
-			menuDialog.add(dialogLayout);
-
 			columnsDialogMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
 				private static final long serialVersionUID = 1L;
 
 				@Override
 				public void onClick(ClickEvent<MenuItem> event) {
-					menuDialog.open();
+					GxPreferenceForm<T> f = new GxPreferenceForm<>();
+					f.initializeWith(entityGrid(), entityClass);
+					f.setDelegate(new EntityFormDelegate<JSONObject>() {
+
+						@Override
+						public void onSave(JSONObject entity) {
+							try {
+								prefMan.saveUserPreference(loggedInUser(), f.getEntity());
+								eventBus.post(new RemoveComponentEvent(f));
+								UI.getCurrent().getUI().ifPresent(ui -> {
+									ui.getPage().reload();
+								});
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+
+						@Override
+						public void onDismiss(JSONObject entity) {
+							eventBus.post(new RemoveComponentEvent(f));
+						}
+
+					});
+					f.setEntity(preferenceJson);
+					eventBus.post(new ShowComponentEvent(f, TargetArea.END_DRAWER, "25rem"));
 				}
 			});
 
@@ -405,7 +398,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 			List<String> userPreferences = new ArrayList<>();
 			if (availableProperties() != null && availableProperties().length > 0) {
 				PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
-				Column<T> editColumn = dataGrid.addComponentColumn(source -> {
+				editColumn = dataGrid.addComponentColumn(source -> {
 					Button rowEditButton = new Button(VaadinIcon.EDIT.create());
 					rowEditButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY_INLINE);
 					customizeEditButton(rowEditButton, source);
@@ -465,35 +458,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 						column.setVisible(isAvailable);
 
-						// if (isAvailable) {
-						// } else {
-						// 	column.setVisible(false);
-						// }
-
-						Checkbox propertyCheck = new Checkbox(propertyDefinition.getCaption(), isAvailable);
-
-						propertyCheck.addClickListener(listener -> {
-							Boolean checked = listener.getSource().getValue();
-							listener.getSource().setValue(checked);
-							Column<T> columnByKey = dataGrid.getColumnByKey(propertyName);
-							columnByKey.setVisible(checked);
-							List<String> availableProps = Arrays.asList(availableProperties());
-							int index = availableProps.indexOf(propertyName);
-							if (checked && !userPreferences.contains(propertyName)) {
-								userPreferences.add(index, propertyName);
-								// columns.remove(columnByKey);
-								// columns.add(index, columnByKey);
-								// dataGrid.getElement().executeJs("this._swapColumnOrders($0, $1)", columns.get(index).getElement(), columns.get(columns.size() - 1).getElement());
-								// refresh();
-							} else {
-								userPreferences.remove(propertyName);
-							}
-							changesMap.putIfAbsent(propertyName, !checked);
-						});
-						propertyCheck.getElement().getStyle().set("width", "5%");
-						dialogLayout.add(propertyCheck, -1);
-						hidingColumnMap.put(propertyName, propertyCheck);
-
 					} catch (Exception ex) {
 						log.warn(propertyName + " error: " + ex.getMessage());
 					}
@@ -521,45 +485,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 				endColumn.setAutoWidth(true);
 			}
 
-			dialogLayout.add(new Hr(), 2);
-
-			Button applyButton = new Button("Apply");
-			applyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-			applyButton.addClickListener(new TRDelayClickListener<Button>() {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick(ClickEvent<Button> event) {
-					loggedInUser().setPreference(className, userPreferences.stream().collect(Collectors.joining(",")));
-					coreEventBus.post(loggedInUser().getUser());
-					// dataService.save(loggedInUser().getUser());
-					menuDialog.close();
-					UI.getCurrent().getPage().reload();
-				}
-			});
-
-			Button dismissButton = new Button("DISMISS");
-			dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-			dismissButton.addClickListener(new TRDelayClickListener<Button>() {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void onClick(ClickEvent<Button> event) {
-					changesMap.keySet().forEach(key -> {
-						setColumnVisibility(key, changesMap.get(key));
-					});
-					menuDialog.close();
-					changesMap.clear();
-				}
-			});
-			HorizontalLayout buttonLayout = new HorizontalLayout(applyButton, dismissButton);
-			buttonLayout.setPadding(false);
-			buttonLayout.setSpacing(false);
-			buttonLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-			dialogLayout.add(buttonLayout, 2);
-
 			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column")).forEach(col -> col.setVisible(false));
 
 			for (String key : preferenceProperties()) {
@@ -570,25 +495,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 				}
 			}
 
-			mainLayout.addToPrimary(gridLayout);
-			add(mainLayout);
+			add(gridLayout);
 			footerTextLayout = new FlexLayout();
 			totalCountFooterText = new Text("No Records");
 
 			footerTextLayout.add(totalCountFooterText);
 			footerTextLayout.addClassName("gx-grid-footer");
-
-			//			if (!shouldShowFormInDialog()) {
-			formLayout = new VerticalLayout();
-			formLayout.setClassName("gx-right-drawer");
-			formLayout.setMargin(false);
-			formLayout.setPadding(false);
-			mainLayout.addToSecondary(formLayout);
-			mainLayout.getSecondaryComponent().setVisible(false);
-			mainLayout.setSplitterPosition(defaultSplitterPosition());
-			//			} else {
-			//				mainLayout.setSplitterPosition(100);
-			//			}
 
 			dataGrid.addSelectionListener(sl -> {
 				int selected = sl.getAllSelectedItems().size();
@@ -635,8 +547,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 			dataGrid.addColumnReorderListener(listener -> {
 				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
 						.collect(Collectors.joining(","));
-				loggedInUser().setPreference(className, orderedColumns);
-				coreEventBus.post(loggedInUser().getUser());
 			});
 		}
 		return this;
@@ -1214,10 +1124,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
 				renderer = new ComponentRenderer<>(s -> {
-					Checkbox c = new Checkbox();
-					Boolean value = (Boolean) propertyDefinition.getGetter().apply((T) s);
-					c.setValue(value);
-					c.setReadOnly(true);
+					Boolean value = (Boolean) propertyDefinition.getGetter().apply(s);
+					GxToggleButton c = new GxToggleButton(VaadinIcon.CHECK_SQUARE_O.create(), VaadinIcon.THIN_SQUARE.create(), value);
 					return c;
 				});
 			}
@@ -1324,23 +1232,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		} else {
 			GxAbstractEntityForm<T> entityForm = cachedForm(entity);
 			if (entityForm != null) {
-				entityForm.setEntity(entity);
+				entityForm.show(entity);
 			}
-			displayForm(entityForm);
 		}
 	}
 
-	private void displayForm(GxAbstractEntityForm<T> entityForm) {
-		if (entityForm != null) {
-			if (!shouldShowFormInDialog()) {
-				showSecondaryComponent(entityForm);
-			} else {
-				hideSecondaryComponent();
-				dialog = entityForm.showInDialog(entityForm.getEntity());
-			}
-		} else {
-			hideSecondaryComponent();
-		}
+	protected String drawerWidth() {
+		return "100%";
 	}
 
 	protected String dialogWidth() {
@@ -1362,20 +1260,30 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 	protected abstract String[] visibleProperties();
 
+	protected GxAuthenticatedUser loggedInUser() {
+		return DashboardUtils.getLoggedInUser();
+	}
+
 	private String[] preferenceProperties() {
-		Set<String> apset = Stream.of(availableProperties()).collect(Collectors.toSet());
+		Set<String> props = new HashSet<>(Stream.of(availableProperties()).collect(Collectors.toSet()));
+		if (preferenceJson.has(entityClass.getSimpleName())) {
+			JSONObject prefsJson = preferenceJson.getJSONObject(entityClass.getSimpleName());
+			if (prefsJson.has("props")) {
+				JSONObject propsJson = prefsJson.getJSONObject("props");
+				propsJson.keys().forEachRemaining(key -> {
+					JSONObject pj = propsJson.getJSONObject(key);
+					if (pj.has("show") && !pj.getBoolean("show")) {
+						props.remove(key);
+					}
+				});
+
+			}
+		}
 		try {
-			String preferences = loggedInUser().getPreference(className);
-			String[] props = preferences.split(",");
-			props = Stream.of(props).filter(p -> apset.contains(p)).collect(Collectors.toList()).toArray(new String[] {});
-			return props;
+			return Stream.of(availableProperties()).filter(p -> props.contains(p)).collect(Collectors.toList()).toArray(new String[] {});
 		} catch (Exception e) {
 			return availableProperties();
 		}
-	}
-
-	public GxDashboardUser loggedInUser() {
-		return DashboardUtils.getLoggedInUser();
 	}
 
 	public void refresh() {
@@ -1389,10 +1297,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		} else {
 			dataGrid.setRowsDraggable(false);
 			dataGrid.setDropMode(null);
-		}
-		if (!shouldShowFormInDialog()) {
-			if (mainLayout.getSecondaryComponent() != null)
-				mainLayout.getSecondaryComponent().setVisible(false);
 		}
 		DataProvider<T, ?> dataProvider = dataGrid.getDataProvider();
 		if (dataProvider instanceof InMemoryDataProvider) {
@@ -1449,11 +1353,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 						listeners.forEach(l -> {
 							l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
 						});
-						if (!shouldShowFormInDialog() || dialog == null) {
-							hideSecondaryComponent();
-						} else {
-							dialog.close();
-						}
 						refresh();
 					} catch (Exception e) {
 						log.warn(e.getMessage(), e);
@@ -1462,14 +1361,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 					refresh();
 				}
 
-				@Override
-				public void onDismiss(T entity) {
-					if (!shouldShowFormInDialog() || dialog == null) {
-						hideSecondaryComponent();
-					} else {
-						dialog.close();
-					}
-				}
 			};
 			entityForm.setDelegate(delegate);
 		}
@@ -1484,23 +1375,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
-		getUI().get().getPage().addBrowserWindowResizeListener(this);
-		PendingJavaScriptResult result = getUI().get().getPage().executeJs("return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth");
-		result.then(r -> {
-			deviceWidth.set(Double.valueOf(r.asNumber()).intValue());
-		});
-	}
-
-	@Override
-	public void browserWindowResized(BrowserWindowResizeEvent event) {
-		deviceWidth.set(event.getWidth());
-	}
-
-	protected boolean shouldShowFormInDialog() {
-		if (deviceWidth.get() > 800) {
-			return false;
-		}
-		return true;
+		preferenceJson = prefMan.loadUserPreference(loggedInUser());
 	}
 
 	protected boolean shouldShowDeleteConfirmation() {
@@ -1538,28 +1413,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 
 	public void showToolbar() {
 		menuBarLayout.setVisible(true);
-	}
-
-	public void showSecondaryComponent(Component component) {
-		if (formLayout == null) {
-			formLayout = new VerticalLayout();
-			mainLayout.addToSecondary(formLayout);
-		}
-		formLayout.removeAll();
-		formLayout.add(component);
-		mainLayout.setSplitterPosition(defaultSplitterPosition());
-		mainLayout.getSecondaryComponent().setVisible(true);
-	}
-
-	public void hideSecondaryComponent() {
-		mainLayout.getSecondaryComponent().setVisible(false);
-		if (formLayout != null) {
-			formLayout.removeAll();
-		}
-	}
-
-	public boolean isSecondaryComponentVisible() {
-		return mainLayout != null && mainLayout.getSecondaryComponent() != null && mainLayout.getSecondaryComponent().isVisible();
 	}
 
 	public Dialog showInDialog(TRVoidCallback... callback) {
@@ -1601,17 +1454,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Brow
 		return dlg;
 	}
 
-	public void dismissDialog() {
-		if (dialog != null) {
-			dialog.close();
-		}
-	}
-
 	public void editItem(T item) {
 		openForm(item);
 	}
 
 	HashSet<GxEntityListEventListner<T>> listeners = new HashSet<>();
+
+	private Column<T> editColumn;
 
 	public void registerListener(GxEntityListEventListner<T> listener) {
 		listeners.add(listener);

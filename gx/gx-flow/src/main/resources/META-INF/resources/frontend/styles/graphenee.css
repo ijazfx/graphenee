@@ -9,7 +9,7 @@
 }
 
 html {
-	--lumo-font-family: "Nanum Bold", "Roboto Condensed";
+	--lumo-font-family: "Roboto Condensed";
 	--lumo-font-size: 1rem;
 	--lumo-font-size-xxxl: 1.75rem;
 	--lumo-font-size-xxl: 1.375rem;
@@ -103,7 +103,7 @@ vaadin-app-layout::part(navbar) {
 }
 
 .gx-right-drawer {
-	box-shadow: -0.5rem 0.5rem 0.25rem #0001;
+	box-shadow: -0.5rem 0.0rem 0.5rem #0001;
 	z-index: 100;
 }
 
@@ -130,6 +130,10 @@ vaadin-app-layout::part(navbar) {
 
 ::-webkit-scrollbar-thumb {
 	background-color: #eee;
+}
+
+vaadin-grid::part(last-row) {
+    border-bottom: var(--_lumo-grid-border-width) solid var(--_lumo-grid-secondary-border-color);
 }
 
 .gx-entity-list>* {
@@ -208,7 +212,7 @@ vaadin-login-form-wrapper {
 }
 
 vaadin-app-layout::part(drawer) {
-	box-shadow: 0.5rem 0.5rem 0.25rem #0001;
+	box-shadow: 0.5rem 0.0rem 0.5rem #0001;
 	z-index: 100;
 }
 
@@ -278,8 +282,4 @@ vaadin-context-menu-item, vaadin-menu-bar-button {
 vaadin-context-menu-item vaadin-icon {
 	margin-right: 0.5rem;
 	width: 1rem;
-}
-
-vaadin-confirm-dialog-overlay::part(content) {
-	padding: 0;
 }
