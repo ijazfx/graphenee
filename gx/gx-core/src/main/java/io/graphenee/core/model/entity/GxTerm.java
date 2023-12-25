@@ -33,8 +33,8 @@ public class GxTerm extends GxMappedSuperclass implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Boolean isActive;
-	private Boolean isProtected;
+	private Boolean isActive = true;
+	private Boolean isProtected = false;
 	private String termKey;
 	private String termPlural;
 	private String termSingular;

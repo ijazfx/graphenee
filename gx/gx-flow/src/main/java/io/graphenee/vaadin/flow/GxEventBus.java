@@ -67,4 +67,20 @@ public class GxEventBus extends EventBus {
 
 	}
 
+	@Getter
+	public static class TagComponentEvent {
+
+		private Component component;
+		private String width;
+		private String title;
+
+		public TagComponentEvent(Component c, String width, String title) {
+			this.component = c;
+			this.width = width;
+			this.title = title;
+
+		}
+
+	}
+
 }

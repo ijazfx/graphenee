@@ -1,6 +1,5 @@
 package io.graphenee.core.model.api;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,38 +15,33 @@ public class GxPreferenceManagerImpl implements GxPreferenceManager {
 	GxDataService service;
 
 	@Override
-	public JSONObject loadUserPreference(GxAuthenticatedUser user) {
+	public String loadUserPreference(GxAuthenticatedUser user) {
 		if (user instanceof GxDashboardUser) {
 			GxUserAccount userAccount = ((GxDashboardUser) user).getUser();
 			GxUserAccount savedUser = service.findUserAccount(userAccount.getOid());
-			String preferences = savedUser.getPreferences();
-			try {
-				return new JSONObject(preferences);
-			} catch (Exception ex) {
-				return new JSONObject();
-			}
+			return savedUser.getPreferences();
 		}
-		return new JSONObject();
+		return "{}";
 	}
 
 	@Override
-	public void saveUserPreference(GxAuthenticatedUser user, JSONObject preference) {
+	public void saveUserPreference(GxAuthenticatedUser user, String json) {
 		if (user instanceof GxDashboardUser) {
 			GxUserAccount userAccount = ((GxDashboardUser) user).getUser();
-			userAccount.setPreferences(preference.toString());
+			userAccount.setPreferences(json);
 			GxUserAccount savedUser = service.findUserAccount(userAccount.getOid());
-			savedUser.setPreferences(preference.toString());
+			savedUser.setPreferences(json);
 			service.save(savedUser);
 		}
 	}
 
 	@Override
-	public JSONObject loadNamespacePreference(GxNamespace namespace) {
+	public String loadNamespacePreference(GxNamespace namespace) {
 		throw new UnsupportedOperationException("To be implemented in future");
 	}
 
 	@Override
-	public void saveNamespacePreference(GxNamespace namespace, JSONObject preference) {
+	public void saveNamespacePreference(GxNamespace namespace, String json) {
 		throw new UnsupportedOperationException("To be implemented in future");
 	}
 

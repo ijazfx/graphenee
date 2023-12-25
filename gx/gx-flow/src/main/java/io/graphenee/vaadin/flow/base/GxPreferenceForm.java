@@ -2,8 +2,6 @@ package io.graphenee.vaadin.flow.base;
 
 import java.util.Optional;
 
-import org.json.JSONObject;
-
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,15 +10,21 @@ import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 
+import io.graphenee.vaadin.flow.GxEventBus;
+import io.graphenee.vaadin.flow.model.ColumnPreferences;
+import io.graphenee.vaadin.flow.model.GridPreferences;
+import io.graphenee.vaadin.flow.model.GxPreferences;
+
 @SuppressWarnings("serial")
-public class GxPreferenceForm<T> extends GxAbstractEntityForm<JSONObject> {
+public class GxPreferenceForm<T> extends GxAbstractEntityForm<GxPreferences> {
 
 	private HasComponents entityForm;
 	private Grid<T> entityGrid;
 	private Class<T> entityClass;
 
-	public GxPreferenceForm() {
-		super(JSONObject.class);
+	public GxPreferenceForm(GxEventBus eventBus) {
+		super(GxPreferences.class);
+		super.eventBus = eventBus;
 	}
 
 	@Override
@@ -34,48 +38,30 @@ public class GxPreferenceForm<T> extends GxAbstractEntityForm<JSONObject> {
 	}
 
 	@Override
-	protected void preBinding(JSONObject entity) {
+	protected void preBinding(GxPreferences entity) {
 		entityForm.removeAll();
-		String key = entityClass.getSimpleName();
+		GridPreferences grid = entity.addGrid(entityClass.getSimpleName());
 		PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
-		final JSONObject prefs;
-		if (!getEntity().has(key)) {
-			prefs = new JSONObject();
-			getEntity().put(key, prefs);
-		} else {
-			prefs = getEntity().getJSONObject(key);
-		}
-		final JSONObject json;
-		if (!prefs.has("props")) {
-			json = new JSONObject();
-			prefs.put("props", json);
-		} else {
-			json = prefs.getJSONObject("props");
-		}
 		H2 columns = new H2("Columns");
+		columns.setWidthFull();
 		expand(columns);
 		entityForm.add(columns);
-		entityGrid.getColumns().stream().filter(c -> c.getKey() != null).map(c -> c.getKey()).forEach(prop -> {
-			final JSONObject propJson;
-			if (!json.has(prop)) {
-				propJson = new JSONObject();
-				json.put(prop, propJson);
-			} else {
-				propJson = json.getJSONObject(prop);
-			}
-			Optional<PropertyDefinition<T, ?>> p = propertySet.getProperty(prop);
+		entityGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().startsWith("__")).map(c -> c.getKey()).forEach(columnName -> {
+			ColumnPreferences column = grid.addColumn(columnName);
+			Optional<PropertyDefinition<T, ?>> p = propertySet.getProperty(columnName);
 			if (p.isPresent()) {
 				PropertyDefinition<T, ?> pd = p.get();
 				Checkbox c = new Checkbox(pd.getCaption());
 				try {
-					c.setValue(propJson.getBoolean("show"));
+					c.setValue(column.getVisible());
 				} catch (Exception ex) {
-					propJson.put("show", true);
+					column.setVisible(true);
 					c.setValue(true);
 				}
 				c.addValueChangeListener(vcl -> {
-					propJson.put("show", vcl.getValue());
+					column.setVisible(vcl.getValue());
 				});
+				c.setWidthFull();
 				entityForm.add(c);
 			}
 		});

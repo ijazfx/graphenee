@@ -34,9 +34,9 @@ public class GxSupportedLocale extends GxMappedSuperclass implements Serializabl
 
 	private static final long serialVersionUID = 1L;
 
-	private Boolean isActive;
-	private Boolean isLeftToRight;
-	private Boolean isProtected;
+	private Boolean isActive = true;
+	private Boolean isLeftToRight = true;
+	private Boolean isProtected = false;
 	private String localeCode;
 	private String localeName;
 

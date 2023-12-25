@@ -288,6 +288,13 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			});
 			formTitleLayout.add(resizeButton);
 			formTitleLayout.setAlignSelf(Alignment.START, resizeButton);
+
+			Button tagButton = new Button(VaadinIcon.TAG.create(), cl -> {
+				eventBus.post(new GxEventBus.TagComponentEvent(this, defaultWidth(), entityClass.getSimpleName()));
+			});
+			tagButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+			formTitleLayout.add(tagButton);
+
 		}
 	}
 

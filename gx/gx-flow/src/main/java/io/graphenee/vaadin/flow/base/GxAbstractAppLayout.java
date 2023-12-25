@@ -14,6 +14,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.ContentAlignment;
@@ -40,6 +42,7 @@ import io.graphenee.vaadin.flow.GxEventBus;
 import io.graphenee.vaadin.flow.GxEventBus.RemoveComponentEvent;
 import io.graphenee.vaadin.flow.GxEventBus.ResizeComponentEvent;
 import io.graphenee.vaadin.flow.GxEventBus.ShowComponentEvent;
+import io.graphenee.vaadin.flow.GxEventBus.TagComponentEvent;
 import io.graphenee.vaadin.flow.GxEventBus.TargetArea;
 import io.graphenee.vaadin.flow.component.GxStackLayout;
 import jakarta.annotation.PostConstruct;
@@ -127,9 +130,8 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 		if (flowSetup().loggedInUser() != null) {
 			GxAuthenticatedUser user = flowSetup().loggedInUser();
 			avatar = new Avatar(user.getFirstNameLastName());
-			avatar.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin", "0");
-			avatar.getStyle().set("background", "var(--lumo-base-color)");
-			avatar.getStyle().set("color", "var(--lumo-primary-color)");
+			avatar.addThemeVariants(AvatarVariant.LUMO_SMALL);
+			avatar.setColorIndex(0);
 			Span space = new Span("");
 			space.setWidth("12px");
 
@@ -165,6 +167,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 		}
 
 		addToNavbar(navbarLayout);
+
 	}
 
 	private boolean canDoAction(GxAuthenticatedUser user, String action, GxMenuItem mi) {
@@ -189,6 +192,13 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 	}
 
 	private void generateMenuItems(SideNav drawer, GxAuthenticatedUser user) {
+		taggedComponents = new SideNavItem("TAGGED");
+		taggedComponents.addClassName("gx-nav-menuitem");
+		taggedComponents.addClassName("gx-nav-menuitem-root");
+		taggedComponents.addClassName("gx-nav-menuitem-parent");
+		taggedComponents.setPrefixComponent(VaadinIcon.TAGS.create());
+		taggedComponents.setVisible(false);
+		drawer.addItem(taggedComponents);
 		flowSetup().menuItems().forEach(mi -> {
 			if (canDoAction(user, "view", mi)) {
 				SideNavItem i = new SideNavItem(mi.getLabel());
@@ -224,19 +234,24 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 			rightDrawerLayout.setVisible(false);
 		}
 		contentLayout.removeAll();
+		while (!rightDrawerLayout.isEmpty()) {
+			rightDrawerLayout.pop();
+		}
+		rightDrawerMaximized = false;
 		contentLayout.add(content, rightDrawerLayout);
 		super.setContent(contentLayout);
 	}
 
 	Map<Component, TargetArea> targetAreaMap = new HashMap<>();
 	boolean rightDrawerMaximized = false;
+	private SideNavItem taggedComponents;
 
 	@Subscribe
 	public void showComponent(ShowComponentEvent event) {
 		UI.getCurrent().access(() -> {
 			Component c = event.getComponent();
 			targetAreaMap.put(c, event.getArea());
-			if (event.getArea() == TargetArea.END_DRAWER) {
+			if (event.getArea() == TargetArea.END_DRAWER && !c.equals(rightDrawerLayout.top())) {
 				rightDrawerLayout.push(c);
 				if (!rightDrawerMaximized) {
 					rightDrawerLayout.setWidth(event.getWidth());
@@ -267,6 +282,27 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 				rightDrawerLayout.setWidth(event.getWidth());
 				rightDrawerMaximized = event.getWidth().matches("(auto|100%)");
 			}
+			UI.getCurrent().push();
+		});
+	}
+
+	@Subscribe
+	public void tagComponent(TagComponentEvent event) {
+		UI.getCurrent().access(() -> {
+			SideNavItem i = new SideNavItem(event.getTitle());
+			Button closeButton = new Button(VaadinIcon.CLOSE.create());
+			closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+			closeButton.addClickListener(cl -> {
+				taggedComponents.remove(i);
+				taggedComponents.setVisible(taggedComponents.getItems().size() > 0);
+			});
+			i.setSuffixComponent(closeButton);
+			i.addClassName("gx-nav-menuitem");
+			i.getElement().addEventListener("click", cl -> {
+				showComponent(new ShowComponentEvent(event.getComponent(), TargetArea.END_DRAWER));
+			});
+			taggedComponents.addItem(i);
+			taggedComponents.setVisible(true);
 			UI.getCurrent().push();
 		});
 	}

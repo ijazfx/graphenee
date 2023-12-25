@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.AbstractField;
@@ -111,6 +110,9 @@ import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.event.TRDelayEventListener;
 import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
+import io.graphenee.vaadin.flow.model.ColumnPreferences;
+import io.graphenee.vaadin.flow.model.GridPreferences;
+import io.graphenee.vaadin.flow.model.GxPreferences;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
@@ -185,7 +187,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	private Text totalCountFooterText;
 	private FlexLayout footerTextLayout;
 
-	private JSONObject preferenceJson = new JSONObject();
+	private GxPreferences preferences;
 
 	@Autowired
 	GxDataService dataService;
@@ -202,8 +204,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	protected T initializeSearchEntity() {
 		try {
-			return entityClass.getDeclaredConstructor().newInstance();
-		} catch (Exception e) {
+			return newInstance();
+		} catch (Throwable e) {
 			return null;
 		}
 	}
@@ -355,17 +357,18 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 				@Override
 				public void onClick(ClickEvent<MenuItem> event) {
-					GxPreferenceForm<T> f = new GxPreferenceForm<>();
+					GxPreferenceForm<T> f = new GxPreferenceForm<>(eventBus);
 					f.initializeWith(entityGrid(), entityClass);
-					f.setDelegate(new EntityFormDelegate<JSONObject>() {
+					f.setDelegate(new EntityFormDelegate<GxPreferences>() {
 
 						@Override
-						public void onSave(JSONObject entity) {
+						public void onSave(GxPreferences entity) {
 							try {
-								prefMan.saveUserPreference(loggedInUser(), f.getEntity());
+								prefMan.saveUserPreference(loggedInUser(), entity.toJson());
 								eventBus.post(new RemoveComponentEvent(f));
 								UI.getCurrent().getUI().ifPresent(ui -> {
-									ui.getPage().reload();
+									//ui.getPage().reload();
+									GxAbstractEntityList.this.refresh();
 								});
 							} catch (Exception ex) {
 								ex.printStackTrace();
@@ -373,13 +376,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 						}
 
 						@Override
-						public void onDismiss(JSONObject entity) {
+						public void onDismiss(GxPreferences entity) {
 							eventBus.post(new RemoveComponentEvent(f));
 						}
 
 					});
-					f.setEntity(preferenceJson);
-					eventBus.post(new ShowComponentEvent(f, TargetArea.END_DRAWER, "25rem"));
+					f.setEntity(preferences);
+					eventBus.post(new ShowComponentEvent(f, TargetArea.END_DRAWER, f.defaultWidth()));
 				}
 			});
 
@@ -545,6 +548,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
+
 				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
 						.collect(Collectors.joining(","));
 			});
@@ -577,13 +581,17 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 			@Override
 			public void onClick(GridContextMenuItemClickEvent<T> event) {
 				try {
-					openForm(entityClass.getDeclaredConstructor().newInstance());
-				} catch (Exception e) {
+					openForm(newInstance());
+				} catch (Throwable e) {
 					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 				}
 			}
 
 		});
+	}
+
+	protected T newInstance() throws Throwable {
+		return entityClass.getDeclaredConstructor().newInstance();
 	}
 
 	@SuppressWarnings("serial")
@@ -837,8 +845,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 			@Override
 			public void onClick(ClickEvent<MenuItem> event) {
 				try {
-					openForm(entityClass.getDeclaredConstructor().newInstance());
-				} catch (Exception e) {
+					openForm(newInstance());
+				} catch (Throwable e) {
 					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
 				}
 			}
@@ -1265,31 +1273,24 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	}
 
 	private String[] preferenceProperties() {
-		Set<String> props = new HashSet<>(Stream.of(availableProperties()).collect(Collectors.toSet()));
-		if (preferenceJson.has(entityClass.getSimpleName())) {
-			JSONObject prefsJson = preferenceJson.getJSONObject(entityClass.getSimpleName());
-			if (prefsJson.has("props")) {
-				JSONObject propsJson = prefsJson.getJSONObject("props");
-				propsJson.keys().forEachRemaining(key -> {
-					JSONObject pj = propsJson.getJSONObject(key);
-					if (pj.has("show") && !pj.getBoolean("show")) {
-						props.remove(key);
-					}
-				});
-
-			}
+		GridPreferences gridPref = preferences.get(entityClass.getSimpleName());
+		if (gridPref != null) {
+			List<ColumnPreferences> columns = gridPref.visibleColumns();
+			return columns.stream().map(c -> c.getColumnName()).collect(Collectors.toList()).toArray(new String[columns.size()]);
 		}
-		try {
-			return Stream.of(availableProperties()).filter(p -> props.contains(p)).collect(Collectors.toList()).toArray(new String[] {});
-		} catch (Exception e) {
-			return availableProperties();
-		}
+		return availableProperties();
 	}
 
 	public void refresh() {
 		build();
 		entityGrid().deselectAll();
 		crudMenuBar.setVisible(isEditable());
+		Stream.of(availableProperties()).forEach(p -> {
+			dataGrid.getColumnByKey(p).setVisible(false);
+		});
+		Stream.of(preferenceProperties()).forEach(p -> {
+			dataGrid.getColumnByKey(p).setVisible(true);
+		});
 		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__editColumn")).forEach(c -> c.setVisible(isEditable()));
 		if (isDragAndDropEnabled()) {
 			dataGrid.setRowsDraggable(isRowDraggable());
@@ -1375,7 +1376,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	@Override
 	protected void onAttach(AttachEvent attachEvent) {
-		preferenceJson = prefMan.loadUserPreference(loggedInUser());
+		preferences = GxPreferences.fromJson(prefMan.loadUserPreference(loggedInUser()));
 	}
 
 	protected boolean shouldShowDeleteConfirmation() {
