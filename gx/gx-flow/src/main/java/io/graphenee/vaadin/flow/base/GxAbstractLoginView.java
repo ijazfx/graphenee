@@ -58,7 +58,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		H5 version = new H5(appVersion());
 		version.addClassName("gx-login-version");
 		titleVersionLayout.add(title, version);
-		titleVersionLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+		titleVersionLayout.setDefaultVerticalComponentAlignment(Alignment.END);
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.addClassName("gx-login-form");

@@ -160,6 +160,10 @@ vaadin-grid::part(last-row) {
 	max-width: min-content;
 }
 
+.gx-login-version {
+	margin: 0.25rem;
+}
+
 .gx-login-title-layout * {
 	color: white;
 }

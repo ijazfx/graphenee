@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -25,7 +24,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -187,7 +185,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	private Text totalCountFooterText;
 	private FlexLayout footerTextLayout;
 
-	private GxPreferences preferences;
+	private GxPreferences __preferences;
 
 	@Autowired
 	GxDataService dataService;
@@ -381,7 +379,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 						}
 
 					});
-					f.setEntity(preferences);
+					f.setEntity(preferences());
 					eventBus.post(new ShowComponentEvent(f, TargetArea.END_DRAWER, f.defaultWidth()));
 				}
 			});
@@ -1272,8 +1270,15 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 		return DashboardUtils.getLoggedInUser();
 	}
 
+	protected GxPreferences preferences() {
+		if (__preferences == null) {
+			__preferences = GxPreferences.fromJson(prefMan.loadUserPreference(loggedInUser()));
+		}
+		return __preferences;
+	}
+
 	private String[] preferenceProperties() {
-		GridPreferences gridPref = preferences.get(entityClass.getSimpleName());
+		GridPreferences gridPref = preferences().get(entityClass.getSimpleName());
 		if (gridPref != null) {
 			List<ColumnPreferences> columns = gridPref.visibleColumns();
 			return columns.stream().map(c -> c.getColumnName()).collect(Collectors.toList()).toArray(new String[columns.size()]);
@@ -1370,13 +1375,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<T> entities) {
 		log.warn(this + " - Override auditLog(...) method to log this event.");
-	}
-
-	AtomicInteger deviceWidth = new AtomicInteger(800);
-
-	@Override
-	protected void onAttach(AttachEvent attachEvent) {
-		preferences = GxPreferences.fromJson(prefMan.loadUserPreference(loggedInUser()));
 	}
 
 	protected boolean shouldShowDeleteConfirmation() {
