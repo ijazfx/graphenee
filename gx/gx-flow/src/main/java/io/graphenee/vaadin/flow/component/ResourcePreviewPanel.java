@@ -31,6 +31,9 @@ public class ResourcePreviewPanel extends VerticalLayout {
 
 	private GxDialog dialog = null;
 
+	public ResourcePreviewPanel() {
+	}
+
 	public ResourcePreviewPanel(String fileName, StreamResource resource) {
 		setSizeFull();
 		setMargin(false);
@@ -93,6 +96,9 @@ public class ResourcePreviewPanel extends VerticalLayout {
 	}
 
 	public GxDialog showInDialog(String width, String height) {
+		if (fileName == null || resource == null) {
+			throw new IllegalStateException("Filename and Resource must be set before calling this method.");
+		}
 		build();
 		dialog = new GxDialog(ResourcePreviewPanel.this);
 		dialog.addThemeVariants(DialogVariant.NO_PADDING);

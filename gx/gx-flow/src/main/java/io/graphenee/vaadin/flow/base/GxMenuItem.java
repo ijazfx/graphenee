@@ -47,6 +47,16 @@ public class GxMenuItem implements Serializable {
 		this.route = route;
 	}
 
+	public GxMenuItem(String label) {
+		this.label = label;
+	}
+
+	public GxMenuItem(String label, Class<? extends Component> componentClass) {
+		this.label = label;
+		this.componentClass = componentClass;
+		this.route = determineRoute(componentClass);
+	}
+
 	public GxMenuItem add(GxMenuItem child) {
 		if (children == null) {
 			children = new ArrayList<>();
@@ -74,8 +84,18 @@ public class GxMenuItem implements Serializable {
 		return mi;
 	}
 
+	public static GxMenuItem create(String label, Class<? extends Component> componentClass) {
+		GxMenuItem mi = new GxMenuItem(label, componentClass);
+		return mi;
+	}
+
 	public static GxMenuItem create(String label, Component icon) {
 		GxMenuItem mi = new GxMenuItem(label, icon);
+		return mi;
+	}
+
+	public static GxMenuItem create(String label) {
+		GxMenuItem mi = new GxMenuItem(label);
 		return mi;
 	}
 

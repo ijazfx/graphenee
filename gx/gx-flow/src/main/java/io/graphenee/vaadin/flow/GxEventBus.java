@@ -17,9 +17,8 @@ public class GxEventBus extends EventBus {
 	}
 
 	public static enum TargetArea {
-		MAIN,
-		END_DRAWER,
-		MINIMIZED_BAR
+		CONTENT,
+		END_DRAWER
 	}
 
 	@Getter
@@ -62,22 +61,6 @@ public class GxEventBus extends EventBus {
 		public ResizeComponentEvent(Component c, String width) {
 			this.component = c;
 			this.width = width;
-
-		}
-
-	}
-
-	@Getter
-	public static class TagComponentEvent {
-
-		private Component component;
-		private String width;
-		private String title;
-
-		public TagComponentEvent(Component c, String width, String title) {
-			this.component = c;
-			this.width = width;
-			this.title = title;
 
 		}
 

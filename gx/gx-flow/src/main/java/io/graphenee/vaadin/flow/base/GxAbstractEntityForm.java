@@ -269,7 +269,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			//			formTitleLayout.expand(spacer);
 			addComponentAsFirst(formTitleLayout);
 			// add resize button
-			GxToggleButton resizeButton = new GxToggleButton(VaadinIcon.MINUS_SQUARE_O.create(), VaadinIcon.PLUS_SQUARE_O.create(), false);
+			GxToggleButton resizeButton = new GxToggleButton(VaadinIcon.MARGIN_RIGHT.create(), VaadinIcon.RASTER.create(), false);
 			resizeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 			resizeButton.setTrueStateCallback(cb -> {
 				if (dialog != null) {
@@ -288,12 +288,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			});
 			formTitleLayout.add(resizeButton);
 			formTitleLayout.setAlignSelf(Alignment.START, resizeButton);
-
-			Button tagButton = new Button(VaadinIcon.TAG.create(), cl -> {
-				eventBus.post(new GxEventBus.TagComponentEvent(this, defaultWidth(), entityClass.getSimpleName()));
-			});
-			tagButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-			formTitleLayout.add(tagButton);
 
 		}
 	}
