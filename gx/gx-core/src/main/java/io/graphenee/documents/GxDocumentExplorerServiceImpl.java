@@ -3,6 +3,7 @@ package io.graphenee.documents;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.repository.GxDocumentRepository;
@@ -104,7 +106,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity) {
+	public Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter) {
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.eq("document", parent);
@@ -123,26 +125,32 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
 		List<GxDocument> docs = docRepo.findByFolder(folder.getOid());
-		count = count + docs.size();
+
+		if (filter != null) {
+			count = count + docs.stream().filter(f -> filter.test(f)).count();
+		} else {
+			count = count + docs.size();
+		}
 
 		return count;
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, String... sortKey) {
-
+	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey) {
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("document", parent);
 			List<GxDocument> docs = docRepo.findAll(dsb.build(), Sort.by(sortKey));
+			if (filter != null) {
+				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
+			}
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
 			}
 		} else {
 			GxFolder folder = (GxFolder) parent;
-			System.out.println(folder.getOid());
 			JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
 			fsb.like("name", searchEntity.getName());
 			fsb.eq("folder", folder);
@@ -155,6 +163,9 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("folder", folder);
 			List<GxDocument> docs = docRepo.findByFolder(folder.getOid());
+			if (filter != null) {
+				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
+			}
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
 			}

@@ -62,8 +62,8 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 				image = IconUtils.fileExtensionIconResource("bin");
 			}
 		}
-		image.setHeight("4rem");
 		fl.add(image, label);
+		fl.setWidth("4rem");
 		return fl;
 	}
 
@@ -95,7 +95,6 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 
 	public void initializeWithExplorer(GxDocumentExplorer explorer) {
 		this.explorer = explorer;
-
 	}
 
 }

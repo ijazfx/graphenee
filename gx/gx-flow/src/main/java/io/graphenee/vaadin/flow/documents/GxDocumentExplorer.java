@@ -19,7 +19,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -42,6 +41,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.documents.GxDocumentExplorerService;
@@ -50,6 +50,7 @@ import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityTreeList;
+import io.graphenee.vaadin.flow.base.GxFormLayout;
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDownloadButton;
 import io.graphenee.vaadin.flow.component.GxNotification;
@@ -94,6 +95,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	private List<GxDocumentExplorerItem> draggedItems;
 
+	private GxDocumentFilter filter;
+
 	public GxDocumentExplorer() {
 		super(GxDocumentExplorerItem.class);
 	}
@@ -101,25 +104,25 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected int getChildCount(GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.countChildren(parent, getSearchEntity()).intValue();
+			return documentService.countChildren(parent, getSearchEntity(), filter).intValue();
 		}
-		return documentService.countChildren(selectedFolder, getSearchEntity()).intValue();
+		return documentService.countChildren(selectedFolder, getSearchEntity(), filter).intValue();
 	}
 
 	@Override
 	protected boolean hasChildren(GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.countChildren(parent, getSearchEntity()) > 0;
+			return documentService.countChildren(parent, getSearchEntity(), filter) > 0;
 		}
-		return documentService.countChildren(selectedFolder, getSearchEntity()) > 0;
+		return documentService.countChildren(selectedFolder, getSearchEntity(), filter) > 0;
 	}
 
 	@Override
 	protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.findExplorerItem(parent, getSearchEntity(), "name").stream();
+			return documentService.findExplorerItem(parent, getSearchEntity(), filter, "name").stream();
 		}
-		return documentService.findExplorerItem(selectedFolder, getSearchEntity(), "name").stream();
+		return documentService.findExplorerItem(selectedFolder, getSearchEntity(), filter, "name").stream();
 	}
 
 	private void generateBreadcrumb(GxDocumentExplorerItem parent) {
@@ -150,7 +153,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_SMALL);
 			}
 			button.addClickListener(cl -> {
-				initializeWithFolderAndStorage((GxFolder) f, storage);
+				initializeWithFolderAndStorage(f, storage);
 			});
 			breadcrumbLayout.add(button);
 		}
@@ -381,7 +384,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	@Override
-	protected void decorateSearchForm(FormLayout searchForm, Binder<GxDocumentExplorerItem> searchBinder) {
+	protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxDocumentExplorerItem> searchBinder) {
 		searchForm.add(breadcrumbLayout, 10);
 	}
 
@@ -489,6 +492,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		});
 		dlg.setWidth("900px");
 		dlg.open();
+	}
+
+	public void setDocumentFilter(GxDocumentFilter filter) {
+		this.filter = filter;
 	}
 
 }
