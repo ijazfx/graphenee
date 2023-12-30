@@ -784,11 +784,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	}
 
 	protected void onDragEnd(GridDragEndEvent<T> event) {
-		System.out.println("onDragEnd ...");
 	}
 
 	protected void onDragStart(GridDragStartEvent<T> event) {
-		System.out.println("onDragStart ...");
 	}
 
 	protected boolean onDropFilter(T item) {

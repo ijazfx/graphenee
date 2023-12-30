@@ -246,7 +246,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		List<GxFolder> folders = new ArrayList<>();
 		List<GxDocument> documents = new ArrayList<>();
 		GxFolder folder = (GxFolder) (parent.isFile() ? parent.getParent() : parent);
-		items.stream().filter(f -> f.getParent() != f && !isAncestorOf(f, parent)).forEach(i -> {
+		items.stream().filter(f -> f != parent && f.getParent() != f && !isAncestorOf(f, parent)).forEach(i -> {
 			if (i instanceof GxDocument) {
 				((GxDocument) i).setFolder(folder);
 				documents.add((GxDocument) i);

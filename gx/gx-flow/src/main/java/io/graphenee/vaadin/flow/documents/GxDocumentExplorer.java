@@ -56,7 +56,9 @@ import io.graphenee.vaadin.flow.component.GxDownloadButton;
 import io.graphenee.vaadin.flow.component.GxNotification;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 import io.graphenee.vaadin.flow.utils.IconUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
@@ -292,7 +294,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					d.setMimeType(uploadedFile.getMimeType());
 					documentService.saveDocument(parentFolder, List.of(d));
 				} catch (Exception ex) {
-					ex.printStackTrace();
+					log.error(ex.getMessage(), ex);
 				}
 				refresh();
 			});
@@ -311,7 +313,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				d.setMimeType(uploadedFile.getMimeType());
 				documentService.createDocumentVersion(parentDocument, d);
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				log.error(ex.getMessage(), ex);
 			}
 			refresh();
 		});
@@ -443,7 +445,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error(ex.getMessage(), ex);
 		} finally {
 			draggedItems = null;
 		}
