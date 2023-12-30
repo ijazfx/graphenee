@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -35,6 +34,7 @@ import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.base.GxFormLayout;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -62,7 +62,7 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 	}
 
 	@Override
-	protected void decorateSearchForm(FormLayout searchForm, Binder<GxTerm> searchBinder) {
+	protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxTerm> searchBinder) {
 		namespaceComboBox = new ComboBox<>("Namespace");
 		namespaceComboBox.setItemLabelGenerator(GxNamespace::getNamespace);
 		List<GxNamespace> namespaceBeans = namespaceRepo.findAll();

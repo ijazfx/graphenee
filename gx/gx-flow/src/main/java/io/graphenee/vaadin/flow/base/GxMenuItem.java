@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.Route;
 
 import lombok.Getter;
@@ -54,6 +55,7 @@ public class GxMenuItem implements Serializable {
 	public GxMenuItem(String label, Class<? extends Component> componentClass) {
 		this.label = label;
 		this.componentClass = componentClass;
+		this.icon = VaadinIcon.CHEVRON_RIGHT.create();
 		this.route = determineRoute(componentClass);
 	}
 

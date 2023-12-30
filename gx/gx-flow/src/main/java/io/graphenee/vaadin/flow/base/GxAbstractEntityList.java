@@ -41,8 +41,6 @@ import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -65,6 +63,7 @@ import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -386,9 +385,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 			deleteMenuItem.setEnabled(false);
 
-			FormLayout searchForm = new FormLayout();
-			searchForm.getStyle().setPadding("0.75rem");
-			searchForm.setResponsiveSteps(new ResponsiveStep("100px", 6));
+			GxFormLayout searchForm = new GxFormLayout();
 
 			decorateSearchForm(searchForm, searchBinder);
 			searchForm.setVisible(searchForm.getChildren().count() > 0);
@@ -581,7 +578,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 				try {
 					openForm(newInstance());
 				} catch (Throwable e) {
-					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+					log.warn(e.getMessage(), e);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}
 
@@ -600,7 +598,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 				try {
 					openForm(event.getItem().get());
 				} catch (Exception e) {
-					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+					log.warn(e.getMessage(), e);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}
 		});
@@ -775,7 +774,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 		emitter.onComplete();
 	}
 
-	protected void decorateSearchForm(FormLayout searchForm, Binder<T> searchBinder) {
+	protected void decorateSearchForm(GxFormLayout searchForm, Binder<T> searchBinder) {
 	}
 
 	protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
@@ -845,7 +844,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 				try {
 					openForm(newInstance());
 				} catch (Throwable e) {
-					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+					log.warn(e.getMessage(), e);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}
 		});
@@ -894,7 +894,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 					dataGrid.deselectAll();
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
-					Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}).open();
 		} else {
@@ -909,7 +909,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 				refresh();
 			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
-				Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+				Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
 			}
 		}
 	}
@@ -1362,7 +1362,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 						refresh();
 					} catch (Exception e) {
 						log.warn(e.getMessage(), e);
-						Notification.show(e.getMessage(), 3000, Position.BOTTOM_CENTER);
+						Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
 					}
 					refresh();
 				}

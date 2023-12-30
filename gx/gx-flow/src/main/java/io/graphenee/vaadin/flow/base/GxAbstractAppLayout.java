@@ -205,9 +205,11 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 				if (mi.hasChildren()) {
 					i.addClassName("gx-nav-menuitem-parent");
 					generateMenuItems(i, mi, user);
-				}
-				if (i.getChildren().count() > 0)
+					if (i.getChildren().count() > 0)
+						drawer.addItem(i);
+				} else {
 					drawer.addItem(i);
+				}
 			}
 		});
 	}
@@ -303,9 +305,11 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 				if (mi.hasChildren()) {
 					i.addClassName("gx-nav-menuitem-parent");
 					generateMenuItems(i, mi, user);
-				}
-				if (i.getChildren().count() > 0)
+					if (i.getChildren().count() > 0)
+						parent.addItem(i);
+				} else {
 					parent.addItem(i);
+				}
 			}
 		});
 	}

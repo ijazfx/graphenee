@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 
@@ -22,6 +21,7 @@ import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
+import io.graphenee.vaadin.flow.base.GxFormLayout;
 
 @SuppressWarnings("serial")
 @Component
@@ -92,7 +92,7 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 	}
 
 	@Override
-	protected void decorateSearchForm(FormLayout searchForm, Binder<GxRegisteredDevice> searchBinder) {
+	protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxRegisteredDevice> searchBinder) {
 		ComboBox<GxNamespace> namespace = new ComboBox<>("Namespace");
 		namespace.setItemLabelGenerator(GxNamespace::getNamespace);
 		namespace.setItems(namespaceRepo.findAll(Sort.by("namespace")));
