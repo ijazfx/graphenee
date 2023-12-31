@@ -38,7 +38,7 @@ public class FlowApplicationConfiguration {
 
 	@Bean
 	GxNamespace namespace(GxDataService dataService) {
-		return dataService.findOrCreateNamespace("workshop");
+		return dataService.systemNamespace();
 	}
 
 }

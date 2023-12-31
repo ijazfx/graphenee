@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 
@@ -24,7 +23,6 @@ public class FlowSetup extends GxAbstractFlowSetup {
 		items.add(GxCoreMenuItemFactory.setupMenuItem());
 		items.add(GxCoreMenuItemFactory.documentsMenuItem());
 		items.add(GxCoreMenuItemFactory.messageTemplateMenuItem());
-		items.add(GxMenuItem.create("Playground", VaadinIcon.PENCIL.create(), PlaygroundView.class));
 
 		return items;
 	}

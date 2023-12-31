@@ -20,10 +20,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import io.graphenee.documents.GrapheneeDocumentsConfiguration;
+import io.graphenee.i18n.GrapheneeI18nConfiguration;
+import io.graphenee.security.GrapheneeSecurityConfiguration;
+import io.graphenee.sms.GrapheneeSmsConfiguration;
+
 @Configuration
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
 @EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
-@ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
+@ComponentScan({ GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeI18nConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
+		GrapheneeSecurityConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
+		GrapheneeDocumentsConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
 public class GrapheneeCoreConfiguration {
 
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core";
