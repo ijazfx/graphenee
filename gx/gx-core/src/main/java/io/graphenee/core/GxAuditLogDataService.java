@@ -19,8 +19,9 @@ import java.util.List;
 
 import org.springframework.data.domain.Sort;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.entity.GxAuditLog;
+import io.graphenee.core.model.entity.GxUserAccount;
 
 public interface GxAuditLogDataService {
 
@@ -31,6 +32,10 @@ public interface GxAuditLogDataService {
 	GxAuditLog log(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity);
 
 	GxAuditLog log(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String detail);
+
+	GxAuditLog log(GxUserAccount user, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity);
+
+	GxAuditLog log(GxUserAccount user, String remoteAddress, String auditEvent, String detail);
 
 	GxAuditLog log(String username, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity);
 

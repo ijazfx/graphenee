@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded.impl;
 
-import jakarta.persistence.EntityManagerFactory;
-
 import org.kie.api.runtime.EnvironmentName;
 import org.kie.api.runtime.manager.RuntimeEngine;
 import org.kie.api.runtime.manager.RuntimeEnvironment;
@@ -34,6 +32,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Service;
 
 import io.graphenee.jbpm.embedded.GxKieRuntimeEngineService;
+import jakarta.persistence.EntityManagerFactory;
 
 @Service
 public class GxKieRuntimeEngineServiceImpl implements GxKieRuntimeEngineService {

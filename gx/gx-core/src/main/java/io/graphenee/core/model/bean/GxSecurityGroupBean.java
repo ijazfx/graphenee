@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.graphenee.core.model.BeanCollectionFault;
-import io.graphenee.core.model.BeanFault;
+import io.graphenee.common.data.BeanCollectionFault;
+import io.graphenee.common.data.BeanFault;
 
 public class GxSecurityGroupBean implements Serializable {
 

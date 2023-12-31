@@ -7,7 +7,7 @@ import com.vaadin.flow.router.ErrorParameter;
 import com.vaadin.flow.router.HasErrorParameter;
 import com.vaadin.flow.router.NotFoundException;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.servlet.http.HttpServletResponse;
 

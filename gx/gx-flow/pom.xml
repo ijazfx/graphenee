@@ -120,10 +120,6 @@
 		</dependency>
 		<dependency>
 			<groupId>io.graphenee</groupId>
-			<artifactId>gx-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.graphenee</groupId>
 			<artifactId>gx-util</artifactId>
 		</dependency>
 		<dependency>

@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.router.Route;
 
+import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.common.exception.AuthenticationFailedException;
+import io.graphenee.common.exception.PasswordChangeRequiredException;
 import io.graphenee.core.GxDataService;
-import io.graphenee.core.exception.AuthenticationFailedException;
-import io.graphenee.core.exception.PasswordChangeRequiredException;
-import io.graphenee.core.model.GxAuthenticatedUser;
-import io.graphenee.core.model.GxDashboardUser;
+import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
@@ -51,7 +51,7 @@ public class LoginView extends GxAbstractLoginView {
 		if (user.getIsPasswordChangeRequired()) {
 			throw new PasswordChangeRequiredException();
 		}
-		return new GxDashboardUser(user);
+		return new GxUserAccountDashboardUser(user);
 	}
 
 }

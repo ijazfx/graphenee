@@ -8,7 +8,7 @@ import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 
-import io.graphenee.core.model.CollectionFault;
+import io.graphenee.common.data.CollectionFault;
 
 public class CollectionFaultToSetConverter<T> implements Converter<Set<T>, CollectionFault<T>> {
 

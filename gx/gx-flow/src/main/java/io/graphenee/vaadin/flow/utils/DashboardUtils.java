@@ -8,7 +8,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 
 public class DashboardUtils {
 

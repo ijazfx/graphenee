@@ -28,8 +28,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.graphenee.core.model.BeanCollectionFault;
-import io.graphenee.core.model.BeanFault;
+import io.graphenee.common.data.BeanCollectionFault;
+import io.graphenee.common.data.BeanFault;
 import io.graphenee.util.enums.GenderEnum;
 import lombok.Getter;
 import lombok.Setter;

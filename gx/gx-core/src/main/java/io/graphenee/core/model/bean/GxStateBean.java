@@ -18,8 +18,8 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.util.Collection;
 
-import io.graphenee.core.model.BeanCollectionFault;
-import io.graphenee.core.model.BeanFault;
+import io.graphenee.common.data.BeanCollectionFault;
+import io.graphenee.common.data.BeanFault;
 
 public class GxStateBean implements Serializable {
 

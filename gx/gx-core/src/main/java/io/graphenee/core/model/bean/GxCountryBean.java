@@ -18,7 +18,7 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.util.Collection;
 
-import io.graphenee.core.model.BeanCollectionFault;
+import io.graphenee.common.data.BeanCollectionFault;
 
 public class GxCountryBean implements Serializable {
 

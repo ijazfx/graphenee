@@ -28,9 +28,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.graphenee.common.data.BeanCollectionFault;
+import io.graphenee.common.data.BeanFault;
 import io.graphenee.core.enums.AccessKeyType;
-import io.graphenee.core.model.BeanCollectionFault;
-import io.graphenee.core.model.BeanFault;
 
 public class GxAccessKeyBean implements Serializable {
 

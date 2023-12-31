@@ -1,5 +1,7 @@
 package io.graphenee.core.model;
 
+import io.graphenee.common.GxAuthenticatedUser;
+
 public class GxAuthenticatedMeetingUserWrapper implements GxMeetingUser {
 
 	private GxAuthenticatedUser wrappedUser;

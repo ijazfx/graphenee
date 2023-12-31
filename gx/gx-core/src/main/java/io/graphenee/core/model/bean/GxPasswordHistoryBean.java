@@ -3,7 +3,7 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-import io.graphenee.core.model.BeanFault;
+import io.graphenee.common.data.BeanFault;
 
 public class GxPasswordHistoryBean implements Serializable {
 	private static final long serialVersionUID = 1L;

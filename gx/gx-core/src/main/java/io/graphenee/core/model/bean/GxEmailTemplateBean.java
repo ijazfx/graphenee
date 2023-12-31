@@ -17,7 +17,7 @@ package io.graphenee.core.model.bean;
 
 import java.io.Serializable;
 
-import io.graphenee.core.model.BeanFault;
+import io.graphenee.common.data.BeanFault;
 import io.graphenee.core.model.entity.GxNamespace;
 import lombok.Getter;
 import lombok.Setter;

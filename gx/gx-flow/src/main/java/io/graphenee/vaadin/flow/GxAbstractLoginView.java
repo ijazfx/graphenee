@@ -22,9 +22,9 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.server.VaadinSession;
 
-import io.graphenee.core.exception.AuthenticationFailedException;
-import io.graphenee.core.exception.PasswordChangeRequiredException;
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.common.exception.AuthenticationFailedException;
+import io.graphenee.common.exception.PasswordChangeRequiredException;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.annotation.PostConstruct;
 

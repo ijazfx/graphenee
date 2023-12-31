@@ -24,12 +24,13 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.dialect.SQLServerDialect;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 public class DataSourceUtil {
 
 	public static DataSource createDataSource(String url, String username, String password) {
-		return DataSourceBuilder.create().url(url).username(username).password(password).build();
+		DriverManagerDataSource ds = new DriverManagerDataSource(url, username, password);
+		return ds;
 	}
 
 	public static String determineDbVendor(DataSource dataSource) {

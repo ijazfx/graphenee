@@ -36,7 +36,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinSession;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.GxEventBus.RemoveComponentEvent;
 import io.graphenee.vaadin.flow.GxEventBus.ResizeComponentEvent;
 import io.graphenee.vaadin.flow.GxEventBus.ShowComponentEvent;
@@ -191,7 +191,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 
 	private void generateMenuItems(SideNav drawer, GxAuthenticatedUser user) {
 		flowSetup().menuItems().forEach(mi -> {
-			if (canDoAction(user, "view", mi)) {
+			if (canDoAction(user, "view", mi) || mi.hasChildren()) {
 				SideNavItem i = new SideNavItem(mi.getLabel());
 				i.addClassName("gx-nav-menuitem");
 				i.addClassName("gx-nav-menuitem-root");
@@ -292,7 +292,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 
 	private void generateMenuItems(SideNavItem parent, GxMenuItem pmi, GxAuthenticatedUser user) {
 		pmi.getChildren().forEach(mi -> {
-			if (canDoAction(user, "view", mi)) {
+			if (canDoAction(user, "view", mi) || mi.hasChildren()) {
 				SideNavItem i = new SideNavItem(mi.getLabel());
 				i.addClassName("gx-nav-menuitem");
 				i.setPrefixComponent(mi.getIcon());

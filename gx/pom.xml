@@ -14,8 +14,9 @@
 	<!-- Modules -->
 	<modules>
 		<module>gx-util</module>
-		<module>gx-core</module>
 		<module>gx-flow</module>
+		<module>gx-core</module>
+		<module>gx-core-flow</module>
 		<module>gx-jbpm-embedded</module>
 		<module>gx-jbpm-flow</module>
 		<module>gx-blockchain</module>
@@ -88,12 +89,17 @@
 			</dependency>
 			<dependency>
 				<groupId>io.graphenee</groupId>
+				<artifactId>gx-flow</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.graphenee</groupId>
 				<artifactId>gx-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.graphenee</groupId>
-				<artifactId>gx-flow</artifactId>
+				<artifactId>gx-core-flow</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

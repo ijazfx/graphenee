@@ -5,7 +5,7 @@ import java.util.List;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.router.RouterLayout;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 
 public abstract class GxAbstractFlowSetup {

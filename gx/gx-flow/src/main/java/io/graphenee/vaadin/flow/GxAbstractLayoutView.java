@@ -20,7 +20,7 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 import jakarta.annotation.PostConstruct;
 
 public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver {

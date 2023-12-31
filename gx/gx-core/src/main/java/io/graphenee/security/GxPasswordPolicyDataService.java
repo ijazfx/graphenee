@@ -2,7 +2,7 @@ package io.graphenee.security;
 
 import java.util.List;
 
-import io.graphenee.core.exception.ChangePasswordFailedException;
+import io.graphenee.common.exception.ChangePasswordFailedException;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxPasswordPolicy;
 import io.graphenee.core.model.entity.GxUserAccount;

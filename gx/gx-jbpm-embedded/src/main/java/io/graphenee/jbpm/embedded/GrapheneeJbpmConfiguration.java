@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
@@ -36,6 +34,8 @@ import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.util.DataSourceUtil;
+import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
 @ConditionalOnClass(GrapheneeCoreConfiguration.class)

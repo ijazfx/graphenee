@@ -11,10 +11,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.GxAuditLogDataService;
-import io.graphenee.core.model.AbstractDashboardUser;
-import io.graphenee.core.model.GxAuthenticatedUser;
-import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.repository.GxAuditLogRepository;
@@ -62,19 +60,27 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 		GxAuditLog l = new GxAuditLog();
 		l.setRemoteAddress(remoteAddress);
 		l.setAuditDate(TRCalendarUtil.getCurrentTimeStamp());
-		if (user != null) {
-			l.setUsername(user.getUsername());
-			if (user instanceof AbstractDashboardUser<?>) {
-				AbstractDashboardUser<?> du = (AbstractDashboardUser<?>) user;
-				if (du.getUser() instanceof GxUserAccountBean) {
-					GxUserAccountBean uab = (GxUserAccountBean) du.getUser();
-					GxUserAccount ua = uaRepo.findById(uab.getOid()).orElse(null);
-					if (ua != null) {
-						l.setUserAccount(ua);
-					}
-				}
-			}
-		}
+		l.setUsername(user.getUsername());
+		l.setAuditEvent(auditEvent);
+		l.setDetail(detail);
+		l.setAuditEntity(auditEntity);
+		l.setOidAuditEntity(oidAuditEntity);
+		l = alRepo.save(l);
+		return l;
+	}
+
+	@Override
+	public GxAuditLog log(GxUserAccount user, String remoteAddress, String auditEvent, String detail) {
+		return log(user, remoteAddress, auditEvent, detail, null, null);
+	}
+
+	@Override
+	public GxAuditLog log(GxUserAccount user, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity) {
+		GxAuditLog l = new GxAuditLog();
+		l.setRemoteAddress(remoteAddress);
+		l.setAuditDate(TRCalendarUtil.getCurrentTimeStamp());
+		l.setUsername(user.getUsername());
+		l.setUserAccount(user);
 		l.setAuditEvent(auditEvent);
 		l.setDetail(detail);
 		l.setAuditEntity(auditEntity);

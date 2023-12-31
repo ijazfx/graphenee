@@ -86,9 +86,7 @@ import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
-import io.graphenee.core.GxDataService;
-import io.graphenee.core.GxPreferenceManager;
-import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
@@ -101,11 +99,11 @@ import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
-import io.graphenee.vaadin.flow.component.GxFormLayout;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
+import io.graphenee.vaadin.flow.component.GxFormLayout;
+import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.data.GxDateRenderer;
 import io.graphenee.vaadin.flow.data.GxNumberToDateRenderer;
-import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.event.TRDelayEventListener;
 import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
@@ -128,8 +126,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	@Autowired
 	GxEventBus eventBus;
 
-	@Autowired
-	GxPreferenceManager prefMan;
+	//	@Autowired
+	//	GxPreferenceManager prefMan;
 
 	private Grid<T> dataGrid;
 	private Class<T> entityClass;
@@ -185,9 +183,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	private FlexLayout footerTextLayout;
 
 	private GxPreferences __preferences;
-
-	@Autowired
-	GxDataService dataService;
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -361,7 +356,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 						@Override
 						public void onSave(GxPreferences entity) {
 							try {
-								prefMan.saveUserPreference(loggedInUser(), entity.toJson());
+								GxAbstractEntityList.this.saveUserPreference(loggedInUser(), entity.toJson());
 								eventBus.post(new RemoveComponentEvent(f));
 								UI.getCurrent().getUI().ifPresent(ui -> {
 									//ui.getPage().reload();
@@ -1270,9 +1265,16 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	protected GxPreferences preferences() {
 		if (__preferences == null) {
-			__preferences = GxPreferences.fromJson(prefMan.loadUserPreference(loggedInUser()));
+			__preferences = GxPreferences.fromJson(GxAbstractEntityList.this.loadUserPreference(loggedInUser()));
 		}
 		return __preferences;
+	}
+
+	protected void saveUserPreference(GxAuthenticatedUser loggedInUser, String json) {
+	}
+
+	protected String loadUserPreference(GxAuthenticatedUser loggedInUser) {
+		return "{}";
 	}
 
 	private String[] preferenceProperties() {

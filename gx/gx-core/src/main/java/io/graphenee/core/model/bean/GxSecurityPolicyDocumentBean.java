@@ -18,7 +18,7 @@ package io.graphenee.core.model.bean;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
-import io.graphenee.core.model.BeanFault;
+import io.graphenee.common.data.BeanFault;
 
 public class GxSecurityPolicyDocumentBean implements Serializable {
 

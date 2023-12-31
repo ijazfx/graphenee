@@ -18,16 +18,8 @@ package io.graphenee.vaadin.flow;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import io.graphenee.core.GrapheneeCoreConfiguration;
-import io.graphenee.documents.GrapheneeDocumentsConfiguration;
-import io.graphenee.i18n.GrapheneeI18nConfiguration;
-import io.graphenee.security.GrapheneeSecurityConfiguration;
-import io.graphenee.sms.GrapheneeSmsConfiguration;
-
 @Configuration
-@ComponentScan(basePackages = { GrapheneeFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
-		GrapheneeI18nConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSecurityConfiguration.COMPONENT_SCAN_BASE_PACKAGE, GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
-		GrapheneeDocumentsConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
+@ComponentScan(basePackages = { GrapheneeFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
 public class GrapheneeFlowConfiguration {
 
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.vaadin.flow";

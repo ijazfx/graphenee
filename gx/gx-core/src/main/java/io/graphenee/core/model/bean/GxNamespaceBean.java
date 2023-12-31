@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import com.google.common.base.Strings;
 
-import io.graphenee.core.model.BeanCollectionFault;
+import io.graphenee.common.data.BeanCollectionFault;
 
 public class GxNamespaceBean implements Serializable {
 
