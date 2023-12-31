@@ -13,12 +13,12 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 
-import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxUserAccount;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxTabItem;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxTabItem;
 
 @Component
 @Scope("prototype")

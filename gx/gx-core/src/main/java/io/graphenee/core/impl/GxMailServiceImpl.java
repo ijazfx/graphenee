@@ -26,7 +26,7 @@ import io.graphenee.core.exception.SendMailFailedException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-public class GxMailServiceImpl implements io.graphenee.core.api.GxMailService {
+public class GxMailServiceImpl implements io.graphenee.core.GxMailService {
 
 	private JavaMailSender javaMailSender;
 

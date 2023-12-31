@@ -7,8 +7,8 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 
-import io.graphenee.vaadin.flow.base.GxSecuredView;
-import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
+import io.graphenee.vaadin.flow.GxSecuredView;
+import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 import io.graphenee.vaadin.flow.component.GxCopyToClipboardWrapper;
 import io.graphenee.workshop.vaadin.lit.GxEcho;
 

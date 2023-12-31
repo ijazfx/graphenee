@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.graphenee.core.api.GxMeetingService;
+import io.graphenee.core.GxMeetingService;
 import io.graphenee.core.model.GxMeeting;
 import io.graphenee.core.model.GxMeetingUser;
 

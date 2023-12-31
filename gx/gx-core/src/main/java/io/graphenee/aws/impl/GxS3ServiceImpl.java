@@ -14,7 +14,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
-import io.graphenee.aws.api.GxS3Service;
+import io.graphenee.aws.GxS3Service;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.util.storage.SaveFailedException;

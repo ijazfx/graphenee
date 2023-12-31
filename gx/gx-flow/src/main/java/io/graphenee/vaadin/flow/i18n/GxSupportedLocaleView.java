@@ -22,8 +22,8 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Route;
 
-import io.graphenee.vaadin.flow.base.GxSecuredView;
-import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
+import io.graphenee.vaadin.flow.GxSecuredView;
+import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
 @SuppressWarnings("serial")
 @Route(GxSupportedLocaleView.VIEW_NAME)

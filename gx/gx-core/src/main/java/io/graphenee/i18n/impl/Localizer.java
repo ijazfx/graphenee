@@ -27,7 +27,7 @@ import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxTerm;
 
 final class Localizer {

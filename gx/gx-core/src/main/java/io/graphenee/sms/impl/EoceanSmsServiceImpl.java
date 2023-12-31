@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 import io.graphenee.sms.GxSmsResponse;
-import io.graphenee.sms.GxSmsSendException;
-import io.graphenee.sms.api.GxSmsService;
+import io.graphenee.sms.GxSmsService;
+import io.graphenee.sms.exception.GxSmsSendException;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.sms.proto.GxSmsConfigProtos.EoceanConfig;
 import retrofit2.Call;

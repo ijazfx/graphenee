@@ -14,14 +14,14 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 
-import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxRegisteredDevice;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxRegisteredDeviceRepository;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
-import io.graphenee.vaadin.flow.base.GxFormLayout;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
+import io.graphenee.vaadin.flow.component.GxFormLayout;
 
 @SuppressWarnings("serial")
 @Component

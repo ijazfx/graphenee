@@ -25,9 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 
-import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.i18n.GrapheneeI18nConfiguration;
-import io.graphenee.i18n.api.LocalizerMapService;
 
 @Service
 @ConditionalOnClass(GrapheneeI18nConfiguration.class)

@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
-import io.graphenee.vaadin.flow.base.GxSecuredView;
-import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
+import io.graphenee.vaadin.flow.GxSecuredView;
+import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
 @GxSecuredView(GxAuditLogListView.VIEW_NAME)
 public class GxAuditLogListView extends GxVerticalLayoutView {

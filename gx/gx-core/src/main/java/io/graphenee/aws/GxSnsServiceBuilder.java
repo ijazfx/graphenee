@@ -4,7 +4,6 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 
-import io.graphenee.aws.api.GxSnsService;
 import io.graphenee.aws.impl.GxSnsServiceImpl;
 
 public class GxSnsServiceBuilder {

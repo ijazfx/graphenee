@@ -5,7 +5,6 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.util.Base64;
 
-import io.graphenee.aws.api.GxKmsService;
 import io.graphenee.aws.impl.GxKmsServiceImpl;
 import io.graphenee.aws.impl.GxKmsServiceImpl.GxKmsKeyProvider;
 import io.graphenee.aws.impl.GxKmsServiceImpl.GxKmsSingleKeyProvider;

@@ -21,11 +21,11 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
-import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.util.storage.FileStorage;
-import io.graphenee.vaadin.flow.base.GxSecuredView;
-import io.graphenee.vaadin.flow.base.GxVerticalLayoutView;
+import io.graphenee.vaadin.flow.GxSecuredView;
+import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
 @SuppressWarnings("serial")
 @GxSecuredView(GxDocumentExplorerView.VIEW_NAME)

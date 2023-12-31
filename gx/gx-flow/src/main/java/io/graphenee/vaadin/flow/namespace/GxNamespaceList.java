@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
 @SuppressWarnings("serial")
 @Component

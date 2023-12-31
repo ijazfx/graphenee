@@ -14,7 +14,7 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
 @SuppressWarnings("serial")
 @SpringComponent

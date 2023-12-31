@@ -9,7 +9,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 
 import io.graphenee.jbpm.embedded.GxAssignee;
 import io.graphenee.jbpm.embedded.flow.GxSelectAssigneeForm.GxAssigneeHolder;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
 @SuppressWarnings("serial")
 public class GxSelectAssigneeForm extends GxAbstractEntityForm<GxAssigneeHolder> {

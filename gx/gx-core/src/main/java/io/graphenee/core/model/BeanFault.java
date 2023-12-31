@@ -22,6 +22,12 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated, use Fault instead.
+ * @param <ID>
+ * @param <T>
+ */
+@Deprecated(forRemoval = true)
 public class BeanFault<ID, T> {
 
 	private static final Logger L = LoggerFactory.getLogger(BeanFault.class);

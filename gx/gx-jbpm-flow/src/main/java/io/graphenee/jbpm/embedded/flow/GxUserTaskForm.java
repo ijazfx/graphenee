@@ -22,9 +22,9 @@ import io.graphenee.jbpm.embedded.exception.GxAssignTaskException;
 import io.graphenee.jbpm.embedded.exception.GxCompleteTaskException;
 import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
 import io.graphenee.jbpm.embedded.flow.GxSelectAssigneeForm.GxAssigneeHolder;
-import io.graphenee.vaadin.flow.GxFlowNotification;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.component.DialogFactory;
+import io.graphenee.vaadin.flow.component.GxNotification;
 
 public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
@@ -118,7 +118,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					closeDialog();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
-					GxFlowNotification.alert(message).open();
+					GxNotification.error(message);
 					L.error(ex.getMessage(), ex);
 				}
 			}
@@ -131,7 +131,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 			@Override
 			public void error(Throwable t) {
 				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
-				GxFlowNotification.alert(message).open();
+				GxNotification.error(message);
 			}
 		});
 
@@ -154,7 +154,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					closeDialog();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
-					GxFlowNotification.alert(message).open();
+					GxNotification.error(message);
 					L.error(ex.getMessage(), ex);
 				}
 			}
@@ -167,7 +167,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 			@Override
 			public void error(Throwable t) {
 				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
-				GxFlowNotification.alert(message).open();
+				GxNotification.error(message);
 			}
 		});
 	}
@@ -198,7 +198,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 									assigneeForm.closeDialog();
 									closeDialog();
 								} catch (GxAssignTaskException ex) {
-									GxFlowNotification.alert(ex.getMessage()).open();
+									GxNotification.error(ex.getMessage());
 									L.error(ex.getMessage(), ex);
 								}
 							}).open();
@@ -207,7 +207,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					});
 					assigneeForm.showInDialog(new GxAssigneeHolder());
 				} else {
-					GxFlowNotification.info("No potential assignees are available to handle this task.").open();
+					GxNotification.primary("No potential assignees are available to handle this task.");
 				}
 			}
 
@@ -219,7 +219,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 			@Override
 			public void error(Throwable t) {
 				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
-				GxFlowNotification.alert(message).open();
+				GxNotification.error(message);
 			}
 
 		});
@@ -242,7 +242,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					closeDialog();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
-					GxFlowNotification.alert(message).open();
+					GxNotification.error(message);
 					L.error(ex.getMessage(), ex);
 				}
 			}
@@ -255,7 +255,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 			@Override
 			public void error(Throwable t) {
 				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
-				GxFlowNotification.alert(message).open();
+				GxNotification.error(message);
 			}
 
 		});
@@ -278,7 +278,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					closeDialog();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
-					GxFlowNotification.alert(message).open();
+					GxNotification.error(message);
 					L.error(ex.getMessage(), ex);
 				}
 			}
@@ -291,7 +291,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 			@Override
 			public void error(Throwable t) {
 				String message = t.getCause() != null ? t.getCause().getMessage() : t.getMessage();
-				GxFlowNotification.alert(message).open();
+				GxNotification.error(message);
 			}
 		});
 	}

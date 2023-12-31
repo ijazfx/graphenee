@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.component.grid.Grid.Column;
 
-import io.graphenee.core.model.api.GxEmailTemplateDataService;
+import io.graphenee.core.GxEmailTemplateDataService;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxNamespace;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 
 @SuppressWarnings("serial")
 @Component

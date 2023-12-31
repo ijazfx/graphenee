@@ -23,8 +23,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.enums.SmsProvider;
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.impl.AwsSmsServiceImpl;
 import io.graphenee.sms.impl.EoceanSmsServiceImpl;

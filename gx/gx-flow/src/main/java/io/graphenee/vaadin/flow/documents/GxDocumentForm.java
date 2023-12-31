@@ -11,8 +11,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.converter.LocalDateTimeToSqlTimestampConverter;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.data.TimestampToDateTimeConverter;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -52,9 +52,9 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
 	@Override
 	protected void bindFields(Binder<GxDocument> dataBinder) {
-		dataBinder.forMemberField(issueDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
-		dataBinder.forMemberField(expiryDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
-		dataBinder.forMemberField(reminderDate).withConverter(new LocalDateTimeToSqlTimestampConverter());
+		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateTimeConverter());
+		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateTimeConverter());
+		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateTimeConverter());
 	}
 
 	@Override

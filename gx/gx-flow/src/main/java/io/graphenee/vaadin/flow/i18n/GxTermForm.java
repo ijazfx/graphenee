@@ -31,8 +31,8 @@ import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
-import io.graphenee.i18n.api.LocalizerService;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.i18n.LocalizerService;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
 @SpringComponent
 @Scope("prototype")

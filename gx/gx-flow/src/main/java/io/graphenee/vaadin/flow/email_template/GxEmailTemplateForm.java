@@ -15,7 +15,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxEmailTemplate;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
 @SuppressWarnings("serial")
 @Scope("prototype")

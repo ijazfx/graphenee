@@ -28,8 +28,8 @@ import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 
 @SuppressWarnings("serial")

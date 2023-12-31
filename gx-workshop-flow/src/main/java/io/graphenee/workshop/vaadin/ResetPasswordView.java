@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.router.Route;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.exception.ChangePasswordFailedException;
-import io.graphenee.core.model.api.GxDataService;
-import io.graphenee.security.api.GxPasswordPolicyDataService;
+import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
-import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
-import io.graphenee.vaadin.flow.base.GxAbstractResetPasswordView;
+import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
+import io.graphenee.vaadin.flow.GxAbstractResetPasswordView;
 
 @Route(value = "reset-password")
 public class ResetPasswordView extends GxAbstractResetPasswordView {

@@ -45,7 +45,7 @@ public class GxSmsProvider extends io.graphenee.core.model.GxMappedSuperclass im
 	private String senderId;
 
 	public String getSenderId() {
-		if (senderId == null && providerName != null) {
+		if (senderId == null && providerName != null && configData != null) {
 			if (providerName.equals(SmsProvider.AWS.getProviderName())) {
 				try {
 					AwsSmsConfig cfg = AwsSmsConfig.parseFrom(configData);

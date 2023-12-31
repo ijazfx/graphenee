@@ -16,6 +16,8 @@
 package io.graphenee.vaadin.flow.sms;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,12 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.flow.component.grid.ItemClickEvent;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.enums.SmsProvider;
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxSmsProvider;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.GxEventBus;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -36,7 +39,12 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProvider> {
 
 	@Autowired
+	GxEventBus eventBus;
+
+	@Autowired
 	GxDataService dataService;
+
+	Map<String, GxAbstractEntityForm<GxSmsProvider>> formMap = new HashMap<>();
 
 	GxAbstractEntityForm<GxSmsProvider> editorForm;
 
@@ -47,18 +55,6 @@ public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProvider> 
 	@Override
 	protected String[] visibleProperties() {
 		return new String[] { "providerName", "isPrimary" };
-	}
-
-	@Override
-	protected void preEdit(GxSmsProvider item) {
-		if (item.getProviderName().equals(SmsProvider.AWS.getProviderName()))
-			editorForm = new GxAwsSmsProviderForm();
-		else if (item.getProviderName().equals(SmsProvider.TWILIO.getProviderName()))
-			editorForm = new GxTwilioSmsProviderForm();
-		else if (item.getProviderName().equals(SmsProvider.EOCEAN.getProviderName()))
-			editorForm = new GxEoceanSmsProviderForm();
-		else
-			editorForm = null;
 	}
 
 	@Override
@@ -75,6 +71,22 @@ public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProvider> 
 
 	@Override
 	protected GxAbstractEntityForm<GxSmsProvider> getEntityForm(GxSmsProvider entity) {
+		editorForm = formMap.get(entity.getProviderName());
+		if (editorForm == null) {
+			if (entity.getProviderName().equals(SmsProvider.AWS.getProviderName())) {
+				editorForm = new GxAwsSmsProviderForm();
+				editorForm.setEventBus(eventBus);
+				formMap.put(entity.getProviderName(), editorForm);
+			} else if (entity.getProviderName().equals(SmsProvider.TWILIO.getProviderName())) {
+				editorForm = new GxTwilioSmsProviderForm();
+				editorForm.setEventBus(eventBus);
+				formMap.put(entity.getProviderName(), editorForm);
+			} else if (entity.getProviderName().equals(SmsProvider.EOCEAN.getProviderName())) {
+				editorForm = new GxEoceanSmsProviderForm();
+				editorForm.setEventBus(eventBus);
+				formMap.put(entity.getProviderName(), editorForm);
+			}
+		}
 		return editorForm;
 	}
 

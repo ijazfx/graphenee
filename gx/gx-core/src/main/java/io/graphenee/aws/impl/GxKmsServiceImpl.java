@@ -13,7 +13,7 @@ import com.amazonaws.services.kms.model.EncryptRequest;
 import com.amazonaws.services.kms.model.EncryptResult;
 import com.amazonaws.util.Base64;
 
-import io.graphenee.aws.api.GxKmsService;
+import io.graphenee.aws.GxKmsService;
 
 public class GxKmsServiceImpl implements GxKmsService {
 

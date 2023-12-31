@@ -32,9 +32,9 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
-import io.graphenee.vaadin.flow.base.GxFormLayout;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.component.GxFormLayout;
 
 @SuppressWarnings("serial")
 @SpringComponent

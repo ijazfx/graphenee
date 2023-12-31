@@ -22,6 +22,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * @deprecated, use CollectionFault instead.
+ * @param <ID>
+ * @param <T>
+ */
+@Deprecated(forRemoval = true)
 public class BeanCollectionFault<T> {
 
 	private boolean isFault = true;

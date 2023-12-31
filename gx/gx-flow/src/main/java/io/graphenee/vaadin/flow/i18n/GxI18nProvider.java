@@ -6,7 +6,7 @@ import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import io.graphenee.i18n.api.LocalizerService;
+import io.graphenee.i18n.LocalizerService;
 
 @SuppressWarnings("serial")
 @Service

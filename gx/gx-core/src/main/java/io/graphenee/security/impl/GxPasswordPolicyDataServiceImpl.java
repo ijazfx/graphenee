@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.exception.ChangePasswordFailedException;
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxPasswordHistory;
 import io.graphenee.core.model.entity.GxPasswordPolicy;
@@ -21,7 +21,7 @@ import io.graphenee.core.model.jpa.repository.GxPasswordHistoryRepository;
 import io.graphenee.core.model.jpa.repository.GxPasswordPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.security.GrapheneeSecurityConfiguration;
-import io.graphenee.security.api.GxPasswordPolicyDataService;
+import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.util.CryptoUtil;
 import io.graphenee.util.TRCalendarUtil;
 

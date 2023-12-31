@@ -9,9 +9,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 
+import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
+import io.graphenee.vaadin.flow.GxMenuItem;
 import io.graphenee.vaadin.flow.GxMenuItemFactory;
-import io.graphenee.vaadin.flow.base.GxAbstractFlowSetup;
-import io.graphenee.vaadin.flow.base.GxMenuItem;
 import io.graphenee.vaadin.flow.documents.GxDocumentExplorerView;
 
 @Component

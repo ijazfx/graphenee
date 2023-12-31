@@ -8,8 +8,7 @@ import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
 
 import io.graphenee.util.callback.TRParamCallback;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
-import io.graphenee.vaadin.flow.base.GxComboBoxSearchForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import lombok.Setter;
 
 /**

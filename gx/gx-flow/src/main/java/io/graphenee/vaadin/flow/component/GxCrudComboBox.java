@@ -7,8 +7,8 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm.EntityFormDelegate;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import jakarta.annotation.PostConstruct;
 
 public abstract class GxCrudComboBox<T> extends ComboBox<T> {

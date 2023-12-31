@@ -23,8 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 
 import io.graphenee.i18n.GrapheneeI18nConfiguration;
-import io.graphenee.i18n.api.LocalizerMapService;
-import io.graphenee.i18n.api.LocalizerService;
+import io.graphenee.i18n.LocalizerService;
 
 @Service
 @ConditionalOnClass(GrapheneeI18nConfiguration.class)

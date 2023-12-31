@@ -27,7 +27,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
 public class GxAwsSmsProviderForm extends GxAbstractEntityForm<GxSmsProvider> {
 

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.enums.SmsProvider;
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxSmsProvider;
-import io.graphenee.sms.api.GxSmsProviderService;
-import io.graphenee.sms.api.GxSmsService;
+import io.graphenee.sms.GxSmsProviderService;
+import io.graphenee.sms.GxSmsService;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.sms.proto.GxSmsConfigProtos.AwsSmsConfig;
 import io.graphenee.sms.proto.GxSmsConfigProtos.EoceanConfig;

@@ -2,7 +2,6 @@ package io.graphenee.vaadin.flow;
 
 import com.vaadin.flow.component.icon.VaadinIcon;
 
-import io.graphenee.vaadin.flow.base.GxMenuItem;
 import io.graphenee.vaadin.flow.device_mgmt.GxRegisteredDeviceListView;
 import io.graphenee.vaadin.flow.email_template.GxEmailTemplateListView;
 import io.graphenee.vaadin.flow.i18n.GxSupportedLocaleView;

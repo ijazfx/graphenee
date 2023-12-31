@@ -21,14 +21,14 @@ import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 
-import io.graphenee.core.model.api.GxDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxUserAccount;
-import io.graphenee.security.api.GxPasswordPolicyDataService;
+import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.util.storage.FileStorage;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxTabItem;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxTabItem;
 import io.graphenee.vaadin.flow.component.FileUploader;
 
 @Component

@@ -7,13 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import io.graphenee.core.GxAuditLogDataService;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.GxAuthenticatedUser;
-import io.graphenee.core.model.api.GxAuditLogDataService;
-import io.graphenee.core.model.api.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
 @Component
 @Scope("prototype")

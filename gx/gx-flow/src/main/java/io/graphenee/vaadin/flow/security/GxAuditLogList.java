@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.data.provider.QuerySortOrder;
 
-import io.graphenee.core.model.api.GxAuditLogDataService;
+import io.graphenee.core.GxAuditLogDataService;
 import io.graphenee.core.model.entity.GxAuditLog;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.base.GxAbstractEntityLazyList;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 
 @Component
 @Scope("prototype")
