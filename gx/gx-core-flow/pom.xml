@@ -17,106 +17,15 @@
 	<!-- Properties -->
 	<properties>
 		<java.version>11</java.version>
-		<version.vaadin>24.2.4</version.vaadin>
-		<version.vaadin.plugin>24.2.4</version.vaadin.plugin>
+		<version.vaadin>24.3.2</version.vaadin>
+		<version.vaadin.plugin>24.3.2</version.vaadin.plugin>
 	</properties>
-
-	<!-- Repositories -->
-	<repositories>
-		<repository>
-			<id>vaadin-addons</id>
-			<url>https://maven.vaadin.com/vaadin-addons/</url>
-		</repository>
-	</repositories>
-
-	<!-- Dependency Management -->
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-core</artifactId>
-				<version>${version.vaadin}</version>
-				<exclusions>
-					<!-- Webjars are only needed when running in Vaadin 13
-					compatibility mode -->
-					<exclusion>
-						<groupId>com.vaadin.webjar</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.insites</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.polymer</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.polymerelements</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.vaadin</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.webcomponents</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-spring-boot-starter</artifactId>
-				<version>${version.vaadin}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-app-layout-flow</artifactId>
-				<version>${version.vaadin}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
+	
 	<!-- Dependencies -->
 	<dependencies>
 		<dependency>
-			<groupId>com.vaadin</groupId>
-			<!-- Replace artifactId with vaadin-core to use only free components -->
-			<artifactId>vaadin-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin.componentfactory</groupId>
-			<artifactId>multi-combo-box-flow</artifactId>
-			<version>23.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.vaadin.addons.componentfactory</groupId>
-			<artifactId>vcf-pdf-viewer</artifactId>
-			<version>2.8.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-app-layout-flow</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.flowingcode.addons.applayout</groupId>
-			<artifactId>app-layout-addon</artifactId>
-			<version>5.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.appreciated</groupId>
-			<artifactId>apexcharts</artifactId>
-			<version>23.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.f0rce.viz</groupId>
-			<artifactId>viz</artifactId>
-			<version>1.0.0</version>
+			<groupId>io.graphenee</groupId>
+			<artifactId>gx-util</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.graphenee</groupId>
@@ -131,19 +40,61 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>com.flowingcode.vaadin.addons</groupId>
-			<artifactId>twincolgrid</artifactId>
-			<version>2.9.5</version>
-		</dependency>
-		<dependency>
-			<groupId>io.reactivex.rxjava3</groupId>
-			<artifactId>rxjava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-		</dependency>
 	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${version.vaadin.plugin}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-frontend</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+            <!-- Production mode is activated using -Pproduction -->
+            <id>production</id>
+            <dependencies>
+                <!-- Exclude development dependencies from production -->
+                <dependency>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-core</artifactId>
+                    <version>${version.vaadin}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.vaadin</groupId>
+                            <artifactId>vaadin-dev</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>vaadin-maven-plugin</artifactId>
+                        <version>${version.vaadin.plugin}</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build-frontend</goal>
+                                </goals>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+	</profiles>
 
 </project>
