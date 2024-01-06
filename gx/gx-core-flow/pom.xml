@@ -24,6 +24,11 @@
 	<!-- Dependencies -->
 	<dependencies>
 		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-core</artifactId>
+			<version>${version.vaadin}</version>
+		</dependency>
+		<dependency>
 			<groupId>io.graphenee</groupId>
 			<artifactId>gx-util</artifactId>
 		</dependency>

@@ -16,6 +16,7 @@
 package io.graphenee.core.flow;
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
@@ -27,6 +28,9 @@ import io.graphenee.sms.GrapheneeSmsConfiguration;
 @Configuration
 @AutoConfigureAfter({ GrapheneeCoreConfiguration.class, GrapheneeI18nConfiguration.class, GrapheneeSecurityConfiguration.class, GrapheneeSmsConfiguration.class,
 		GrapheneeDocumentsConfiguration.class })
+@ComponentScan(basePackages = { GrapheneeCoreFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
 public class GrapheneeCoreFlowConfiguration {
+
+	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core.flow";
 
 }

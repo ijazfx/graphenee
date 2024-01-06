@@ -36,34 +36,6 @@
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-core</artifactId>
 				<version>${version.vaadin}</version>
-				<exclusions>
-					<!-- Webjars are only needed when running in Vaadin 13
-					compatibility mode -->
-					<exclusion>
-						<groupId>com.vaadin.webjar</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.insites</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.polymer</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.polymerelements</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.vaadin</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.webjars.bowergithub.webcomponents</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin</groupId>
@@ -102,11 +74,6 @@
 			<groupId>com.github.appreciated</groupId>
 			<artifactId>apexcharts</artifactId>
 			<version>23.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>de.f0rce.viz</groupId>
-			<artifactId>viz</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>io.graphenee</groupId>
