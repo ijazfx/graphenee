@@ -1,1 +1,1 @@
-mvn -Pproduction -f ./pom.xml -U clean compile -DskipTests
+mvn -f ./pom.xml -U clean compile -DskipTests
