@@ -1,5 +1,10 @@
 package io.graphenee.core.flow.documents;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -9,12 +14,12 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.StreamResource;
 
 import io.graphenee.core.model.entity.GxDocument;
+import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.vaadin.flow.utils.IconUtils;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @SuppressWarnings("serial")
 public class GxDocumentChooser extends CustomField<GxDocument> {
 
@@ -49,7 +54,16 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 			image = IconUtils.fileExtensionIconResource("folder");
 		} else {
 			if (mimeType.startsWith("image")) {
-				image = IconUtils.fileExtensionIconResource("image");
+				String resourcePath = explorer.storage.resourcePath("documents", s.getPath());
+				try {
+					InputStream stream = explorer.storage.resolve(resourcePath);
+					byte[] bytes = IOUtils.toByteArray(stream);
+					StreamResource sr = new StreamResource(s.getName(), () -> new ByteArrayInputStream(bytes));
+					sr.setContentType(mimeType);
+					image = new Image(sr, s.getName());
+				} catch (Exception e) {
+					image = IconUtils.fileExtensionIconResource("image");
+				}
 			} else if (mimeType.startsWith("audio")) {
 				image = IconUtils.fileExtensionIconResource("audio");
 			} else if (mimeType.startsWith("video")) {
@@ -66,11 +80,11 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 		return fl;
 	}
 
-	public GxDocumentChooser() {
-		this("Browse Documents...");
+	public GxDocumentChooser(GxDocumentFilter filter) {
+		this("Browse Documents...", filter);
 	}
 
-	public GxDocumentChooser(String buttonCaption) {
+	public GxDocumentChooser(String buttonCaption, GxDocumentFilter filter) {
 		addClassName("gx-document-chooser");
 
 		VerticalLayout rootLayout = new VerticalLayout();
@@ -81,7 +95,7 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 		Button selectDocument = new Button(buttonCaption);
 		selectDocument.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
 		selectDocument.addClickListener(cl -> {
-			explorer.chooseSingle(doc -> {
+			explorer.chooseSingle(filter, doc -> {
 				setPresentationValue(doc);
 			});
 		});

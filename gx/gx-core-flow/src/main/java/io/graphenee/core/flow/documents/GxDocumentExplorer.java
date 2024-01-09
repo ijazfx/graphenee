@@ -476,7 +476,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		return true;
 	}
 
-	public void chooseSingle(TRParamCallback<GxDocument> onChoose) {
+	public void chooseSingle(GxDocumentFilter filter, TRParamCallback<GxDocument> onChoose) {
+		entityGrid().deselectAll();
+		this.filter = filter;
 		VerticalLayout fl = new VerticalLayout();
 		fl.setPadding(false);
 		fl.setSpacing(false);
@@ -494,10 +496,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		});
 		dlg.setWidth("900px");
 		dlg.open();
-	}
-
-	public void setDocumentFilter(GxDocumentFilter filter) {
-		this.filter = filter;
 	}
 
 }
