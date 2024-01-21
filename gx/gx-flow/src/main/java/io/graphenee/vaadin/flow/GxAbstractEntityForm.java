@@ -114,7 +114,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			if (toolbar instanceof HasComponents) {
 				HasComponents c = (HasComponents) toolbar;
 				decorateToolbar(c);
-				saveButton = new Button("SAVE");
+				saveButton = new Button("Save");
 				saveButton.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
 				saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 				saveButton.setDisableOnClick(true);
@@ -142,7 +142,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 				customizeSaveButton(saveButton);
 
-				resetButton = new Button("RESET");
+				resetButton = new Button("Reset");
 				resetButton.addClickShortcut(Key.KEY_R, KeyModifier.ALT);
 				resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 
@@ -162,7 +162,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 				customizeResetButton(resetButton);
 
-				dismissButton = new Button("DISMISS");
+				dismissButton = new Button("Dismiss");
 				// dismissButton.addClickShortcut(Key.ESCAPE);
 				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
