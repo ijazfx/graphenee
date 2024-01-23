@@ -1,15 +1,7 @@
 package io.graphenee.vaadin.flow;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.eventbus.Subscribe;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -37,11 +29,6 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.common.GxAuthenticatedUser;
-import io.graphenee.vaadin.flow.GxEventBus.RemoveComponentEvent;
-import io.graphenee.vaadin.flow.GxEventBus.ResizeComponentEvent;
-import io.graphenee.vaadin.flow.GxEventBus.ShowComponentEvent;
-import io.graphenee.vaadin.flow.GxEventBus.TargetArea;
-import io.graphenee.vaadin.flow.component.GxStackLayout;
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
 
@@ -54,25 +41,6 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 
 	@Setter
 	private GxAbstractAppLayoutDelegate delegate;
-
-	@Autowired
-	GxEventBus eventBus;
-
-	private FlexLayout rootLayout;
-	private GxStackLayout contentLayout;
-	private GxStackLayout rightDrawerLayout;
-
-	@Override
-	protected void onAttach(AttachEvent attachEvent) {
-		eventBus.register(this);
-		super.onAttach(attachEvent);
-	}
-
-	@Override
-	protected void onDetach(DetachEvent detachEvent) {
-		eventBus.unregister(this);
-		super.onDetach(detachEvent);
-	}
 
 	@PostConstruct
 	private void postBuild() {
@@ -210,83 +178,6 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 					drawer.addItem(i);
 				}
 			}
-		});
-	}
-
-	@Override
-	public void setContent(Component content) {
-		if (rootLayout == null) {
-			rootLayout = new FlexLayout();
-			rootLayout.setFlexDirection(FlexDirection.ROW);
-			rootLayout.setSizeFull();
-
-			contentLayout = new GxStackLayout();
-			contentLayout.addClassName("gx-content");
-			contentLayout.setSizeFull();
-
-			rightDrawerLayout = new GxStackLayout();
-			rightDrawerLayout.addClassName("gx-right-drawer");
-			rightDrawerLayout.setSizeFull();
-			rightDrawerLayout.setVisible(false);
-
-			rootLayout.add(contentLayout, rightDrawerLayout);
-			super.setContent(rootLayout);
-		}
-		while (!contentLayout.isEmpty()) {
-			contentLayout.pop();
-		}
-		while (!rightDrawerLayout.isEmpty()) {
-			rightDrawerLayout.pop();
-		}
-		contentLayout.push(content);
-	}
-
-	Map<Component, TargetArea> targetAreaMap = new HashMap<>();
-
-	@Subscribe
-	public void showComponent(ShowComponentEvent event) {
-		UI.getCurrent().access(() -> {
-			Component c = event.getComponent();
-			targetAreaMap.put(c, event.getArea());
-			if (event.getArea() == TargetArea.END_DRAWER && !c.equals(rightDrawerLayout.top())) {
-				rightDrawerLayout.push(c);
-			}
-			UI.getCurrent().push();
-		});
-	}
-
-	@Subscribe
-	public void removeComponent(RemoveComponentEvent event) {
-		UI.getCurrent().access(() -> {
-			Component c = event.getComponent();
-			TargetArea area = targetAreaMap.get(c);
-			if (area == TargetArea.END_DRAWER && c.equals(rightDrawerLayout.top())) {
-				rightDrawerLayout.pop();
-				targetAreaMap.remove(c);
-			}
-			if (area == TargetArea.CONTENT && c.equals(contentLayout.top())) {
-				contentLayout.pop();
-				targetAreaMap.remove(c);
-			}
-			UI.getCurrent().push();
-		});
-	}
-
-	@Subscribe
-	public void resizeComponent(ResizeComponentEvent event) {
-		UI.getCurrent().access(() -> {
-			Component c = event.getComponent();
-			TargetArea area = targetAreaMap.get(c);
-			if (area == TargetArea.CONTENT && c.equals(contentLayout.top())) {
-				contentLayout.pop();
-				rightDrawerLayout.push(c);
-				targetAreaMap.put(c, TargetArea.END_DRAWER);
-			} else if (area == TargetArea.END_DRAWER && c.equals(rightDrawerLayout.top())) {
-				rightDrawerLayout.pop();
-				contentLayout.push(c);
-				targetAreaMap.put(c, TargetArea.CONTENT);
-			}
-			UI.getCurrent().push();
 		});
 	}
 

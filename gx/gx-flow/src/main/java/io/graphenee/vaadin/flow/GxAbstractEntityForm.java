@@ -9,12 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.vaadin.flow.component.AttachEvent;
+import com.google.common.base.Strings;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
@@ -26,7 +23,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.NativeLabel;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
@@ -41,19 +37,13 @@ import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
-import io.graphenee.vaadin.flow.GxEventBus.TargetArea;
 import io.graphenee.vaadin.flow.component.GxDialog;
-import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
-
-	@Setter
-	@Autowired
-	protected GxEventBus eventBus;
 
 	private static final long serialVersionUID = 1L;
 
@@ -78,20 +68,12 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	private boolean editable = true;
 
-	@Setter
-	private boolean dialogAutoClose = true;
+	private HasComponents parent;
 
 	private GxDialog dialog;
 
-	@Override
-	protected void onAttach(AttachEvent attachEvent) {
-		eventBus.register(this);
-	}
-
-	@Override
-	protected void onDetach(DetachEvent detachEvent) {
-		eventBus.unregister(this);
-	}
+	@Setter
+	private boolean dialogAutoClose = true;
 
 	public GxAbstractEntityForm(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -128,11 +110,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 							listeners.forEach(l -> {
 								l.onEvent(GxEntityFormEvent.SAVE, entity);
 							});
-							if (dialog != null && dialogAutoClose) {
-								closeDialog();
-							} else {
+							if (dialogAutoClose)
 								dismiss();
-							}
 						} catch (Exception e) {
 							log.error(e.getMessage(), e);
 						}
@@ -172,10 +151,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 					@Override
 					public void onClick(ClickEvent<Button> event) {
-						if (dialog != null)
-							closeDialog();
-						else
-							dismiss();
+						dismiss();
 						if (delegate != null)
 							delegate.onDismiss(entity);
 						listeners.forEach(l -> {
@@ -229,12 +205,32 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	public void show(T entity) {
+		this.parent = null;
+		showInDialog(entity);
+	}
+
+	public void show(T entity, HasComponents host) {
 		setEntity(entity);
-		eventBus.post(new GxEventBus.ShowComponentEvent(this, TargetArea.END_DRAWER, defaultWidth()));
+		this.parent = host;
+		host.add(this);
+	}
+
+	/**
+	 * @deprecated use {@link #dismiss()} instead.
+	 */
+	@Deprecated
+	public void closeDialog() {
+		dismiss();
 	}
 
 	public void dismiss() {
-		eventBus.post(new GxEventBus.RemoveComponentEvent(this));
+		if (dialog != null) {
+			dialog.close();
+		} else {
+			if (parent != null) {
+				parent.remove(this);
+			}
+		}
 	}
 
 	public void validateForm() throws ValidationException {
@@ -264,30 +260,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			formTitleLayout.getStyle().set("padding-top", "0.5rem");
 			formTitleLayout.setWidthFull();
 			formTitleLayout.add(formTitleLabel);
-			//			Div spacer = new Div();
-			//			formTitleLayout.add(spacer);
-			//			formTitleLayout.expand(spacer);
 			addComponentAsFirst(formTitleLayout);
-			// add resize button
-			GxToggleButton resizeButton = new GxToggleButton(VaadinIcon.MARGIN_RIGHT.create(), VaadinIcon.RASTER.create(), false);
-			resizeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-			resizeButton.setTrueStateCallback(cb -> {
-				if (dialog != null) {
-					dialog.setSizeFull();
-				} else {
-					eventBus.post(new GxEventBus.ResizeComponentEvent(this, "100%"));
-				}
-			});
-			resizeButton.setFalseStateCallback(cb -> {
-				if (dialog != null) {
-					dialog.setWidth(dialogWidth());
-					dialog.setHeight(dialogHeight());
-				} else {
-					eventBus.post(new GxEventBus.ResizeComponentEvent(this, defaultWidth()));
-				}
-			});
-			formTitleLayout.add(resizeButton);
-			formTitleLayout.setAlignSelf(Alignment.START, resizeButton);
 
 		}
 	}
@@ -406,17 +379,14 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				formTitle = new KeyValueWrapper(entity).stringForKeyPath(keyPath);
 			}
 		}
-		if (formTitle == null || formTitle.isBlank()) {
-			formTitle = "Entry Form";
-		}
-		if (formTitle.length() > 50) {
+		if (formTitle != null && formTitle.length() > 50) {
 			formTitleLabel.setText(formTitle.substring(0, 47) + "...");
 			formTitleLabel.setTitle(formTitle);
 		} else {
 			formTitleLabel.setText(formTitle);
 			formTitleLabel.setTitle("");
 		}
-		//		setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
+		setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
 		if (shouldFocusFirstFieldOnShow()) {
 			focusFirst(this);
 		}
@@ -449,17 +419,11 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		return showInDialog(entity, dialogWidth(), dialogHeight());
 	}
 
-	@Deprecated(forRemoval = true)
 	protected String dialogHeight() {
 		return "50rem";
 	}
 
-	@Deprecated(forRemoval = true)
 	protected String dialogWidth() {
-		return "50rem";
-	}
-
-	protected String defaultWidth() {
 		return "50rem";
 	}
 
@@ -470,18 +434,17 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 * @param height
 	 * @return
 	 */
-	@Deprecated(forRemoval = true)
-	public GxDialog showInDialog(T entity, String width, String height) {
+	private GxDialog showInDialog(T entity, String width, String height) {
 		setEntity(entity);
 		if (dialog == null) {
 			dialog = new GxDialog(GxAbstractEntityForm.this);
 			dialog.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
 			dialog.setResizable(true);
-			dialog.setModal(isModal());
+			dialog.setModal(true);
 			dialog.setCloseOnEsc(false);
 			dialog.setDraggable(true);
 			dialog.setResizable(true);
-			dialog.setCloseOnOutsideClick(!isModal());
+			dialog.setCloseOnOutsideClick(false);
 		}
 		if (!dialog.isOpened()) {
 			dialog.setWidth(width);
@@ -489,27 +452,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			dialog.open();
 		}
 		return dialog;
-	}
-
-	/**
-	 * If returned false, the dialog will close when clicked outside the form.
-	 * Default value is true.
-	 * 
-	 * @return
-	 */
-	@Deprecated(forRemoval = true)
-	protected boolean isModal() {
-		return true;
-	}
-
-	/**
-	 * This method has been deprecated in favor of {@link #dismiss()} and will be removed in future.
-	 */
-	@Deprecated(forRemoval = true)
-	public void closeDialog() {
-		if (dialog != null) {
-			dialog.close();
-		}
 	}
 
 	public void setDelegate(EntityFormDelegate<T> delegate) {

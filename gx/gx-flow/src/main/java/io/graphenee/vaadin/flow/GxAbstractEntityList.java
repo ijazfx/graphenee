@@ -30,7 +30,6 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -92,15 +91,13 @@ import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
-import io.graphenee.vaadin.flow.GxEventBus.RemoveComponentEvent;
-import io.graphenee.vaadin.flow.GxEventBus.ShowComponentEvent;
-import io.graphenee.vaadin.flow.GxEventBus.TargetArea;
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
+import io.graphenee.vaadin.flow.component.GxStackLayout;
 import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.data.GxDateRenderer;
 import io.graphenee.vaadin.flow.data.GxNumberToDateRenderer;
@@ -124,7 +121,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-	GxEventBus eventBus;
+	GxEventBus eventBus1;
 
 	//	@Autowired
 	//	GxPreferenceManager prefMan;
@@ -217,6 +214,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	@SuppressWarnings("unchecked")
 	synchronized private GxAbstractEntityList<T> build() {
 		if (!isBuilt) {
+			rootLayout = new GxStackLayout();
 			FlexLayout gridLayout = new FlexLayout();
 			gridLayout.setFlexDirection(FlexDirection.COLUMN);
 			gridLayout.setSizeFull();
@@ -283,7 +281,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 			decorateToolbarLayout(menuBarLayout);
 			menuBarLayout.add(columnMenuBar);
 
-			add(menuBarLayout);
+			gridLayout.addComponentAsFirst(menuBarLayout);
 			crudMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 			customMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 			columnMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
@@ -349,7 +347,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 				@Override
 				public void onClick(ClickEvent<MenuItem> event) {
-					GxPreferenceForm<T> f = new GxPreferenceForm<>(eventBus);
+					GxPreferenceForm<T> f = new GxPreferenceForm<>();
 					f.initializeWith(entityGrid(), entityClass);
 					f.setDelegate(new EntityFormDelegate<GxPreferences>() {
 
@@ -357,11 +355,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 						public void onSave(GxPreferences entity) {
 							try {
 								GxAbstractEntityList.this.saveUserPreference(loggedInUser(), entity.toJson());
-								eventBus.post(new RemoveComponentEvent(f));
-								UI.getCurrent().getUI().ifPresent(ui -> {
-									//ui.getPage().reload();
-									GxAbstractEntityList.this.refresh();
-								});
+								f.dismiss();
 							} catch (Exception ex) {
 								ex.printStackTrace();
 							}
@@ -369,12 +363,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 						@Override
 						public void onDismiss(GxPreferences entity) {
-							eventBus.post(new RemoveComponentEvent(f));
+							GxAbstractEntityList.this.refresh();
 						}
 
 					});
-					f.setEntity(preferences());
-					eventBus.post(new ShowComponentEvent(f, TargetArea.END_DRAWER, f.defaultWidth()));
+					f.show(preferences(), rootLayout);
 				}
 			});
 
@@ -488,7 +481,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 				}
 			}
 
-			add(gridLayout);
+			rootLayout.add(gridLayout);
+
+			add(rootLayout);
 			footerTextLayout = new FlexLayout();
 			totalCountFooterText = new Text("No Records");
 
@@ -1231,9 +1226,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 		} else {
 			GxAbstractEntityForm<T> entityForm = cachedForm(entity);
 			if (entityForm != null) {
-				entityForm.show(entity);
+				entityForm.show(entity, rootLayout);
 			}
 		}
+	}
+
+	protected boolean shouldShowFormInDialog() {
+		return true;
 	}
 
 	protected String drawerWidth() {
@@ -1460,6 +1459,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	HashSet<GxEntityListEventListner<T>> listeners = new HashSet<>();
 
 	private Column<T> editColumn;
+
+	private GxStackLayout rootLayout;
 
 	public void registerListener(GxEntityListEventListner<T> listener) {
 		listeners.add(listener);

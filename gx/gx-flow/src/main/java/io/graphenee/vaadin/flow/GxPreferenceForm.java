@@ -21,9 +21,8 @@ public class GxPreferenceForm<T> extends GxAbstractEntityForm<GxPreferences> {
 	private Grid<T> entityGrid;
 	private Class<T> entityClass;
 
-	public GxPreferenceForm(GxEventBus eventBus) {
+	public GxPreferenceForm() {
 		super(GxPreferences.class);
-		setEventBus(eventBus);
 	}
 
 	@Override

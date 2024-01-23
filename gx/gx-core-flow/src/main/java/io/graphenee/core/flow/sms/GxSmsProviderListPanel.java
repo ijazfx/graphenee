@@ -75,15 +75,12 @@ public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProvider> 
 		if (editorForm == null) {
 			if (entity.getProviderName().equals(SmsProvider.AWS.getProviderName())) {
 				editorForm = new GxAwsSmsProviderForm();
-				editorForm.setEventBus(eventBus);
 				formMap.put(entity.getProviderName(), editorForm);
 			} else if (entity.getProviderName().equals(SmsProvider.TWILIO.getProviderName())) {
 				editorForm = new GxTwilioSmsProviderForm();
-				editorForm.setEventBus(eventBus);
 				formMap.put(entity.getProviderName(), editorForm);
 			} else if (entity.getProviderName().equals(SmsProvider.EOCEAN.getProviderName())) {
 				editorForm = new GxEoceanSmsProviderForm();
-				editorForm.setEventBus(eventBus);
 				formMap.put(entity.getProviderName(), editorForm);
 			}
 		}

@@ -1,5 +1,6 @@
 package io.graphenee.vaadin.flow.component;
 
+import java.util.Collection;
 import java.util.LinkedList;
 
 import com.vaadin.flow.component.Component;
@@ -17,44 +18,29 @@ public class GxStackLayout extends VerticalLayout {
 		setPadding(false);
 	}
 
-	/*
-	 * 1. check if there is any content
-	 * if yes then push that content to stack and add new content
-	 * if no then add new content
-	 */
-
-	public void push(Component c) {
+	@Override
+	public void add(Collection<Component> components) {
+		if (components.size() > 1) {
+			throw new IllegalArgumentException("Adding collection of components is not allowed because only one component at a time can be visible.");
+		}
 		if (getComponentCount() > 0) {
 			stack.push(getComponentAt(0));
 			removeAll();
 		}
-		add(c);
-		setVisible(true);
+		super.add(components);
 	}
 
-	/*
-	 * 1. check if stack is empty
-	 * if yes, do nothing
-	 * if no, then pop from stack and display new content
-	 */
-	public void pop() {
-		try {
-			Component c = stack.pop();
+	@Override
+	public void remove(Collection<Component> components) {
+		stack.removeAll(components);
+		if (getComponentCount() > 0 && components.contains(getComponentAt(0))) {
 			removeAll();
-			add(c);
-			setVisible(true);
-		} catch (Exception ex) {
-			removeAll();
-			setVisible(false);
 		}
-	}
+		if (!stack.isEmpty()) {
+			Component c = stack.removeLast();
+			super.add(c);
+		}
 
-	public boolean isEmpty() {
-		return getComponentCount() == 0;
-	}
-
-	public Component top() {
-		return isEmpty() ? null : getComponentAt(0);
 	}
 
 }
