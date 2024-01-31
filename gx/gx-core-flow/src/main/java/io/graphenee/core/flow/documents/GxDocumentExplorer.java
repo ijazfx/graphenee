@@ -3,7 +3,6 @@ package io.graphenee.core.flow.documents;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +13,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -331,7 +331,17 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
-		documentService.deleteExplorerItem(new ArrayList<>(entities));
+		int count = 0;
+		for (GxDocumentExplorerItem e : entities) {
+			try {
+				documentService.deleteExplorerItem(List.of(e));
+			} catch (DataIntegrityViolationException ex) {
+				count++;
+			}
+		}
+		if (count > 0) {
+			GxNotification.error("Some document(s) are in use hence cannot be removed.");
+		}
 	}
 
 	@Override
