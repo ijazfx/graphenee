@@ -3,7 +3,6 @@ package io.graphenee.core.flow.documents;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -333,16 +331,17 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
-		try {
-            documentService.deleteExplorerItem(new ArrayList<>(entities));
-        } catch (DataIntegrityViolationException ex) {
-            if (StringUtils.isNotBlank(ex.getMessage()) && ex.getMessage().contains("violates foreign key constraint")) {
-                GxNotification.error("One or more selected record(s) are in use and can not be deleted.");
-            } else {
-                GxNotification.error("Failed to delete one or more selected record(s).");
-            }
-        }
-
+		int count = 0;
+		for (GxDocumentExplorerItem e : entities) {
+			try {
+				documentService.deleteExplorerItem(List.of(e));
+			} catch (DataIntegrityViolationException ex) {
+				count++;
+			}
+		}
+		if (count > 0) {
+			GxNotification.error("Some document(s) are in use hence cannot be removed.");
+		}
 	}
 
 	@Override
