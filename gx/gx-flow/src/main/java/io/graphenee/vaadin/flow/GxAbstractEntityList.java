@@ -348,7 +348,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 						propNameSet.add(propName);
 					}
 
-					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass);
+					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass, availableProperties());
 					importDataForm.open();
 				}
 			});
