@@ -12,8 +12,10 @@ import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -331,7 +333,16 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
-		documentService.deleteExplorerItem(new ArrayList<>(entities));
+		try {
+            documentService.deleteExplorerItem(new ArrayList<>(entities));
+        } catch (DataIntegrityViolationException ex) {
+            if (StringUtils.isNotBlank(ex.getMessage()) && ex.getMessage().contains("violates foreign key constraint")) {
+                GxNotification.error("One or more selected record(s) are in use and can not be deleted.");
+            } else {
+                GxNotification.error("Failed to delete one or more selected record(s).");
+            }
+        }
+
 	}
 
 	@Override
