@@ -97,6 +97,7 @@ import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
+import io.graphenee.vaadin.flow.component.GxImportDataForm;
 import io.graphenee.vaadin.flow.component.GxStackLayout;
 import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.data.GxDateRenderer;
@@ -144,6 +145,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	private MenuItem columnsDialogMenuItem;
 
 	private MenuItem exportDataMenuItem;
+
+	private MenuItem importDataMenuItem;
 
 	private MenuBar crudMenuBar;
 
@@ -329,6 +332,24 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 					exportDataSpreadSheetComponent.withDelegate(exportDataDelegate());
 
 					exportDataSpreadSheetComponent.prepareDownload();
+				}
+			});
+
+			importDataMenuItem = columnMenuBar.addItem(VaadinIcon.UPLOAD.create());
+			importDataMenuItem.setVisible(shouldShowExportDataMenu());
+			importDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(ClickEvent<MenuItem> event) {
+					Set<String> propNameSet = new HashSet<>();
+					for (String propName : GxAbstractEntityList.this.availableProperties()) {
+						propNameSet.add(propName);
+					}
+
+					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass);
+					importDataForm.open();
 				}
 			});
 
