@@ -39,7 +39,9 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 
 	private void refreshLayout() {
 		docsLayout.removeAll();
-		docsLayout.add(createItem(getValue()));
+		GxDocument value = getValue();
+		if (value != null)
+			docsLayout.add(createItem(value));
 	}
 
 	private Component createItem(GxDocument s) {
