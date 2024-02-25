@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.AbstractField;
@@ -98,6 +99,8 @@ import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 import io.graphenee.vaadin.flow.component.GxImportDataForm;
+import io.graphenee.vaadin.flow.component.GxImportDataForm.ImportDataFormDelegate;
+import io.graphenee.vaadin.flow.component.GxImportDataForm.JsonToEntityConversionException;
 import io.graphenee.vaadin.flow.component.GxStackLayout;
 import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.data.GxDateRenderer;
@@ -117,7 +120,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends FlexLayout {
+public abstract class GxAbstractEntityList<T> extends FlexLayout implements ImportDataFormDelegate<T> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -349,6 +352,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 					}
 
 					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass, availableProperties());
+					importDataForm.setDelegate(GxAbstractEntityList.this);
 					importDataForm.open();
 				}
 			});
@@ -1498,6 +1502,18 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 		}
 
 		void onEvent(GxEntityListEvent event, Collection<T> entity);
+	}
+
+	@Override
+	public T convertImportedJsonToEntity(JSONObject json) throws JsonToEntityConversionException {
+		throw new JsonToEntityConversionException(new UnsupportedOperationException(), json);
+	}
+
+	@Override
+	public void saveConverted(Collection<T> converted) {
+		converted.forEach(c -> {
+			onSave(c);
+		});
 	}
 
 }
