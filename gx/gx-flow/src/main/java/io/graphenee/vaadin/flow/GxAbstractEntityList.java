@@ -189,7 +189,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.entityClass = entityClass;
-		PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+		bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
 		this.searchBinder = Binder.withPropertySet(bps);
 		setSizeFull();
 		setFlexDirection(FlexDirection.COLUMN);
@@ -351,7 +351,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 						propNameSet.add(propName);
 					}
 
-					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass, availableProperties());
+					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass);
 					importDataForm.setDelegate(GxAbstractEntityList.this);
 					importDataForm.open();
 				}
@@ -408,7 +408,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			List<Column<T>> columns = new ArrayList<>();
 			List<String> userPreferences = new ArrayList<>();
 			if (availableProperties() != null && availableProperties().length > 0) {
-				PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
+				//				PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
 				editColumn = dataGrid.addComponentColumn(source -> {
 					Button rowEditButton = new Button(VaadinIcon.EDIT.create());
 					rowEditButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY_INLINE);
@@ -432,7 +432,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
-						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
+						//						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
+						propertyDefinition = (PropertyDefinition<T, Object>) bps.getProperty(propertyName).get();
 						Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
 
 						if (renderer != null) {
@@ -820,7 +821,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	protected Grid<T> dataGrid(Class<T> entityClass) {
 		Grid<T> dataGrid = new Grid<>(entityClass, true);
 		if (isGridInlineEditingEnabled()) {
-			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+			//			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
 			Binder<T> editBinder = Binder.withPropertySet(bps);
 			dataGrid.getEditor().setBinder(editBinder);
 			dataGrid.getEditor().setBuffered(false);
@@ -1487,6 +1488,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	private GxStackLayout rootLayout;
 
+	private PropertySet<T> bps;
+
 	public void registerListener(GxEntityListEventListner<T> listener) {
 		listeners.add(listener);
 	}
@@ -1506,7 +1509,29 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	@Override
 	public T convertImportedJsonToEntity(JSONObject json) throws JsonToEntityConversionException {
-		throw new JsonToEntityConversionException(new UnsupportedOperationException(), json);
+		try {
+			T o = newInstance();
+			preEdit(o);
+			bps.getProperties().forEach(p -> {
+				String key = p.getName();
+				if (!key.contains(".")) {
+					@SuppressWarnings("unchecked")
+					com.vaadin.flow.data.binder.Setter<T, Object> setter = (com.vaadin.flow.data.binder.Setter<T, Object>) p.getSetter().orElse(null);
+					if (setter != null) {
+						Object convertedValue = null;
+						if (json.has(key)) {
+							convertedValue = GxAbstractEntityList.this.convertValueForProperty(key, json.get(key));
+						} else {
+							convertedValue = GxAbstractEntityList.this.convertValueForProperty(key, null);
+						}
+						setter.accept(o, convertedValue);
+					}
+				}
+			});
+			return o;
+		} catch (Throwable e) {
+			throw new JsonToEntityConversionException(e, json);
+		}
 	}
 
 	@Override
@@ -1514,6 +1539,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		converted.forEach(c -> {
 			onSave(c);
 		});
+	}
+
+	@Override
+	public Object convertValueForProperty(String key, Object value) {
+		return value;
 	}
 
 }

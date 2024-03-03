@@ -44,6 +44,7 @@ import org.json.JSONObject;
 import com.google.common.base.Strings;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -86,11 +87,10 @@ public class GxImportDataForm<T> extends Dialog {
 	Map<String, String> missingMap = new HashMap<>();
 	Map<String, PropertyDefinition<T, ?>> pdMap = new HashMap<>();
 
-	private String[] availableProperties;
+	private List<T> converted;
 
-	public GxImportDataForm(Class<T> entityClass, String[] availableProperties) {
+	public GxImportDataForm(Class<T> entityClass) {
 		this.entityClass = entityClass;
-		this.availableProperties = availableProperties;
 
 		setHeaderTitle("Import Data");
 
@@ -117,6 +117,11 @@ public class GxImportDataForm<T> extends Dialog {
 		Button finishButton = new Button("Save Converted");
 		finishButton.setEnabled(true);
 		finishButton.addClickListener(cl -> {
+			if (delegate != null && converted != null && !converted.isEmpty()) {
+				LongRunningTask.newTask(UI.getCurrent(), ui -> {
+					delegate.saveConverted(converted);
+				}).withProgressMessage("Saving records...").withSuccessMessage("Records have been saved.").start();
+			}
 			this.close();
 		});
 
@@ -149,11 +154,16 @@ public class GxImportDataForm<T> extends Dialog {
 		successGrid.setSizeFull();
 		successGrid.getColumns().forEach(c -> c.setVisible(false));
 		List<Column<T>> ordered = new ArrayList<>();
-		for (String key : availableProperties) {
+		colMap.keySet().stream().sorted().forEach(i -> {
+			String jsonKey = colMap.get(i);
+			PropertyDefinition<T, ?> pd = pdMap.get(jsonKey);
+			String key = pd.getName();
 			Column<T> c = successGrid.getColumnByKey(key);
-			ordered.add(c);
-			c.setVisible(true);
-		}
+			if (c != null) {
+				ordered.add(c);
+				c.setVisible(true);
+			}
+		});
 		successGrid.getColumns().forEach(c -> {
 			if (!ordered.contains(c)) {
 				successGrid.removeColumnByKey(c.getKey());
@@ -171,7 +181,7 @@ public class GxImportDataForm<T> extends Dialog {
 			}
 		});
 
-		List<T> converted = new ArrayList<>();
+		converted = new ArrayList<>();
 		List<JSONObject> failed = new ArrayList<>();
 
 		rows.forEach(row -> {
@@ -225,7 +235,7 @@ public class GxImportDataForm<T> extends Dialog {
 		JSONObject item = importGrid.getListDataView().getItem(0);
 
 		PropertySet<T> pset = BeanPropertySet.get(entityClass);
-		List<PropertyDefinition<T, ?>> props = pset.getProperties().collect(Collectors.toList());
+		List<PropertyDefinition<T, ?>> props = pset.getProperties().filter(p -> p.getSetter().isPresent() && !p.getName().contains(".")).collect(Collectors.toList());
 
 		form.add(new H5("Source"), new H5("Data"), new H5("Target"), new H5("Type"), new H5("Pattern"), new H5("If Missing"), new H5("Output"));
 
@@ -238,7 +248,15 @@ public class GxImportDataForm<T> extends Dialog {
 			data.setValue(item.getString(key));
 
 			TextField targetType = new TextField();
-			TextField pattern = new TextField();
+
+			List<String> patternList = new ArrayList<>(List.of("yyyy-MM-dd", "yyyy-dd-MM", "dd-MM-yyyy", "MM-dd-yyyy", "dd/MM/yyyy", "MM/dd/yyyy", "dd-MMM-yy"));
+			ComboBox<String> pattern = new ComboBox<>();
+			pattern.setAllowCustomValue(true);
+			pattern.setItems(patternList);
+			pattern.addCustomValueSetListener(vcl -> {
+				patternList.add(vcl.getDetail());
+			});
+
 			TextField ifMissing = new TextField();
 			TextField output = new TextField();
 
@@ -247,12 +265,12 @@ public class GxImportDataForm<T> extends Dialog {
 			targetField.addValueChangeListener(vcl -> {
 				targetType.setValue(vcl.getValue().getType().getTypeName());
 				try {
+					pdMap.put(key, vcl.getValue());
 					Object value = convertSourceToTarget(item.getString(key), vcl.getValue(), pattern.getValue(), ifMissing.getValue());
 					output.setValue(value.toString());
-					pdMap.put(key, vcl.getValue());
 				} catch (Exception e) {
 					output.setErrorMessage(e.getMessage());
-					pdMap.remove(key);
+					// pdMap.remove(key);
 				}
 			});
 			targetField.setItems(props);
@@ -316,17 +334,17 @@ public class GxImportDataForm<T> extends Dialog {
 			output = Boolean.parseBoolean(source);
 		} else if (pd.getType().equals(java.util.Date.class)) {
 			if (Strings.isNullOrEmpty(pattern)) {
-				output = TRCalendarUtil.dateFormatter.parse(source);
+				output = TRCalendarUtil.getCustomDateFormatter().parse(source);
 			} else {
 				SimpleDateFormat sdf = new SimpleDateFormat(pattern.trim());
 				output = sdf.parse(source);
 			}
 		} else if (pd.getType().equals(java.sql.Timestamp.class)) {
 			if (Strings.isNullOrEmpty(pattern)) {
-				output = TRCalendarUtil.dateTimeFormatter.parse(source);
+				output = new Timestamp(TRCalendarUtil.getCustomDateTimeFormatter().parse(source).getTime());
 			} else {
 				SimpleDateFormat sdf = new SimpleDateFormat(pattern.trim());
-				output = sdf.parse(source);
+				output = new Timestamp(sdf.parse(source).getTime());
 			}
 		} else {
 			output = source;
@@ -519,15 +537,17 @@ public class GxImportDataForm<T> extends Dialog {
 	public static interface ImportDataFormDelegate<T> {
 		T convertImportedJsonToEntity(JSONObject json) throws JsonToEntityConversionException;
 
+		Object convertValueForProperty(String key, Object value);
+
 		void saveConverted(Collection<T> converted);
 	}
 
-	public static class JsonToEntityConversionException extends Exception {
+	public static class JsonToEntityConversionException extends Throwable {
 
 		private static final long serialVersionUID = 1L;
 		private JSONObject json;
 
-		public JsonToEntityConversionException(Exception ex, JSONObject json) {
+		public JsonToEntityConversionException(Throwable ex, JSONObject json) {
 			super(ex);
 			this.json = json;
 		}
