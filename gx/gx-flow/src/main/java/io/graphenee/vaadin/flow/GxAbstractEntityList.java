@@ -556,7 +556,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	}
 
 	protected boolean shouldShowContextMenu() {
-		return true;
+		return false;
 	}
 
 	@SuppressWarnings("serial")
