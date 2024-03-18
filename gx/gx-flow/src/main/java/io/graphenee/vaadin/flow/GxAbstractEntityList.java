@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.AbstractField;
@@ -97,6 +98,9 @@ import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
+import io.graphenee.vaadin.flow.component.GxImportDataForm;
+import io.graphenee.vaadin.flow.component.GxImportDataForm.ImportDataFormDelegate;
+import io.graphenee.vaadin.flow.component.GxImportDataForm.JsonToEntityConversionException;
 import io.graphenee.vaadin.flow.component.GxStackLayout;
 import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.data.GxDateRenderer;
@@ -116,7 +120,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends FlexLayout {
+public abstract class GxAbstractEntityList<T> extends FlexLayout implements ImportDataFormDelegate<T> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -144,6 +148,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	private MenuItem columnsDialogMenuItem;
 
 	private MenuItem exportDataMenuItem;
+
+	private MenuItem importDataMenuItem;
 
 	private MenuBar crudMenuBar;
 
@@ -183,7 +189,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.entityClass = entityClass;
-		PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+		bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
 		this.searchBinder = Binder.withPropertySet(bps);
 		setSizeFull();
 		setFlexDirection(FlexDirection.COLUMN);
@@ -332,6 +338,25 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 				}
 			});
 
+			importDataMenuItem = columnMenuBar.addItem(VaadinIcon.UPLOAD.create());
+			importDataMenuItem.setVisible(shouldShowExportDataMenu());
+			importDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				public void onClick(ClickEvent<MenuItem> event) {
+					Set<String> propNameSet = new HashSet<>();
+					for (String propName : GxAbstractEntityList.this.availableProperties()) {
+						propNameSet.add(propName);
+					}
+
+					GxImportDataForm<T> importDataForm = new GxImportDataForm<>(entityClass);
+					importDataForm.setDelegate(GxAbstractEntityList.this);
+					importDataForm.open();
+				}
+			});
+
 			if (shouldShowContextMenu()) {
 				decorateContextMenu(dataGrid.addContextMenu());
 			}
@@ -383,7 +408,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 			List<Column<T>> columns = new ArrayList<>();
 			List<String> userPreferences = new ArrayList<>();
 			if (availableProperties() != null && availableProperties().length > 0) {
-				PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
+				//				PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
 				editColumn = dataGrid.addComponentColumn(source -> {
 					Button rowEditButton = new Button(VaadinIcon.EDIT.create());
 					rowEditButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY_INLINE);
@@ -407,7 +432,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
-						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
+						//						propertyDefinition = (PropertyDefinition<T, Object>) propertySet.getProperty(propertyName).get();
+						propertyDefinition = (PropertyDefinition<T, Object>) bps.getProperty(propertyName).get();
 						Renderer<T> renderer = defaultRendererForProperty(propertyName, propertyDefinition);
 
 						if (renderer != null) {
@@ -795,7 +821,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 	protected Grid<T> dataGrid(Class<T> entityClass) {
 		Grid<T> dataGrid = new Grid<>(entityClass, true);
 		if (isGridInlineEditingEnabled()) {
-			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+			//			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
 			Binder<T> editBinder = Binder.withPropertySet(bps);
 			dataGrid.getEditor().setBinder(editBinder);
 			dataGrid.getEditor().setBuffered(false);
@@ -1462,6 +1488,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 
 	private GxStackLayout rootLayout;
 
+	private PropertySet<T> bps;
+
 	public void registerListener(GxEntityListEventListner<T> listener) {
 		listeners.add(listener);
 	}
@@ -1477,6 +1505,45 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout {
 		}
 
 		void onEvent(GxEntityListEvent event, Collection<T> entity);
+	}
+
+	@Override
+	public T convertImportedJsonToEntity(JSONObject json) throws JsonToEntityConversionException {
+		try {
+			T o = newInstance();
+			preEdit(o);
+			bps.getProperties().forEach(p -> {
+				String key = p.getName();
+				if (!key.contains(".")) {
+					@SuppressWarnings("unchecked")
+					com.vaadin.flow.data.binder.Setter<T, Object> setter = (com.vaadin.flow.data.binder.Setter<T, Object>) p.getSetter().orElse(null);
+					if (setter != null) {
+						Object convertedValue = null;
+						if (json.has(key)) {
+							convertedValue = GxAbstractEntityList.this.convertValueForProperty(key, json.get(key));
+						} else {
+							convertedValue = GxAbstractEntityList.this.convertValueForProperty(key, null);
+						}
+						setter.accept(o, convertedValue);
+					}
+				}
+			});
+			return o;
+		} catch (Throwable e) {
+			throw new JsonToEntityConversionException(e, json);
+		}
+	}
+
+	@Override
+	public void saveConverted(Collection<T> converted) {
+		converted.forEach(c -> {
+			onSave(c);
+		});
+	}
+
+	@Override
+	public Object convertValueForProperty(String key, Object value) {
+		return value;
 	}
 
 }
