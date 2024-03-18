@@ -1543,7 +1543,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	@Override
-	public void onImportCompletion(UI ui) {
+	public void onImportCompletion(List<T> converted, UI ui) {
 		ui.access(() -> {
 			refresh();
 		});

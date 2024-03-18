@@ -120,7 +120,7 @@ public class GxImportDataForm<T> extends Dialog {
 			if (delegate != null && converted != null && !converted.isEmpty()) {
 				LongRunningTask.newTask(UI.getCurrent(), ui -> {
 					delegate.saveConverted(converted);
-					delegate.onImportCompletion(ui);
+					delegate.onImportCompletion(converted, ui);
 				}).withProgressMessage("Saving records...").withSuccessMessage("Records have been saved.").start();
 			}
 			this.close();
@@ -538,7 +538,7 @@ public class GxImportDataForm<T> extends Dialog {
 	public static interface ImportDataFormDelegate<T> {
 		T convertImportedJsonToEntity(JSONObject json) throws JsonToEntityConversionException;
 
-		void onImportCompletion(UI ui);
+		void onImportCompletion(List<T> converted, UI ui);
 
 		Object convertValueForProperty(String key, Object value);
 
