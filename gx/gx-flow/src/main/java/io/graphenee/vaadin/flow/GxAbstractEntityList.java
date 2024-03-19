@@ -31,6 +31,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -582,7 +583,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean shouldShowContextMenu() {
-		return true;
+		return false;
 	}
 
 	@SuppressWarnings("serial")
@@ -1538,6 +1539,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	public void saveConverted(Collection<T> converted) {
 		converted.forEach(c -> {
 			onSave(c);
+		});
+	}
+
+	@Override
+	public void onImportCompletion(List<T> converted, UI ui) {
+		ui.access(() -> {
+			refresh();
 		});
 	}
 
