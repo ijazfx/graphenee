@@ -38,7 +38,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 	private void postBuild() {
 		Component captionComponent = getCaptionComponent();
 		if (captionComponent != null) {
-			add(getCaptionComponent());
+			add(captionComponent);
 		}
 		List<GxTabItem> tabItems = new ArrayList<>();
 		addTabsToView(tabItems);
