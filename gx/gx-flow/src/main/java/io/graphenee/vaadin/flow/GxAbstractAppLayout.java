@@ -98,6 +98,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 			avatar = new Avatar(user.getFirstNameLastName());
 			avatar.addThemeVariants(AvatarVariant.LUMO_SMALL);
 			avatar.setColorIndex(0);
+			customizeAvatar(avatar);
 			Span space = new Span("");
 			space.setWidth("12px");
 
@@ -134,6 +135,9 @@ public abstract class GxAbstractAppLayout extends AppLayout implements RouterLay
 
 		addToNavbar(navbarLayout);
 
+	}
+
+	protected void customizeAvatar(Avatar avatar) {
 	}
 
 	private boolean canDoAction(GxAuthenticatedUser user, String action, GxMenuItem mi) {
