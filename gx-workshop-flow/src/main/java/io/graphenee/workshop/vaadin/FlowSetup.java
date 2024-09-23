@@ -3,17 +3,16 @@ package io.graphenee.workshop.vaadin;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 
 import io.graphenee.core.flow.GxCoreMenuItemFactory;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.GxMenuItem;
 
-@Component
+@SpringComponent
 @VaadinSessionScope
 public class FlowSetup extends GxAbstractFlowSetup {
 

@@ -2,7 +2,9 @@ package io.graphenee.workshop.vaadin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.UIScope;
 
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
@@ -10,6 +12,8 @@ import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.GxAbstractResetPasswordView;
 
 @Route(value = "reset-password")
+@UIScope
+@PreserveOnRefresh
 public class ResetPasswordView extends GxAbstractResetPasswordView {
 
 	private static final long serialVersionUID = 1L;
@@ -17,11 +21,11 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
 	@Autowired
 	GxAbstractFlowSetup flowSetup;
 
-	//	@Autowired
-	//	GxDataService dataService;
+	// @Autowired
+	// GxDataService dataService;
 	//
-	//	@Autowired
-	//	GxPasswordPolicyDataService passwordService;
+	// @Autowired
+	// GxPasswordPolicyDataService passwordService;
 
 	@Override
 	protected GxAbstractFlowSetup flowSetup() {
@@ -29,7 +33,8 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
 	}
 
 	@Override
-	protected void sendSecurityPinToUser(String securityPin, String username, TRVoidCallback success, TRErrorCallback error) {
+	protected void sendSecurityPinToUser(String securityPin, String username, TRVoidCallback success,
+			TRErrorCallback error) {
 		System.out.println("Security Pin = " + securityPin);
 		success.execute();
 	}
@@ -37,12 +42,13 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
 	@Override
 	protected void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error) {
 		System.out.println("Password changed");
-		//		try {
-		//			passwordService.changePassword(dataService.systemNamespace(), username, password);
+		// try {
+		// passwordService.changePassword(dataService.systemNamespace(), username,
+		// password);
 		success.execute();
-		//		} catch (ChangePasswordFailedException e) {
-		//			error.execute(e);
-		//		}
+		// } catch (ChangePasswordFailedException e) {
+		// error.execute(e);
+		// }
 	}
 
 }

@@ -6,9 +6,9 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.GxEmailTemplateDataService;
 import io.graphenee.core.model.entity.GxEmailTemplate;
@@ -17,7 +17,7 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 
 @SuppressWarnings("serial")
-@Component
+@SpringComponent
 @Scope("prototype")
 public class GxEmailTemplateList extends GxAbstractEntityLazyList<GxEmailTemplate> {
 

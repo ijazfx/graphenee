@@ -16,42 +16,43 @@
 package io.graphenee.core.flow.i18n;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.RouteScope;
+import com.vaadin.flow.spring.annotation.RouteScopeOwner;
 
 import io.graphenee.vaadin.flow.GxSecuredView;
 import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
-@SuppressWarnings("serial")
 @Route(GxSupportedLocaleView.VIEW_NAME)
 @GxSecuredView
-@Scope("prototype")
+@RouteScope
+@RouteScopeOwner(GxSupportedLocaleView.class)
 public class GxSupportedLocaleView extends GxVerticalLayoutView {
 
-	public static final String VIEW_NAME = "languages";
+    public static final String VIEW_NAME = "languages";
 
-	@Autowired
-	GxSupportedLocaleListPanel supportedLocaleListPanel;
+    @Autowired
+    GxSupportedLocaleListPanel supportedLocaleListPanel;
 
-	@Autowired
-	GxTermListPanel termListPanel;
+    @Autowired
+    GxTermListPanel termListPanel;
 
-	@Override
-	protected String getCaption() {
-		return "Languages";
-	}
+    @Override
+    protected String getCaption() {
+        return "Languages";
+    }
 
-	@Override
-	protected void decorateLayout(HasComponents rootLayout) {
-		rootLayout.add(supportedLocaleListPanel);
-	}
+    @Override
+    protected void decorateLayout(HasComponents rootLayout) {
+        rootLayout.add(supportedLocaleListPanel);
+    }
 
-	@Override
-	public void afterNavigation(AfterNavigationEvent event) {
-		supportedLocaleListPanel.refresh();
-	}
+    @Override
+    public void afterNavigation(AfterNavigationEvent event) {
+        supportedLocaleListPanel.refresh();
+    }
 
 }

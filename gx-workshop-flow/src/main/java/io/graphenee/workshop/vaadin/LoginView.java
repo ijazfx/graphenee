@@ -3,7 +3,9 @@ package io.graphenee.workshop.vaadin;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.UIScope;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
@@ -16,6 +18,8 @@ import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.GxAbstractLoginView;
 
 @Route(value = "login")
+@UIScope
+@PreserveOnRefresh
 public class LoginView extends GxAbstractLoginView {
 
 	private static final long serialVersionUID = 1L;
@@ -35,12 +39,14 @@ public class LoginView extends GxAbstractLoginView {
 	GxNamespace namespace;
 
 	@Override
-	protected GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException {
+	protected GxAuthenticatedUser onLogin(LoginEvent event)
+			throws AuthenticationFailedException, PasswordChangeRequiredException {
 		String username = event.getUsername();
 		String password = event.getPassword();
 		GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);
 		if (user == null) {
-			user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, dataService.systemNamespace());
+			user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password,
+					dataService.systemNamespace());
 		}
 		if (user == null) {
 			throw new AuthenticationFailedException("Invalid credentials, please try again.");

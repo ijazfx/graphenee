@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.QuerySortOrder;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -24,7 +24,7 @@ import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 
 @SuppressWarnings("serial")
-@Component
+@SpringComponent
 @Scope("prototype")
 public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegisteredDevice> {
 

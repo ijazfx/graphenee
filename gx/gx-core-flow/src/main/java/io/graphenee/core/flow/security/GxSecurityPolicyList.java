@@ -5,7 +5,8 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.GxAuditLogDataService;
@@ -15,76 +16,77 @@ import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
-@Component
+@SpringComponent
 @Scope("prototype")
 public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicy> {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Autowired
-	GxAuditLogDataService auditService;
+    @Autowired
+    GxAuditLogDataService auditService;
 
-	@Autowired
-	GxDataService dataService;
+    @Autowired
+    GxDataService dataService;
 
-	@Autowired
-	GxSecurityPolicyForm securityPolicyForm;
+    @Autowired
+    GxSecurityPolicyForm securityPolicyForm;
 
-	private GxNamespace namespace;
+    private GxNamespace namespace;
 
-	public GxSecurityPolicyList() {
-		super(GxSecurityPolicy.class);
-	}
+    public GxSecurityPolicyList() {
+        super(GxSecurityPolicy.class);
+    }
 
-	@Override
-	protected Stream<GxSecurityPolicy> getData() {
-		if (namespace == null)
-			return dataService.findSecurityPolicy().stream();
-		return dataService.findSecurityPolicyByNamespace(namespace).stream();
-	}
+    @Override
+    protected Stream<GxSecurityPolicy> getData() {
+        if (namespace == null)
+            return dataService.findSecurityPolicy().stream();
+        return dataService.findSecurityPolicyByNamespace(namespace).stream();
+    }
 
-	@Override
-	protected String[] visibleProperties() {
-		return new String[] { "securityPolicyName", "priority", "isActive" };
-	}
+    @Override
+    protected String[] visibleProperties() {
+        return new String[] { "securityPolicyName", "priority", "isActive" };
+    }
 
-	@Override
-	protected GxAbstractEntityForm<GxSecurityPolicy> getEntityForm(GxSecurityPolicy entity) {
-		return securityPolicyForm;
-	}
+    @Override
+    protected GxAbstractEntityForm<GxSecurityPolicy> getEntityForm(GxSecurityPolicy entity) {
+        return securityPolicyForm;
+    }
 
-	@Override
-	protected void onSave(GxSecurityPolicy entity) {
-		dataService.save(entity);
-	}
+    @Override
+    protected void onSave(GxSecurityPolicy entity) {
+        dataService.save(entity);
+    }
 
-	@Override
-	protected void onDelete(Collection<GxSecurityPolicy> entities) {
-		for (GxSecurityPolicy entity : entities) {
-			dataService.delete(entity);
-		}
-	}
+    @Override
+    protected void onDelete(Collection<GxSecurityPolicy> entities) {
+        for (GxSecurityPolicy entity : entities) {
+            dataService.delete(entity);
+        }
+    }
 
-	protected void preEdit(GxSecurityPolicy entity) {
-		if (entity.getOid() == null) {
-			entity.setNamespace(namespace);
-		}
-	}
+    protected void preEdit(GxSecurityPolicy entity) {
+        if (entity.getOid() == null) {
+            entity.setNamespace(namespace);
+        }
+    }
 
-	public void initializeWithNamespace(GxNamespace namespace) {
-		this.namespace = namespace != null ? namespace : dataService.systemNamespace();
-		refresh();
-	}
+    public void initializeWithNamespace(GxNamespace namespace) {
+        this.namespace = namespace != null ? namespace : dataService.systemNamespace();
+        refresh();
+    }
 
-	@Override
-	protected boolean isAuditLogEnabled() {
-		return true;
-	}
+    @Override
+    protected boolean isAuditLogEnabled() {
+        return true;
+    }
 
-	@Override
-	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<GxSecurityPolicy> entities) {
-		entities.forEach(e -> {
-			auditService.log(user, remoteAddress, auditEvent, e.getSecurityPolicyName(), auditEntity, e.getOid());
-		});
-	}
+    @Override
+    protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity,
+            Collection<GxSecurityPolicy> entities) {
+        entities.forEach(e -> {
+            auditService.log(user, remoteAddress, auditEvent, e.getSecurityPolicyName(), auditEntity, e.getOid());
+        });
+    }
 
 }

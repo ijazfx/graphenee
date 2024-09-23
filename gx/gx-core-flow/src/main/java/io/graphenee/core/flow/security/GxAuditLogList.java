@@ -7,55 +7,57 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.data.provider.QuerySortOrder;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.GxAuditLogDataService;
 import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 
-@Component
+@SpringComponent
 @Scope("prototype")
 public class GxAuditLogList extends GxAbstractEntityLazyList<GxAuditLog> {
 
-	@Autowired
-	GxAuditLogDataService dataService;
+    @Autowired
+    GxAuditLogDataService dataService;
 
-	public GxAuditLogList() {
-		super(GxAuditLog.class);
-	}
+    public GxAuditLogList() {
+        super(GxAuditLog.class);
+    }
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	protected int getTotalCount(GxAuditLog searchEntity) {
-		return dataService.count(searchEntity);
-	}
+    @Override
+    protected int getTotalCount(GxAuditLog searchEntity) {
+        return dataService.count(searchEntity);
+    }
 
-	@Override
-	protected Stream<GxAuditLog> getData(int pageNumber, int pageSize, GxAuditLog searchEntity, List<QuerySortOrder> sortOrders) {
-		Sort sort = createSort(sortOrders, Sort.by("auditDate").descending());
-		return dataService.fetch(pageNumber, pageSize, searchEntity, sort).stream();
-	}
+    @Override
+    protected Stream<GxAuditLog> getData(int pageNumber, int pageSize, GxAuditLog searchEntity,
+            List<QuerySortOrder> sortOrders) {
+        Sort sort = createSort(sortOrders, Sort.by("auditDate").descending());
+        return dataService.fetch(pageNumber, pageSize, searchEntity, sort).stream();
+    }
 
-	@Override
-	protected String[] visibleProperties() {
-		return new String[] { "timestamp", "username", "remoteAddress", "auditEvent", "detail", "auditEntity", "oidAuditEntity" };
-	}
+    @Override
+    protected String[] visibleProperties() {
+        return new String[] { "timestamp", "username", "remoteAddress", "auditEvent", "detail", "auditEntity",
+                "oidAuditEntity" };
+    }
 
-	@Override
-	protected GxAbstractEntityForm<GxAuditLog> getEntityForm(GxAuditLog entity) {
-		return null;
-	}
+    @Override
+    protected GxAbstractEntityForm<GxAuditLog> getEntityForm(GxAuditLog entity) {
+        return null;
+    }
 
-	@Override
-	protected void onSave(GxAuditLog entity) {
-	}
+    @Override
+    protected void onSave(GxAuditLog entity) {
+    }
 
-	@Override
-	protected void onDelete(Collection<GxAuditLog> entities) {
-	}
+    @Override
+    protected void onDelete(Collection<GxAuditLog> entities) {
+    }
 
 }
