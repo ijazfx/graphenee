@@ -1,5 +1,6 @@
 package io.graphenee.core.model;
 
+import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.util.enums.GenderEnum;
 
 public interface GxAuthenticatedUser {
@@ -37,6 +38,14 @@ public interface GxAuthenticatedUser {
 	String getMobileNumber();
 
 	void setMobileNumber(String mobileNumber);
+
+	BeanFault<Integer, GxNamespaceBean> getNamespaceFault();
+
+	void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault);
+
+	Integer getOid();
+
+	void setOid(Integer oid);
 
 	default boolean isPasswordChangeRequired() {
 		return false;

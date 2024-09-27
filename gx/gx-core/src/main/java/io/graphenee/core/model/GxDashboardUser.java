@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.json.JSONObject;
 
+import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.util.enums.GenderEnum;
 
@@ -127,6 +128,26 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 
 	public void createAllPreferences() {
 		getUser().createAllPreferences();
+	}
+
+	@Override
+	public BeanFault<Integer, GxNamespaceBean> getNamespaceFault() {
+		return getUser().getNamespaceFault();
+	}
+
+	@Override
+	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
+		getUser().setNamespaceFault(namespaceFault);
+	}
+
+	@Override
+	public Integer getOid() {
+		return getUser().getOid();
+	}
+
+	@Override
+	public void setOid(Integer oid) {
+		getUser().setOid(oid);
 	}
 
 }

@@ -2,6 +2,7 @@ package io.graphenee.vaadin.flow.namespace;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -19,6 +20,7 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
 	TextField namespace;
 	TextArea namespaceDescription;
 	Checkbox isActive;
+	IntegerField usersCount;
 
 	public GxNamespaceForm() {
 		super(GxNamespace.class);
@@ -29,9 +31,11 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
 		namespace = new TextField("Namespace");
 		namespaceDescription = new TextArea("Description");
 		isActive = new Checkbox("Is Active?");
-		form.add(namespace, namespaceDescription, isActive);
+		usersCount = new IntegerField("No. of Users Allowed");
+		form.add(namespace, namespaceDescription, isActive, usersCount);
 		setColspan(namespace, 2);
 		setColspan(namespaceDescription, 2);
+		setColspan(usersCount, 2);
 	}
 
 	@Override

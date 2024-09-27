@@ -2,6 +2,7 @@ package io.graphenee.core.model;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.util.enums.GenderEnum;
 
 public final class MockUser extends AbstractDashboardUser<String> {
@@ -99,6 +100,26 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	@Override
 	public void setUnreadNotificationCount(int count) {
 		notificationCount.set(count);
+	}
+
+	@Override
+	public BeanFault<Integer, GxNamespaceBean> getNamespaceFault() {
+		throw new UnsupportedOperationException("Unimplemented method 'getNamespaceFault'");
+	}
+
+	@Override
+	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
+		throw new UnsupportedOperationException("Unimplemented method 'setNamespaceFault'");
+	}
+
+	@Override
+	public Integer getOid() {
+		throw new UnsupportedOperationException("Unimplemented method 'getOid'");
+	}
+
+	@Override
+	public void setOid(Integer oid) {
+		throw new UnsupportedOperationException("Unimplemented method 'setOid'");
 	}
 
 }

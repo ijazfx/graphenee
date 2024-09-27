@@ -60,6 +60,9 @@ public class GxNamespace implements Serializable {
 	@Column(name = "namespace_description")
 	private String namespaceDescription;
 
+	@Column(name = "users_count")
+	private Integer usersCount = 0;
+
 	@Transient
 	private CollectionFault<GxNamespaceProperty> namespacePropertyCollectionFault = CollectionFault.emptyCollectionFault();
 

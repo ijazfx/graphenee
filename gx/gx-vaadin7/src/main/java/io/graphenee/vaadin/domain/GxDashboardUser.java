@@ -22,7 +22,9 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.Position;
 import com.vaadin.ui.UI;
 
+import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.GxNotificationEvent;
+import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.util.enums.GenderEnum;
 import io.graphenee.vaadin.BadgeWrapper;
@@ -156,6 +158,26 @@ public class GxDashboardUser extends AbstractDashboardUser<GxUserAccountBean> {
 	@Override
 	public void setUnreadNotificationCount(int count) {
 		notificationCount.set(count);
+	}
+
+	@Override
+	public BeanFault<Integer, GxNamespaceBean> getNamespaceFault() {
+		return getUser().getNamespaceFault();
+	}
+
+	@Override
+	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
+		getUser().setNamespaceFault(namespaceFault);
+	}
+
+	@Override
+	public Integer getOid() {
+		return getUser().getOid();
+	}
+
+	@Override
+	public void setOid(Integer oid) {
+		getUser().setOid(oid);
 	}
 
 }

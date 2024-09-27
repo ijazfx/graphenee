@@ -2,7 +2,9 @@ package io.graphenee.vaadin.flow.security;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.graphenee.core.model.BeanFault;
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.core.model.bean.GxNamespaceBean;
 import io.graphenee.core.model.bean.GxUserAccountBean;
 import io.graphenee.util.enums.GenderEnum;
 
@@ -107,6 +109,26 @@ public class GxUserAccountAuthenticatedUser implements GxAuthenticatedUser {
 	@Override
 	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
 		return user.canDoAction(resource, action, forceRefresh);
+	}
+
+	@Override
+	public BeanFault<Integer, GxNamespaceBean> getNamespaceFault() {
+		return user.getNamespaceFault();
+	}
+
+	@Override
+	public void setNamespaceFault(BeanFault<Integer, GxNamespaceBean> namespaceFault) {
+		user.setNamespaceFault(namespaceFault);
+	}
+
+	@Override
+	public Integer getOid() {
+		return user.getOid();
+	}
+
+	@Override
+	public void setOid(Integer oid) {
+		user.setOid(oid);
 	}
 
 }

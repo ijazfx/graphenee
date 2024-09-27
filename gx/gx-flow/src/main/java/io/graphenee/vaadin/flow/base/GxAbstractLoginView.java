@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -23,6 +25,7 @@ import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.server.VaadinSession;
 
+import io.graphenee.core.api.GxUserSessionDetailDataService;
 import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;
 import io.graphenee.core.model.GxAuthenticatedUser;
@@ -30,6 +33,9 @@ import io.graphenee.vaadin.flow.utils.DashboardUtils;
 
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractLoginView extends VerticalLayout implements HasUrlParameter<String> {
+
+	@Autowired
+	GxUserSessionDetailDataService userSessionDetailDataService;
 
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
@@ -92,7 +98,12 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 		loginForm.addLoginListener(e -> {
 			try {
 				GxAuthenticatedUser user = onLogin(e);
-				VaadinSession.getCurrent().setAttribute(GxAuthenticatedUser.class, user);
+				VaadinSession session = VaadinSession.getCurrent();
+				if (user.getNamespaceFault() != null && user.getOid() != null) {
+					Integer oidNamespace = user.getNamespaceFault().getBean().getOid();
+					userSessionDetailDataService.saveNewSessionForUser(oidNamespace, user.getOid());
+				}
+				session.setAttribute(GxAuthenticatedUser.class, user);
 				DashboardUtils.setCurrentUI(user, getUI().orElse(UI.getCurrent()));
 				RouteConfiguration rc = RouteConfiguration.forSessionScope();
 				registerRoutesOnSuccessfulAuthentication(rc, user);
@@ -155,7 +166,8 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
 	protected abstract GxAbstractFlowSetup flowSetup();
 
-	protected abstract GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
+	protected abstract GxAuthenticatedUser onLogin(LoginEvent event)
+			throws AuthenticationFailedException, PasswordChangeRequiredException;
 
 	protected void onForgotPassword(ForgotPasswordEvent event) {
 		getUI().ifPresent(ui -> {
@@ -171,5 +183,22 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 		if (parameter != null && !parameter.startsWith("login"))
 			this.lastRoute = parameter;
 	}
+
+	// public synchronized void updateUserSession(String username, VaadinSession newSession) {
+	// 	System.err.println("Updaing Session: " + newSession);
+	// 	VaadinSession existingUserSession = userSessions.get(username);
+	// 	closeExistingSession(username, existingUserSession);
+	// 	if (newSession != null)
+	// 		userSessions.put(username, newSession);
+	// }
+
+	// private void closeExistingSession(String username, VaadinSession existingSession) {
+	// 	if (existingSession != null && existingSession.getSession() != null) {
+	// 		existingSession.getSession().invalidate();
+	// 		existingSession.close();
+	// 		System.err.println("Closed Session: " + existingSession);
+	// 		userSessions.remove(username);
+	// 	}
+	// }
 
 }
