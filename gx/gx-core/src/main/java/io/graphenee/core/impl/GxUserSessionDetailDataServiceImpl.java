@@ -18,7 +18,7 @@ import io.graphenee.util.TRCalendarUtil;
 
 @Service
 public class GxUserSessionDetailDataServiceImpl implements GxUserSessionDetailDataService {
-    
+
     @Autowired
     GxUserSessionDetailRepository repository;
 
@@ -36,37 +36,59 @@ public class GxUserSessionDetailDataServiceImpl implements GxUserSessionDetailDa
     @Override
     public void save(GxUserSessionDetail gxUserSessionDetail, Integer oidNamespace, Integer userId) {
     }
-    
+
     @Override
     public void delete(Collection<GxUserSessionDetail> gxUserSessionDetails) {
         repository.delete(gxUserSessionDetails);
     }
-    
+
     @Override
-    public void saveNewSessionForUser(Integer oidNamespace, Integer userId) {
+    public void saveNewSessionForUser(Integer oidNamespace, Integer userId, String identifier) {
+        try {
+            Optional<GxNamespace> namespace = namespaceRepository.findById(oidNamespace);
+            Optional<GxUserAccount> user = userAccountRepository.findById(userId);
+            if (namespace.isPresent() && user.isPresent()) {
+                // session update BL
+                // sessionRegistry.registerNewSession(user.get().getUsername(), user.get());
+
+                // local db BL
+                repository.updateExistingSignedInCheck(userId);
+                GxUserSessionDetail gxUserSessionDetail = new GxUserSessionDetail();
+                gxUserSessionDetail.setIdentifier(identifier);
+                gxUserSessionDetail.setNamespace(namespace.get());
+                gxUserSessionDetail.setUser(user.get());
+                gxUserSessionDetail.setIsSignedIn(true);
+                gxUserSessionDetail.setSignedinAt(TRCalendarUtil.getCurrentTimeStamp());
+                gxUserSessionDetail.setLastSync(TRCalendarUtil.getCurrentTimeStamp());
+                repository.save(gxUserSessionDetail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public Boolean isUserLimitReached(Integer oidNamespace, Integer userId) throws Exception {
         Optional<GxNamespace> namespace = namespaceRepository.findById(oidNamespace);
         Optional<GxUserAccount> user = userAccountRepository.findById(userId);
         if (namespace.isPresent() && user.isPresent()) {
-            repository.updateExistingSignedInCheck(userId);
-
-            // repository.findByUserAndIsSignedInTrue(user.get()).stream().map(usd -> {
-            //     usd.setIsSignedIn(false);
-            //     usd.setLastSync(TRCalendarUtil.getCurrentTimeStamp());
-            //     return repository.save(usd);
-            // });
-
-            GxUserSessionDetail gxUserSessionDetail = new GxUserSessionDetail();
-            gxUserSessionDetail.setNamespace(namespace.get());
-            gxUserSessionDetail.setUser(user.get());
-            gxUserSessionDetail.setIsSignedIn(true);
-            gxUserSessionDetail.setSignedinAt(TRCalendarUtil.getCurrentTimeStamp());
-            gxUserSessionDetail.setLastSync(TRCalendarUtil.getCurrentTimeStamp());
-            repository.save(gxUserSessionDetail);
+            Integer count = repository.countByNamespaceAndIsSignedInTrueAndUserNot(namespace.get(), user.get())
+                    .intValue();
+            if (count < namespace.get().getUsersCount()) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            throw new Exception("Namespace not found.");
         }
     }
 
-    public void closeAllExistingSessionsForUser(String username) {
-        
+    @Override
+    public Boolean isUserSignedIn(String identifier) {
+        Boolean isSignedIn = repository.findIsSignedInByIdentifier(identifier);
+        return isSignedIn != null && isSignedIn;
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.entity.GxUserSessionDetail;
 import io.graphenee.core.model.jpa.GxJpaRepository;
@@ -21,5 +22,10 @@ public interface GxUserSessionDetailRepository extends GxJpaRepository<GxUserSes
     void updateExistingSignedInCheck(Integer id);
 
     List<GxUserSessionDetail> findByUserAndIsSignedInTrue(GxUserAccount user);
+
+    Long countByNamespaceAndIsSignedInTrueAndUserNot(GxNamespace namespace, GxUserAccount user);
+
+    @Query(value = "select is_signed_in from user_session_detail where identifier = ?1 and is_signed_in = true", nativeQuery = true)
+    Boolean findIsSignedInByIdentifier(String id);
 
 }

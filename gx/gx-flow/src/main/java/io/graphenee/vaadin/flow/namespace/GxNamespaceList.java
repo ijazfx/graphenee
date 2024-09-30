@@ -34,7 +34,7 @@ public class GxNamespaceList extends GxAbstractEntityList<GxNamespace> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "namespace", "namespaceDescription", "isActive", "isProtected" };
+		return new String[] { "namespace", "namespaceDescription", "isActive", "isProtected", "usersCount" };
 	}
 
 	@Override

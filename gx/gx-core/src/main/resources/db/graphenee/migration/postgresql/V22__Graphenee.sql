@@ -2,6 +2,7 @@ alter table gx_namespace add column users_count integer;
 
 create table user_session_detail(
     oid serial primary key,
+    identifier text,
     oid_user integer,
     oid_namespace integer,
     is_signed_in boolean,

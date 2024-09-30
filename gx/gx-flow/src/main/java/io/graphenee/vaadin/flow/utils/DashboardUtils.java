@@ -1,8 +1,13 @@
 package io.graphenee.vaadin.flow.utils;
 
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinRequest;
@@ -67,6 +72,31 @@ public class DashboardUtils {
 
 	public static String getRemoteAddress() {
 		return VaadinRequest.getCurrent().getRemoteAddr();
+	}
+
+	public static String getMacAddress() {
+		try {
+			Enumeration<NetworkInterface> networks = NetworkInterface.getNetworkInterfaces();
+			while (networks.hasMoreElements()) {
+				NetworkInterface network = networks.nextElement();
+				if (network.isUp() && !network.isLoopback() && !network.isVirtual()) {
+					byte[] mac = network.getHardwareAddress();
+					if (mac != null) {
+						StringBuilder sb = new StringBuilder();
+						for (byte b : mac) {
+							sb.append(String.format("%02X:", b));
+						}
+						if (sb.length() > 0) {
+							sb.deleteCharAt(sb.length() - 1);
+						}
+						return sb.toString();
+					}
+				}
+			}
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		return null; // MAC address not found
 	}
 
 }

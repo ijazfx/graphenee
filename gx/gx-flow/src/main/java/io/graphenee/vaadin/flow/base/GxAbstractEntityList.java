@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.vaadin.gatanaso.MultiselectComboBox;
 
 import com.google.common.eventbus.EventBus;
@@ -112,6 +113,7 @@ import io.graphenee.vaadin.flow.event.TRDelayEventListener;
 import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
 import io.graphenee.vaadin.flow.renderer.GxDateRenderer;
 import io.graphenee.vaadin.flow.renderer.GxNumberToDateRenderer;
+import io.graphenee.vaadin.flow.security.UserSignOutEvent;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
@@ -192,6 +194,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 	@Autowired
 	GxDataService gxDataService;
 
+	@Autowired
+	ApplicationEventPublisher eventPublisher;
+
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.className = entityClass.getName();
 		this.entityClass = entityClass;
@@ -226,6 +231,9 @@ public abstract class GxAbstractEntityList<T> extends VerticalLayout {
 
 	@SuppressWarnings("unchecked")
 	synchronized private GxAbstractEntityList<T> build() {
+		// System.out.println("My List");
+		// GxAuthenticatedUser user = DashboardUtils.getLoggedInUser();
+		eventPublisher.publishEvent(new UserSignOutEvent(0));
 		if (!isBuilt) {
 			dataGrid = dataGrid(entityClass);
 			dataGrid.setSizeFull();

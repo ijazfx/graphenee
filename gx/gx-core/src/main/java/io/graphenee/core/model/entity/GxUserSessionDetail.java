@@ -29,6 +29,7 @@ public class GxUserSessionDetail implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer oid;
     
+    private String identifier;
     private Boolean isSignedIn;
     private Timestamp signedinAt;
     private Timestamp lastSync;

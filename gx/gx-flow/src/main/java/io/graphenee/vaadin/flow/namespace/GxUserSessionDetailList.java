@@ -6,14 +6,12 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.api.GxUserSessionDetailDataService;
 import io.graphenee.core.model.entity.GxUserSessionDetail;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
-import io.graphenee.vaadin.flow.base.SessionRegistry;
 
 @SpringComponent
 @Scope("prototype")
