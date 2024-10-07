@@ -9,8 +9,11 @@ import lombok.Setter;
 @Setter
 public class UserSignOutEvent extends ApplicationEvent {
 
-    public UserSignOutEvent(Integer id) {
+    private String identifer;
+
+    public UserSignOutEvent(Integer id, String idn) {
         super(id);
+        this.identifer = idn;
     }
     
 }

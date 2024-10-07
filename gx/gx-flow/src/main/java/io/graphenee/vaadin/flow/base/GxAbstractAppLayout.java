@@ -5,6 +5,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+
 import com.github.appreciated.app.layout.component.appbar.AppBarBuilder;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts;
 import com.github.appreciated.app.layout.component.applayout.LeftLayouts.LeftHybrid;
@@ -22,9 +25,11 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.vaadin.flow.security.UserSignOutEvent;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 @Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> {
+
+	@Autowired
+	ApplicationEventPublisher eventPublisher;
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,6 +53,15 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 		}
 		LeftHybrid layout = builder.build();
 		init(layout);
+		this.getElement().addEventListener("click", event -> {
+			System.out.println("User clicked.");
+			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+			if (user != null) {
+				String identifier = user.getUsername() + DashboardUtils.getMacAddress()
+						+ VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ", "");
+				eventPublisher.publishEvent(new UserSignOutEvent(0, identifier));
+			}
+		});
 	}
 
 	private Component buildAppMenu() {
@@ -77,7 +94,8 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 		} else {
 			try {
 				if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
-					LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+					LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(),
+							mi.getComponentClass());
 					builder.add(item);
 				}
 			} catch (Exception ex) {
@@ -97,7 +115,8 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 		} else {
 			try {
 				if (mi.getRoute() == null || user != null && user.canDoAction(mi.getRoute(), "view")) {
-					LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(), mi.getComponentClass());
+					LeftNavigationItem item = new LeftNavigationItem(mi.getLabel(), mi.getIcon(),
+							mi.getComponentClass());
 					builder.add(item);
 				}
 			} catch (Exception ex) {

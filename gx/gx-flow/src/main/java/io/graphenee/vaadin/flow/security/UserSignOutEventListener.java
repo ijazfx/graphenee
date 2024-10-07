@@ -1,17 +1,19 @@
 package io.graphenee.vaadin.flow.security;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.api.GxUserSessionDetailDataService;
-import io.graphenee.vaadin.flow.utils.DashboardUtils;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class UserSignOutEventListener implements ApplicationListener<UserSignOutEvent> {
 
@@ -19,33 +21,26 @@ public class UserSignOutEventListener implements ApplicationListener<UserSignOut
     GxUserSessionDetailDataService userSessionDetailDataService;
 
     @Autowired
-	HttpServletRequest httpServletRequest;
+    private Map<String, Boolean> sessionMap;
 
     @Override
     public void onApplicationEvent(UserSignOutEvent event) {
-        Boolean userSignedIn = userSessionDetailDataService.isUserSignedIn(
-                DashboardUtils.getMacAddress() + getBrowserName(
-                        httpServletRequest.getHeader("User-Agent")));
-        if (!userSignedIn) {
-            UI.getCurrent().navigate("login");
-            VaadinSession.getCurrent().close();
+        try {
+            // if (!sessionMap.keySet().isEmpty()) {
+            Boolean userSignedIn = sessionMap
+                    .containsKey(event.getIdentifer());
+            if (userSignedIn == false) {
+                UI.getCurrent().navigate("login");
+                VaadinSession.getCurrent().close();
+            }
+            // }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
 
-    private static String getBrowserName(String userAgent) {
-        if (userAgent.contains("Chrome")) {
-            return "Chrome";
-        } else if (userAgent.contains("Firefox")) {
-            return "Mozilla Firefox";
-        } else if (userAgent.contains("Safari") && !userAgent.contains("Chrome")) {
-            return "Safari";
-        } else if (userAgent.contains("Edge")) {
-            return "Microsoft Edge";
-        } else if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
-            return "Internet Explorer";
-        } else {
-            return "Unknown Browser";
-        }
+    public static String getRemoteAddress() {
+        return VaadinRequest.getCurrent().getRemoteAddr();
     }
 
 }

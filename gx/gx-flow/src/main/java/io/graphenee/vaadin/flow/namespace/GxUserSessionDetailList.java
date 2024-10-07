@@ -1,11 +1,14 @@
 package io.graphenee.vaadin.flow.namespace;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
+import com.amazonaws.util.StringUtils;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.api.GxUserSessionDetailDataService;
@@ -16,6 +19,9 @@ import io.graphenee.vaadin.flow.base.GxAbstractEntityList;
 @SpringComponent
 @Scope("prototype")
 public class GxUserSessionDetailList extends GxAbstractEntityList<GxUserSessionDetail> {
+
+    @Autowired
+    public Map<String, Boolean> sessionMap;
 
     public GxUserSessionDetailList() {
         super(GxUserSessionDetail.class);
@@ -47,6 +53,14 @@ public class GxUserSessionDetailList extends GxAbstractEntityList<GxUserSessionD
     @Override
     protected void onDelete(Collection<GxUserSessionDetail> entities) {
         dataService.delete(entities);
+    }
+
+    @Override
+    protected void decorateMenuBar(MenuBar menuBar) {
+        menuBar.addItem("Show Mao", l -> {
+            sessionMap.forEach((k, v) -> System.out.println("Key: " + k + " V: " + v));
+            System.out.println("-----------------------------");
+        });
     }
 
 }

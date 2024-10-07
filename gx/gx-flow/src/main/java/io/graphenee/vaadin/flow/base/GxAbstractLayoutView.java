@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -18,12 +21,18 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.model.GxAuthenticatedUser;
+import io.graphenee.vaadin.flow.security.UserSignOutEvent;
+import io.graphenee.vaadin.flow.utils.DashboardUtils;
 
 @CssImport("./styles/gx-common.css")
 public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObserver, AfterNavigationObserver {
+
+	@Autowired
+	ApplicationEventPublisher eventPublisher;
 
 	private static final long serialVersionUID = 1L;
 	private Tabs tabs;
@@ -111,6 +120,13 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
 
 	@Override
 	public void beforeEnter(BeforeEnterEvent event) {
+		GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+		if (user != null) {
+			String identifier = user.getUsername() + DashboardUtils.getMacAddress()
+					+ VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ", "");
+			eventPublisher.publishEvent(new UserSignOutEvent(0, identifier));
+		}
+
 		if (this.getClass().isAnnotationPresent(GxSecuredView.class)) {
 			GxSecuredView annotation = this.getClass().getAnnotation(GxSecuredView.class);
 			String route = null;
@@ -120,7 +136,6 @@ public abstract class GxAbstractLayoutView extends Div implements BeforeEnterObs
 				Route routeAnnotation = this.getClass().getAnnotation(Route.class);
 				route = routeAnnotation.value();
 			}
-			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
 			if (user == null) {
 				event.rerouteTo("login", route);
 			} else if (!route.equals("") && !user.canDoAction(route, "view")) {

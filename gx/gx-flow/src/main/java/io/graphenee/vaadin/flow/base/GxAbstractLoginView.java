@@ -25,6 +25,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.RouteConfiguration;
+import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.api.GxUserSessionDetailDataService;
@@ -32,6 +33,7 @@ import io.graphenee.core.exception.AuthenticationFailedException;
 import io.graphenee.core.exception.PasswordChangeRequiredException;
 import io.graphenee.core.model.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.component.GxNotification;
+import io.graphenee.vaadin.flow.security.GxHazelCastSessionService;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 
 @CssImport("./styles/gx-common.css")
@@ -44,7 +46,10 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 	ApplicationEventPublisher eventPublisher;
 
 	@Autowired
-	HttpServletRequest httpServletRequest;
+	GxHazelCastSessionService sessionService;
+
+	@Autowired
+    HttpServletRequest httpServletRequest;
 
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
@@ -106,7 +111,6 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 
 		loginForm.addLoginListener(e -> {
 			try {
-				System.out.println(httpServletRequest.getHeader("User-Agent"));
 				GxAuthenticatedUser user = onLogin(e);
 				if (user.getNamespaceFault() == null) { // user is admin
 
@@ -133,13 +137,20 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 						if (isUserLimitReached) {
 							GxNotification.error("User limited reached.");
 						} else {
-							VaadinSession session = VaadinSession.getCurrent();
-							// logoutExistingSessions(user);
-							GxNotification.error("Success.");
-							userSessionDetailDataService.saveNewSessionForUser(oidNamespace, user.getOid(),
-									DashboardUtils.getMacAddress() + getBrowserName(
-											httpServletRequest.getHeader("User-Agent")));
+							String identifier = user.getUsername() + DashboardUtils.getMacAddress() + VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ","");
+							System.out.println(identifier);
+							// userSessionDetailDataService.saveNewSessionForUser(oidNamespace,
+							// user.getOid(),
+							// DashboardUtils.getMacAddress() + getBrowserName(
+							// httpServletRequest.getHeader("User-Agent")));
 
+							// removes all sessions
+							sessionService.removeAllSessionsForUser(user.getUsername());
+
+							// save new session
+							sessionService.saveNewSessionForUser(identifier);
+
+							VaadinSession session = VaadinSession.getCurrent();
 							session.setAttribute(GxAuthenticatedUser.class, user);
 							DashboardUtils.setCurrentUI(user, getUI().orElse(UI.getCurrent()));
 							RouteConfiguration rc = RouteConfiguration.forSessionScope();
@@ -176,66 +187,6 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 			onForgotPassword(e);
 		});
 
-	}
-	
-	private static String getBrowserName(String userAgent) {
-		if (userAgent.contains("Chrome")) {
-			return "Chrome";
-		} else if (userAgent.contains("Firefox")) {
-			return "Mozilla Firefox";
-		} else if (userAgent.contains("Safari") && !userAgent.contains("Chrome")) {
-			return "Safari";
-		} else if (userAgent.contains("Edge")) {
-			return "Microsoft Edge";
-		} else if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
-			return "Internet Explorer";
-		} else {
-			return "Unknown Browser";
-		}
-	}
-
-	public void logoutExistingSessions(GxAuthenticatedUser user) {
-		// IMap<String, UserSessionBean> map = hazelcastInstance.getMap("userSessionMap");
-		// UserSessionBean userSessionBean = map.get(user.getUsername());
-		// VaadinSession s = VaadinSession.getCurrent();
-		// if (userSessionBean != null && s.getSession().getId().equals(userSessionBean.getSessionId())) {
-		// 	s.close();
-		// }
-
-		// 	// HttpServletRequest httpServletRequest =
-		// 	// VaadinServletRequest.getCurrent().getHttpServletRequest();
-		// 	// HttpSession httpSession = httpServletRequest.getSession(true);
-		// 	// if (httpSession != null) {
-		// 	// Collection<VaadinSession> allSessions =
-		// 	// VaadinSession.getAllSessions(httpSession);
-		// 	// Set<VaadinSession> allSessionsForUser = new HashSet<>();
-		// 	// for (VaadinSession vaadinSession : allSessions) {
-		// 	// GxAuthenticatedUser sessionUser =
-		// 	// vaadinSession.getAttribute(GxAuthenticatedUser.class);
-		// 	// if (user.equals(sessionUser)) {
-		// 	// allSessionsForUser.add(vaadinSession);
-		// 	// }
-		// 	// }
-		// 	// System.out.println("Total sessions for " + user.getUsername() + " are: " +
-		// 	// allSessionsForUser.size());
-		// 	// for (VaadinSession vaadinSession : allSessionsForUser) {
-		// 	// vaadinSession.close();
-		// 	// }
-		// 	// }
-
-		// 	List<Object> allPrincipals = sessionRegistry.getAllPrincipals();
-		// 	for (Object p : allPrincipals) {
-		// 		if (p instanceof GxUserAccount) {
-		// 			GxUserAccount user = (GxUserAccount) p;
-		// 			if (user.getUsername().equals(username)) {
-		// 				List<SessionInformation> sessions = sessionRegistry.getAllSessions(username,
-		// 						false);
-		// 				for (SessionInformation session : sessions) {
-		// 					session.expireNow();
-		// 				}
-		// 			}
-		// 		}
-		// 	}
 	}
 
 	protected String backgoundColor() {
@@ -288,24 +239,5 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 		if (parameter != null && !parameter.startsWith("login"))
 			this.lastRoute = parameter;
 	}
-
-	// public synchronized void updateUserSession(String username, VaadinSession
-	// newSession) {
-	// System.err.println("Updaing Session: " + newSession);
-	// VaadinSession existingUserSession = userSessions.get(username);
-	// closeExistingSession(username, existingUserSession);
-	// if (newSession != null)
-	// userSessions.put(username, newSession);
-	// }
-
-	// private void closeExistingSession(String username, VaadinSession
-	// existingSession) {
-	// if (existingSession != null && existingSession.getSession() != null) {
-	// existingSession.getSession().invalidate();
-	// existingSession.close();
-	// System.err.println("Closed Session: " + existingSession);
-	// userSessions.remove(username);
-	// }
-	// }
 
 }
