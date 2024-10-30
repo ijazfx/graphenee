@@ -1,16 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>gx-core</artifactId>
 	<name>Graphenee Framework</name>
 	<description>Graphenee Framework for Web Application Development</description>
 
-  <!-- Parent -->
-  <parent>
-      <groupId>io.graphenee</groupId>
-      <artifactId>gx</artifactId>
-      <version>3.6.5-SNAPSHOT</version>
-      <relativePath>..</relativePath>
-  </parent>
+	<!-- Parent -->
+	<parent>
+		<groupId>io.graphenee</groupId>
+		<artifactId>gx</artifactId>
+		<version>3.6.5-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
 
 	<!-- Dependencies -->
 	<dependencies>
@@ -106,6 +108,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+			<version>1.18.30</version>
 		</dependency>
 	</dependencies>
 

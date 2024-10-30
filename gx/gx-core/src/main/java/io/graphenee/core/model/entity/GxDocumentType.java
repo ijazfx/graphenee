@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -22,6 +25,11 @@ import lombok.Setter;
 public class GxDocumentType extends GxMappedSuperclass implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer oid;
 
     String name;
     String note;

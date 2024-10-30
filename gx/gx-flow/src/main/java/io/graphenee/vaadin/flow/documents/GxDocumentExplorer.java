@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.claspina.confirmdialog.ButtonOption;
 import org.claspina.confirmdialog.ConfirmDialog;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -65,6 +66,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplorerItem> {
 
     @Autowired
+    @Lazy
     GxDocumentExplorerService documentService;
 
     @Autowired

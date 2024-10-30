@@ -1,4 +1,4 @@
-package io.graphenee.documents.impl;
+package io.graphenee.documents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.repository.GxDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxDocumentTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxFolderRepository;
-import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.JpaSpecificationBuilder;
 
 @Service
@@ -98,12 +97,12 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 
 	@Override
 	public void deleteFolder(List<GxFolder> folders) {
-		folderRepo.deleteAllInBatch(folders);
+		folderRepo.deleteAll(folders);
 	}
 
 	@Override
 	public void deleteDocument(List<GxDocument> documents) {
-		docRepo.deleteAllInBatch(documents);
+		docRepo.deleteAll(documents);
 	}
 
 	@Override
