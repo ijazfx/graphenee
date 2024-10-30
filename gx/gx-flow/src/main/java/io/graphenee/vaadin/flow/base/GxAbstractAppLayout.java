@@ -17,6 +17,7 @@ import com.github.appreciated.app.layout.component.menu.left.builder.LeftAppMenu
 import com.github.appreciated.app.layout.component.menu.left.builder.LeftSubMenuBuilder;
 import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigationItem;
 import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
+import com.hazelcast.core.IMap;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Span;
@@ -41,6 +42,9 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 	@Autowired
 	ApplicationEventPublisher eventPublisher;
 
+	@Autowired
+    private IMap<String, Boolean> sessionMap;
+
 	private static final long serialVersionUID = 1L;
 
 	@PostConstruct
@@ -61,6 +65,16 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 						+ VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ", "");
 				eventPublisher.publishEvent(new UserSignOutEvent(0, identifier));
 			}
+		});
+		this.getElement().addEventListener("keydown", event -> {
+			System.out.println("User key down.");
+			// GxAuthenticatedUser user =
+			// VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
+			// if (user != null) {
+			// String identifier = user.getUsername() + DashboardUtils.getMacAddress()
+			// + VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ", "");
+			// eventPublisher.publishEvent(new UserSignOutEvent(0, identifier));
+			// }
 		});
 	}
 
@@ -147,6 +161,9 @@ public abstract class GxAbstractAppLayout extends AppLayoutRouterLayout<LeftLayo
 		profileMenuBar.addItem("|");
 		profileMenuBar.addItem("Sign Out", event -> {
 			getUI().ifPresent(ui -> {
+				String identifier = user.getUsername() + DashboardUtils.getMacAddress()
+						+ VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ", "");
+				sessionMap.remove(identifier);
 				ui.navigate("login");
 				VaadinSession.getCurrent().close();
 			});

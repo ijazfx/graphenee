@@ -1,7 +1,6 @@
 package io.graphenee.workshop;
 
 import java.io.File;
-import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorageFactory;
@@ -28,6 +28,23 @@ public class FlowApplicationConfiguration {
 	public Config hazelCastConfig() {
 		Config config = new Config();
 		config.getMapConfig("user-session").setTimeToLiveSeconds(300);
+		// Connect to the external Hazelcast instance
+		// if running inside docker on same network
+		// config.getNetworkConfig().getJoin().getTcpIpConfig()
+		// .setEnabled(true)
+		// .addMember("hazelcast-instance:5701"); // Docker container name
+
+		// if running outside docker, use IP address through docker inspect -- docker
+		// command:
+		// inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+		// hazelcast-instance
+		// config code:
+		String hazelcastIp = "172.17.0.2";
+		config.getNetworkConfig().getJoin().getTcpIpConfig()
+				.setEnabled(true)
+				.addMember(hazelcastIp + ":5701");
+
+		config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
 		return config;
 	}
 
@@ -37,7 +54,7 @@ public class FlowApplicationConfiguration {
 	}
 
 	@Bean
-	public Map<String, Boolean> sessionMap(HazelcastInstance hazelcastInstance) {
+	public IMap<String, Boolean> sessionMap(HazelcastInstance hazelcastInstance) {
 		return hazelcastInstance.getMap("user-session");
 	}
 

@@ -1,13 +1,11 @@
 package io.graphenee.vaadin.flow.security;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import com.hazelcast.core.IMap;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.core.api.GxUserSessionDetailDataService;
@@ -21,7 +19,7 @@ public class UserSignOutEventListener implements ApplicationListener<UserSignOut
     GxUserSessionDetailDataService userSessionDetailDataService;
 
     @Autowired
-    private Map<String, Boolean> sessionMap;
+    private IMap<String, Boolean> sessionMap;
 
     @Override
     public void onApplicationEvent(UserSignOutEvent event) {
@@ -37,10 +35,6 @@ public class UserSignOutEventListener implements ApplicationListener<UserSignOut
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-    }
-
-    public static String getRemoteAddress() {
-        return VaadinRequest.getCurrent().getRemoteAddr();
     }
 
 }

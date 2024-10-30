@@ -46,10 +46,10 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 	ApplicationEventPublisher eventPublisher;
 
 	@Autowired
-	GxHazelCastSessionService sessionService;
+	GxHazelCastSessionService hazelCastSessionService;
 
 	@Autowired
-    HttpServletRequest httpServletRequest;
+	HttpServletRequest httpServletRequest;
 
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
@@ -137,18 +137,17 @@ public abstract class GxAbstractLoginView extends VerticalLayout implements HasU
 						if (isUserLimitReached) {
 							GxNotification.error("User limited reached.");
 						} else {
-							String identifier = user.getUsername() + DashboardUtils.getMacAddress() + VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ","");
+							String identifier = user.getUsername() + DashboardUtils.getMacAddress()
+									+ VaadinRequest.getCurrent().getHeader("User-Agent").replaceAll(" ", "");
 							System.out.println(identifier);
-							// userSessionDetailDataService.saveNewSessionForUser(oidNamespace,
-							// user.getOid(),
-							// DashboardUtils.getMacAddress() + getBrowserName(
-							// httpServletRequest.getHeader("User-Agent")));
+							userSessionDetailDataService.saveNewSessionForUser(oidNamespace,
+									user.getOid(), identifier);
 
 							// removes all sessions
-							sessionService.removeAllSessionsForUser(user.getUsername());
+							hazelCastSessionService.removeAllSessionsForUser(user.getUsername());
 
 							// save new session
-							sessionService.saveNewSessionForUser(identifier);
+							hazelCastSessionService.saveNewSessionForUser(identifier);
 
 							VaadinSession session = VaadinSession.getCurrent();
 							session.setAttribute(GxAuthenticatedUser.class, user);
