@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 
@@ -31,9 +32,9 @@ public interface GxDocumentExplorerService {
 
 	void deleteDocument(List<GxDocument> documents);
 
-	Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity);
+	Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter);
 
-	List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, String... sortKey);
+	List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey);
 
 	void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
 

@@ -1,8 +1,9 @@
-package io.graphenee.documents;
+package io.graphenee.documents.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -10,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.jpa.repository.GxDocumentRepository;
 import io.graphenee.core.model.jpa.repository.GxDocumentTypeRepository;
 import io.graphenee.core.model.jpa.repository.GxFolderRepository;
+import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.JpaSpecificationBuilder;
 
 @Service
@@ -95,16 +98,16 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 
 	@Override
 	public void deleteFolder(List<GxFolder> folders) {
-		folderRepo.deleteInBatch(folders);
+		folderRepo.deleteAllInBatch(folders);
 	}
 
 	@Override
 	public void deleteDocument(List<GxDocument> documents) {
-		docRepo.deleteInBatch(documents);
+		docRepo.deleteAllInBatch(documents);
 	}
 
 	@Override
-	public Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity) {
+	public Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter) {
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.eq("document", parent);
@@ -123,27 +126,32 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
 		List<GxDocument> docs = docRepo.findByFolder(folder.getOid());
-		count = count + docs.size();
+
+		if (filter != null) {
+			count = count + docs.stream().filter(f -> filter.test(f)).count();
+		} else {
+			count = count + docs.size();
+		}
 
 		return count;
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent,
-			GxDocumentExplorerItem searchEntity, String... sortKey) {
-
+	public List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey) {
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("document", parent);
 			List<GxDocument> docs = docRepo.findAll(dsb.build(), Sort.by(sortKey));
+			if (filter != null) {
+				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
+			}
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
 			}
 		} else {
 			GxFolder folder = (GxFolder) parent;
-			System.out.println(folder.getOid());
 			JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
 			fsb.like("name", searchEntity.getName());
 			fsb.eq("folder", folder);
@@ -156,6 +164,9 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("folder", folder);
 			List<GxDocument> docs = docRepo.findByFolder(folder.getOid());
+			if (filter != null) {
+				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
+			}
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
 			}
@@ -165,8 +176,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent,
-			List<GxDocumentExplorerItem> items) {
+	public List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> items) {
 		if (items != null) {
 			for (GxDocumentExplorerItem item : items) {
 				if (item.isFile()) {
@@ -202,8 +212,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	private void resetSortOrder(List<GxDocumentExplorerItem> sortList) {
-		AtomicInteger min = new AtomicInteger(
-				sortList.stream().mapToInt(GxDocumentExplorerItem::getSortOrder).min().orElse(999999));
+		AtomicInteger min = new AtomicInteger(sortList.stream().mapToInt(GxDocumentExplorerItem::getSortOrder).min().orElse(999999));
 		List<GxFolder> folders = new ArrayList<>();
 		List<GxDocument> documents = new ArrayList<>();
 		sortList.forEach(i -> {
@@ -238,7 +247,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		List<GxFolder> folders = new ArrayList<>();
 		List<GxDocument> documents = new ArrayList<>();
 		GxFolder folder = (GxFolder) (parent.isFile() ? parent.getParent() : parent);
-		items.stream().filter(f -> f.getParent() != f && !isAncestorOf(f, parent)).forEach(i -> {
+		items.stream().filter(f -> f != parent && f.getParent() != f && !isAncestorOf(f, parent)).forEach(i -> {
 			if (i instanceof GxDocument) {
 				((GxDocument) i).setFolder(folder);
 				documents.add((GxDocument) i);

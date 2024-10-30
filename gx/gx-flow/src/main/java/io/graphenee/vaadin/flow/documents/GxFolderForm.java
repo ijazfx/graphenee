@@ -11,43 +11,44 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.vaadin.flow.base.GxAbstractEntityForm;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 
-	TextField name;
-	TextArea note;
+    TextField name;
+    TextArea note;
 
-	IntegerField expiryReminderInDays;
+    IntegerField expiryReminderInDays;
 
-	public GxFolderForm() {
-		super(GxFolder.class);
-	}
+    public GxFolderForm() {
+        super(GxFolder.class);
+    }
 
-	@Override
-	protected void decorateForm(HasComponents entityForm) {
-		name = new TextField("Folder Name");
-		note = new TextArea("Note");
-		note.setHeight("100px");
-		entityForm.add(name, note);
+    @Override
+    protected void decorateForm(HasComponents entityForm) {
+        name = new TextField("Folder Name");
+        note = new TextArea("Note");
+        note.setHeight("100px");
+        entityForm.add(name, note);
 
-		expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
-		expiryReminderInDays.setMin(0);
+        expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
+        expiryReminderInDays.setMin(0);
 
-		entityForm.add(name, note, expiryReminderInDays);
+        entityForm.add(name, note, expiryReminderInDays);
 
-		setColspan(name, 2);
-		setColspan(note, 2);
-	}
+        setColspan(name, 2);
+        setColspan(note, 2);
+    }
 
-	@Override
-	protected String formTitleProperty() {
-		return "name";
-	}
+    @Override
+    protected String formTitleProperty() {
+        return "name";
+    }
 
-	@Override
-	protected String dialogHeight() {
-		return "350px";
-	}
+    @Override
+    protected String dialogHeight() {
+        return "350px";
+    }
 
 }

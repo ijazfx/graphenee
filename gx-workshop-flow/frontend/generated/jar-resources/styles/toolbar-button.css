@@ -1,0 +1,6 @@
+:host([theme~="download-button"]), :host([theme~="print-button"]) {
+	background: transparent;
+	color: var(--lumo-contrast-80pct);
+	min-width: 0;
+	padding: 0 6px;
+}
