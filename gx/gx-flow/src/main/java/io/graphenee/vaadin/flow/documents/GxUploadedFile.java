@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class GxUploadedFile {
 
-	private File file;
-	private String fileName;
-	private String mimeType;
+    private File file;
+    private String fileName;
+    private String mimeType;
 
 }

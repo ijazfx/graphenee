@@ -33,10 +33,12 @@ import io.graphenee.util.DataSourceUtil;
 @ConditionalOnClass(DataSource.class)
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
 @EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
-@ComponentScan(GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
+@ComponentScan({ GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE,
+		GrapheneeCoreConfiguration.COMPONENT_SCAN_DOCUMENT_PACKAGE })
 public class GrapheneeCoreConfiguration {
 
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core";
+	public static final String COMPONENT_SCAN_DOCUMENT_PACKAGE = "io.graphenee.documents";
 	public static final String ENTITY_SCAN_BASE_PACKAGE = "io.graphenee.core.model.entity";
 	public static final String JPA_REPOSITORIES_BASE_PACKAGE = "io.graphenee.core.model.jpa.repository";
 

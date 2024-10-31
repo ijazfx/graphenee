@@ -9,30 +9,36 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import org.json.JSONObject;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
-import lombok.Data;
-import lombok.EqualsAndHashCode.Include;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
-public class GxDocumentType implements Serializable {
+@Table(name = "gx_document_type")
+public class GxDocumentType extends GxMappedSuperclass implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer oid;
+    private static final long serialVersionUID = 1L;
 
-	String name;
-	String note;
 
-	@Convert(converter = GxStringToJsonConverter.class)
-	JSONObject tags;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer oid;
 
-	@Include
-	@ManyToOne
-	@JoinColumn(name = "oid_namespace")
-	GxNamespace namespace;
+    String name;
+    String note;
+
+    @Convert(converter = GxStringToJsonConverter.class)
+    JSONObject tags;
+
+    @ManyToOne
+    @JoinColumn(name = "oid_namespace")
+    GxNamespace namespace;
 
 }
