@@ -5,9 +5,9 @@ import java.util.List;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.AbstractLogin.ForgotPasswordEvent;
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.component.login.LoginForm;
@@ -28,7 +28,7 @@ import io.graphenee.common.exception.PasswordChangeRequiredException;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.annotation.PostConstruct;
 
-@CssImport("./styles/graphenee.css")
+@CssImport(value = "./styles/graphenee.css")
 public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlParameter<String> {
 
 	private static final long serialVersionUID = 1L;
@@ -53,7 +53,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		HorizontalLayout titleVersionLayout = new HorizontalLayout();
 		titleVersionLayout.setWidthFull();
 		titleVersionLayout.addClassName("gx-login-title-layout");
-		H1 title = new H1(appTitle());
+		Span title = new Span(appTitle());
 		title.addClassName("gx-login-title");
 		H5 version = new H5(appVersion());
 		version.addClassName("gx-login-version");
@@ -65,7 +65,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		loginForm.setForgotPasswordButtonVisible(true);
 		LoginI18n loginI18n = LoginI18n.createDefault();
 		loginI18n.getForm().setSubmit("Sign In");
-		loginI18n.getForm().setTitle("Enter Credentials");
+		loginI18n.getForm().setTitle("");
 		loginI18n.getForm().setForgotPassword("Forgot Password? Click here!");
 		loginI18n.getForm().setUsername("Username");
 		loginI18n.getForm().setPassword("Password");

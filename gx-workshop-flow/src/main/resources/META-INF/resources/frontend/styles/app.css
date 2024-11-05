@@ -4,12 +4,12 @@
 }
 
 @font-face {
-	font-family: "Nanum Bold";
-	src: url("/frontend/fonts/NanumGothic-Bold.ttf");
+	font-family: "PlaypenSans";
+	src: url("/frontend/fonts/PlaypenSans-Regular.ttf");
 }
 
 html {
-	--lumo-font-family: "Nanum Gothic", "Roboto Condensed";
+	--lumo-font-family: "PlaypenSans", "Roboto Condensed";
 	--lumo-font-size: 1rem;
 	--lumo-font-size-xxxl: 1.75rem;
 	--lumo-font-size-xxl: 1.375rem;
@@ -156,7 +156,6 @@ vaadin-grid::part(last-row) {
 
 .gx-login-title {
 	font-size: 1.5rem;
-	text-transform: uppercase;
 	max-width: min-content;
 }
 

@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "path": "gx-workshop-flow"
+    },
+    {
+      "path": "gx"
+    },
+    {
+      "path": "gx-core-archetype"
+    }
+  ],
+"settings": {
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "interactive"
+}
+}

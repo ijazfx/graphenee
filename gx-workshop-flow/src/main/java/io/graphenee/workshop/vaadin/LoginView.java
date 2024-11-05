@@ -1,11 +1,11 @@
 package io.graphenee.workshop.vaadin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.UIScope;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
@@ -18,46 +18,46 @@ import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.GxAbstractLoginView;
 
 @Route(value = "login")
-@UIScope
+@Scope("prototype")
 @PreserveOnRefresh
 public class LoginView extends GxAbstractLoginView {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Autowired
-	GxAbstractFlowSetup flowSetup;
+    @Autowired
+    GxAbstractFlowSetup flowSetup;
 
-	@Autowired
-	GxDataService dataService;
+    @Autowired
+    GxDataService dataService;
 
-	@Override
-	protected GxAbstractFlowSetup flowSetup() {
-		return flowSetup;
-	}
+    @Override
+    protected GxAbstractFlowSetup flowSetup() {
+        return flowSetup;
+    }
 
-	@Autowired
-	GxNamespace namespace;
+    @Autowired
+    GxNamespace namespace;
 
-	@Override
-	protected GxAuthenticatedUser onLogin(LoginEvent event)
-			throws AuthenticationFailedException, PasswordChangeRequiredException {
-		String username = event.getUsername();
-		String password = event.getPassword();
-		GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);
-		if (user == null) {
-			user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password,
-					dataService.systemNamespace());
-		}
-		if (user == null) {
-			throw new AuthenticationFailedException("Invalid credentials, please try again.");
-		}
-		if (user.getIsLocked()) {
-			throw new AuthenticationFailedException("The account is locked, please contact system administrator.");
-		}
-		if (user.getIsPasswordChangeRequired()) {
-			throw new PasswordChangeRequiredException();
-		}
-		return new GxUserAccountDashboardUser(user);
-	}
+    @Override
+    protected GxAuthenticatedUser onLogin(LoginEvent event)
+            throws AuthenticationFailedException, PasswordChangeRequiredException {
+        String username = event.getUsername();
+        String password = event.getPassword();
+        GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);
+        if (user == null) {
+            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password,
+                    dataService.systemNamespace());
+        }
+        if (user == null) {
+            throw new AuthenticationFailedException("Invalid credentials, please try again.");
+        }
+        if (user.getIsLocked()) {
+            throw new AuthenticationFailedException("The account is locked, please contact system administrator.");
+        }
+        if (user.getIsPasswordChangeRequired()) {
+            throw new PasswordChangeRequiredException();
+        }
+        return new GxUserAccountDashboardUser(user);
+    }
 
 }
