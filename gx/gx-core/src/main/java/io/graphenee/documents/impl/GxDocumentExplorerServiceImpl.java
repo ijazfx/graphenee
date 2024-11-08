@@ -49,6 +49,42 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
+	synchronized public GxFolder findOrCreateFolder(GxNamespace namespace, String folderName) {
+		GxFolder namespaceFolder = findOrCreateNamespaceFolder(namespace);
+		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
+		sb.eq("namespace", namespace);
+		sb.eq("name", folderName);
+		List<GxFolder> folders = folderRepo.findAll(sb.build());
+		if (folders.isEmpty()) {
+			GxFolder folder = new GxFolder();
+			folder.setNamespace(namespace);
+			folder.setName(folderName);
+			folder.setFolder(namespaceFolder);
+			folder = folderRepo.save(folder);
+			return folder;
+		}
+		return folders.get(0);
+	}
+
+	@Override
+	synchronized public GxFolder findOrCreateFolder(GxFolder parentFolder, String folderName) {
+		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
+		sb.eq("namespace", parentFolder.getNamespace());
+		sb.eq("folder", parentFolder);
+		sb.eq("name", folderName);
+		List<GxFolder> folders = folderRepo.findAll(sb.build());
+		if (folders.isEmpty()) {
+			GxFolder folder = new GxFolder();
+			folder.setNamespace(parentFolder.getNamespace());
+			folder.setName(folderName);
+			folder.setFolder(parentFolder);
+			folder = folderRepo.save(folder);
+			return folder;
+		}
+		return folders.get(0);
+	}
+
+	@Override
 	public List<GxFolder> findFolder(GxFolder parent, String... sortKey) {
 		JpaSpecificationBuilder<GxFolder> sb = JpaSpecificationBuilder.get();
 		sb.eq("folder", parent);

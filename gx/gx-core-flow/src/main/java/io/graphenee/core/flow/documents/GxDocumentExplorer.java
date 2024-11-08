@@ -204,26 +204,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					}
 
 					image.addClickListener(cl -> {
-						GxDocument document = (GxDocument) s;
-						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
-							try {
-								InputStream stream = null;
-								String src = document.getPath();
-								String resourcePath = storage.resourcePath("documents", src);
-								try {
-									stream = storage.resolve(resourcePath);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								byte[] bytes = IOUtils.toByteArray(stream);
-								StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
-								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
-								resourcePreviewPanel.showInDialog("80%", "80%");
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-
-						}
+						previewDocument(s);
 					});
 				}
 				image.setHeight("24px");
@@ -231,6 +212,32 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			});
 		}
 		return super.rendererForProperty(propertyName, propertyDefinition);
+	}
+
+	public void previewDocument(GxDocumentExplorerItem s) {
+		// TODO Auto-generated method stub
+		GxDocument document = (GxDocument) s;
+		String mimeType = s.getMimeType();
+		String extension = s.getExtension();
+		if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+			try {
+				InputStream stream = null;
+				String src = document.getPath();
+				String resourcePath = storage.resourcePath("documents", src);
+				try {
+					stream = storage.resolve(resourcePath);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				byte[] bytes = IOUtils.toByteArray(stream);
+				StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
+				resourcePreviewPanel.showInDialog("80%", "80%");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 	}
 
 	@Override
@@ -276,7 +283,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		folderForm.setDelegate(folder -> {
 			documentService.saveFolder(selectedFolder, List.of(folder));
 			refresh();
-			folderForm.closeDialog();
+			folderForm.dismiss();
 		});
 
 		uploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
@@ -288,7 +295,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					GxDocument d = new GxDocument();
 					d.setFolder(parentFolder);
 					d.setSize((long) metaData.getFileSize());
-					d.setNamespace(namespace);
+					d.setNamespace(parentFolder.getNamespace());
 					d.setName(uploadedFile.getFileName());
 					d.setPath(metaData.getFileName());
 					d.setMimeType(uploadedFile.getMimeType());
@@ -307,7 +314,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				FileMetaData metaData = savedFile.get();
 				GxDocument d = new GxDocument();
 				d.setSize((long) metaData.getFileSize());
-				d.setNamespace(namespace);
+				d.setNamespace(parentDocument.getNamespace());
 				d.setName(uploadedFile.getFileName());
 				d.setPath(metaData.getFileName());
 				d.setMimeType(uploadedFile.getMimeType());
@@ -331,6 +338,14 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
+		deleteMultiple(entities);
+	}
+
+	public void delete(GxDocumentExplorerItem entity) {
+		deleteMultiple(List.of(entity));
+	}
+
+	public void deleteMultiple(Collection<GxDocumentExplorerItem> entities) {
 		int count = 0;
 		for (GxDocumentExplorerItem e : entities) {
 			try {
@@ -350,9 +365,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	public void initializeWithNamespaceAndStorage(GxNamespace namespace, FileStorage storage) {
-		this.namespace = namespace;
 		this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
 		this.selectedFolder = this.topFolder;
+		this.namespace = namespace;
 		this.storage = storage;
 		generateBreadcrumb(this.selectedFolder);
 		refresh();
@@ -361,7 +376,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	public void initializeWithFolderAndStorage(GxDocumentExplorerItem parent, FileStorage storage) {
 		this.topFolder = parent.isFile() ? ((GxDocument) parent).getFolder() : (GxFolder) parent;
 		this.selectedFolder = this.topFolder;
-		this.namespace = this.topFolder.getNamespace();
+		this.namespace = topFolder.getNamespace();
 		this.storage = storage;
 		generateBreadcrumb(parent);
 		refresh();
@@ -494,7 +509,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		fl.setSpacing(false);
 		fl.setMargin(false);
 		fl.setHeight("600px");
-		//		fl.add(this);
+		fl.add(this);
 		setWidthFull();
 		setHeight("600px");
 		ConfirmDialog dlg = DialogFactory.customDialog("Choose a Document", this, "Choose", "Dismiss", cb -> {
@@ -506,6 +521,33 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		});
 		dlg.setWidth("900px");
 		dlg.open();
+	}
+
+	public void uploadSingle(GxDocumentFilter filter, TRParamCallback<GxDocument> onChoose) {
+		GxFileUploadForm quickUploadForm = new GxFileUploadForm();
+		quickUploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
+			uploadedFiles.forEach(uploadedFile -> {
+				try {
+					File file = uploadedFile.getFile();
+					Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
+					FileMetaData metaData = savedFile.get();
+					GxDocument d = new GxDocument();
+					d.setFolder(parentFolder);
+					d.setSize((long) metaData.getFileSize());
+					d.setNamespace(parentFolder.getNamespace());
+					d.setName(uploadedFile.getFileName());
+					d.setPath(metaData.getFileName());
+					d.setMimeType(uploadedFile.getMimeType());
+					documentService.saveDocument(parentFolder, List.of(d));
+					if (onChoose != null) {
+						onChoose.execute(d);
+					}
+				} catch (Exception ex) {
+					log.error(ex.getMessage(), ex);
+				}
+			});
+		});
+		quickUploadForm.showInDialog(selectedFolder);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -46,9 +47,11 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
 		headingLayout.setWidth("328px");
 		Span heading = new Span(flowSetup().appTitle());
+		heading.addClassName("gx-login-title");
 		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		heading.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+		heading.getStyle().set("font-size", "var(--lumo-font-size-xxxl)");
 		Span version = new Span(flowSetup().appVersion());
+		version.addClassName("gx-login-title");
 		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
 		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
 		headingLayout.add(heading, version);
@@ -63,11 +66,12 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		rootLayout.getElement().getStyle().set("background", "white");
 
 		add(rootLayout);
+		setSpacing(false);
 
 		appLogo = flowSetup().appLogo();
 		if (appLogo != null) {
 			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-			appLogo.setWidth("100px");
+			appLogo.setHeight("4rem");
 			rootLayout.add(appLogo);
 			rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
 		}
@@ -76,6 +80,7 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		FormLayout form1 = new FormLayout();
 		usernameTextField = new TextField("Username");
 		usernameTextField.setAutoselect(true);
+		usernameTextField.setRequired(true);
 
 		Button sendResetKeyButton = new Button("Send Security Pin");
 		sendResetKeyButton.setEnabled(false);
@@ -91,7 +96,11 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		nextButton.setEnabled(false);
 
-		form2.add(resetKeyTextField, nextButton);
+		Button dismissButton = new Button("Return to Sign In Page");
+		dismissButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+		dismissButton.setEnabled(true);
+
+		form2.add(resetKeyTextField, nextButton, dismissButton);
 
 		passwordField = new PasswordField("New Password");
 		retypePasswordField = new PasswordField("Re-type Password");
@@ -155,6 +164,10 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 			form1.setVisible(false);
 			form2.setVisible(false);
 			form3.setVisible(true);
+		});
+
+		dismissButton.addClickListener(event -> {
+			UI.getCurrent().navigate("login");
 		});
 
 		passwordField.setValueChangeMode(ValueChangeMode.EAGER);

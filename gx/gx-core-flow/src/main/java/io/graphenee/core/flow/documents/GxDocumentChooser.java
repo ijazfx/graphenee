@@ -11,8 +11,11 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.StreamResource;
 
@@ -45,9 +48,14 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 	}
 
 	private Component createItem(GxDocument s) {
+		VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(false);
+		layout.setPadding(false);
+		layout.setSpacing(false);
 		FlexLayout fl = new FlexLayout();
 		fl.setClassName("gx-document-chooser-item");
-		fl.setFlexDirection(FlexDirection.COLUMN);
+		fl.setFlexDirection(FlexDirection.ROW);
+		fl.setAlignItems(Alignment.END);
 		NativeLabel label = new NativeLabel(s.getName());
 		Image image = null;
 		String extension = s.getExtension();
@@ -77,13 +85,22 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 				image = IconUtils.fileExtensionIconResource("bin");
 			}
 		}
+		Button deleteDocument = new Button();
+		deleteDocument.addClickListener(cl -> {
+			setPresentationValue(null);
+		});
+		deleteDocument.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+		deleteDocument.setIcon(VaadinIcon.TRASH.create());
 		fl.add(image, label);
-		fl.setWidth("4rem");
-		return fl;
+		image.addClickListener(cl -> {
+			explorer.previewDocument(getValue());
+		});
+		layout.add(fl, deleteDocument);
+		return layout;
 	}
 
 	public GxDocumentChooser(GxDocumentFilter filter) {
-		this("Browse Documents...", filter);
+		this("Attach Document...", filter);
 	}
 
 	public GxDocumentChooser(String buttonCaption, GxDocumentFilter filter) {
@@ -94,9 +111,17 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 		rootLayout.setPadding(false);
 		rootLayout.setWidthFull();
 
-		Button selectDocument = new Button(buttonCaption);
-		selectDocument.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
-		selectDocument.addClickListener(cl -> {
+		Button attachDocument = new Button(buttonCaption);
+		attachDocument.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+		attachDocument.addClickListener(cl -> {
+			explorer.uploadSingle(filter, doc -> {
+				setPresentationValue(doc);
+			});
+		});
+
+		Button browseDocument = new Button(VaadinIcon.FOLDER_SEARCH.create());
+		browseDocument.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+		browseDocument.addClickListener(cl -> {
 			explorer.chooseSingle(filter, doc -> {
 				setPresentationValue(doc);
 			});
@@ -104,7 +129,10 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 
 		docsLayout = new FlexLayout();
 
-		rootLayout.add(selectDocument, docsLayout);
+		HorizontalLayout buttonsLayout = new HorizontalLayout(attachDocument, browseDocument);
+		buttonsLayout.setSpacing(false);
+
+		rootLayout.add(buttonsLayout, docsLayout);
 		add(rootLayout);
 	}
 

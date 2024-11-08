@@ -21,6 +21,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.vaadin.flow.GxForbiddenView.ForbiddenException;
 import jakarta.annotation.PostConstruct;
 
 public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver {
@@ -128,7 +129,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 			if (user == null) {
 				event.rerouteTo("login", route);
 			} else if (!route.equals("") && !user.canDoAction(route, "view")) {
-				event.rerouteTo("");
+				throw new ForbiddenException();
 			}
 		}
 	}

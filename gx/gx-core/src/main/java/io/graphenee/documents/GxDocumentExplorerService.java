@@ -12,6 +12,10 @@ public interface GxDocumentExplorerService {
 
 	GxFolder findOrCreateNamespaceFolder(GxNamespace namespace);
 
+	GxFolder findOrCreateFolder(GxNamespace namespace, String folderName);
+
+	GxFolder findOrCreateFolder(GxFolder parentFolder, String folderName);
+
 	List<GxFolder> findFolder(GxFolder parent, String... sortKey);
 
 	List<GxDocument> findDocument(GxFolder parent, String... sortKey);
