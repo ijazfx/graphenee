@@ -21,7 +21,7 @@ public class GxForbiddenView extends VerticalLayout implements HasErrorParameter
 
 	@Override
 	public int setErrorParameter(BeforeEnterEvent event, ErrorParameter<ForbiddenException> parameter) {
-		error.setText(parameter.getCustomMessage());
+		error.setText("Access is denied!");
 		return HttpServletResponse.SC_FORBIDDEN;
 	}
 

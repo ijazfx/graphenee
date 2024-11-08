@@ -21,7 +21,7 @@ public class GxNotFoundView extends VerticalLayout implements HasErrorParameter<
 
 	@Override
 	public int setErrorParameter(BeforeEnterEvent event, ErrorParameter<NotFoundException> parameter) {
-		error.setText(parameter.getCustomMessage());
+		error.setText("Page not found!");
 		return HttpServletResponse.SC_NOT_FOUND;
 	}
 
