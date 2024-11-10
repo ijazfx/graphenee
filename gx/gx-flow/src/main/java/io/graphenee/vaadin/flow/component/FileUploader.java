@@ -29,9 +29,9 @@ import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j
+@Slf4j
 public class FileUploader extends CustomField<String> {
 	private static final long serialVersionUID = 1L;
 

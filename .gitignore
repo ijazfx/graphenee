@@ -1,3 +1,4 @@
+build
 **/frontend/generated
 vite.config.ts
 vite.generated.ts

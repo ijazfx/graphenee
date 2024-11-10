@@ -1,0 +1,19 @@
+ext {
+	vaadinVersion = "24.3.2"
+}
+
+repositories {
+    maven { url 'https://maven.vaadin.com/vaadin-addons/' }
+}
+
+dependencies {
+	implementation platform("com.vaadin:vaadin-bom:${vaadinVersion}")
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.vaadin:vaadin-core'
+    implementation 'com.vaadin:vaadin-spring-boot-starter'
+    implementation 'com.flowingcode.vaadin.addons:twincolgrid:2.9.5'
+    implementation project(':gx-util')
+    implementation project(':gx-core')
+    implementation project(':gx-flow')
+    compileOnly 'org.projectlombok:lombok'
+}

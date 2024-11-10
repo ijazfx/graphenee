@@ -1,0 +1,14 @@
+dependencies {
+    implementation 'com.squareup.retrofit2:retrofit'
+    implementation 'com.squareup.retrofit2:converter-gson'
+    implementation 'com.squareup.retrofit2:converter-scalars'
+    implementation 'com.squareup.retrofit2:converter-protobuf'
+    implementation 'org.web3j:core:5.0.0'
+    implementation 'org.web3j:utils:5.0.0'
+    implementation 'org.web3j:abi:5.0.0'
+    implementation 'org.web3j:quorum:4.10.0'
+    implementation 'org.hyperledger.sawtooth:sawtooth-sdk-transaction-processor:v0.1.2'
+    implementation 'org.hyperledger.sawtooth:sawtooth-sdk-signing:v0.1.2'
+    implementation 'org.hyperledger.sawtooth:sawtooth-sdk-protos:v0.1.2'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+}
