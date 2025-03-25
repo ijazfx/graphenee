@@ -18,7 +18,6 @@ public class GxSecurityPolicyListView extends GxVerticalLayoutView {
 	@Autowired
 	GxSecurityPolicyList list;
 
-	@Autowired(required = false)
 	GxNamespace namespace;
 
 	@Override
@@ -28,6 +27,7 @@ public class GxSecurityPolicyListView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
+		namespace = list.getNamespace();
 		list.initializeWithNamespace(namespace);
 	}
 

@@ -18,7 +18,6 @@ public class GxUserAccountListView extends GxVerticalLayoutView {
 	@Autowired
 	GxUserAccountList list;
 
-	@Autowired(required = false)
 	GxNamespace namespace;
 
 	@Override
@@ -28,6 +27,7 @@ public class GxUserAccountListView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
+		namespace = list.getNamespace();
 		list.initializeWithNamespace(namespace);
 	}
 
