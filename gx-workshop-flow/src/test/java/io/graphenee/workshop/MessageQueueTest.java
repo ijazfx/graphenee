@@ -23,7 +23,7 @@ public class MessageQueueTest {
             String snsTopic = "arn:aws:sns:us-east-1:000000000000:my-topic";
             String kafkaTopic = "my-topic";
             String response = null;
-            TestMessageDto messageDto = new TestMessageDto("TestID-123", "Hello, this is a test message!");
+            TestMessageDto messageDto = new TestMessageDto("12345", "Tesing for kafka message!");
             if ("kafka".equalsIgnoreCase(provider))
                 response = messagingService.publishMessage(kafkaTopic, messageDto);
             else if ("sns".equalsIgnoreCase(provider))

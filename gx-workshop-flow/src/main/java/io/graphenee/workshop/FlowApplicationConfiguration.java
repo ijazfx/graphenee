@@ -7,8 +7,10 @@ import io.graphenee.aws.messaging.Payload;
 import io.graphenee.aws.messaging.factory.MessagePublisherFactory;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import io.graphenee.core.GrapheneeMigration;
@@ -20,6 +22,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
+@ComponentScan(basePackages = {"io.graphenee.aws.messaging.publisher.kafka"})
 public class FlowApplicationConfiguration {
 
 	@Autowired
@@ -51,7 +54,7 @@ public class FlowApplicationConfiguration {
 
 
 	@Bean
-	public MessagePublisherFactory messagePublisherFactory(@Autowired(required = false) KafkaTemplate<Object, Object> kafkaTemplate) {
+	public MessagePublisherFactory messagePublisherFactory(@Autowired(required = false) @Qualifier("kafkaTemplate1") KafkaTemplate<Object, Object> kafkaTemplate) {
 		return new MessagePublisherFactory(env,kafkaTemplate);
 	}
 
