@@ -3,6 +3,7 @@ package io.graphenee.workshop;
 import java.io.File;
 
 import io.graphenee.aws.messaging.MessagingService;
+import io.graphenee.aws.messaging.Payload;
 import io.graphenee.aws.messaging.factory.MessagePublisherFactory;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorageFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
 public class FlowApplicationConfiguration {
@@ -47,9 +49,10 @@ public class FlowApplicationConfiguration {
 		return dataService.systemNamespace();
 	}
 
+
 	@Bean
-	public MessagePublisherFactory messagePublisherFactory() {
-		return new MessagePublisherFactory(env);
+	public MessagePublisherFactory messagePublisherFactory(@Autowired(required = false) KafkaTemplate<Object, Object> kafkaTemplate) {
+		return new MessagePublisherFactory(env,kafkaTemplate);
 	}
 
 	@Bean

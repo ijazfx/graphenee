@@ -3,6 +3,7 @@ package io.graphenee.workshop;
 import lombok.Data;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import io.graphenee.aws.messaging.MessagingService;
@@ -13,13 +14,21 @@ public class MessageQueueTest {
     @Autowired
     private MessagingService messagingService;
 
+    @Value("${messaging.provider}")
+    private String provider;
+
     @Test
     void sendTestMessage() {
         try {
-            String topic = "arn:aws:sns:us-east-1:000000000000:my-topic"; // or Kafka topic
+            String snsTopic = "arn:aws:sns:us-east-1:000000000000:my-topic";
+            String kafkaTopic = "my-topic";
+            String response = null;
             TestMessageDto messageDto = new TestMessageDto("TestID-123", "Hello, this is a test message!");
-            String response = messagingService.publishMessage(topic, messageDto);
-            System.out.println("Response: " + response);
+            if ("kafka".equalsIgnoreCase(provider))
+                response = messagingService.publishMessage(kafkaTopic, messageDto);
+            else if ("sns".equalsIgnoreCase(provider))
+                response = messagingService.publishMessage(snsTopic, messageDto);
+            System.out.println(provider + " Response: " + response);
         } catch (Exception e) {
             e.printStackTrace();
         }

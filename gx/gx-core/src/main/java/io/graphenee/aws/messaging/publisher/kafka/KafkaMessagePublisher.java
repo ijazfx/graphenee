@@ -3,15 +3,13 @@ package io.graphenee.aws.messaging.publisher.kafka;
 import io.graphenee.aws.messaging.Payload;
 import io.graphenee.aws.messaging.publisher.MessagePublisher;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
 
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KafkaMessagePublisher implements MessagePublisher {
 
     private final KafkaTemplate<Object, Object> kafkaTemplate;
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public KafkaMessagePublisher(KafkaTemplate<Object, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
@@ -19,13 +17,12 @@ public class KafkaMessagePublisher implements MessagePublisher {
 
     @Override
     public String publish(String topic, Payload<?> payload) {
-        Message<? extends Payload<?>> message = MessageBuilder.withPayload(payload)
-                .setHeader(KafkaHeaders.TOPIC, topic)
-                .setHeader(KafkaHeaders.REPLY_TOPIC, "your-reply-topic") // ✅ Kafka only
-                .build();
-
-        kafkaTemplate.send(message);
-        return "Kafka message sent to topic: " + topic;
+        try {
+            String jsonPayload = objectMapper.writeValueAsString(payload);
+            kafkaTemplate.send(topic, jsonPayload);
+            return "Kafka message sent to topic: " + topic;
+        } catch (Exception e) {
+            throw new RuntimeException("Error serializing Kafka message", e);
+        }
     }
 }
-
