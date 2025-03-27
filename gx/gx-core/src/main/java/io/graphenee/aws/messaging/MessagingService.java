@@ -2,6 +2,9 @@ package io.graphenee.aws.messaging;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,25 +12,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.graphenee.aws.messaging.factory.MessagePublisherFactory;
 import io.graphenee.aws.messaging.publisher.MessagePublisher;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
+
 @Service
 public class MessagingService {
 
     private final MessagePublisher messagePublisher;
-    private final ObjectMapper objectMapper;
 
-    @Autowired
-    public MessagingService(MessagePublisherFactory factory, Environment env) {
-        String provider = env.getProperty("messaging.provider");
-        this.objectMapper = new ObjectMapper();
-        this.messagePublisher = factory.createPublisher(provider);
+    public MessagingService(MessagePublisherFactory factory) {
+        this.messagePublisher = factory.createPublisher();
     }
 
-    public String publishMessage(String topic, Object payload) {
-        try {
-            String message = objectMapper.writeValueAsString(payload);
-            return messagePublisher.publish(topic, message);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error serializing message", e);
-        }
+    public String publishMessage(String topic, Object messageDto) {
+        Payload<Object> payload = new Payload<>(messageDto);
+        return messagePublisher.publish(topic, payload);
     }
 }

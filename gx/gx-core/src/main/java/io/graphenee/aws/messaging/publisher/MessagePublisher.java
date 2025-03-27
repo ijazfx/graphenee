@@ -1,5 +1,7 @@
 package io.graphenee.aws.messaging.publisher;
 
+import io.graphenee.aws.messaging.Payload;
+
 public interface MessagePublisher {
-    public String publish(String topic, String payload);
+    String publish(String topic, Payload<?> payload);
 }
