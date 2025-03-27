@@ -34,7 +34,7 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicy>
     @Autowired
     GxSecurityPolicyForm securityPolicyForm;
 
-    private GxNamespace namespace = getNamespace();
+    private GxNamespace namespace = null;
 
     public GxSecurityPolicyList() {
         super(GxSecurityPolicy.class);
@@ -91,14 +91,6 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicy>
         //Making the namespace filter visible to Super Admin only
         Boolean flag = loggedInUser().canDoAction("namespace-filter","view",true);
         namespaceComboBox.setVisible(flag);
-    }
-
-    public GxNamespace getNamespace() {
-        GxAuthenticatedUser user = loggedInUser();
-        if(user instanceof GxUserAccountDashboardUser){
-            return ((GxUserAccountDashboardUser)user).getUser().getNamespace();
-        }
-        return null;
     }
 
     public void initializeWithNamespace(GxNamespace namespace) {

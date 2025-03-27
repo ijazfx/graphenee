@@ -35,7 +35,7 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccount> {
     @Autowired
     GxUserAccountForm entityForm;
 
-   private GxNamespace namespace = getNamespace();
+   private GxNamespace namespace = null;
 
     public GxUserAccountList() {
         super(GxUserAccount.class);
@@ -93,14 +93,6 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccount> {
         //Making the namespace filter visible to Super Admin only
         Boolean flag = loggedInUser().canDoAction("namespace-filter","view",true);
         namespaceComboBox.setVisible(flag);
-    }
-
-    public GxNamespace getNamespace() {
-        GxAuthenticatedUser user = loggedInUser();
-        if(user instanceof GxUserAccountDashboardUser){
-            return ((GxUserAccountDashboardUser)user).getUser().getNamespace();
-        }
-        return null;
     }
 
     public void initializeWithNamespace(GxNamespace namespace) {
