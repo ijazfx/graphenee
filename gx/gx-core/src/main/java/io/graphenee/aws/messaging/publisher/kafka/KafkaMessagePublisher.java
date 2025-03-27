@@ -1,18 +1,10 @@
 package io.graphenee.aws.messaging.publisher.kafka;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.graphenee.aws.messaging.Payload;
 import io.graphenee.aws.messaging.publisher.MessagePublisher;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 

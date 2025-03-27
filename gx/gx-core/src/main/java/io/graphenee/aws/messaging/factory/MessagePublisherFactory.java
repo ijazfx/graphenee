@@ -1,6 +1,5 @@
 package io.graphenee.aws.messaging.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -8,10 +7,6 @@ import org.springframework.stereotype.Component;
 import io.graphenee.aws.messaging.publisher.MessagePublisher;
 import io.graphenee.aws.messaging.publisher.kafka.KafkaMessagePublisher;
 import io.graphenee.aws.messaging.publisher.sns.SnsMessagePublisher;
-
-import org.springframework.core.env.Environment;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
 
 @Component
 public class MessagePublisherFactory {

@@ -1,15 +1,11 @@
 package io.graphenee.workshop;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.graphenee.aws.messaging.MessagingService;
 import io.graphenee.aws.messaging.factory.MessagePublisherFactory;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +16,6 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorageFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
 @Configuration
 public class FlowApplicationConfiguration {
