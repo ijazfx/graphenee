@@ -1,6 +1,8 @@
 package io.graphenee.aws.messaging.publisher.kafka;
 
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,37 +20,54 @@ import java.util.Map;
 @EnableAsync
 public class KafkaProducerConfig {
 
-    @Value("${kafka.bootstrap-server.local}")
-    private String kafkaBootstrapServerLocal;
+    @Value("${kafka.bootstrap-server}")
+    private String kafkaBootstrapServer;
 
-    @Value("${kafka.use-aws-msk-bootstrap-servers}")
-    private Boolean useAwsMskBootstrapServers;
+    @Value("${kafka.security.protocol:PLAINTEXT}") // Default to PLAINTEXT for local
+    private String securityProtocol;
 
-    @Autowired
-    private AwsMskConfig awsMskConfig;
+    @Value("${kafka.sasl.mechanism:#{null}}")
+    private String saslMechanism;
 
-    @Bean("producerConfig1")
+    @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServerLocal);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootstrapServer);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-//        props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 180_000); // default is 30_000
-//        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 8192); // default is 16384
 
-        if (useAwsMskBootstrapServers) {
-            awsMskConfig.addMskIamProperties(props);
+        // Configure security only if not using plaintext
+        if (!"PLAINTEXT".equals(securityProtocol)) {
+            props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
+
+            if (saslMechanism != null) {
+                props.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
+
+                // Configure for AWS MSK IAM
+                if ("AWS_MSK_IAM".equals(saslMechanism)) {
+                    props.put(SaslConfigs.SASL_JAAS_CONFIG,
+                            "software.amazon.msk.auth.iam.IAMLoginModule required;");
+                    props.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS,
+                            "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
+                }
+            }
         }
+
+        // Recommended producer settings
+        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.RETRIES_CONFIG, 3);
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
 
         return props;
     }
 
-    @Bean("producerFactory1")
+    @Bean
     public ProducerFactory<Object, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
-    @Bean("kafkaTemplate1")
+    @Bean
     public KafkaTemplate<Object, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }

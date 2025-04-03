@@ -24,7 +24,7 @@ public class MessagePublisherFactory {
     }
 
     public MessagePublisher createPublisher() {
-        String provider = env.getProperty("messaging.provider", "sns").toLowerCase();
+        String provider = env.getProperty("messaging.provider").toLowerCase();
 
         switch (provider) {
             case "sns":

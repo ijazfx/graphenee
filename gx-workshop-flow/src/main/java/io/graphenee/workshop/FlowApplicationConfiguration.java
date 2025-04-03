@@ -54,7 +54,7 @@ public class FlowApplicationConfiguration {
 
 
 	@Bean
-	public MessagePublisherFactory messagePublisherFactory(@Autowired(required = false) @Qualifier("kafkaTemplate1") KafkaTemplate<Object, Object> kafkaTemplate) {
+	public MessagePublisherFactory messagePublisherFactory(@Autowired(required = false) KafkaTemplate<Object, Object> kafkaTemplate) {
 		return new MessagePublisherFactory(env,kafkaTemplate);
 	}
 
