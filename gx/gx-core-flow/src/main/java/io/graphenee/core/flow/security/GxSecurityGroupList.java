@@ -3,6 +3,10 @@ package io.graphenee.core.flow.security;
 import java.util.Collection;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.data.binder.Binder;
+import io.graphenee.core.flow.GxUserAccountDashboardUser;
+import io.graphenee.vaadin.flow.component.GxFormLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -30,7 +34,7 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroup> {
     @Autowired
     GxSecurityGroupForm entityForm;
 
-    private GxNamespace namespace;
+    private GxNamespace namespace = null;
 
     public GxSecurityGroupList() {
         super(GxSecurityGroup.class);
@@ -70,6 +74,24 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroup> {
         if (entity.getOid() == null) {
             entity.setNamespace(namespace);
         }
+    }
+
+    @Override
+    protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxSecurityGroup> searchBinder) {
+        ComboBox<GxNamespace> namespaceComboBox = new ComboBox<>("Namespace");
+        namespaceComboBox.setItemLabelGenerator(GxNamespace::getNamespace);
+        namespaceComboBox.setClearButtonVisible(true);
+        namespaceComboBox.setItems(dataService.findNamespace());
+        namespaceComboBox.setValue(namespace);
+        namespaceComboBox.addValueChangeListener(vcl -> {
+            namespace = vcl.getValue();
+            refresh();
+        });
+        searchForm.add(namespaceComboBox);
+        searchForm.getStyle().set("margin-left","10px");
+        //Making the namespace filter visible to Super Admin only
+        Boolean flag = loggedInUser().canDoAction("namespace-filter","view",true);
+        namespaceComboBox.setVisible(flag);
     }
 
     public void initializeWithNamespace(GxNamespace namespace) {

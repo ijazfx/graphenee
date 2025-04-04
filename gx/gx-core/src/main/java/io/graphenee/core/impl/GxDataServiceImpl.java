@@ -1234,7 +1234,8 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public GxUserAccount save(GxUserAccount entity) {
 		if (!Strings.isBlank(entity.getConfirmPassword())) {
-			entity.setPassword(entity.getConfirmPassword());
+			String encryptedPassword = CryptoUtil.createPasswordHash(entity.getConfirmPassword());
+			entity.setPassword(encryptedPassword);
 			entity.setNewPassword(null);
 			entity.setConfirmPassword(null);
 		}

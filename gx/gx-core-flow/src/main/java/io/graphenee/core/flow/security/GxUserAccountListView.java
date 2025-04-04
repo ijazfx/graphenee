@@ -1,5 +1,7 @@
 package io.graphenee.core.flow.security;
 
+import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.HasComponents;
@@ -18,9 +20,6 @@ public class GxUserAccountListView extends GxVerticalLayoutView {
 	@Autowired
 	GxUserAccountList list;
 
-	@Autowired(required = false)
-	GxNamespace namespace;
-
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
 		rootLayout.add(list);
@@ -28,12 +27,20 @@ public class GxUserAccountListView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		list.initializeWithNamespace(namespace);
+		list.initializeWithNamespace(getNamespace());
 	}
 
 	@Override
 	protected String getCaption() {
 		return "User Accounts";
+	}
+
+	public GxNamespace getNamespace() {
+		GxAuthenticatedUser user = loggedInUser();
+		if(user instanceof GxUserAccountDashboardUser){
+			return ((GxUserAccountDashboardUser)user).getUser().getNamespace();
+		}
+		return null;
 	}
 
 }
