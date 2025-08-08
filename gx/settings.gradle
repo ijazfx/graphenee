@@ -1,3 +1,0 @@
-rootProject.name = 'gx'
-
-include 'gx-util', 'gx-flow', 'gx-core', 'gx-core-flow', 'gx-jbpm-embedded', 'gx-jbpm-flow', 'gx-blockchain'
