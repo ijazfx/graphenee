@@ -88,6 +88,7 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.util.HtmlSanitizer;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
@@ -1193,6 +1194,10 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			}
 			if (propertyDefinition.getType() != null && propertyDefinition.getType().equals(String.class)) {
 				column.setTextAlign(ColumnTextAlign.START);
+				column.setRenderer(new ComponentRenderer<>(s -> {
+					String value = (String) propertyDefinition.getGetter().apply(s);
+					return new Span(HtmlSanitizer.clean(value));
+				}));
 			}
 		}
 	}

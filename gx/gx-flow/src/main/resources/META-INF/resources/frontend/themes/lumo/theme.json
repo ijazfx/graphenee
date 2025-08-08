@@ -1,0 +1,4 @@
+{
+  "importCss": ["@vaadin/vaadin-lumo-styles/color.js", "@vaadin/vaadin-lumo-styles/typography.js"],
+  "parent": "Lumo"
+}
