@@ -37,11 +37,21 @@ import io.graphenee.util.DataSourceUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManagerFactory;
 
+/**
+ * The main configuration class for Graphenee jBPM.
+ */
 @Configuration
 @ConditionalOnClass(GrapheneeCoreConfiguration.class)
 //@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", matchIfMissing = false)
 @ComponentScan("io.graphenee.jbpm.embedded")
 public class GrapheneeJbpmConfiguration {
+
+	/**
+	 * Creates a new instance of this configuration.
+	 */
+	public GrapheneeJbpmConfiguration() {
+		// a default constructor
+	}
 
 	@Autowired(required = false)
 	GrapheneeJbpmProperties grapheneeJbpmProperties;
@@ -49,6 +59,9 @@ public class GrapheneeJbpmConfiguration {
 	@Value("${flyway.enabled:false}")
 	boolean flywayEnabled;
 
+	/**
+	 * Initializes the database.
+	 */
 	@PostConstruct
 	public void init() {
 		if (flywayEnabled) {
@@ -72,12 +85,21 @@ public class GrapheneeJbpmConfiguration {
 		return grapheneeJbpmProperties;
 	}
 
+	/**
+	 * Creates a new transaction manager.
+	 * @param jbpmEntityManagerFactory The entity manager factory.
+	 * @return The new transaction manager.
+	 */
 	@Bean("jbpmTransactionManager")
 	public JpaTransactionManager jbpmTransactionManager(@Qualifier("jbpmEntityManagerFactory") EntityManagerFactory jbpmEntityManagerFactory) {
 		JpaTransactionManager tm = new JpaTransactionManager(jbpmEntityManagerFactory);
 		return tm;
 	}
 
+	/**
+	 * Creates a new entity manager factory.
+	 * @return The new entity manager factory.
+	 */
 	@Bean("jbpmEntityManagerFactory")
 	public EntityManagerFactory jbpmEntityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();

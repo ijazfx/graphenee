@@ -22,9 +22,18 @@ import java.util.Formatter;
 import io.graphenee.util.hash.TRHashProvider;
 
 /**
+ * An abstract implementation of a hash provider.
+ *
  * @author ijazfx
  */
 abstract public class AbstractHashProvider implements TRHashProvider {
+
+	/**
+	 * Creates a new instance of this provider.
+	 */
+	protected AbstractHashProvider() {
+		// a protected constructor for this abstract class
+	}
 
 	@Override
 	public String createPasswordHash(String input) {
@@ -56,6 +65,11 @@ abstract public class AbstractHashProvider implements TRHashProvider {
 		return inputHash != null && inputHash.equals(hashed);
 	}
 
+	/**
+	 * Converts a byte array to a hex string.
+	 * @param bytes the byte array to convert.
+	 * @return the hex string.
+	 */
 	protected static String toHexString(byte[] bytes) {
 		try (Formatter formatter = new Formatter()) {
 			for (byte b : bytes) {
@@ -65,6 +79,11 @@ abstract public class AbstractHashProvider implements TRHashProvider {
 		}
 	}
 
+	/**
+	 * Checks if a string is null or empty.
+	 * @param value the string to check.
+	 * @return true if the string is null or empty, false otherwise.
+	 */
 	protected boolean isNullOrEmpty(String value) {
 		return value == null || value.trim().length() == 0;
 	}

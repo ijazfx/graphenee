@@ -11,9 +11,15 @@ import io.graphenee.jbpm.embedded.GxAssignee;
 import io.graphenee.jbpm.embedded.flow.GxSelectAssigneeForm.GxAssigneeHolder;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
+/**
+ * A form for selecting an assignee.
+ */
 @SuppressWarnings("serial")
 public class GxSelectAssigneeForm extends GxAbstractEntityForm<GxAssigneeHolder> {
 
+	/**
+	 * Creates a new instance of this form.
+	 */
 	public GxSelectAssigneeForm() {
 		super(GxAssigneeHolder.class);
 	}
@@ -26,6 +32,10 @@ public class GxSelectAssigneeForm extends GxAbstractEntityForm<GxAssigneeHolder>
 		saveButton.setText("Assign");
 	}
 
+	/**
+	 * Initializes the form with a collection of assignees.
+	 * @param assignees The assignees.
+	 */
 	public void initializeWithAssignees(Collection<GxAssignee> assignees) {
 		assigneeList.clear();
 		assigneeList.addAll(assignees);
@@ -36,13 +46,30 @@ public class GxSelectAssigneeForm extends GxAbstractEntityForm<GxAssigneeHolder>
 		return "Assign Task";
 	}
 
+	/**
+	 * A holder for an assignee.
+	 */
 	public static class GxAssigneeHolder {
+		/**
+		 * Creates a new instance of this holder.
+		 */
+		public GxAssigneeHolder() {
+			// a default constructor
+		}
 		GxAssignee assignee;
 
+		/**
+		 * Gets the assignee.
+		 * @return The assignee.
+		 */
 		public GxAssignee getAssignee() {
 			return assignee;
 		}
 
+		/**
+		 * Sets the assignee.
+		 * @param assignee The assignee.
+		 */
 		public void setAssignee(GxAssignee assignee) {
 			this.assignee = assignee;
 		}

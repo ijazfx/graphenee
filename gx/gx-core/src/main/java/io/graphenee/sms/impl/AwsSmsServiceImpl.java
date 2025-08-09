@@ -18,11 +18,18 @@ import io.graphenee.sms.exception.GxSmsSendException;
 import io.graphenee.sms.proto.GxSmsConfigProtos;
 import io.graphenee.sms.proto.GxSmsConfigProtos.AwsSmsConfig;
 
+/**
+ * An implementation of {@link GxSmsService} that uses AWS SNS to send SMS messages.
+ */
 public class AwsSmsServiceImpl implements GxSmsService {
 
 	private AwsSmsConfig smsConfig;
 	private final int perSMSMaxLength = 160;
 
+	/**
+	 * Creates a new instance of this service.
+	 * @param smsConfig The AWS SMS configuration.
+	 */
 	public AwsSmsServiceImpl(GxSmsConfigProtos.AwsSmsConfig smsConfig) {
 		this.smsConfig = smsConfig;
 	}
@@ -91,6 +98,10 @@ public class AwsSmsServiceImpl implements GxSmsService {
 		return null;
 	}
 
+	/**
+	 * Gets the AWS credentials provider.
+	 * @return The AWS credentials provider.
+	 */
 	public AWSCredentialsProvider getAwsCredentialProvider() {
 
 		return new AWSCredentialsProvider() {

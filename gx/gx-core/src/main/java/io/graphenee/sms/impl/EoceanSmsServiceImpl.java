@@ -16,6 +16,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+/**
+ * An implementation of {@link GxSmsService} that uses Eocean to send SMS messages.
+ */
 public class EoceanSmsServiceImpl implements GxSmsService {
 
 	private static final Logger L = LoggerFactory.getLogger(EoceanSmsServiceImpl.class);
@@ -24,6 +27,10 @@ public class EoceanSmsServiceImpl implements GxSmsService {
 	private EoceanConfig smsConfig;
 	private final int perSMSMaxLength = 160;
 
+	/**
+	 * Creates a new instance of this service.
+	 * @param smsConfig The Eocean SMS configuration.
+	 */
 	public EoceanSmsServiceImpl(GxSmsConfigProtos.EoceanConfig smsConfig) {
 		this.smsConfig = smsConfig;
 		eoceanService = new Retrofit.Builder().addConverterFactory(ScalarsConverterFactory.create()).addConverterFactory(GsonConverterFactory.create())

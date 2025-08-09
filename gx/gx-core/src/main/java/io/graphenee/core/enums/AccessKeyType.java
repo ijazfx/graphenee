@@ -15,9 +15,21 @@
  *******************************************************************************/
 package io.graphenee.core.enums;
 
+/**
+ * An enum that represents the type of an access key.
+ */
 public enum AccessKeyType {
+	/**
+	 * A retina scan.
+	 */
 	RETINASCAN(0),
+	/**
+	 * A fingerprint.
+	 */
 	FINGERPRINT(1),
+	/**
+	 * A card.
+	 */
 	CARD(2);
 
 	private Integer typeCode;
@@ -26,10 +38,19 @@ public enum AccessKeyType {
 		this.typeCode = typeCode;
 	}
 
+	/**
+	 * Gets the type code.
+	 * @return The type code.
+	 */
 	public Integer typeCode() {
 		return this.typeCode;
 	}
 
+	/**
+	 * Gets the access key type for a type code.
+	 * @param typeCode The type code.
+	 * @return The access key type.
+	 */
 	public static AccessKeyType accessKeyType(Integer typeCode) {
 		if (typeCode == 0)
 			return AccessKeyType.RETINASCAN;

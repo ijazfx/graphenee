@@ -31,12 +31,20 @@ import io.graphenee.util.enums.GxVideoType;
 import io.graphenee.util.exception.GxMediaConversionException;
 
 /**
- * 
+ * An implementation of {@link GxMediaConverter} that uses ffmpeg to convert media files.
+ *
  * @author muhammadhamza
  * @since 2.0.0
  */
 @Service
 public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
+
+	/**
+	 * Creates a new instance of this converter.
+	 */
+	public GxFfmpegMediaConverterImpl() {
+		// a default constructor
+	}
 	@Override
 	public void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType) throws GxMediaConversionException {
 		if (sourceType.equals(targetType))
@@ -119,6 +127,11 @@ public class GxFfmpegMediaConverterImpl implements GxMediaConverter {
 		convertMedia(cmd);
 	}
 
+	/**
+	 * Converts a media file.
+	 * @param cmd The command to execute.
+	 * @throws GxMediaConversionException if the conversion fails.
+	 */
 	protected void convertMedia(String cmd) throws GxMediaConversionException {
 		try {
 			// Process process = Runtime.getRuntime().exec(command, null, null);

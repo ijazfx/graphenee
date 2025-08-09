@@ -29,10 +29,17 @@ import com.lambdaworks.crypto.SCryptUtil;
  */
 public class SCryptHashProvider extends AbstractHashProvider {
 
+	/**
+	 * The encryption algorithm used by this provider.
+	 */
 	public static final String ENCRYPTION = "scrypt";
 
 	private String scryptSalt;
 
+	/**
+	 * Creates a new instance of this provider.
+	 * @param salt The salt to use.
+	 */
 	public SCryptHashProvider(String salt) {
 		this.scryptSalt = salt;
 	}

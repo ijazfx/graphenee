@@ -26,13 +26,35 @@ import org.hibernate.dialect.PostgreSQLDialect;
 import org.hibernate.dialect.SQLServerDialect;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+/**
+ * A utility class for data sources.
+ */
 public class DataSourceUtil {
 
+	/**
+	 * Creates a new instance of this utility class.
+	 */
+	public DataSourceUtil() {
+		// a default constructor
+	}
+
+	/**
+	 * Creates a new data source.
+	 * @param url The URL of the data source.
+	 * @param username The username for the data source.
+	 * @param password The password for the data source.
+	 * @return The new data source.
+	 */
 	public static DataSource createDataSource(String url, String username, String password) {
 		DriverManagerDataSource ds = new DriverManagerDataSource(url, username, password);
 		return ds;
 	}
 
+	/**
+	 * Determines the database vendor for a data source.
+	 * @param dataSource The data source.
+	 * @return The database vendor.
+	 */
 	public static String determineDbVendor(DataSource dataSource) {
 		String vendor = null;
 		try (Connection c = dataSource.getConnection()) {
@@ -51,6 +73,11 @@ public class DataSourceUtil {
 		return vendor;
 	}
 
+	/**
+	 * Determines the dialect for a data source.
+	 * @param dataSource The data source.
+	 * @return The dialect.
+	 */
 	public static Dialect determineDialect(DataSource dataSource) {
 		String vendor = null;
 		try (Connection c = dataSource.getConnection()) {

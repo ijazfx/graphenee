@@ -18,10 +18,16 @@ package io.graphenee.vaadin.flow;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * The main configuration class for Graphenee Flow.
+ */
 @Configuration
 @ComponentScan(basePackages = { GrapheneeFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
 public class GrapheneeFlowConfiguration {
 
+	/**
+	 * The base package for component scanning.
+	 */
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.vaadin.flow";
 
 }

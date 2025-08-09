@@ -10,14 +10,27 @@ import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.common.GxAuthenticatedUser;
 
+/**
+ * A utility class for the dashboard.
+ */
 public class DashboardUtils {
 
 	private static final Map<GxAuthenticatedUser, UI> UI_MAP = new ConcurrentHashMap<>(new HashMap<>());
 
+	/**
+	 * Sets the current UI for a user.
+	 * @param user The user.
+	 * @param ui The UI.
+	 */
 	public static void setCurrentUI(GxAuthenticatedUser user, UI ui) {
 		UI_MAP.put(user, ui);
 	}
 
+	/**
+	 * Gets the current UI for a user.
+	 * @param user The user.
+	 * @return The UI.
+	 */
 	public static UI getCurrentUI(GxAuthenticatedUser user) {
 		UI ui = UI_MAP.get(user);
 		if (ui != null && !ui.isClosing())
@@ -26,16 +39,31 @@ public class DashboardUtils {
 		return null;
 	}
 
+	/**
+	 * Gets the logged in user.
+	 * @param <T> The user type.
+	 * @return The logged in user.
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends GxAuthenticatedUser> T getLoggedInUser() {
 		return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
 	}
 
+	/**
+	 * Gets the logged in user.
+	 * @param <T> The user type.
+	 * @param vaadinSession The Vaadin session.
+	 * @return The logged in user.
+	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends GxAuthenticatedUser> T getLoggedInUser(VaadinSession vaadinSession) {
 		return (T) vaadinSession.getAttribute(GxAuthenticatedUser.class.getName());
 	}
 
+	/**
+	 * Gets the logged in username.
+	 * @return The logged in username.
+	 */
 	public static String getLoggedInUsername() {
 		GxAuthenticatedUser loggedInUser = DashboardUtils.getLoggedInUser();
 		final String targetUser;
@@ -47,6 +75,10 @@ public class DashboardUtils {
 		return targetUser;
 	}
 
+	/**
+	 * Gets the query map.
+	 * @return The query map.
+	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String[]> getQueryMap() {
 		Map<String, String[]> map = (Map<String, String[]>) VaadinSession.getCurrent().getAttribute("gx-QueryMap");
@@ -56,6 +88,11 @@ public class DashboardUtils {
 		return map;
 	}
 
+	/**
+	 * Gets the query map.
+	 * @param vaadinSession The Vaadin session.
+	 * @return The query map.
+	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String[]> getQueryMap(VaadinSession vaadinSession) {
 		Map<String, String[]> map = (Map<String, String[]>) vaadinSession.getAttribute("gx-QueryMap");
@@ -65,6 +102,10 @@ public class DashboardUtils {
 		return map;
 	}
 
+	/**
+	 * Gets the remote address.
+	 * @return The remote address.
+	 */
 	public static String getRemoteAddress() {
 		return VaadinRequest.getCurrent().getRemoteAddr();
 	}

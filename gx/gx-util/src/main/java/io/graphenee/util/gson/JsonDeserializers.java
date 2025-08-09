@@ -31,11 +31,23 @@ import com.google.gson.JsonSerializer;
 
 import io.graphenee.util.TRCalendarUtil;
 
+/**
+ * A utility class for creating JSON deserializers.
+ */
 public class JsonDeserializers {
 
+	/**
+	 * A JSON deserializer for timestamps.
+	 */
 	public static final JsonDeserializer<Timestamp> TIMESTAMP_DESERIALIZER = new TimestampDeserializer();
+	/**
+	 * A JSON serializer for timestamps.
+	 */
 	public static final JsonSerializer<Timestamp> TIMESTAMP_SERIALIZER = new TimestampSerializer();
 
+	/**
+	 * A JSON deserializer for timestamps.
+	 */
 	public static class TimestampDeserializer implements JsonDeserializer<Timestamp> {
 
 		@Override
@@ -65,6 +77,9 @@ public class JsonDeserializers {
 		}
 	}
 
+	/**
+	 * A JSON serializer for timestamps.
+	 */
 	public static class TimestampSerializer implements JsonSerializer<Timestamp> {
 
 		@Override
@@ -76,6 +91,9 @@ public class JsonDeserializers {
 
 	}
 
+	/**
+	 * A JSON deserializer for byte arrays.
+	 */
 	public static class ByteArrayDeserializer implements JsonDeserializer<byte[]> {
 
 		@Override

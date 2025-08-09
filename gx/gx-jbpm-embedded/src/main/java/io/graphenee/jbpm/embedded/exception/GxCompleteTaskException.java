@@ -15,17 +15,33 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded.exception;
 
+/**
+ * An exception that is thrown when a task cannot be completed.
+ */
 @SuppressWarnings("serial")
 public class GxCompleteTaskException extends GxTaskException {
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param e The cause of this exception.
+	 */
 	public GxCompleteTaskException(Exception e) {
 		super(e);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 */
 	public GxCompleteTaskException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 * @param e The cause of this exception.
+	 */
 	public GxCompleteTaskException(String message, Exception e) {
 		super(message, e);
 	}

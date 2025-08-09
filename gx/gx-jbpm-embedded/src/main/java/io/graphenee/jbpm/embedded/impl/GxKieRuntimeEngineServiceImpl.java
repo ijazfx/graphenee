@@ -34,8 +34,18 @@ import org.springframework.stereotype.Service;
 import io.graphenee.jbpm.embedded.GxKieRuntimeEngineService;
 import jakarta.persistence.EntityManagerFactory;
 
+/**
+ * An implementation of {@link GxKieRuntimeEngineService}.
+ */
 @Service
 public class GxKieRuntimeEngineServiceImpl implements GxKieRuntimeEngineService {
+
+	/**
+	 * Creates a new instance of this service.
+	 */
+	public GxKieRuntimeEngineServiceImpl() {
+		// a default constructor
+	}
 
 	@Autowired
 	@Qualifier("jbpmEntityManagerFactory")

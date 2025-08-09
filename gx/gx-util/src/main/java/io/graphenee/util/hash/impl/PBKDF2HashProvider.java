@@ -27,10 +27,17 @@ import com.lambdaworks.crypto.PBKDF;
  */
 public class PBKDF2HashProvider extends AbstractHashProvider {
 
+	/**
+	 * The encryption algorithm used by this provider.
+	 */
 	public static final String ENCRYPTION = "PBKDF2";
 
 	private String pbkdf2Salt;
 
+	/**
+	 * Creates a new instance of this provider.
+	 * @param salt The salt to use.
+	 */
 	public PBKDF2HashProvider(String salt) {
 		this.pbkdf2Salt = salt;
 	}

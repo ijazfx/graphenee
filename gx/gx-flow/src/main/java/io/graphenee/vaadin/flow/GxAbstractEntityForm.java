@@ -42,6 +42,11 @@ import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * An abstract entity form.
+ *
+ * @param <T> The entity type.
+ */
 @Slf4j
 public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
@@ -75,6 +80,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	@Setter
 	private boolean dialogAutoClose = true;
 
+	/**
+	 * Creates a new instance of this form.
+	 * @param entityClass The entity class.
+	 */
 	public GxAbstractEntityForm(Class<T> entityClass) {
 		this.entityClass = entityClass;
 		setSizeFull();
@@ -204,11 +213,20 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	}
 
+	/**
+	 * Shows the form.
+	 * @param entity The entity to show.
+	 */
 	public void show(T entity) {
 		this.parent = null;
 		showInDialog(entity);
 	}
 
+	/**
+	 * Shows the form.
+	 * @param entity The entity to show.
+	 * @param host The host component.
+	 */
 	public void show(T entity, HasComponents host) {
 		setEntity(entity);
 		this.parent = host;
@@ -223,6 +241,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		dismiss();
 	}
 
+	/**
+	 * Dismisses the form.
+	 */
 	public void dismiss() {
 		if (dialog != null) {
 			dialog.close();
@@ -233,6 +254,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 	}
 
+	/**
+	 * Validates the form.
+	 * @throws ValidationException If the form is invalid.
+	 */
 	public void validateForm() throws ValidationException {
 		dataBinder.validate();
 		dataBinder.writeBean(entity);
@@ -344,6 +369,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 	}
 
+	/**
+	 * Sets whether the form is editable.
+	 * @param editable Whether the form is editable.
+	 */
 	public void setEditable(boolean editable) {
 		this.editable = editable;
 		if (saveButton != null) {
@@ -351,10 +380,18 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 	}
 
+	/**
+	 * Checks if the form is editable.
+	 * @return True if the form is editable, false otherwise.
+	 */
 	public boolean isEditable() {
 		return editable;
 	}
 
+	/**
+	 * Sets the entity.
+	 * @param entity The entity.
+	 */
 	public void setEntity(T entity) {
 		this.entity = entity;
 		build();
@@ -411,10 +448,19 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		return false;
 	}
 
+	/**
+	 * Gets the entity.
+	 * @return The entity.
+	 */
 	public T getEntity() {
 		return entity;
 	}
 
+	/**
+	 * Shows the form in a dialog.
+	 * @param entity The entity to show.
+	 * @return The dialog.
+	 */
 	public GxDialog showInDialog(T entity) {
 		return showInDialog(entity, dialogWidth(), dialogHeight());
 	}
@@ -454,6 +500,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		return dialog;
 	}
 
+	/**
+	 * Sets the delegate.
+	 * @param delegate The delegate.
+	 */
 	public void setDelegate(EntityFormDelegate<T> delegate) {
 		this.delegate = delegate;
 	}
@@ -517,12 +567,29 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 	}
 
+	/**
+	 * A delegate for the entity form.
+	 *
+	 * @param <T> The entity type.
+	 */
 	public interface EntityFormDelegate<T> {
+		/**
+		 * Called when the entity is saved.
+		 * @param entity The entity.
+		 */
 		void onSave(T entity);
 
+		/**
+		 * Called when the form is dismissed.
+		 * @param entity The entity.
+		 */
 		default void onDismiss(T entity) {
 		}
 
+		/**
+		 * Called when the form is reset.
+		 * @param entity The entity.
+		 */
 		default void onReset(T entity) {
 		}
 	}
@@ -533,23 +600,59 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	HashSet<GxEntityFormEventListener<T>> listeners = new HashSet<>();
 
+	/**
+	 * Registers a listener.
+	 * @param listener The listener to register.
+	 */
 	public void registerListener(GxEntityFormEventListener<T> listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * Unregisters a listener.
+	 * @param listener The listener to unregister.
+	 */
 	public void unregisterListener(GxEntityFormEventListener<T> listener) {
 		listeners.remove(listener);
 	}
 
+	/**
+	 * An event listener for the entity form.
+	 *
+	 * @param <T> The entity type.
+	 */
 	public static interface GxEntityFormEventListener<T> {
+		/**
+		 * An enum that represents the events of the entity form.
+		 */
 		public enum GxEntityFormEvent {
+			/**
+			 * The save event.
+			 */
 			SAVE,
+			/**
+			 * The dismiss event.
+			 */
 			DISMISS,
+			/**
+			 * The reset event.
+			 */
 			RESET,
+			/**
+			 * The pre-bind event.
+			 */
 			PRE_BIND,
+			/**
+			 * The post-bind event.
+			 */
 			POST_BIND
 		}
 
+		/**
+		 * Called when an event occurs.
+		 * @param event The event.
+		 * @param entity The entity.
+		 */
 		void onEvent(GxEntityFormEvent event, T entity);
 	}
 

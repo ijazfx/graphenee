@@ -27,30 +27,57 @@ import sawtooth.sdk.signing.CryptoFactory;
 import sawtooth.sdk.signing.PrivateKey;
 import sawtooth.sdk.signing.Secp256k1PrivateKey;
 
+/**
+ * A client for the Sawtooth REST API.
+ */
 public class SawtoothClient {
 
 	private SawtoothRestService service;
 	private ECKey transactionSignerECKey, batchSignerECKey;
 
+	/**
+	 * Creates a new instance of this client.
+	 * @param endpoint The endpoint of the Sawtooth REST API.
+	 */
 	public SawtoothClient(String endpoint) {
 		Retrofit.Builder rb = new Retrofit.Builder().addConverterFactory(ScalarsConverterFactory.create()).addConverterFactory(GsonConverterFactory.create())
 				.addConverterFactory(ProtoConverterFactory.create());
 		service = rb.baseUrl(endpoint).build().create(SawtoothRestService.class);
 	}
 
+	/**
+	 * Sets the private key for the signer.
+	 * @param keyAsBytes The private key as a byte array.
+	 */
 	public void setSignerPrivateKey(byte[] keyAsBytes) {
 		setTransactionSignerPrivateKey(keyAsBytes);
 		setBatchSignerPrivateKey(keyAsBytes);
 	}
 
+	/**
+	 * Sets the private key for the transaction signer.
+	 * @param keyAsBytes The private key as a byte array.
+	 */
 	public void setTransactionSignerPrivateKey(byte[] keyAsBytes) {
 		transactionSignerECKey = ECKey.fromPrivate(keyAsBytes);
 	}
 
+	/**
+	 * Sets the private key for the batch signer.
+	 * @param keyAsBytes The private key as a byte array.
+	 */
 	public void setBatchSignerPrivateKey(byte[] keyAsBytes) {
 		batchSignerECKey = ECKey.fromPrivate(keyAsBytes);
 	}
 
+	/**
+	 * Submits a transaction.
+	 * @param familyName The name of the transaction family.
+	 * @param version The version of the transaction family.
+	 * @param inputAddress The input addresses.
+	 * @param outputAddress The output addresses.
+	 * @param payload The payload.
+	 */
 	public void submitTransaction(String familyName, String version, Collection<String> inputAddress, Collection<String> outputAddress, byte[] payload) {
 		try {
 			Secp256k1PrivateKey transactionSignerPrivateKey = Secp256k1PrivateKey.fromHex(transactionSignerECKey.getPrivateKeyAsHex());
@@ -88,6 +115,10 @@ public class SawtoothClient {
 		}
 	}
 
+	/**
+	 * The main method.
+	 * @param args The arguments.
+	 */
 	public static void main(String[] args) {
 		SawtoothClient cli = new SawtoothClient("http://localhost:8008");
 		//		cli.setSignerPrivateKey("d7f5894f14987b2bb56fdfed8c12e1cb40566bbc250a20c1e49a40ef4c050057".getBytes());
@@ -105,3 +136,5 @@ public class SawtoothClient {
 	}
 
 }
+
+

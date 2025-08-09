@@ -15,12 +15,27 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded;
 
+/**
+ * An interface that represents an assignee.
+ */
 public interface GxAssignee {
 
+	/**
+	 * Gets the username.
+	 * @return The username.
+	 */
 	String getUsername();
 
+	/**
+	 * Gets the full name.
+	 * @return The full name.
+	 */
 	String getFullName();
 
+	/**
+	 * Gets the email.
+	 * @return The email.
+	 */
 	String getEmail();
 
 }

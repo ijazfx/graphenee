@@ -33,11 +33,18 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A wrapper class for accessing values from a key-value object.
+ */
 public class KeyValueWrapper {
 
 	static final Logger L = LoggerFactory.getLogger(KeyValueWrapper.class);
 	static volatile DateFormat _iso8601DateFormat;
 
+	/**
+	 * Gets the ISO 8601 date format.
+	 * @return The date format.
+	 */
 	public static DateFormat iso8601DateFormat() {
 
 		if (_iso8601DateFormat == null) {
@@ -51,6 +58,11 @@ public class KeyValueWrapper {
 		return _iso8601DateFormat;
 	}
 
+	/**
+	 * Gets a date from an ISO 8601 date string.
+	 * @param dateString The date string.
+	 * @return The date.
+	 */
 	public static Date getDateFromISO8601DateString(String dateString) {
 		try {
 			return iso8601DateFormat().parse(dateString);
@@ -61,10 +73,19 @@ public class KeyValueWrapper {
 
 	Object wrappedObject;
 
+	/**
+	 * Creates a new instance of this wrapper.
+	 * @param wrappedObject The object to wrap.
+	 */
 	public KeyValueWrapper(Object wrappedObject) {
 		this.wrappedObject = wrappedObject;
 	}
 
+	/**
+	 * Gets a value for a key path.
+	 * @param keyPath The key path.
+	 * @return The value.
+	 */
 	public Object valueForKeyPath(String keyPath) {
 		String[] parts = keyPath.split("\\.");
 		Object currentObject = wrappedObject;
@@ -110,6 +131,12 @@ public class KeyValueWrapper {
 		return currentObject;
 	}
 
+	/**
+	 * Gets an array for a key path.
+	 * @param <T> The type of the array.
+	 * @param keyPath The key path.
+	 * @return The array.
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> Collection<T> arrayForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
@@ -137,6 +164,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a key-value wrapper array for a key path.
+	 * @param keyPath The key path.
+	 * @return The array.
+	 */
 	public Collection<KeyValueWrapper> kvwArrayForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -163,6 +195,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a string for a key path.
+	 * @param keyPath The key path.
+	 * @return The string.
+	 */
 	public String stringForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -173,6 +210,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a boolean for a key path.
+	 * @param keyPath The key path.
+	 * @return The boolean.
+	 */
 	public Boolean booleanForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -186,6 +228,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets an integer for a key path.
+	 * @param keyPath The key path.
+	 * @return The integer.
+	 */
 	public Integer intForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -199,6 +246,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a short for a key path.
+	 * @param keyPath The key path.
+	 * @return The short.
+	 */
 	public Short shortForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -212,6 +264,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a long for a key path.
+	 * @param keyPath The key path.
+	 * @return The long.
+	 */
 	public Long longForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -225,6 +282,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets an ISO 8601 date for a key path.
+	 * @param keyPath The key path.
+	 * @return The date.
+	 */
 	public Date iso8601DateForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -238,6 +300,12 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a date for a key path.
+	 * @param keyPath The key path.
+	 * @param datePattern The date pattern.
+	 * @return The date.
+	 */
 	public Date dateForKeyPath(String keyPath, String datePattern) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -251,6 +319,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a float for a key path.
+	 * @param keyPath The key path.
+	 * @return The float.
+	 */
 	public Float floatForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {
@@ -264,6 +337,11 @@ public class KeyValueWrapper {
 		}
 	}
 
+	/**
+	 * Gets a double for a key path.
+	 * @param keyPath The key path.
+	 * @return The double.
+	 */
 	public Double doubleForKeyPath(String keyPath) {
 		Object value = valueForKeyPath(keyPath);
 		try {

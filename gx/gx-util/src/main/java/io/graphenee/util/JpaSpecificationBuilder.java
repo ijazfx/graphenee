@@ -12,6 +12,11 @@ import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.Join;
 
+/**
+ * A builder for creating JPA specifications.
+ *
+ * @param <T> The entity type.
+ */
 public class JpaSpecificationBuilder<T> {
 
 	private LinkedList<Specification<T>> specsQueue;
@@ -20,10 +25,19 @@ public class JpaSpecificationBuilder<T> {
 		specsQueue = new LinkedList<>();
 	}
 
+	/**
+	 * Gets a new instance of this builder.
+	 * @param <I> The entity type.
+	 * @return The new instance.
+	 */
 	public static <I> JpaSpecificationBuilder<I> get() {
 		return new JpaSpecificationBuilder<I>();
 	}
 
+	/**
+	 * Adds an AND operator to the specification.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> and() {
 		if (specsQueue.isEmpty())
 			return this;
@@ -35,6 +49,11 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Builds the specification.
+	 * @param <S> The entity type.
+	 * @return The specification.
+	 */
 	public <S extends T> Specification<T> build() {
 		and();
 		if (specsQueue.isEmpty())
@@ -42,6 +61,10 @@ public class JpaSpecificationBuilder<T> {
 		return specsQueue.removeFirst();
 	}
 
+	/**
+	 * Adds an OR operator to the specification.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> or() {
 		if (specsQueue.isEmpty())
 			return this;
@@ -53,6 +76,12 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an equals operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> eq(String key, Object value) {
 		if (value == null || (value instanceof String && value.toString().trim().length() == 0))
 			return this;
@@ -71,6 +100,12 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a not equals operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> ne(String key, Object value) {
 		if (value == null || (value instanceof String && value.toString().trim().length() == 0))
 			return this;
@@ -89,6 +124,12 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a like operator to the specification.
+	 * @param key The key.
+	 * @param pattern The pattern.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> like(String key, String pattern) {
 		if (pattern == null || pattern.trim().length() == 0)
 			return this;
@@ -108,6 +149,14 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a join to the specification.
+	 * @param <J> The join type.
+	 * @param on The join on.
+	 * @param key The key.
+	 * @param pattern The pattern.
+	 * @return This instance.
+	 */
 	public <J> JpaSpecificationBuilder<T> join(String on, String key, Object pattern) {
 		if (key == null || on == null || pattern == null)
 			return this;
@@ -137,6 +186,13 @@ public class JpaSpecificationBuilder<T> {
 		return pattern.toLowerCase();
 	}
 
+	/**
+	 * Adds a greater than operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public <VT extends Number> JpaSpecificationBuilder<T> gt(String key, VT value) {
 		if (value == null)
 			return this;
@@ -155,6 +211,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a greater than or equal to operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public <VT extends Number> JpaSpecificationBuilder<T> ge(String key, VT value) {
 		if (value == null)
 			return this;
@@ -173,6 +236,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a less than operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public <VT extends Number> JpaSpecificationBuilder<T> lt(String key, VT value) {
 		if (value == null)
 			return this;
@@ -191,9 +261,16 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a less than or equal to operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public <VT extends Number> JpaSpecificationBuilder<T> le(String key, VT value) {
 		if (value == null)
-			return this;
+			return this.and();
 		Specification<T> spec = (root, cq, cb) -> {
 			if (key.contains(".")) {
 				String[] parts = key.split("\\.");
@@ -209,6 +286,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a between operator to the specification.
+	 * @param key The key.
+	 * @param value1 The first value.
+	 * @param value2 The second value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> between(String key, Integer value1, Integer value2) {
 		if (value1 == null || value2 == null)
 			return this;
@@ -227,6 +311,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a between operator to the specification.
+	 * @param key The key.
+	 * @param value1 The first value.
+	 * @param value2 The second value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> between(String key, Long value1, Long value2) {
 		if (value1 == null || value2 == null)
 			return this;
@@ -245,6 +336,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a between operator to the specification.
+	 * @param key The key.
+	 * @param value1 The first value.
+	 * @param value2 The second value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> between(String key, Date value1, Date value2) {
 		if (value1 == null || value2 == null)
 			return this;
@@ -263,6 +361,12 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a before operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> before(String key, Date value) {
 		if (value == null)
 			return this;
@@ -282,6 +386,12 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a day operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> day(String key, Date value) {
 		if (value == null)
 			return this;
@@ -292,6 +402,12 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an after operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> after(String key, Date value) {
 		if (value == null)
 			return this;
@@ -311,6 +427,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an in operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param values The values.
+	 * @return This instance.
+	 */
 	public <VT> JpaSpecificationBuilder<T> in(String key, VT[] values) {
 		if (values == null || values.length == 0)
 			return this;
@@ -339,6 +462,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an in operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param values The values.
+	 * @return This instance.
+	 */
 	public <VT> JpaSpecificationBuilder<T> in(String key, Iterable<VT> values) {
 		if (values == null)
 			return this;
@@ -370,6 +500,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a not in operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param values The values.
+	 * @return This instance.
+	 */
 	public <VT> JpaSpecificationBuilder<T> notIn(String key, Iterable<VT> values) {
 		if (values == null)
 			return this;
@@ -401,6 +538,13 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds a not in operator to the specification.
+	 * @param <VT> The value type.
+	 * @param key The key.
+	 * @param values The values.
+	 * @return This instance.
+	 */
 	public <VT> JpaSpecificationBuilder<T> notIn(String key, VT[] values) {
 		if (values == null || values.length == 0)
 			return this;
@@ -429,6 +573,11 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an is empty operator to the specification.
+	 * @param key The key.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> isEmpty(String key) {
 		if (key == null)
 			return this;
@@ -439,6 +588,11 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an is not empty operator to the specification.
+	 * @param key The key.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> isNotEmpty(String key) {
 		if (key == null)
 			return this;
@@ -449,6 +603,11 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an is null operator to the specification.
+	 * @param key The key.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> isNull(String key) {
 		if (key == null)
 			return this;
@@ -467,6 +626,11 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
+	/**
+	 * Adds an is not null operator to the specification.
+	 * @param key The key.
+	 * @return This instance.
+	 */
 	public JpaSpecificationBuilder<T> isNotNull(String key) {
 		if (key == null)
 			return this;

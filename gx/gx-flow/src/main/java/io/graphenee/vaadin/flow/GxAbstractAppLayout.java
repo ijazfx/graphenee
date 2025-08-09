@@ -27,6 +27,9 @@ import io.graphenee.common.GxAuthenticatedUser;
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
 
+/**
+ * An abstract app layout.
+ */
 public abstract class GxAbstractAppLayout extends AppLayout {
 
 	private static final long serialVersionUID = 1L;
@@ -130,6 +133,10 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	}
 
+	/**
+	 * Customizes the avatar.
+	 * @param avatar The avatar to customize.
+	 */
 	protected void customizeAvatar(Avatar avatar) {
 	}
 
@@ -201,18 +208,42 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		});
 	}
 
+	/**
+	 * Gets the flow setup.
+	 * @return The flow setup.
+	 */
 	protected abstract GxAbstractFlowSetup flowSetup();
 
+	/**
+	 * An enum that represents the position of the logo.
+	 */
 	public static enum LogoPosition {
+		/**
+		 * The logo is in the title bar.
+		 */
 		TITLE_BAR,
+		/**
+		 * The logo is in the drawer.
+		 */
 		DRAWER
 	}
 
+	/**
+	 * Gets the position of the logo.
+	 * @return The position of the logo.
+	 */
 	protected LogoPosition logoPosition() {
 		return LogoPosition.TITLE_BAR;
 	}
 
+	/**
+	 * A delegate for the app layout.
+	 */
 	public static interface GxAbstractAppLayoutDelegate {
+		/**
+		 * Called when the user logs out.
+		 * @param ui The UI.
+		 */
 		default void onLogout(UI ui) {
 			ui.navigate("/");
 		}

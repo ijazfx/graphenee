@@ -26,8 +26,17 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxNotification;
 
+/**
+ * An abstract form for user tasks.
+ *
+ * @param <T> The entity type.
+ */
 public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
+	/**
+	 * Creates a new instance of this form.
+	 * @param entityClass The entity class.
+	 */
 	public GxUserTaskForm(Class<T> entityClass) {
 		super(entityClass);
 	}
@@ -43,6 +52,9 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 	private Button skipButton;
 	private Button assignButton;
 
+	/**
+	 * The listeners for this form.
+	 */
 	public Set<GxTaskActionListener<T>> listeners = new HashSet<>();
 
 	@Override
@@ -52,18 +64,34 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 		return "User Task";
 	}
 
+	/**
+	 * Initializes the form with a user task.
+	 * @param userTask The user task.
+	 */
 	public void initializeWithTask(GxUserTask userTask) {
 		this.userTask = userTask;
 	}
 
+	/**
+	 * Gets the caption for the complete button.
+	 * @return The caption for the complete button.
+	 */
 	protected String completeButtonCaption() {
 		return "Complete";
 	}
 
+	/**
+	 * Gets the caption for the reject button.
+	 * @return The caption for the reject button.
+	 */
 	protected String rejectButtonCaption() {
 		return "Reject";
 	}
 
+	/**
+	 * Gets the caption for the approve button.
+	 * @return The caption for the approve button.
+	 */
 	protected String approveButtonCaption() {
 		return "Approve";
 	}
@@ -137,6 +165,12 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 	}
 
+	/**
+	 * Called when the task is rejected.
+	 * @param taskData The task data.
+	 * @param entity The entity.
+	 * @param handler The handler.
+	 */
 	protected void onReject(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
@@ -172,6 +206,12 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 		});
 	}
 
+	/**
+	 * Called when the task is approved.
+	 * @param taskData The task data.
+	 * @param entity The entity.
+	 * @param handler The handler.
+	 */
 	protected void onApprove(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
@@ -226,6 +266,11 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 	}
 
+	/**
+	 * Called when the task is assigned.
+	 * @param entity The entity.
+	 * @param assigner The assigner.
+	 */
 	protected void onAssign(T entity, GxUserTaskAssigner assigner) {
 	}
 
@@ -261,6 +306,11 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 		});
 	}
 
+	/**
+	 * Called when the task is skipped.
+	 * @param entity The entity.
+	 * @param skipper The skipper.
+	 */
 	protected void onSkip(T entity, GxUserTaskSkipper skipper) {
 	}
 
@@ -296,6 +346,12 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 		});
 	}
 
+	/**
+	 * Called when the task is completed.
+	 * @param taskData The task data.
+	 * @param entity The entity.
+	 * @param handler The handler.
+	 */
 	protected void onComplete(Map<String, Object> taskData, T entity, GxUserTaskHandler handler) {
 	}
 
@@ -320,67 +376,178 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 		assignButton.setVisible(valid && isAssignable());
 	}
 
+	/**
+	 * Called after the task is approved.
+	 * @param entity The entity.
+	 * @throws GxCompleteTaskException If the task cannot be completed.
+	 */
 	protected void onPostApprove(T entity) throws GxCompleteTaskException {
 	}
 
+	/**
+	 * Called after the task is rejected.
+	 * @param entity The entity.
+	 * @throws GxCompleteTaskException If the task cannot be completed.
+	 */
 	protected void onPostReject(T entity) throws GxCompleteTaskException {
 	}
 
+	/**
+	 * Called after the task is completed.
+	 * @param entity The entity.
+	 * @throws GxCompleteTaskException If the task cannot be completed.
+	 */
 	protected void onPostComplete(T entity) throws GxCompleteTaskException {
 	}
 
+	/**
+	 * Called after the task is assigned.
+	 * @param assignee The assignee.
+	 * @param entity The entity.
+	 * @throws GxAssignTaskException If the task cannot be assigned.
+	 */
 	protected void onPostAssign(GxAssignee assignee, T entity) throws GxAssignTaskException {
 	}
 
+	/**
+	 * Called after the task is skipped.
+	 * @param entity The entity.
+	 * @throws GxSkipTaskException If the task cannot be skipped.
+	 */
 	protected void onPostSkip(T entity) throws GxSkipTaskException {
 	}
 
+	/**
+	 * Adds a task action listener.
+	 * @param listener The listener to add.
+	 */
 	public void addTaskActionListener(GxTaskActionListener<T> listener) {
 		listeners.add(listener);
 	}
 
+	/**
+	 * An interface for task action listeners.
+	 *
+	 * @param <T> The entity type.
+	 */
 	public static interface GxTaskActionListener<T> {
+		/**
+		 * Called when an action is performed on a task.
+		 * @param action The action.
+		 * @param userTask The user task.
+		 * @param entity The entity.
+		 */
 		void onAction(GxTaskAction action, GxUserTask userTask, T entity);
 	}
 
+	/**
+	 * An enum that represents the actions that can be performed on a task.
+	 */
 	public static enum GxTaskAction {
+		/**
+		 * The task was approved.
+		 */
 		APPROVED,
+		/**
+		 * The task was rejected.
+		 */
 		REJECTED,
+		/**
+		 * The task was completed.
+		 */
 		COMPLETED,
+		/**
+		 * The task was assigned.
+		 */
 		ASSIGNED,
+		/**
+		 * The task was skipped.
+		 */
 		SKIPPED
 	}
 
+	/**
+	 * Checks if the form is an approval form.
+	 * @return True if the form is an approval form, false otherwise.
+	 */
 	protected abstract boolean isApprovalForm();
 
+	/**
+	 * Checks if the task is assignable.
+	 * @return True if the task is assignable, false otherwise.
+	 */
 	protected abstract boolean isAssignable();
 
+	/**
+	 * Gets the user task.
+	 * @return The user task.
+	 */
 	public GxUserTask getUserTask() {
 		assert userTask != null;
 		return userTask;
 	}
 
+	/**
+	 * An interface for user task handlers.
+	 */
 	public static interface GxUserTaskHandler {
+		/**
+		 * Proceeds with the task.
+		 */
 		void proceed();
 
+		/**
+		 * Cancels the task.
+		 */
 		void cancel();
 
+		/**
+		 * Called when an error occurs.
+		 * @param t The error.
+		 */
 		void error(Throwable t);
 	}
 
+	/**
+	 * An interface for user task assigners.
+	 */
 	public static interface GxUserTaskAssigner {
+		/**
+		 * Assigns the task.
+		 * @param assignees The assignees.
+		 */
 		void assign(Collection<GxAssignee> assignees);
 
+		/**
+		 * Cancels the assignment.
+		 */
 		void cancel();
 
+		/**
+		 * Called when an error occurs.
+		 * @param t The error.
+		 */
 		void error(Throwable t);
 	}
 
+	/**
+	 * An interface for user task skippers.
+	 */
 	public static interface GxUserTaskSkipper {
+		/**
+		 * Skips the task.
+		 */
 		void skip();
 
+		/**
+		 * Cancels the skip.
+		 */
 		void cancel();
 
+		/**
+		 * Called when an error occurs.
+		 * @param t The error.
+		 */
 		void error(Throwable t);
 	}
 

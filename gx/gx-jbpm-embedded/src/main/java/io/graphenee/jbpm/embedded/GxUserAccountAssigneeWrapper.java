@@ -17,10 +17,20 @@ package io.graphenee.jbpm.embedded;
 
 import io.graphenee.core.model.bean.GxUserAccountBean;
 
+/**
+ * A wrapper for a {@link GxUserAccountBean} that implements {@link GxAssignee}.
+ */
 public class GxUserAccountAssigneeWrapper implements GxAssignee {
 
+	/**
+	 * The user account.
+	 */
 	public GxUserAccountBean userAccount;
 
+	/**
+	 * Creates a new instance of this wrapper.
+	 * @param userAccount The user account.
+	 */
 	public GxUserAccountAssigneeWrapper(GxUserAccountBean userAccount) {
 		this.userAccount = userAccount;
 	}

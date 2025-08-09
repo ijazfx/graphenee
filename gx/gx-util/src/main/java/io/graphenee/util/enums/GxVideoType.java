@@ -15,11 +15,29 @@
  *******************************************************************************/
 package io.graphenee.util.enums;
 
+/**
+ * An enum that represents the type of a video file.
+ */
 public enum GxVideoType {
+	/**
+	 * WebM video.
+	 */
 	WEBM_VIDEO("video/webm", "webm"),
+	/**
+	 * MP4 video.
+	 */
 	MP4("video/mp4", "mp4"),
+	/**
+	 * M4V video.
+	 */
 	M4V("video/m4v", "m4v"),
+	/**
+	 * MPEG video.
+	 */
 	MPEG("video/mpeg", "mpeg"),
+	/**
+	 * OGG video.
+	 */
 	OGG_VIDEO("video/ogg", "ogg");
 
 	private String mimeType;
@@ -31,22 +49,43 @@ public enum GxVideoType {
 		this.extension = extension;
 	}
 
+	/**
+	 * Gets the MIME type.
+	 * @return The MIME type.
+	 */
 	public String getMimeType() {
 		return mimeType;
 	}
 
+	/**
+	 * Sets the MIME type.
+	 * @param mimeType The MIME type.
+	 */
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
 
+	/**
+	 * Gets the extension.
+	 * @return The extension.
+	 */
 	public String getExtension() {
 		return extension;
 	}
 
+	/**
+	 * Sets the extension.
+	 * @param extension The extension.
+	 */
 	public void setExtension(String extension) {
 		this.extension = extension;
 	}
 
+	/**
+	 * Finds a video type by MIME type.
+	 * @param mimeType The MIME type.
+	 * @return The video type.
+	 */
 	public static GxVideoType findByMimeType(String mimeType) {
 		if (mimeType.equals(GxVideoType.WEBM_VIDEO.mimeType))
 			return GxVideoType.WEBM_VIDEO;

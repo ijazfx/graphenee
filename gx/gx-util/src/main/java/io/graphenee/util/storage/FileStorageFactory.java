@@ -26,12 +26,34 @@ import java.util.concurrent.Future;
 
 import org.springframework.util.StreamUtils;
 
+/**
+ * A factory for creating file storage instances.
+ */
 public class FileStorageFactory {
 
+	/**
+	 * Creates a new instance of this factory.
+	 */
+	public FileStorageFactory() {
+		// a default constructor
+	}
+
+	/**
+	 * Creates a new local file storage.
+	 * @param rootFolder The root folder.
+	 * @return The new file storage.
+	 */
 	public static FileStorage createLocalFileStorage(File rootFolder) {
 		return new LocalFileStorage(rootFolder);
 	}
 
+	/**
+	 * Creates a new S3 file storage.
+	 * @param awsKey The AWS key.
+	 * @param awsSecret The AWS secret.
+	 * @param bucketName The bucket name.
+	 * @return The new file storage.
+	 */
 	public static FileStorage createS3FileStorage(String awsKey, String awsSecret, String bucketName) {
 		throw new UnsupportedOperationException("This feature is not yet implemented.");
 	}

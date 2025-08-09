@@ -18,7 +18,17 @@ package io.graphenee.util;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A utility class for conversions.
+ */
 public class ConversionUtil {
+
+	/**
+	 * Creates a new instance of this utility class.
+	 */
+	public ConversionUtil() {
+		// a default constructor
+	}
 
 	private static Map<Integer, String> NUMBER_RANK_TO_WORD_MAP = new HashMap<>();
 
@@ -45,16 +55,31 @@ public class ConversionUtil {
 		NUMBER_RANK_TO_WORD_MAP.put(20, "Twentieth");
 	}
 
+	/**
+	 * Converts a number rank to a word.
+	 * @param number The number rank.
+	 * @return The word.
+	 */
 	public static String numberRankToWord(Integer number) {
 		return NUMBER_RANK_TO_WORD_MAP.get(number);
 	}
 
+	/**
+	 * Converts text to HTML.
+	 * @param text The text to convert.
+	 * @return The HTML.
+	 */
 	public static String textToHtml(String text) {
 		if (text != null)
 			return text.replace("\n", "<br/>").replaceAll("\\s", "&nbsp;");
 		return text;
 	}
 
+	/**
+	 * Truncates a number.
+	 * @param floatNumber The number to truncate.
+	 * @return The truncated number.
+	 */
 	public static String truncateNumber(double floatNumber) {
 		long million = 1000000L;
 		long billion = 1000000000L;
@@ -70,6 +95,12 @@ public class ConversionUtil {
 		return Long.toString(number);
 	}
 
+	/**
+	 * Calculates the fraction of a number.
+	 * @param number The number.
+	 * @param divisor The divisor.
+	 * @return The fraction.
+	 */
 	public static float calculateFraction(long number, long divisor) {
 		long truncate = (number * 10L + (divisor / 2L)) / divisor;
 		float fraction = (float) truncate * 0.10F;

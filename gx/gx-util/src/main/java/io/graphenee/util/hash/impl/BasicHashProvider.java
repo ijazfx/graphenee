@@ -16,13 +16,23 @@
 package io.graphenee.util.hash.impl;
 
 /**
- * Basic implementation.
+ * Basic implementation of a hash provider.
  *
  * @author ijazfx
  */
 public class BasicHashProvider extends AbstractHashProvider {
 
+	/**
+	 * The encryption algorithm used by this provider.
+	 */
 	public static final String ENCRYPTION = "Basic";
+
+	/**
+	 * Creates a new instance of this provider.
+	 */
+	public BasicHashProvider() {
+		// a default constructor
+	}
 
 	@Override
 	public String encryption() {

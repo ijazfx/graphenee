@@ -26,10 +26,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class provides the JSON Utility Methods
- * 
+ *
  * @author ijazfx
  */
 public class JSONUtils {
+	/**
+	 * Converts a JSON string to an object.
+	 * @param <T> The type of the object.
+	 * @param klass The class of the object.
+	 * @param json The JSON string.
+	 * @return The object.
+	 */
 	public static <T> T jsonToObject(Class<T> klass, String json) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -45,6 +52,15 @@ public class JSONUtils {
 		return null;
 	}
 
+	/**
+	 * Converts a JSON string to an object.
+	 * @param <A> The type of the parametric class.
+	 * @param <B> The type of the object class.
+	 * @param parametricClass The parametric class.
+	 * @param objectClass The object class.
+	 * @param json The JSON string.
+	 * @return The object.
+	 */
 	// this method returns A<B>
 	public static <A, B> A jsonToObject(Class<A> parametricClass, Class<B> objectClass, String json) {
 		ObjectMapper mapper = new ObjectMapper();
@@ -62,6 +78,11 @@ public class JSONUtils {
 		return null;
 	}
 
+	/**
+	 * Converts an object to a JSON string.
+	 * @param object The object.
+	 * @return The JSON string.
+	 */
 	public static String objectToJson(Object object) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {

@@ -4,6 +4,9 @@ import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
 
+/**
+ * A converter that converts a {@link Double} to a {@link Float}.
+ */
 public class DoubleToFloatConverter implements Converter<Double, Float> {
 	private static final long serialVersionUID = 1L;
 

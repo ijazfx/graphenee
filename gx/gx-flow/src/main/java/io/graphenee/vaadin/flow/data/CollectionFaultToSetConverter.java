@@ -10,6 +10,11 @@ import com.vaadin.flow.data.converter.Converter;
 
 import io.graphenee.common.data.CollectionFault;
 
+/**
+ * A converter that converts a {@link CollectionFault} to a {@link Set}.
+ *
+ * @param <T> The bean type.
+ */
 public class CollectionFaultToSetConverter<T> implements Converter<Set<T>, CollectionFault<T>> {
 
 	private static final long serialVersionUID = 1L;

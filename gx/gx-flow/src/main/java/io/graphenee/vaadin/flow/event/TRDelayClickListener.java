@@ -10,6 +10,7 @@ import com.vaadin.flow.component.ComponentEventListener;
 /**
  * ClickListner to prevent multiple click behavior.
  * @author fijaz
+ * @param <T> The component type.
  *
  */
 public abstract class TRDelayClickListener<T extends Component> implements ComponentEventListener<ClickEvent<T>>, Serializable {

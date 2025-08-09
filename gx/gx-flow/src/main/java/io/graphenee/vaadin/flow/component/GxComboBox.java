@@ -13,6 +13,7 @@ import lombok.Setter;
 
 /**
  * GxComboBox
+ * @param <T> The bean type.
  */
 public class GxComboBox<T> extends ComboBox<T> {
 	private static final long serialVersionUID = 1L;

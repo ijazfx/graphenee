@@ -15,25 +15,51 @@
  *******************************************************************************/
 package io.graphenee.common.exception;
 
+/**
+ * An exception that is thrown when a password change is required.
+ */
 @SuppressWarnings("serial")
 public class PasswordChangeRequiredException extends Exception {
 
+	/**
+	 * Creates a new instance of this exception.
+	 */
 	public PasswordChangeRequiredException() {
 		super();
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 * @param cause The cause.
+	 * @param enableSuppression Whether or not suppression is enabled or disabled.
+	 * @param writableStackTrace Whether or not the stack trace should be writable.
+	 */
 	public PasswordChangeRequiredException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 * @param cause The cause.
+	 */
 	public PasswordChangeRequiredException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 */
 	public PasswordChangeRequiredException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param cause The cause.
+	 */
 	public PasswordChangeRequiredException(Throwable cause) {
 		super(cause);
 	}

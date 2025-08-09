@@ -15,16 +15,56 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded;
 
+/**
+ * An interface for KIE services.
+ */
 public interface GxKieService {
 
+	/**
+	 * Gets the value of a variable.
+	 * @param processInstanceId The process instance ID.
+	 * @param variableName The name of the variable.
+	 * @return The value of the variable.
+	 */
 	public Object getVariableValue(Long processInstanceId, String variableName);
 
+	/**
+	 * Gets the value of a variable.
+	 * @param processInstanceId The process instance ID.
+	 * @param variableName The name of the variable.
+	 * @param defaultValue The default value.
+	 * @return The value of the variable.
+	 */
 	public Object getVariableValue(Long processInstanceId, String variableName, Object defaultValue);
 
+	/**
+	 * Gets the value of a variable.
+	 * @param <T> The type of the variable.
+	 * @param processInstanceId The process instance ID.
+	 * @param variableName The name of the variable.
+	 * @param variableType The type of the variable.
+	 * @return The value of the variable.
+	 */
 	public <T> T getVariableValue(Long processInstanceId, String variableName, Class<? extends T> variableType);
 
+	/**
+	 * Gets the value of a variable.
+	 * @param <T> The type of the variable.
+	 * @param processInstanceId The process instance ID.
+	 * @param variableName The name of the variable.
+	 * @param variableType The type of the variable.
+	 * @param defaultValue The default value.
+	 * @return The value of the variable.
+	 */
 	public <T> T getVariableValue(Long processInstanceId, String variableName, Class<? extends T> variableType, T defaultValue);
 
+	/**
+	 * Gets the value of a variable as a long.
+	 * @param processInstanceId The process instance ID.
+	 * @param variableName The name of the variable.
+	 * @param defaultValue The default value.
+	 * @return The value of the variable.
+	 */
 	public Long getVariableValueAsLong(Long processInstanceId, String variableName, Long defaultValue);
 
 }

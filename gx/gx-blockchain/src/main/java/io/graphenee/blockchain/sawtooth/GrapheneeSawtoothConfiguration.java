@@ -18,10 +18,16 @@ package io.graphenee.blockchain.sawtooth;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * The main configuration class for Graphenee Sawtooth.
+ */
 @Configuration
 @ComponentScan(GrapheneeSawtoothConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeSawtoothConfiguration {
 
+	/**
+	 * The base package for component scanning.
+	 */
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.blockchain.sawtooth";
 
 }

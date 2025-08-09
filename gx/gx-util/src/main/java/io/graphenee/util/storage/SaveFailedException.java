@@ -15,24 +15,50 @@
  *******************************************************************************/
 package io.graphenee.util.storage;
 
+/**
+ * An exception that is thrown when a save fails.
+ */
 @SuppressWarnings("serial")
 public class SaveFailedException extends Exception {
 
+	/**
+	 * Creates a new instance of this exception.
+	 */
 	public SaveFailedException() {
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 */
 	public SaveFailedException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param cause The cause.
+	 */
 	public SaveFailedException(Throwable cause) {
 		super(cause);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 * @param cause The cause.
+	 */
 	public SaveFailedException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 * @param cause The cause.
+	 * @param enableSuppression Whether or not suppression is enabled or disabled.
+	 * @param writableStackTrace Whether or not the stack trace should be writable.
+	 */
 	public SaveFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}

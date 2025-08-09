@@ -36,10 +36,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.util.StreamUtils;
 
+/**
+ * A utility class for handling images.
+ */
 public class TRImageUtil {
 
 	private static final Logger L = LoggerFactory.getLogger(TRImageUtil.class);
 
+	/**
+	 * Resizes an image.
+	 * @param sourceFile The source file.
+	 * @param targetFile The target file.
+	 * @return True if the image was resized, false otherwise.
+	 */
 	public static boolean resizeImage(File sourceFile, File targetFile) {
 		try {
 			// scale image on disk
@@ -57,6 +66,11 @@ public class TRImageUtil {
 		}
 	}
 
+	/**
+	 * Compresses an image.
+	 * @param sourceFile The source file.
+	 * @param targetFile The target file.
+	 */
 	public static void compressImage(File sourceFile, File targetFile) {
 		boolean compressed = false;
 		try {
@@ -83,6 +97,11 @@ public class TRImageUtil {
 		}
 	}
 
+	/**
+	 * Compresses an image.
+	 * @param sourceFile The source file.
+	 * @param targetStream The target stream.
+	 */
 	public static void compressImage(File sourceFile, OutputStream targetStream) {
 		boolean compressed = false;
 		try {
@@ -108,6 +127,11 @@ public class TRImageUtil {
 		}
 	}
 
+	/**
+	 * Compresses an image.
+	 * @param sourceStream The source stream.
+	 * @param targetFile The target file.
+	 */
 	public static void compressImage(InputStream sourceStream, File targetFile) {
 		boolean compressed = false;
 		try {
@@ -133,6 +157,12 @@ public class TRImageUtil {
 		}
 	}
 
+	/**
+	 * Compresses an image.
+	 * @param sourceStream The source stream.
+	 * @param targetStream The target stream.
+	 * @param imageWriter The image writer.
+	 */
 	public static void compressImage(InputStream sourceStream, OutputStream targetStream, ImageWriter imageWriter) {
 		try {
 			float imageQuality = 0.3f;
@@ -162,6 +192,13 @@ public class TRImageUtil {
 		}
 	}
 
+	/**
+	 * Resizes an image.
+	 * @param originalImage The original image.
+	 * @param type The image type.
+	 * @param targetWidth The target width.
+	 * @return The resized image.
+	 */
 	public static BufferedImage resizeImage(BufferedImage originalImage, int type, Integer targetWidth) {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();

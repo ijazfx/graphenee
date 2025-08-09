@@ -16,6 +16,8 @@
 package io.graphenee.util.hash;
 
 /**
+ * An exception that is thrown when a hash provider fails to register.
+ *
  * @author ijazfx
  */
 @SuppressWarnings("serial")

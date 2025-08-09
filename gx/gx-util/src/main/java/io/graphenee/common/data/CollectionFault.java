@@ -22,6 +22,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * A fault-tolerant collection that can be used to lazily load a collection of beans.
+ *
+ * @param <T> The bean type.
+ */
 public class CollectionFault<T> {
 
 	private boolean isFault = true;
@@ -33,9 +38,18 @@ public class CollectionFault<T> {
 	private Collection<T> values;
 	private Set<ModificationListener> modificationListeners;
 
+	/**
+	 * Creates a new instance of this fault.
+	 */
 	CollectionFault() {
 	}
 
+	/**
+	 * Creates a new instance of this fault from a collection.
+	 * @param <T> The bean type.
+	 * @param collection The collection to create the fault from.
+	 * @return The new fault.
+	 */
 	public static <T> CollectionFault<T> from(Collection<T> collection) {
 		CollectionFault<T> collectionFault = new CollectionFault<>(new ArrayList<>());
 		collection.forEach(item -> {
@@ -44,36 +58,80 @@ public class CollectionFault<T> {
 		return collectionFault;
 	}
 
+	/**
+	 * Creates a new empty instance of this fault.
+	 * @param <T> The bean type.
+	 * @return The new fault.
+	 */
 	public static <T> CollectionFault<T> emptyCollectionFault() {
 		return new CollectionFault<>(new ArrayList<>());
 	}
 
+	/**
+	 * Creates a new instance of this fault from a collection.
+	 * @param <T> The bean type.
+	 * @param collection The collection to create the fault from.
+	 * @return The new fault.
+	 */
 	public static <T> CollectionFault<T> collectionFault(Collection<T> collection) {
 		return new CollectionFault<>(collection);
 	}
 
+	/**
+	 * Creates a new instance of this fault from a resolver.
+	 * @param <T> The bean type.
+	 * @param resolver The resolver to create the fault from.
+	 * @return The new fault.
+	 */
 	public static <T> CollectionFault<T> collectionFault(Supplier<Collection<T>> resolver) {
 		return new CollectionFault<>(resolver);
 	}
 
+	/**
+	 * Creates a new instance of this fault from a collection and modification listeners.
+	 * @param <T> The bean type.
+	 * @param collection The collection to create the fault from.
+	 * @param modificationListeners The modification listeners.
+	 * @return The new fault.
+	 */
 	public static <T> CollectionFault<T> collectionFault(Collection<T> collection, ModificationListener... modificationListeners) {
 		return new CollectionFault<>(collection, modificationListeners);
 	}
 
+	/**
+	 * Creates a new instance of this fault from a resolver and modification listeners.
+	 * @param <T> The bean type.
+	 * @param resolver The resolver to create the fault from.
+	 * @param modificationListeners The modification listeners.
+	 * @return The new fault.
+	 */
 	public static <T> CollectionFault<T> collectionFault(Supplier<Collection<T>> resolver, ModificationListener... modificationListeners) {
 		return new CollectionFault<>(resolver, modificationListeners);
 	}
 
+	/**
+	 * Creates a new instance of this fault from a resolver.
+	 * @param resolver The resolver to create the fault from.
+	 */
 	public CollectionFault(Supplier<Collection<T>> resolver) {
 		this.resolver = resolver;
 	}
 
+	/**
+	 * Creates a new instance of this fault from a collection.
+	 * @param values The collection to create the fault from.
+	 */
 	public CollectionFault(Collection<T> values) {
 		this.resolver = () -> {
 			return values;
 		};
 	}
 
+	/**
+	 * Creates a new instance of this fault from a resolver and modification listeners.
+	 * @param resolver The resolver to create the fault from.
+	 * @param modificationListeners The modification listeners.
+	 */
 	public CollectionFault(Supplier<Collection<T>> resolver, ModificationListener... modificationListeners) {
 		this.resolver = resolver;
 		if (modificationListeners != null) {
@@ -83,6 +141,11 @@ public class CollectionFault<T> {
 		}
 	}
 
+	/**
+	 * Creates a new instance of this fault from a collection and modification listeners.
+	 * @param values The collection to create the fault from.
+	 * @param modificationListeners The modification listeners.
+	 */
 	public CollectionFault(Collection<T> values, ModificationListener... modificationListeners) {
 		this.resolver = () -> {
 			return values;
@@ -94,6 +157,9 @@ public class CollectionFault<T> {
 		}
 	}
 
+	/**
+	 * Invalidates this fault.
+	 */
 	public void invalidate() {
 		isFault = true;
 		isModified = false;
@@ -103,11 +169,19 @@ public class CollectionFault<T> {
 		valuesUpdated = null;
 	}
 
+	/**
+	 * Gets the invalidated collection.
+	 * @return The invalidated collection.
+	 */
 	public Collection<T> getInvalidatedCollection() {
 		invalidate();
 		return getCollection();
 	}
 
+	/**
+	 * Gets the collection.
+	 * @return The collection.
+	 */
 	public Collection<T> getCollection() {
 		isFault = false;
 		_initializeCollection();
@@ -123,6 +197,10 @@ public class CollectionFault<T> {
 		}
 	}
 
+	/**
+	 * Gets the added values.
+	 * @return The added values.
+	 */
 	public Collection<T> getAdded() {
 		_initializeAddedCollection();
 		return Collections.unmodifiableCollection(valuesAdded);
@@ -134,6 +212,10 @@ public class CollectionFault<T> {
 		}
 	}
 
+	/**
+	 * Gets the updated values.
+	 * @return The updated values.
+	 */
 	public Collection<T> getUpdated() {
 		_initializeUpdatedCollection();
 		return Collections.unmodifiableCollection(valuesUpdated);
@@ -145,6 +227,10 @@ public class CollectionFault<T> {
 		}
 	}
 
+	/**
+	 * Gets the removed values.
+	 * @return The removed values.
+	 */
 	public Collection<T> getRemoved() {
 		_initializeRemovedCollection();
 		return Collections.unmodifiableCollection(valuesRemoved);
@@ -156,6 +242,10 @@ public class CollectionFault<T> {
 		}
 	}
 
+	/**
+	 * Adds a value to this fault.
+	 * @param value The value to add.
+	 */
 	public void add(T value) {
 		_initializeCollection();
 		values.add(value);
@@ -170,6 +260,10 @@ public class CollectionFault<T> {
 		notificationModificationListeners();
 	}
 
+	/**
+	 * Updates a value in this fault.
+	 * @param value The value to update.
+	 */
 	public void update(T value) {
 		_initializeCollection();
 		values.remove(value);
@@ -181,6 +275,10 @@ public class CollectionFault<T> {
 		notificationModificationListeners();
 	}
 
+	/**
+	 * Removes a value from this fault.
+	 * @param value The value to remove.
+	 */
 	public void remove(T value) {
 		_initializeCollection();
 		values.remove(value);
@@ -199,15 +297,26 @@ public class CollectionFault<T> {
 		notificationModificationListeners();
 	}
 
+	/**
+	 * Checks if this is a fault.
+	 * @return True if this is a fault, false otherwise.
+	 */
 	public boolean isFault() {
 		return isFault;
 	}
 
+	/**
+	 * Checks if this fault has been modified.
+	 * @return True if this fault has been modified, false otherwise.
+	 */
 	public boolean isModified() {
 		return isModified || (valuesAdded != null && !valuesAdded.isEmpty())
 				|| (valuesRemoved != null && !valuesRemoved.isEmpty() || (valuesUpdated != null && !valuesUpdated.isEmpty()));
 	}
 
+	/**
+	 * Marks this fault as modified.
+	 */
 	public void markAsModified() {
 		this.isModified = true;
 	}
@@ -223,14 +332,25 @@ public class CollectionFault<T> {
 		return modificationListeners;
 	}
 
+	/**
+	 * Adds a modification listener to this fault.
+	 * @param modificationListener The modification listener to add.
+	 */
 	public void addModificationListener(ModificationListener modificationListener) {
 		getModificationListeners().add(modificationListener);
 	}
 
+	/**
+	 * Removes a modification listener from this fault.
+	 * @param modificationListener The modification listener to remove.
+	 */
 	public void removeModificationListener(ModificationListener modificationListener) {
 		getModificationListeners().remove(modificationListener);
 	}
 
+	/**
+	 * Notifies the modification listeners that this fault has been modified.
+	 */
 	public void notificationModificationListeners() {
 		if (modificationListeners == null) {
 			return;

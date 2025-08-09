@@ -15,24 +15,50 @@
  *******************************************************************************/
 package io.graphenee.util.storage;
 
+/**
+ * An exception that is thrown when a resolve fails.
+ */
 @SuppressWarnings("serial")
 public class ResolveFailedException extends Exception {
 
+	/**
+	 * Creates a new instance of this exception.
+	 */
 	public ResolveFailedException() {
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 */
 	public ResolveFailedException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param cause The cause.
+	 */
 	public ResolveFailedException(Throwable cause) {
 		super(cause);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 * @param cause The cause.
+	 */
 	public ResolveFailedException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message.
+	 * @param cause The cause.
+	 * @param enableSuppression Whether or not suppression is enabled or disabled.
+	 * @param writableStackTrace Whether or not the stack trace should be writable.
+	 */
 	public ResolveFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}

@@ -15,17 +15,33 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded.exception;
 
+/**
+ * An exception that is thrown when a task is skipped.
+ */
 @SuppressWarnings("serial")
 public class GxSkipTaskException extends GxTaskException {
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param e The cause of this exception.
+	 */
 	public GxSkipTaskException(Exception e) {
 		super(e);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 */
 	public GxSkipTaskException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 * @param e The cause of this exception.
+	 */
 	public GxSkipTaskException(String message, Exception e) {
 		super(message, e);
 	}

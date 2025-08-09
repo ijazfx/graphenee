@@ -18,6 +18,8 @@ package io.graphenee.util.hash;
 import java.util.logging.Logger;
 
 /**
+ * A provider for creating and checking hashes.
+ *
  * @author ijazfx
  */
 public interface TRHashProvider {
@@ -56,8 +58,18 @@ public interface TRHashProvider {
 	 */
 	String createHash(String input, String signingKey);
 
+	/**
+	 * Checks if the given input matches the hashed value.
+	 * @param input the input to check.
+	 * @param hashed the hashed value to check against.
+	 * @return true if the input matches the hashed value, false otherwise.
+	 */
 	boolean checkPasswordHash(String input, String hashed);
 
+	/**
+	 * Returns the encryption algorithm used by this provider.
+	 * @return the encryption algorithm.
+	 */
 	String encryption();
 
 }

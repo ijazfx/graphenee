@@ -24,8 +24,18 @@ import io.graphenee.util.gson.JsonDeserializers;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * A builder for creating Retrofit instances.
+ */
 public class RetrofitBuilder {
 
+	/**
+	 * Builds a Retrofit instance.
+	 * @param <T> The type of the interface.
+	 * @param interfaceType The interface type.
+	 * @param baseUrl The base URL.
+	 * @return The Retrofit instance.
+	 */
 	public static <T> T build(Class<T> interfaceType, String baseUrl) {
 		GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(Timestamp.class, JsonDeserializers.TIMESTAMP_DESERIALIZER);

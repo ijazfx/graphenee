@@ -15,8 +15,14 @@
  *******************************************************************************/
 package io.graphenee.common.data;
 
+/**
+ * A listener for modification events.
+ */
 public interface ModificationListener {
 
+	/**
+	 * Called when a modification occurs.
+	 */
 	void onModification();
 
 }

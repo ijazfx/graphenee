@@ -25,6 +25,16 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class HMACSHA1HashProvider extends AbstractHashProvider {
 
+	/**
+	 * Creates a new instance of this provider.
+	 */
+	public HMACSHA1HashProvider() {
+		// a default constructor
+	}
+
+	/**
+	 * The encryption algorithm used by this provider.
+	 */
 	public static final String ENCRYPTION = "HMAC-SHA1";
 
 	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";

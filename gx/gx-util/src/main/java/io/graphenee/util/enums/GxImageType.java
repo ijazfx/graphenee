@@ -15,10 +15,25 @@
  *******************************************************************************/
 package io.graphenee.util.enums;
 
+/**
+ * An enum that represents the type of an image file.
+ */
 public enum GxImageType {
+	/**
+	 * JPEG image.
+	 */
 	JPEG("image/jpeg", "jpeg"),
+	/**
+	 * JPG image.
+	 */
 	JPG("image/jpg", "jpg"),
+	/**
+	 * PNG image.
+	 */
 	PNG("image/png", "png"),
+	/**
+	 * WebP image.
+	 */
 	WEB_IMAGE("image/webp", "webp");
 
 	private String mimeType;
@@ -30,22 +45,43 @@ public enum GxImageType {
 		this.extension = extension;
 	}
 
+	/**
+	 * Gets the MIME type.
+	 * @return The MIME type.
+	 */
 	public String getMimeType() {
 		return mimeType;
 	}
 
+	/**
+	 * Sets the MIME type.
+	 * @param mimeType The MIME type.
+	 */
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
 
+	/**
+	 * Gets the extension.
+	 * @return The extension.
+	 */
 	public String getExtension() {
 		return extension;
 	}
 
+	/**
+	 * Sets the extension.
+	 * @param extension The extension.
+	 */
 	public void setExtension(String extension) {
 		this.extension = extension;
 	}
 
+	/**
+	 * Finds an image type by MIME type.
+	 * @param mimeType The MIME type.
+	 * @return The image type.
+	 */
 	public static GxImageType findByMimeType(String mimeType) {
 		if (mimeType.equals(JPEG.mimeType))
 			return GxImageType.JPEG;

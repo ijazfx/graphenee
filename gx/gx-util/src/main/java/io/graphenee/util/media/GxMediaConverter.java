@@ -20,20 +20,75 @@ import io.graphenee.util.enums.GxImageType;
 import io.graphenee.util.enums.GxVideoType;
 import io.graphenee.util.exception.GxMediaConversionException;
 
+/**
+ * An interface for media converters.
+ */
 public interface GxMediaConverter {
 
+	/**
+	 * Converts an audio file.
+	 * @param sourceFile The source file.
+	 * @param targetFile The target file.
+	 * @param targetType The target type.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void convertAudioMedia(String sourceFile, String targetFile, GxAudioType targetType) throws GxMediaConversionException;
 
+	/**
+	 * Converts an audio file.
+	 * @param sourceFile The source file.
+	 * @param sourceType The source type.
+	 * @param targetFile The target file.
+	 * @param targetType The target type.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void convertAudioMedia(String sourceFile, GxAudioType sourceType, String targetFile, GxAudioType targetType) throws GxMediaConversionException;
 
+	/**
+	 * Converts a video file.
+	 * @param sourceFile The source file.
+	 * @param targetFile The target file.
+	 * @param targetType The target type.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void convertVideoMedia(String sourceFile, String targetFile, GxVideoType targetType) throws GxMediaConversionException;
 
+	/**
+	 * Converts a video file.
+	 * @param sourceFile The source file.
+	 * @param sourceType The source type.
+	 * @param targetFile The target file.
+	 * @param targetType The target type.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void convertVideoMedia(String sourceFile, GxVideoType sourceType, String targetFile, GxVideoType targetType) throws GxMediaConversionException;
 
+	/**
+	 * Converts an image file.
+	 * @param sourceFile The source file.
+	 * @param targetFile The target file.
+	 * @param targetType The target type.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void convertImageMedia(String sourceFile, String targetFile, GxImageType targetType) throws GxMediaConversionException;
 
+	/**
+	 * Converts an image file.
+	 * @param sourceFile The source file.
+	 * @param sourceType The source type.
+	 * @param targetFile The target file.
+	 * @param targetType The target type.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void convertImageMedia(String sourceFile, GxImageType sourceType, String targetFile, GxImageType targetType) throws GxMediaConversionException;
 
+	/**
+	 * Compresses an image file.
+	 * @param sourceFile The source file.
+	 * @param targetFile The target file.
+	 * @param quality The quality.
+	 * @throws GxMediaConversionException If an error occurs.
+	 */
 	void compressImageMedia(String sourceFile, String targetFile, Integer quality) throws GxMediaConversionException;
 
 }

@@ -15,25 +15,51 @@
  *******************************************************************************/
 package io.graphenee.util.exception;
 
+/**
+ * An exception that is thrown when a media conversion fails.
+ */
 @SuppressWarnings("serial")
 public class GxMediaConversionException extends Exception {
 
+	/**
+	 * Creates a new instance of this exception.
+	 */
 	public GxMediaConversionException() {
 		super();
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 * @param cause The cause of this exception.
+	 * @param enableSuppression Whether suppression is enabled or disabled.
+	 * @param writableStackTrace Whether the stack trace should be writable.
+	 */
 	public GxMediaConversionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 * @param cause The cause of this exception.
+	 */
 	public GxMediaConversionException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 */
 	public GxMediaConversionException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param cause The cause of this exception.
+	 */
 	public GxMediaConversionException(Throwable cause) {
 		super(cause);
 	}

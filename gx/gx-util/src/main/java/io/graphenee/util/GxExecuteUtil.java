@@ -10,10 +10,26 @@ import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 
+/**
+ * A utility class for executing code.
+ */
 public class GxExecuteUtil {
 
 	/**
+	 * Creates a new instance of this utility class.
+	 */
+	public GxExecuteUtil() {
+		// a default constructor
+	}
+
+	/**
 	 * Purpose of this method is to divide a list in chunk and process sequentially.
+	 * @param <T> The type of the list.
+	 * @param list The list to process.
+	 * @param chunkSize The size of the chunks.
+	 * @param onIterate The callback to execute on each chunk.
+	 * @param onComplete The callback to execute when the process is complete.
+	 * @param onError The callback to execute when an error occurs.
 	 */
 	public static <T> void sequential(List<T> list, int chunkSize, TRParamCallback<List<T>> onIterate, TRVoidCallback onComplete, TRErrorCallback onError) {
 		try {
@@ -32,6 +48,13 @@ public class GxExecuteUtil {
 
 	/**
 	 * Purpose of this method is to divide a list in chunk and process in parallel within a timeout.
+	 * @param <T> The type of the list.
+	 * @param list The list to process.
+	 * @param chunkSize The size of the chunks.
+	 * @param onIterate The callback to execute on each chunk.
+	 * @param onComplete The callback to execute when the process is complete.
+	 * @param onError The callback to execute when an error occurs.
+	 * @param timeoutInMillis The timeout in milliseconds.
 	 */
 	public static <T> void parallel(List<T> list, int chunkSize, TRParamCallback<List<T>> onIterate, TRVoidCallback onComplete, TRErrorCallback onError, long timeoutInMillis) {
 		ExecutorService es = Executors.newCachedThreadPool();

@@ -29,9 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import io.graphenee.jbpm.embedded.GxKieService;
 
+/**
+ * An implementation of {@link GxKieService}.
+ */
 @Service
 @Transactional("jbpmTransactionManager")
 public class GxKieServiceImpl implements GxKieService {
+
+	/**
+	 * Creates a new instance of this service.
+	 */
+	public GxKieServiceImpl() {
+		// a default constructor
+	}
 
 	@Autowired
 	@Qualifier("jbpmEntityManagerFactory")
@@ -39,6 +49,10 @@ public class GxKieServiceImpl implements GxKieService {
 
 	JPAAuditLogService auditLogService;
 
+	/**
+	 * Gets the audit log service.
+	 * @return The audit log service.
+	 */
 	public JPAAuditLogService getAuditLogService() {
 		if (auditLogService == null) {
 			auditLogService = new JPAAuditLogService(emf, PersistenceStrategyType.STANDALONE_LOCAL_SPRING_SHARED_EM);
@@ -70,6 +84,7 @@ public class GxKieServiceImpl implements GxKieService {
 		return defaultValue;
 	}
 
+	@Override
 	public <T> T getVariableValue(Long processInstanceId, String variableName, Class<? extends T> variableType) {
 		Object variableValue = getVariableValue(processInstanceId, variableName);
 		if (variableValue != null)
@@ -77,6 +92,7 @@ public class GxKieServiceImpl implements GxKieService {
 		return null;
 	}
 
+	@Override
 	public Long getVariableValueAsLong(Long processInstanceId, String variableName, Long defaultValue) {
 		Object variableValue = getVariableValue(processInstanceId, variableName);
 		if (variableValue != null)
@@ -84,6 +100,7 @@ public class GxKieServiceImpl implements GxKieService {
 		return defaultValue;
 	}
 
+	@Override
 	public <T> T getVariableValue(Long processInstanceId, String variableName, Class<? extends T> variableType, T defaultValue) {
 		Object variableValue = getVariableValue(processInstanceId, variableName);
 		if (variableValue != null)

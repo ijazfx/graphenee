@@ -32,6 +32,9 @@ import org.apache.commons.beanutils.BeanMap;
 
 public class TemplateUtil {
 
+	/**
+	 * The pattern for keys in the template.
+	 */
 	public static final Pattern KEY_PATTERN = Pattern.compile("(?:\\#\\{)(\\w+)(?:\\})");
 
 	/**
@@ -90,6 +93,10 @@ public class TemplateUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * The main method.
+	 * @param args The arguments.
+	 */
 	public static void main(String[] args) {
 		HashMap<String, String> data = new HashMap<>();
 		data.put("name", "Farrukh");

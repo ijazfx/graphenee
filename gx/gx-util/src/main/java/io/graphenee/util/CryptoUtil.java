@@ -28,10 +28,27 @@ import io.graphenee.util.hash.TRHashProviderException;
  */
 public class CryptoUtil {
 
+	/**
+	 * Creates a new instance of this utility class.
+	 */
+	public CryptoUtil() {
+		// a default constructor
+	}
+
+	/**
+	 * Encodes a byte array to a hex string.
+	 * @param input The byte array to encode.
+	 * @return The hex string.
+	 */
 	public static String encodeHex(byte[] input) {
 		return Hex.encodeHexString(input);
 	}
 
+	/**
+	 * Decodes a hex string.
+	 * @param input The hex string to decode.
+	 * @return The decoded string.
+	 */
 	public static String decodeHex(String input) {
 		if (input == null)
 			return input;
@@ -43,10 +60,20 @@ public class CryptoUtil {
 		}
 	}
 
+	/**
+	 * Encodes a string.
+	 * @param input The string to encode.
+	 * @return The encoded string.
+	 */
 	public static String encode(String input) {
 		return Hex.encodeHexString(java.util.Base64.getEncoder().encode(input.getBytes()));
 	}
 
+	/**
+	 * Decodes a string.
+	 * @param input The string to decode.
+	 * @return The decoded string.
+	 */
 	public static String decode(String input) {
 		if (input == null)
 			return input;
@@ -59,6 +86,11 @@ public class CryptoUtil {
 		}
 	}
 
+	/**
+	 * Creates a password hash.
+	 * @param password The password to hash.
+	 * @return The hashed password.
+	 */
 	public static String createPasswordHash(String password) {
 		if (password == null)
 			return password;

@@ -17,9 +17,21 @@ package io.graphenee.util.enums;
 
 import java.util.stream.Stream;
 
+/**
+ * An enum that represents the gender of a user.
+ */
 public enum GenderEnum {
+	/**
+	 * Male.
+	 */
 	Male("M"),
+	/**
+	 * Female.
+	 */
 	Female("F"),
+	/**
+	 * Undisclosed.
+	 */
 	Undisclosed("X");
 
 	private String genderCode;
@@ -28,10 +40,19 @@ public enum GenderEnum {
 		this.genderCode = genderCode;
 	}
 
+	/**
+	 * Gets the gender code.
+	 * @return The gender code.
+	 */
 	public String getGenderCode() {
 		return genderCode;
 	}
 
+	/**
+	 * Gets the gender by gender code.
+	 * @param genderCode The gender code.
+	 * @return The gender.
+	 */
 	public static GenderEnum genderByGenderCode(String genderCode) {
 		return Stream.of(values()).filter(v -> v.getGenderCode().equals(genderCode)).findFirst().orElse(null);
 	}

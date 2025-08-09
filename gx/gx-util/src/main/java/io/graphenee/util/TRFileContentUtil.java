@@ -17,8 +17,23 @@ package io.graphenee.util;
 
 import org.springframework.util.MimeType;
 
+/**
+ * A utility class for handling file content.
+ */
 public class TRFileContentUtil {
 
+	/**
+	 * Creates a new instance of this utility class.
+	 */
+	public TRFileContentUtil() {
+		// a default constructor
+	}
+
+	/**
+	 * Gets the extension from a filename.
+	 * @param filename The filename.
+	 * @return The extension.
+	 */
 	public static String getExtensionFromFilename(String filename) {
 		if (filename != null) {
 			String[] parts = filename.trim().toLowerCase().split("\\.");
@@ -29,6 +44,11 @@ public class TRFileContentUtil {
 		return null;
 	}
 
+	/**
+	 * Gets the extension from a content type.
+	 * @param contentType The content type.
+	 * @return The extension.
+	 */
 	public static String getExtensionFromContentType(String contentType) {
 		if (contentType != null) {
 			MimeType mimeType = MimeType.valueOf(contentType);
@@ -43,6 +63,11 @@ public class TRFileContentUtil {
 		return null;
 	}
 
+	/**
+	 * Gets the MIME type from a filename.
+	 * @param filename The filename.
+	 * @return The MIME type.
+	 */
 	public static String getMimeType(String filename) {
 		String[] parts = filename.toLowerCase().split("[.]");
 		String ext = parts[parts.length - 1];
@@ -124,3 +149,5 @@ public class TRFileContentUtil {
 	}
 
 }
+
+

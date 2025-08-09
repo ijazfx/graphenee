@@ -37,6 +37,9 @@ import io.graphenee.jbpm.embedded.exception.GxCompleteTaskException;
 import io.graphenee.jbpm.embedded.exception.GxSkipTaskException;
 import io.graphenee.util.KeyValueWrapper;
 
+/**
+ * A wrapper for a {@link TaskSummary} that provides additional functionality.
+ */
 public class GxUserTask implements TaskSummary {
 
 	private TaskSummary task;
@@ -47,6 +50,11 @@ public class GxUserTask implements TaskSummary {
 	private Fault<Long, Object> taskObjectFault;
 	private KeyValueWrapper o;
 
+	/**
+	 * Creates a new instance of this wrapper.
+	 * @param taskService The task service.
+	 * @param task The task summary.
+	 */
 	public GxUserTask(TaskService taskService, TaskSummary task) {
 		this.taskService = new WeakReference<>(taskService);
 		this.task = task;
@@ -152,6 +160,10 @@ public class GxUserTask implements TaskSummary {
 		return task.getActualOwner();
 	}
 
+	/**
+	 * Gets the task initiator.
+	 * @return The task initiator.
+	 */
 	public User getTaskInitiator() {
 		return getTask().getPeopleAssignments().getTaskInitiator();
 	}
@@ -177,6 +189,10 @@ public class GxUserTask implements TaskSummary {
 		return task.isQuickTaskSummary();
 	}
 
+	/**
+	 * Gets the comments.
+	 * @return The comments.
+	 */
 	public List<Comment> getComments() {
 		List<Comment> comments = getTaskService().getAllCommentsByTaskId(getId());
 		comments = comments.stream().sorted((o1, o2) -> {
@@ -187,6 +203,10 @@ public class GxUserTask implements TaskSummary {
 		return comments;
 	}
 
+	/**
+	 * Gets the latest comment.
+	 * @return The latest comment.
+	 */
 	public Comment getLatestComment() {
 		List<Comment> comments = getComments();
 		if (comments != null && !comments.isEmpty())
@@ -194,6 +214,10 @@ public class GxUserTask implements TaskSummary {
 		return null;
 	}
 
+	/**
+	 * Gets the comment.
+	 * @return The comment.
+	 */
 	public String getComment() {
 		Comment latestComment = getLatestComment();
 		if (latestComment != null)
@@ -201,6 +225,10 @@ public class GxUserTask implements TaskSummary {
 		return null;
 	}
 
+	/**
+	 * Gets the user who added the comment.
+	 * @return The user who added the comment.
+	 */
 	public String getCommentedBy() {
 		Comment latestComment = getLatestComment();
 		if (latestComment != null)
@@ -208,11 +236,19 @@ public class GxUserTask implements TaskSummary {
 		return null;
 	}
 
+	/**
+	 * Gets the task service.
+	 * @return The task service.
+	 */
 	protected TaskService getTaskService() {
 		assert taskService.get() != null;
 		return taskService.get();
 	}
 
+	/**
+	 * Gets the task.
+	 * @return The task.
+	 */
 	public Task getTask() {
 		if (internalTask == null)
 			synchronized (GxUserTask.this) {
@@ -223,6 +259,11 @@ public class GxUserTask implements TaskSummary {
 		return internalTask;
 	}
 
+	/**
+	 * Completes the task.
+	 * @param taskData The task data.
+	 * @throws GxCompleteTaskException If the task cannot be completed.
+	 */
 	public void complete(Map<String, Object> taskData) throws GxCompleteTaskException {
 		try {
 			getTaskService().complete(getId(), getTaskOwner(), taskData);
@@ -231,6 +272,10 @@ public class GxUserTask implements TaskSummary {
 		}
 	}
 
+	/**
+	 * Skips the task.
+	 * @throws GxSkipTaskException If the task cannot be skipped.
+	 */
 	public void skip() throws GxSkipTaskException {
 		try {
 			getTaskService().skip(getId(), getTaskOwner());
@@ -239,6 +284,11 @@ public class GxUserTask implements TaskSummary {
 		}
 	}
 
+	/**
+	 * Assigns the task.
+	 * @param assignToUserId The user to assign the task to.
+	 * @throws GxAssignTaskException If the task cannot be assigned.
+	 */
 	public void assign(String assignToUserId) throws GxAssignTaskException {
 		try {
 			getTaskService().delegate(getId(), getTaskOwner(), assignToUserId);
@@ -247,6 +297,10 @@ public class GxUserTask implements TaskSummary {
 		}
 	}
 
+	/**
+	 * Gets the task owner.
+	 * @return The task owner.
+	 */
 	public String getTaskOwner() {
 		User user = getActualOwner();
 		if (user == null)
@@ -256,18 +310,34 @@ public class GxUserTask implements TaskSummary {
 		return taskOwner;
 	}
 
+	/**
+	 * Sets the task owner.
+	 * @param taskOwner The task owner.
+	 */
 	public void setTaskOwner(String taskOwner) {
 		this.taskOwner = taskOwner;
 	}
 
+	/**
+	 * Gets the task object fault.
+	 * @return The task object fault.
+	 */
 	public Fault<Long, Object> getTaskObjectFault() {
 		return taskObjectFault;
 	}
 
+	/**
+	 * Sets the task object fault.
+	 * @param taskObjectFault The task object fault.
+	 */
 	public void setTaskObjectFault(Fault<Long, Object> taskObjectFault) {
 		this.taskObjectFault = taskObjectFault;
 	}
 
+	/**
+	 * Gets the task object.
+	 * @return The task object.
+	 */
 	public KeyValueWrapper getO() {
 		if (o == null && getTaskObjectFault() != null) {
 			o = new KeyValueWrapper(getTaskObjectFault().getValue());

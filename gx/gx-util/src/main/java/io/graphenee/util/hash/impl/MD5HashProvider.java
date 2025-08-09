@@ -26,6 +26,16 @@ import java.security.MessageDigest;
  */
 public class MD5HashProvider extends AbstractHashProvider {
 
+	/**
+	 * Creates a new instance of this provider.
+	 */
+	public MD5HashProvider() {
+		// a default constructor
+	}
+
+	/**
+	 * The encryption algorithm used by this provider.
+	 */
 	public static final String ENCRYPTION = "MD5";
 
 	@Override

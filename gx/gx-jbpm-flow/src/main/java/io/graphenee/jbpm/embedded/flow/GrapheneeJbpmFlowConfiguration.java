@@ -21,9 +21,19 @@ import org.springframework.context.annotation.Configuration;
 
 import io.graphenee.jbpm.embedded.GrapheneeJbpmConfiguration;
 
+/**
+ * The main configuration class for Graphenee jBPM Flow.
+ */
 @Configuration
 @ConditionalOnClass(GrapheneeJbpmConfiguration.class)
 @ComponentScan("io.graphenee.jbpm.embedded.vaadin")
 public class GrapheneeJbpmFlowConfiguration {
+
+	/**
+	 * Creates a new instance of this configuration.
+	 */
+	public GrapheneeJbpmFlowConfiguration() {
+		// a default constructor
+	}
 
 }

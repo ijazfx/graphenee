@@ -15,17 +15,33 @@
  *******************************************************************************/
 package io.graphenee.jbpm.embedded.exception;
 
+/**
+ * An exception that is thrown when a task cannot be assigned.
+ */
 @SuppressWarnings("serial")
 public class GxAssignTaskException extends GxTaskException {
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param e The cause of this exception.
+	 */
 	public GxAssignTaskException(Exception e) {
 		super(e);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 */
 	public GxAssignTaskException(String message) {
 		super(message);
 	}
 
+	/**
+	 * Creates a new instance of this exception.
+	 * @param message The message of this exception.
+	 * @param e The cause of this exception.
+	 */
 	public GxAssignTaskException(String message, Exception e) {
 		super(message, e);
 	}

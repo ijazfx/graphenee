@@ -31,6 +31,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * A file uploader component.
+ */
 @Slf4j
 public class FileUploader extends CustomField<String> {
 	private static final long serialVersionUID = 1L;
@@ -68,10 +71,17 @@ public class FileUploader extends CustomField<String> {
 	private Div output;
 	private MemoryBuffer buffer;
 
+	/**
+	 * Creates a new instance of this component.
+	 */
 	public FileUploader() {
 		this(null);
 	}
 
+	/**
+	 * Creates a new instance of this component.
+	 * @param label The label of the component.
+	 */
 	public FileUploader(String label) {
 		this.label = label;
 		build();
@@ -148,25 +158,45 @@ public class FileUploader extends CustomField<String> {
 		add(upload, output);
 	}
 
+	/**
+	 * Sets the allowed file types.
+	 * @param fileTypes The allowed file types.
+	 */
 	public void setAllowedFileTypes(String... fileTypes) {
 		this.allowedFileTypes = fileTypes;
 		upload.setAcceptedFileTypes(allowedFileTypes);
 	}
 
+	/**
+	 * Sets the maximum number of files.
+	 * @param maxFiles The maximum number of files.
+	 */
 	public void setMaxFiles(int maxFiles) {
 		upload.setMaxFiles(maxFiles);
 	}
 
+	/**
+	 * Sets the maximum file size.
+	 * @param maxFileSize The maximum file size.
+	 */
 	public void setMaxFileSize(int maxFileSize) {
 		this.maxFileSize = maxFileSize;
 		upload.setMaxFileSize(this.maxFileSize);
 	}
 
+	/**
+	 * Sets whether to auto upload.
+	 * @param autoUpload Whether to auto upload.
+	 */
 	public void setAutoUpload(Boolean autoUpload) {
 		this.autoUpload = autoUpload;
 		upload.setAutoUpload(this.autoUpload);
 	}
 
+	/**
+	 * Sets the drop file label.
+	 * @param dropFileLabel The drop file label.
+	 */
 	public void setDropFileLabel(String dropFileLabel) {
 		this.dropFileLabel = dropFileLabel;
 		upload.setDropLabel(new NativeLabel(dropFileLabel));

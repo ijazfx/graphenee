@@ -8,6 +8,9 @@ import io.graphenee.core.GxMeetingService;
 import io.graphenee.core.model.GxMeeting;
 import io.graphenee.core.model.GxMeetingUser;
 
+/**
+ * A default implementation of {@link GxMeetingService}.
+ */
 public class DefaultMeetingServiceImpl implements GxMeetingService {
 
 	private Map<String, GxMeeting> meetingMap = new HashMap<>();

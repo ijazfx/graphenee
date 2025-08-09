@@ -15,9 +15,21 @@
  *******************************************************************************/
 package io.graphenee.core.enums;
 
+/**
+ * An enum that represents the status of an access type.
+ */
 public enum AccessTypeStatus {
+	/**
+	 * Access.
+	 */
 	ACCESS(0),
+	/**
+	 * Check-in.
+	 */
 	CHECKIN(1),
+	/**
+	 * Check-out.
+	 */
 	CHECKOUT(2);
 
 	private Integer statusCode;
@@ -26,6 +38,10 @@ public enum AccessTypeStatus {
 		this.statusCode = statusCode;
 	}
 
+	/**
+	 * Gets the status code.
+	 * @return The status code.
+	 */
 	public Integer statusCode() {
 		return this.statusCode;
 	}
