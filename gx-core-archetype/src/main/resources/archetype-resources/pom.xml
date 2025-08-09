@@ -32,14 +32,14 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>io.graphenee</groupId>
+				<groupId>io.github.ijazfx.graphenee</groupId>
 				<artifactId>gx</artifactId>
 				<version>${version.graphenee}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>io.graphenee</groupId>
+				<groupId>io.github.ijazfx.graphenee</groupId>
 				<artifactId>gx-flow</artifactId>
 				<version>${version.graphenee}</version>
 				<type>pom</type>
@@ -72,7 +72,7 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.graphenee</groupId>
+			<groupId>io.github.ijazfx.graphenee</groupId>
 			<artifactId>gx-core-flow</artifactId>
 		</dependency>
 		<dependency>

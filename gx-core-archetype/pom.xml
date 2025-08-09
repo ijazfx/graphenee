@@ -3,9 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.graphenee</groupId>
+	<groupId>io.github.ijazfx.graphenee</groupId>
 	<artifactId>gx-core-archetype</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<packaging>maven-archetype</packaging>
 	<name>gx-core-archetype</name>
 	<description>Graphenee Core Archetype</description>
@@ -14,7 +14,6 @@
 	<properties>
 		<version.maven.gpg.plugin>3.1.0</version.maven.gpg.plugin>
 		<version.maven.archetype.plugin>3.1.1</version.maven.archetype.plugin>
-		<version.maven.sonatype.plugin>1.6.13</version.maven.sonatype.plugin>
 	</properties>
 
 	<!-- License -->
@@ -24,6 +23,7 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
 		</license>
 	</licenses>
+
 
 	<!-- Developers -->
 	<developers>
@@ -45,18 +45,6 @@
 		<url>https://github.com/ijazfx/graphenee/issues</url>
 	</issueManagement>
 
-	<!-- Distribution Management -->
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-	</distributionManagement>
-
 	<profiles>
 		<profile>
 			<id>sonatype</id>
@@ -69,9 +57,9 @@
 							<version>${version.maven.gpg.plugin}</version>
 						</plugin>
 						<plugin>
-							<groupId>org.sonatype.plugins</groupId>
-							<artifactId>nexus-staging-maven-plugin</artifactId>
-							<version>${version.maven.sonatype.plugin}</version>
+							<groupId>org.sonatype.central</groupId>
+							<artifactId>central-publishing-maven-plugin</artifactId>
+							<version>0.6.0</version>
 						</plugin>
 					</plugins>
 				</pluginManagement>
@@ -91,14 +79,14 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>${version.maven.sonatype.plugin}</version>
+						<groupId>org.sonatype.central</groupId>
+						<artifactId>central-publishing-maven-plugin</artifactId>
+						<version>0.8.0</version>
 						<extensions>true</extensions>
 						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+							<publishingServerId>central</publishingServerId>
+							<autoPublish>true</autoPublish>
+							<waitUntil>published</waitUntil>
 						</configuration>
 					</plugin>
 				</plugins>
