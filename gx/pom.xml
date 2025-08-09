@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.github.ijazfx.graphenee</groupId>
+	<groupId>com.trigsoft.graphenee</groupId>
 	<artifactId>gx</artifactId>
 	<packaging>pom</packaging>
 	<version>4.0.0-SNAPSHOT</version>
@@ -67,32 +67,32 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>io.github.ijazfx.graphenee</groupId>
+				<groupId>com.trigsoft.graphenee</groupId>
 				<artifactId>gx-blockchain</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.ijazfx.graphenee</groupId>
+				<groupId>com.trigsoft.graphenee</groupId>
 				<artifactId>gx-util</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.ijazfx.graphenee</groupId>
+				<groupId>com.trigsoft.graphenee</groupId>
 				<artifactId>gx-flow</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.ijazfx.graphenee</groupId>
+				<groupId>com.trigsoft.graphenee</groupId>
 				<artifactId>gx-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.ijazfx.graphenee</groupId>
+				<groupId>com.trigsoft.graphenee</groupId>
 				<artifactId>gx-core-flow</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.github.ijazfx.graphenee</groupId>
+				<groupId>com.trigsoft.graphenee</groupId>
 				<artifactId>gx-jbpm-embedded</artifactId>
 				<version>${project.version}</version>
 			</dependency>
