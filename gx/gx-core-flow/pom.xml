@@ -8,7 +8,7 @@
 
 	<!-- Parent -->
 	<parent>
-		<groupId>io.graphenee</groupId>
+		<groupId>io.github.ijazfx.graphenee</groupId>
 		<artifactId>gx</artifactId>
 		<version>4.0.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
@@ -29,15 +29,15 @@
 			<version>${version.vaadin}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.graphenee</groupId>
+			<groupId>io.github.ijazfx.graphenee</groupId>
 			<artifactId>gx-util</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.graphenee</groupId>
+			<groupId>io.github.ijazfx.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.graphenee</groupId>
+			<groupId>io.github.ijazfx.graphenee</groupId>
 			<artifactId>gx-flow</artifactId>
 		</dependency>
 		<dependency>

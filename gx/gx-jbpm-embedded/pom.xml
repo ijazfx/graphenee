@@ -9,7 +9,7 @@
 
 	<!-- Parent -->
 	<parent>
-		<groupId>io.graphenee</groupId>
+		<groupId>io.github.ijazfx.graphenee</groupId>
 		<version>4.0.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 		<artifactId>gx</artifactId>
@@ -87,11 +87,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>io.graphenee</groupId>
+			<groupId>io.github.ijazfx.graphenee</groupId>
 			<artifactId>gx-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.graphenee</groupId>
+			<groupId>io.github.ijazfx.graphenee</groupId>
 			<artifactId>gx-util</artifactId>
 		</dependency>
 	</dependencies>

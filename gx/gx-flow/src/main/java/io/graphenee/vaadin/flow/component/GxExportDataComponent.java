@@ -129,7 +129,7 @@ public class GxExportDataComponent<T> {
 				});
 				StreamRegistration sr = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
 				ui.getPage().open(sr.getResourceUri().toString(), "_top");
-			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data").withSuccessMessage("Data exported successfully!").withDoneCaption("Download");
+			}).withProgressMessage("Exporting data...").withErrorMessage("Failed to export data").withSuccessMessage("Data exported successfully!");
 			task.start();
 		} catch (Exception ex) {
 			log.error("Failed to export data", ex);

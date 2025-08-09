@@ -4,18 +4,17 @@ import java.util.concurrent.Executors;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 
 import io.graphenee.util.callback.TRBiParamCallback;
 import io.graphenee.util.callback.TRParamCallback;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class LongRunningTask {
 
 	private String progressMessage;
@@ -25,8 +24,6 @@ public class LongRunningTask {
 	private TRParamCallback<UI> taskCallback;
 	private TRParamCallback<UI> doneCallback;
 	private TRBiParamCallback<UI, Exception> errorCallback;
-	private String doneCaption;
-	private Button doneButton;
 	private UI ui;
 
 	private LongRunningTask(UI ui, TRParamCallback<UI> taskCallback) {
@@ -53,11 +50,6 @@ public class LongRunningTask {
 		return this;
 	}
 
-	public LongRunningTask withDoneCaption(String caption) {
-		this.doneCaption = caption;
-		return this;
-	}
-
 	public LongRunningTask withDoneCallback(TRParamCallback<UI> actionCallback) {
 		this.doneCallback = actionCallback;
 		return this;
@@ -75,17 +67,9 @@ public class LongRunningTask {
 		ProgressBar progressBar = new ProgressBar();
 		progressBar.setIndeterminate(true);
 
-		VerticalLayout notificationLoadingLayout = new VerticalLayout(new Text(progressMessage != null ? progressMessage : "Task is in progress..."), progressBar);
+		VerticalLayout notificationLoadingLayout = new VerticalLayout(
+				new Text(progressMessage != null ? progressMessage : "Task is in progress..."), progressBar);
 		notification.add(notificationLoadingLayout);
-
-		if (doneCallback != null) {
-			doneButton = new Button(doneCaption != null ? doneCaption : "Done");
-			doneButton.addClickListener(cl -> {
-				notification.close();
-				doneCallback.execute(ui);
-			});
-			doneButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-		}
 
 		notification.open();
 		ui.push();
@@ -95,29 +79,30 @@ public class LongRunningTask {
 				ui.access(() -> {
 					notification.remove(notificationLoadingLayout);
 					notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-					HorizontalLayout buttonLayout = new HorizontalLayout();
-					if (doneButton != null) {
-						buttonLayout.add(doneButton);
-						notification.setDuration(0);
+					notification.setDuration(7000);
+					notification
+							.setText(successMessage != null ? successMessage : "Task has been completed successfully!");
+					if (doneCallback != null) {
+						doneCallback.execute(ui);
 					} else {
-						notification.setDuration(5000);
+						ui.push();
 					}
-					notification.add(new Text(successMessage != null ? successMessage : "Task has been completed successfully!"), buttonLayout);
-					ui.push();
 				});
 			} catch (Exception ex) {
 				Exception cause = cause(ex);
-				cause.printStackTrace();
+				log.error("Task execution failed:", ex);
 				if (errorCallback != null) {
 					errorCallback.execute(ui, cause);
 				}
 				ui.access(() -> {
 					notification.remove(notificationLoadingLayout);
 					notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-					notification.setDuration(5000);
-					HorizontalLayout buttonLayout = new HorizontalLayout();
-					errorMessage = errorMessage == null ? (cause != null && cause.getMessage() != null ? cause.getMessage() : "Task stopped with error!") : errorMessage;
-					notification.add(new Text(errorMessage), buttonLayout);
+					notification.setDuration(0);
+					errorMessage = errorMessage == null
+							? (cause != null && cause.getMessage() != null ? cause.getMessage()
+									: "Task stopped with error!")
+							: errorMessage;
+					notification.setText(errorMessage);
 					ui.push();
 				});
 			}
