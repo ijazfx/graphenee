@@ -35,7 +35,7 @@ public class FlowSetup extends GxAbstractFlowSetup {
 
     @Override
     public String appTitle() {
-        return "Graphenee";
+        return "My First Graphenee Application";
     }
 
     @Override
