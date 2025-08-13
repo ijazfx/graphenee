@@ -91,8 +91,8 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		if (flowSetup().loggedInUser() != null) {
 			GxAuthenticatedUser user = flowSetup().loggedInUser();
 			avatar = new Avatar(user.getFirstNameLastName());
-			avatar.addThemeVariants(AvatarVariant.LUMO_SMALL);
-			avatar.setColorIndex(0);
+			avatar.addThemeVariants(AvatarVariant.LUMO_LARGE);
+			avatar.setColorIndex(1);
 			customizeAvatar(avatar);
 			Span space = new Span("");
 			space.setWidth("12px");

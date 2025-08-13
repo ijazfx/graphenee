@@ -24,6 +24,7 @@ public class FlowSetup extends GxAbstractFlowSetup {
         items.add(GxCoreMenuItemFactory.setupMenuItem());
         items.add(GxCoreMenuItemFactory.documentsMenuItem());
         items.add(GxCoreMenuItemFactory.messageTemplateMenuItem());
+        items.add(GxCoreMenuItemFactory.developmentMenuItem());
 
         return items;
     }
