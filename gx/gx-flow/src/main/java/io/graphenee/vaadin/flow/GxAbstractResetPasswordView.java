@@ -8,13 +8,12 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -24,60 +23,49 @@ import io.graphenee.util.callback.TRVoidCallback;
 import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/graphenee.css")
-public abstract class GxAbstractResetPasswordView extends VerticalLayout {
+public abstract class GxAbstractResetPasswordView extends FlexLayout {
 
 	private static final long serialVersionUID = 1L;
-	private Image appLogo;
 
 	private TextField usernameTextField;
 	private PasswordField passwordField;
 	private PasswordField retypePasswordField;
 
 	public GxAbstractResetPasswordView() {
-		setSizeFull();
 		setClassName("gx-login-view");
-		setJustifyContentMode(JustifyContentMode.CENTER);
+		setSizeFull();
+		setFlexDirection(FlexDirection.COLUMN);
 		setAlignItems(Alignment.CENTER);
+		setJustifyContentMode(JustifyContentMode.CENTER);
 	}
 
 	@PostConstruct
 	private void postBuild() {
-		FlexLayout headingLayout = new FlexLayout();
-		headingLayout.setAlignItems(Alignment.BASELINE);
-		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-		headingLayout.setWidth("328px");
-		Span heading = new Span(flowSetup().appTitle());
-		heading.addClassName("gx-login-title");
-		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		heading.getStyle().set("font-size", "var(--lumo-font-size-xxxl)");
-		Span version = new Span(flowSetup().appVersion());
-		version.addClassName("gx-login-title");
-		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
-		headingLayout.add(heading, version);
-
-		add(headingLayout);
-
-		VerticalLayout rootLayout = new VerticalLayout();
-		rootLayout.setWidth("328px");
-		rootLayout.setSpacing(false);
-		rootLayout.setPadding(false);
-		rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		rootLayout.getElement().getStyle().set("background", "white");
-
+		Div rootLayout = new Div();
+		rootLayout.addClassName("gx-reset-password-layout");
 		add(rootLayout);
-		setSpacing(false);
 
-		appLogo = flowSetup().appLogo();
+		Div heading = new Div();
+		heading.addClassName("gx-login-header");
+		Span appTitle = new Span(flowSetup().appTitle());
+		appTitle.addClassName("gx-login-app-title");
+		Span appVersion = new Span(flowSetup().appVersion());
+		appVersion.addClassName("gx-login-app-version");
+		Div appTitleVersion = new Div(appTitle, appVersion);
+		appTitleVersion.addClassName("gx-login-app-title-version");
+		heading.add(appTitleVersion);
+		rootLayout.add(heading);
+
+		Image appLogo = flowSetup().appLogo();
 		if (appLogo != null) {
-			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-			appLogo.setHeight("4rem");
-			rootLayout.add(appLogo);
-			rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
+			Div appLogoDiv = new Div(appLogo);
+			appLogoDiv.addClassName("gx-login-app-logo");
+			heading.add(appLogoDiv);
 		}
 
 		// add content to loginForm
-		FormLayout form1 = new FormLayout();
+		Div form1 = new Div();
+		form1.addClassName("gx-reset-password-form");
 		usernameTextField = new TextField("Username");
 		usernameTextField.setAutoselect(true);
 		usernameTextField.setRequired(true);
@@ -85,9 +73,6 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		Button sendResetKeyButton = new Button("Send Security Pin");
 		sendResetKeyButton.setEnabled(false);
 
-		form1.add(usernameTextField, sendResetKeyButton);
-
-		FormLayout form2 = new FormLayout();
 		TextField resetKeyTextField = new TextField("Enter Security Pin");
 		resetKeyTextField.setMaxLength(6);
 		resetKeyTextField.setEnabled(false);
@@ -96,31 +81,25 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		nextButton.setEnabled(false);
 
-		Button dismissButton = new Button("Return to Sign In Page");
+		Button dismissButton = new Button("Back to Login");
 		dismissButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
 		dismissButton.setEnabled(true);
 
-		form2.add(resetKeyTextField, nextButton, dismissButton);
+		form1.add(usernameTextField, sendResetKeyButton, resetKeyTextField, nextButton, dismissButton);
 
 		passwordField = new PasswordField("New Password");
 		retypePasswordField = new PasswordField("Re-type Password");
 		retypePasswordField.setEnabled(false);
-		Button changeButton = new Button("Change");
+		Button changeButton = new Button("Update Password");
 		changeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		changeButton.setEnabled(false);
 
-		FormLayout form3 = new FormLayout();
-		form3.add(passwordField, retypePasswordField, changeButton);
+		Div form2 = new Div();
+		form2.addClassName("gx-reset-password-form");
+		form2.add(passwordField, retypePasswordField, changeButton);
+		form2.setVisible(false);
 
-		VerticalLayout formLayout = new VerticalLayout();
-		formLayout.getElement().getStyle().set("padding", "var(--lumo-space-l)");
-		form1.getElement().getStyle().set("padding", "var(--lumo-space-s)");
-		form2.getElement().getStyle().set("padding", "var(--lumo-space-s)");
-		form3.getElement().getStyle().set("padding", "var(--lumo-space-s)");
-		formLayout.add(form1, form2, form3);
-		rootLayout.add(formLayout);
-
-		form3.setVisible(false);
+		rootLayout.add(form1, form2);
 
 		AtomicReference<String> securityPin = new AtomicReference<>();
 
@@ -136,7 +115,8 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 				resetKeyTextField.clear();
 				resetKeyTextField.setEnabled(shouldEnable);
 				resetKeyTextField.focus();
-				Notification.show("The reset pin has been sent to your registered email/phone.", 5000, Position.BOTTOM_CENTER);
+				Notification.show("The reset pin has been sent to your registered email/phone.", 5000,
+						Position.BOTTOM_CENTER);
 			}, error -> {
 				usernameTextField.focus();
 				StringBuilder sb = new StringBuilder();
@@ -162,8 +142,7 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 		});
 		nextButton.addClickListener(event -> {
 			form1.setVisible(false);
-			form2.setVisible(false);
-			form3.setVisible(true);
+			form2.setVisible(true);
 		});
 
 		dismissButton.addClickListener(event -> {
@@ -209,8 +188,10 @@ public abstract class GxAbstractResetPasswordView extends VerticalLayout {
 
 	protected abstract GxAbstractFlowSetup flowSetup();
 
-	protected abstract void sendSecurityPinToUser(String securityPin, String username, TRVoidCallback success, TRErrorCallback error);
+	protected abstract void sendSecurityPinToUser(String securityPin, String username, TRVoidCallback success,
+			TRErrorCallback error);
 
-	protected abstract void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error);
+	protected abstract void changePassword(String username, String password, TRVoidCallback success,
+			TRErrorCallback error);
 
 }

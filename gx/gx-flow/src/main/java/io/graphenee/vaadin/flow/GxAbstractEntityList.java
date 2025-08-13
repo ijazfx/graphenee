@@ -41,6 +41,7 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -230,7 +231,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			dataGrid = dataGrid(entityClass);
 			dataGrid.setSizeFull();
 			dataGrid.addClassName("gx-grid");
-			gridLayout.add(dataGrid);
+			
 			((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI)).setSelectionColumnFrozen(true);
 
 			DataProvider<T, ?> dataProvider = dataProvider(entityClass);
@@ -278,7 +279,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			customMenuBar = new MenuBar();
 
 			menuBarLayout = new HorizontalLayout();
-			menuBarLayout.getStyle().set("padding", "0.75rem");
 			menuBarLayout.addClassName("gx-grid-menubar-layout");
 
 			menuBarLayout.setWidthFull();
@@ -300,7 +300,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			deleteMenuItem = crudMenuBar.addItem(VaadinIcon.TRASH.create());
 			customizeDeleteMenuItem(deleteMenuItem);
 
-			exportDataMenuItem = columnMenuBar.addItem(VaadinIcon.DOWNLOAD.create());
+			MenuItem optionsMenuItem = columnMenuBar.addItem(VaadinIcon.ELLIPSIS_DOTS_H.create());
+
+			exportDataMenuItem = optionsMenuItem.getSubMenu().addItem("Export to Excel...");
 			exportDataMenuItem.setVisible(shouldShowExportDataMenu());
 			exportDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
@@ -340,7 +342,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				}
 			});
 
-			importDataMenuItem = columnMenuBar.addItem(VaadinIcon.UPLOAD.create());
+			importDataMenuItem = optionsMenuItem.getSubMenu().addItem("Import from Excel...");
 			importDataMenuItem.setVisible(shouldShowExportDataMenu());
 			importDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
@@ -365,7 +367,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			decorateMenuBar(customMenuBar);
 
-			columnsDialogMenuItem = columnMenuBar.addItem(VaadinIcon.TASKS.create());
+			columnsDialogMenuItem = optionsMenuItem.getSubMenu().addItem("Customize Grid...");
 			decorateColumnMenuBar(columnMenuBar);
 
 			columnsDialogMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
@@ -401,11 +403,15 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			deleteMenuItem.setEnabled(false);
 
 			GxFormLayout searchForm = new GxFormLayout();
+			searchForm.addClassName("gx-grid-search-form");
 
 			decorateSearchForm(searchForm, searchBinder);
-			searchForm.setVisible(searchForm.getChildren().count() > 0);
+			
+			Details searchFormDetails = new Details("Search...");
+			searchFormDetails.add(searchForm);
+			searchFormDetails.setVisible(searchForm.getChildren().count() > 0);
 
-			gridLayout.addComponentAsFirst(searchForm);
+			gridLayout.add(searchFormDetails);
 
 			List<Column<T>> columns = new ArrayList<>();
 			List<String> userPreferences = new ArrayList<>();
@@ -418,7 +424,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 					return rowEditButton;
 				});
 				editColumn.setKey("__editColumn");
-				editColumn.setWidth("50px");
+				editColumn.addClassName("gx-grid-edit-column");
+				editColumn.setAutoWidth(true);
 				editColumn.setTextAlign(ColumnTextAlign.CENTER);
 				editColumn.setResizable(false);
 				editColumn.setFlexGrow(0);
@@ -552,6 +559,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			}
 
 			postBuild();
+
+			gridLayout.add(dataGrid);
 
 			if (shouldDisplayGridFooter()) {
 				gridLayout.add(footerTextLayout);

@@ -1,100 +1,87 @@
 @font-face {
-    font-family: "Roboto Condensed";
-    src: url("/frontend/fonts/RobotoCondensed-Regular.ttf");
+    font-family: 'Roboto Flex';
+    src: url('/frontend/fonts/Roboto_Flex/RobotoFlex-VariableFont_GRAD,XOPQ,XTRA,YOPQ,YTAS,YTDE,YTFI,YTLC,YTUC,opsz,slnt,wdth,wght.ttf');
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }
 
 @font-face {
-    font-family: "Nanum Bold";
-    src: url("/frontend/fonts/NanumGothic-Bold.ttf");
+    font-family: 'IBM Plex Sans';
+    src: url('/frontend/fonts/IBM_Plex_Sans/IBMPlexSans-VariableFont_wdth,wght.ttf');
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
 }
 
 html {
-    --lumo-font-family: "Roboto Condensed";
-    --lumo-font-size: 1rem;
-    --lumo-font-size-xxxl: 1.75rem;
-    --lumo-font-size-xxl: 1.375rem;
-    --lumo-font-size-xl: 1.125rem;
-    --lumo-font-size-l: 1rem;
-    --lumo-font-size-m: 0.875rem;
-    --lumo-font-size-s: 0.8125rem;
-    --lumo-font-size-xs: 0.75rem;
-    --lumo-font-size-xxs: 0.6875rem;
-    --lumo-border-radius: 0.1rem;
-    --lumo-size-xl: 3rem;
-    --lumo-size-l: 2.5rem;
-    --lumo-size-m: 2rem;
-    --lumo-size-s: 1.75rem;
-    --lumo-size-xs: 1.5rem;
-    --lumo-space-xl: 1.875rem;
-    --lumo-space-l: 1.25rem;
-    --lumo-space-m: 0.625rem;
-    --lumo-space-s: 0.3125rem;
-    --lumo-space-xs: 0.1875rem;
-    --lumo-primary-text-color: rgb(0, 0, 0);
-    --lumo-primary-color-50pct: rgba(0, 0, 0, 0.5);
-    --lumo-primary-color-10pct: rgba(0, 0, 0, 0.1);
-    --lumo-error-text-color: rgb(255, 56, 103);
-    --lumo-error-color-50pct: rgba(255, 56, 103, 0.5);
-    --lumo-error-color-10pct: rgba(255, 56, 103, 0.1);
+    --lumo-font-family: "Roboto Flex";
+    --lumo-primary-text-color: #111111;
+    --lumo-primary-color-50pct: #1565C080;
+    --lumo-primary-color-10pct: #1565C020;
+    --lumo-error-text-color: #C62828;
+    --lumo-error-color-50pct: #C6282880;
+    --lumo-error-color-10pct: #C6282820;
     --lumo-success-text-color: rgb(20, 184, 143);
-    --lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
-    --lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
-    --lumo-primary-color: rgb(30, 30, 30);
-    --lumo-error-color: hsl(346, 100%, 61%);
+    --lumo-success-color-50pct: rgba(20, 184, 143, .5);
+    --lumo-success-color-10pct: rgba(20, 184, 143, .1);
+    --lumo-primary-color: #1565C0;
+    --lumo-error-color: #C62828;
     --lumo-success-color: hsl(165, 80%, 40%);
     --lumo-header-text-color: hsl(285, 35%, 15%);
-    --lumo-body-text-color: hsla(285, 40%, 16%, 0.94);
-    --lumo-secondary-text-color: hsla(285, 42%, 18%, 0.72);
-    --lumo-tertiary-text-color: hsla(285, 45%, 20%, 0.5);
-    --lumo-disabled-text-color: hsla(285, 50%, 22%, 0.26);
-    --background-color: rgb(100, 200, 200);
-    --background-text-color: white;
+    --lumo-body-text-color: hsla(285, 40%, 16%, .94);
+    --lumo-secondary-text-color: hsla(285, 42%, 18%, .72);
+    --lumo-tertiary-text-color: hsla(285, 45%, 20%, .5);
+    --lumo-disabled-text-color: hsla(285, 50%, 22%, .26);
+    --background-color: #263238;
+    --background-text-color: #82B1FF;
+    font-size: 0.90rem;
+    font-variation-settings:
+        "slnt" -1,
+        "wdth" 87.5,
+        "GRAD" 0,
+        "XOPQ" 96,
+        "XTRA" 468,
+        "YOPQ" 79,
+        "YTAS" 750,
+        "YTDE" -203,
+        "YTFI" 738,
+        "YTLC" 514,
+        "YTUC" 712;
 }
 
-[theme~="dark"] {
-    --lumo-font-family: "Nanum Gothic", "Roboto Condensed";
-    --lumo-tint-5pct: rgba(252, 245, 255, 0.05);
-    --lumo-tint-10pct: rgba(252, 245, 255, 0.1);
-    --lumo-tint-20pct: rgba(252, 245, 255, 0.2);
-    --lumo-tint-30pct: rgba(252, 245, 255, 0.3);
-    --lumo-tint-40pct: rgba(252, 245, 255, 0.4);
-    --lumo-tint-50pct: rgba(252, 245, 255, 0.5);
-    --lumo-tint-60pct: rgba(252, 245, 255, 0.6);
-    --lumo-tint-70pct: rgba(252, 245, 255, 0.7);
-    --lumo-tint-80pct: rgba(252, 245, 255, 0.8);
-    --lumo-tint-90pct: rgba(252, 245, 255, 0.9);
-    --lumo-shade-5pct: rgba(7, 6, 15, 0.05);
-    --lumo-shade-10pct: rgba(7, 6, 15, 0.1);
-    --lumo-shade-20pct: rgba(7, 6, 15, 0.2);
-    --lumo-shade-30pct: rgba(7, 6, 15, 0.3);
-    --lumo-shade-40pct: rgba(7, 6, 15, 0.4);
-    --lumo-shade-50pct: rgba(7, 6, 15, 0.5);
-    --lumo-shade-60pct: rgba(7, 6, 15, 0.6);
-    --lumo-shade-70pct: rgba(7, 6, 15, 0.7);
-    --lumo-shade-80pct: rgba(7, 6, 15, 0.8);
-    --lumo-shade-90pct: rgba(7, 6, 15, 0.9);
-    --lumo-primary-text-color: rgb(124, 42, 239);
-    --lumo-primary-color-50pct: rgba(124, 42, 239, 0.5);
-    --lumo-primary-color-10pct: rgba(124, 42, 239, 0.1);
-    --lumo-error-text-color: rgb(255, 56, 103);
-    --lumo-error-color-50pct: rgba(255, 56, 103, 0.5);
-    --lumo-error-color-10pct: rgba(255, 56, 103, 0.1);
-    --lumo-success-text-color: rgb(20, 184, 143);
-    --lumo-success-color-50pct: rgba(20, 184, 143, 0.5);
-    --lumo-success-color-10pct: rgba(20, 184, 143, 0.1);
-    --lumo-base-color: hsl(255, 35%, 23%);
-    --lumo-tint: hsl(285, 100%, 98%);
-    --lumo-shade: hsl(249, 46%, 4%);
-    --lumo-primary-color: hsl(265, 86%, 55%);
-    --lumo-error-color: hsl(346, 100%, 61%);
-    --lumo-success-color: hsl(165, 80%, 40%);
-    --lumo-header-text-color: hsl(285, 100%, 98%);
-    --lumo-body-text-color: hsla(285, 96%, 96%, 0.9);
-    --lumo-secondary-text-color: hsla(285, 87%, 92%, 0.7);
-    --lumo-tertiary-text-color: hsla(285, 78%, 88%, 0.5);
-    --lumo-disabled-text-color: hsla(285, 69%, 84%, 0.32);
-    --background-color: #444444;
-    --background-text-color: white;
+.gx-login-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.gx-login-app-logo {
+    > img {
+        max-height: 3rem;
+        max-width: 9rem;
+    }
+}
+
+.gx-login-app-title-version {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+.gx-login-app-title {
+    font-size: var(--lumo-font-size-xxxl);
+}
+
+.gx-login-app-version {
+    font-size: var(--lumo-font-size-xs);
+}
+
+.gx-login-form {
+    vaadin-login-form-wrapper {
+        border-radius: 0.5rem;
+    }
 }
 
 vaadin-app-layout::part(navbar) {
@@ -121,6 +108,19 @@ vaadin-app-layout::part(navbar) {
     color: var(--background-text-color);
 }
 
+.gx-reset-password-layout {
+    width: 340px;
+}
+
+.gx-reset-password-form {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: var(--lumo-space-l);
+    gap: var(--lumo-space-m);
+}
+
 ::-webkit-scrollbar {
     width: 0.4rem;
     background-color: transparent;
@@ -134,6 +134,11 @@ vaadin-app-layout::part(navbar) {
 
 vaadin-grid::part(last-row) {
     border-bottom: var(--_lumo-grid-border-width) solid var(--_lumo-grid-secondary-border-color);
+    font-size: 0.9rem;
+}
+
+vaadin-grid::part(cell) {
+    font-size: 0.9rem;
 }
 
 .gx-entity-list>* {
@@ -147,11 +152,27 @@ vaadin-grid::part(last-row) {
 }
 
 .gx-grid-footer {
-    margin: 0.75rem
+    padding: var(--lumo-space-s);
 }
 
 .gx-grid-search-layout {
-    margin: 0.75rem;
+    padding: var(--lumo-space-s);
+}
+
+vaadin-menu-bar-button {
+    width: 0px;
+}
+
+.gx-dms-breadcrumb-layout {
+    padding: 0 var(--lumo-space-s) 0 var(--lumo-space-s);
+    vaadin-button[theme="icon"] {
+        width: 0px;
+    }
+}
+
+
+.gx-grid-menubar-layout {
+    padding: var(--lumo-space-s);   
 }
 
 .gx-login-title {
@@ -293,6 +314,7 @@ vaadin-context-menu-item vaadin-icon {
     width: 4em;
     text-align: start;
 }
+
 .gx-document-chooser-item label {
     font-size: smaller;
     line-height: normal;

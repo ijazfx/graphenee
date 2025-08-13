@@ -5,6 +5,7 @@ import java.util.List;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.AbstractLogin.ForgotPasswordEvent;
@@ -14,7 +15,6 @@ import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
@@ -43,63 +43,36 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 	@PostConstruct
 	private void postBuild() {
-		//		FlexLayout loginFormLayout = new FlexLayout();
-		//		loginFormLayout.addClassName("gx-login-form-layout");
-		//		loginFormLayout.setFlexDirection(FlexDirection.COLUMN);
-		//		loginFormLayout.setAlignItems(Alignment.CENTER);
-		//		loginFormLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-		//
-		//		HorizontalLayout titleVersionLayout = new HorizontalLayout();
-		//		titleVersionLayout.setWidthFull();
-		//		titleVersionLayout.addClassName("gx-login-title-layout");
-		//		Span title = new Span(appTitle());
-		//		title.addClassName("gx-login-title");
-		//		H5 version = new H5(appVersion());
-		//		version.addClassName("gx-login-version");
-		//		titleVersionLayout.add(title, version);
-		//		titleVersionLayout.setDefaultVerticalComponentAlignment(Alignment.END);
-
-		FlexLayout headingLayout = new FlexLayout();
-		headingLayout.setAlignItems(Alignment.BASELINE);
-		headingLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-		headingLayout.setWidth("328px");
-		Span heading = new Span(flowSetup().appTitle());
-		heading.addClassName("gx-login-title");
-		heading.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		heading.getStyle().set("font-size", "var(--lumo-font-size-xxxl)");
-		Span version = new Span(flowSetup().appVersion());
-		version.addClassName("gx-login-title");
-		version.getStyle().set("color", "var(--app-layout-bar-font-color)");
-		version.getStyle().set("font-size", "var(--lumo-font-size-s)");
-		headingLayout.add(heading, version);
-
-		add(headingLayout);
-
-		VerticalLayout rootLayout = new VerticalLayout();
-		rootLayout.setWidth("328px");
-		rootLayout.setSpacing(false);
-		rootLayout.setPadding(false);
-		rootLayout.getElement().getStyle().set("border-radius", "var(--lumo-border-radius-l)");
-		rootLayout.getElement().getStyle().set("background", "white");
-
+		Div rootLayout = new Div();
+		rootLayout.addClassName("gx-login-root-layout");
 		add(rootLayout);
+
+		Div heading = new Div();
+		heading.addClassName("gx-login-header");
+		Span appTitle = new Span(flowSetup().appTitle());
+		appTitle.addClassName("gx-login-app-title");
+		Span appVersion = new Span(flowSetup().appVersion());
+		appVersion.addClassName("gx-login-app-version");
+		Div appTitleVersion = new Div(appTitle, appVersion);
+		appTitleVersion.addClassName("gx-login-app-title-version");
+		heading.add(appTitleVersion);
+		rootLayout.add(heading);
 
 		Image appLogo = flowSetup().appLogo();
 		if (appLogo != null) {
-			appLogo.getElement().getStyle().set("padding-top", "var(--lumo-space-l)");
-			appLogo.setHeight("4rem");
-			rootLayout.add(appLogo);
-			rootLayout.setHorizontalComponentAlignment(Alignment.CENTER, appLogo);
+			Div appLogoDiv = new Div(appLogo);
+			appLogoDiv.addClassName("gx-login-app-logo");
+			heading.add(appLogoDiv);
 		}
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.addClassName("gx-login-form");
 		loginForm.setForgotPasswordButtonVisible(true);
 		LoginI18n loginI18n = LoginI18n.createDefault();
-		loginI18n.getForm().setSubmit("Sign In");
+		loginI18n.getForm().setSubmit("Login");
 		loginI18n.getForm().setTitle("");
 		loginI18n.getForm().setForgotPassword("Forgot Password? Click here!");
-		loginI18n.getForm().setUsername("Username");
+		loginI18n.getForm().setUsername("Username or Email");
 		loginI18n.getForm().setPassword("Password");
 		loginForm.setI18n(loginI18n);
 
@@ -135,22 +108,6 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		});
 
 		rootLayout.add(loginForm);
-
-		//		Image logo = appLogo();
-		//		if (logo != null) {
-		//			logo.setHeight("3.5rem");
-		//			logo.getStyle().set("border-radius", "0.5rem");
-		//			titleVersionLayout.add(logo);
-		//			titleVersionLayout.expand(version);
-		//		}
-		//
-		//		loginFormLayout.add(titleVersionLayout, loginForm);
-		//		//loginFormLayout.setWidth("400px");
-		//		add(loginFormLayout);
-	}
-
-	protected String backgoundColor() {
-		return "white";
 	}
 
 	protected Image appLogo() {

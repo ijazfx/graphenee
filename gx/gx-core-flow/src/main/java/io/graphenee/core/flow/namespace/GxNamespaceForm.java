@@ -1,9 +1,11 @@
 package io.graphenee.core.flow.namespace;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -21,6 +23,9 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
     TextArea namespaceDescription;
     Checkbox isActive;
 
+    @Autowired
+    private GxNamespacePropertyList properties;
+
     public GxNamespaceForm() {
         super(GxNamespace.class);
     }
@@ -31,8 +36,14 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
         namespaceDescription = new TextArea("Description");
         isActive = new Checkbox("Is Active?");
         form.add(namespace, namespaceDescription, isActive);
-        setColspan(namespace, 2);
-        setColspan(namespaceDescription, 2);
+        expand(namespace);
+        expand(namespaceDescription);
+
+        Details propertiesDetails = new Details("Namespace Properties");
+        propertiesDetails.setOpened(true);
+        propertiesDetails.add(properties);
+        form.add(propertiesDetails);
+        expand(propertiesDetails);
     }
 
     @Override

@@ -151,7 +151,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				customizeResetButton(resetButton);
 
 				dismissButton = new Button("Dismiss");
-				// dismissButton.addClickShortcut(Key.ESCAPE);
+				dismissButton.addClickShortcut(Key.ESCAPE);
 				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
 				dismissButton.addClickListener(new TRDelayClickListener<Button>() {
@@ -169,9 +169,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 					}
 				});
 
-				saveButton.getElement().getStyle().set("margin-left", "auto");
+				dismissButton.getElement().getStyle().set("margin-right", "auto");
 				customizeDismissButton(dismissButton);
-				c.add(dismissButton, resetButton, saveButton);
+				c.add(saveButton, resetButton, dismissButton);
 
 			}
 

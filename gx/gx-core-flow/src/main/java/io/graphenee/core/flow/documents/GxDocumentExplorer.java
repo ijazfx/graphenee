@@ -130,6 +130,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	private void generateBreadcrumb(GxDocumentExplorerItem parent) {
 		if (breadcrumbLayout == null) {
 			breadcrumbLayout = new FlexLayout();
+			breadcrumbLayout.addClassName("gx-dms-breadcrumb-layout");
 			breadcrumbLayout.setAlignItems(Alignment.CENTER);
 		}
 		breadcrumbLayout.removeAll();

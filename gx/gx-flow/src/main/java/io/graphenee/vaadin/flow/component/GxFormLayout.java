@@ -9,7 +9,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 @SuppressWarnings("serial")
 public class GxFormLayout extends FormLayout {
 
-	int maxCols = 2;
+	int maxCols = 5;
 
 	public GxFormLayout() {
 		this.maxCols = 2;

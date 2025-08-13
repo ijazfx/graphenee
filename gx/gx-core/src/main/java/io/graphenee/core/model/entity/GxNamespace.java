@@ -49,4 +49,16 @@ public class GxNamespace extends GxMappedSuperclass implements Serializable {
 	@OneToMany(mappedBy = "namespace", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<GxNamespaceProperty> properties = new ArrayList<>();
 
+	public void addToProperties(GxNamespaceProperty property) {
+		if (!properties.contains(property)) {
+			properties.add(property);
+			property.setNamespace(this);
+		}
+	}
+
+	public void removeFromProperty(GxNamespaceProperty property) {
+		properties.remove(property);
+		property.setNamespace(null);
+	}
+
 }
