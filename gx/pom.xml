@@ -272,6 +272,15 @@
 	<profiles>
 		<profile>
 			<id>sonatype</id>
+			<modules>
+				<module>gx-util</module>
+				<module>gx-core</module>
+				<module>gx-jbpm-embedded</module>
+				<module>gx-flow</module>
+				<module>gx-core-flow</module>
+				<module>gx-jbpm-flow</module>
+				<module>gx-blockchain</module>
+			</modules>
 			<build>
 				<pluginManagement>
 					<plugins>
