@@ -22,8 +22,8 @@ public class FlowSetup extends GxAbstractFlowSetup {
         List<GxMenuItem> items = new ArrayList<>();
 
         items.add(GxCoreMenuItemFactory.setupMenuItem());
-        items.add(GxCoreMenuItemFactory.documentsMenuItem());
         items.add(GxCoreMenuItemFactory.messageTemplateMenuItem());
+        items.add(GxCoreMenuItemFactory.documentsMenuItem());
 
         return items;
     }
@@ -35,7 +35,7 @@ public class FlowSetup extends GxAbstractFlowSetup {
 
     @Override
     public String appTitle() {
-        return "Graphenee";
+        return "Graphenee Application";
     }
 
     @Override

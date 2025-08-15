@@ -6,19 +6,18 @@
 	<artifactId>${artifactId}</artifactId>
 	<version>${version}</version>
 	<packaging>jar</packaging>
-	<name>${artifactId}</name>
-	<description>A SpringBoot Vaadin Flow Application based on Graphenee
-		Framework</description>
-
+	<name>Graphenee Application</name>
+	<description>An SpringBoot application based on Graphenee Framework</description>
 	<properties>
-		<version.graphenee>4.0.0-SNAPSHOT</version.graphenee>
-		<java.version>17</java.version>
+		<version.graphenee>4.1.0-SNAPSHOT</version.graphenee>
+		<java.version>21</java.version>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>sonatype-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<name>Central Portal Snapshots</name>
+			<id>central-portal-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
@@ -86,7 +85,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.5.4</version>
 				<executions>
 					<execution>
 						<goals>
@@ -101,8 +100,8 @@
 				<version>3.11.0</version>
 				<configuration>
 					<encoding>utf8</encoding>
-					<source>17</source>
-					<target>17</target>
+					<source>21</source>
+					<target>21</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -116,7 +115,7 @@
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>24.3.2</version>
+				<version>24.8.4</version>
 				<executions>
 					<execution>
 						<goals>
@@ -151,12 +150,14 @@
 					<plugin>
 						<groupId>com.vaadin</groupId>
 						<artifactId>vaadin-maven-plugin</artifactId>
-						<version>24.3.2</version>
+						<version>24.8.4</version>
 						<executions>
 							<execution>
 								<goals>
+									<goal>prepare-frontend</goal>
 									<goal>build-frontend</goal>
 								</goals>
+								<phase>prepare-package</phase>
 							</execution>
 						</executions>
 						<configuration>
