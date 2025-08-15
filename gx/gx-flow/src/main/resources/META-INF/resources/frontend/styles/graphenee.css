@@ -37,7 +37,7 @@ html {
     --background-color: #27005D;
     font-size: 0.90rem;
     font-variation-settings:
-        "slnt" -1,
+        "slnt" -2,
         "wdth" 87.5,
         "GRAD" 0,
         "XOPQ" 96,
@@ -67,12 +67,13 @@ html {
 .gx-login-app-title-version {
     display: flex;
     gap: 0.5rem;
-    align-items: baseline;
+    align-items: bottom;
 }
 
 .gx-login-app-title {
-    font-size: var(--lumo-font-size-xxl);
+    font-size: var(--lumo-font-size-xxxl);
     flex: 0;
+    line-height: normal;
 }
 
 .gx-login-app-version {

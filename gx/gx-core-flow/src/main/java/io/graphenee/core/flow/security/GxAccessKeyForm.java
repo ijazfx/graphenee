@@ -28,15 +28,15 @@ public class GxAccessKeyForm extends GxAbstractEntityForm<GxAccessKey> {
 	protected void decorateForm(HasComponents entityForm) {
 		accessKey = new TextField("Access Key");
 		secret = new PasswordField("Secret");
-		secret.setReadOnly(true);
 		isActive = new Checkbox("Is Active?", true);
-
+		
 		entityForm.add(accessKey, secret, isActive);
 	}
-
+	
 	@Override
 	protected void postBinding(GxAccessKey entity) {
 		accessKey.setReadOnly(true);
+		secret.setReadOnly(true);
 	}
 
 }

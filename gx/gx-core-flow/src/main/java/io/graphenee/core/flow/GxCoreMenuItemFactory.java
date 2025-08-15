@@ -9,6 +9,7 @@ import io.graphenee.core.flow.i18n.GxSupportedLocaleView;
 import io.graphenee.core.flow.i18n.GxTermView;
 import io.graphenee.core.flow.namespace.GxNamespaceListView;
 import io.graphenee.core.flow.security.GxAuditLogListView;
+import io.graphenee.core.flow.security.GxPasswordPolicyView;
 import io.graphenee.core.flow.security.GxSecurityGroupListView;
 import io.graphenee.core.flow.security.GxSecurityPolicyListView;
 import io.graphenee.core.flow.security.GxUserAccountListView;
@@ -22,6 +23,7 @@ public class GxCoreMenuItemFactory {
 		menu.add(GxMenuItem.create("Users", VaadinIcon.USERS.create(), GxUserAccountListView.class));
 		menu.add(GxMenuItem.create("Groups", VaadinIcon.GROUP.create(), GxSecurityGroupListView.class));
 		menu.add(GxMenuItem.create("Policies", VaadinIcon.TASKS.create(), GxSecurityPolicyListView.class));
+		menu.add(GxMenuItem.create("Password Policy", VaadinIcon.PASSWORD.create(), GxPasswordPolicyView.class));
 		menu.add(GxMenuItem.create("Audit Log", VaadinIcon.RECORDS.create(), GxAuditLogListView.class));
 		return menu;
 	}
