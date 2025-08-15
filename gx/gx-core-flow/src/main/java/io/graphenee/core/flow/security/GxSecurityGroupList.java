@@ -3,13 +3,11 @@ package io.graphenee.core.flow.security;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.data.binder.Binder;
-import io.graphenee.core.flow.GxUserAccountDashboardUser;
-import io.graphenee.vaadin.flow.component.GxFormLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.common.GxAuthenticatedUser;
@@ -19,6 +17,7 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.component.GxFormLayout;
 
 @SpringComponent
 @Scope("prototype")

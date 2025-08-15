@@ -23,7 +23,7 @@ public abstract class TRDelayMenuClickListener<T, C extends Component> implement
                     try {
                         onClick(event);
                     } finally {
-                        Executors.newSingleThreadExecutor().execute(() -> {
+                        Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
                             try {
                                 Thread.sleep(sleepDuration);
                             } catch (InterruptedException e) {

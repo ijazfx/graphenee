@@ -52,19 +52,21 @@ public class GxPasswordPolicyForm extends GxAbstractEntityForm<GxPasswordPolicy>
 		isUserUsernameAllowed = new Checkbox("Username allowed in Password?", true);
 		isActive = new Checkbox("Is Active?", true);
 
-		TextField uesrname = new TextField("Test Username");
+		TextField username = new TextField("Test Username");
 		TextField testPolicy = new TextField("Test Password");
 		testPolicy.addValueChangeListener(vcl -> {
 			try {
-				passwordPolicyDataService.assertPasswordPolicy(getEntity(), uesrname.getValue(), vcl.getValue());
+				passwordPolicyDataService.assertPasswordPolicy(getEntity(), username.getValue(), vcl.getValue());
 			} catch (AssertionError error) {
 				testPolicy.setErrorMessage(error.getMessage());
 			}
 		});
 
-		entityForm.add(passwordPolicyName, maxHistory, maxAge,
+		entityForm.add(maxHistory, maxAge,
 				minLength, maxAllowedMatchingUserName, minUppercase, minLowercase,
-				minNumbers, minSpecialCharacters, isUserUsernameAllowed, isActive, new Hr(), testPolicy);
+				minNumbers, minSpecialCharacters, isUserUsernameAllowed, isActive, new Hr(), username, testPolicy);
+		
+		expand(username, testPolicy);
 	}
 
 }

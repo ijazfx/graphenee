@@ -41,7 +41,7 @@
 		<version.maven.resources.plugin>3.3.1</version.maven.resources.plugin>
 		<version.maven.javadoc.plugin>3.6.2</version.maven.javadoc.plugin>
 		<version.maven.sonatype.plugin>1.7.0</version.maven.sonatype.plugin>
-		<version.springboot>3.2.0</version.springboot>
+		<version.springboot>3.5.4</version.springboot>
 		<version.hibernate>1.0.2.Final</version.hibernate>
 		<version.twilio>9.14.1</version.twilio>
 		<version.aws>1.12.604</version.aws>
@@ -53,7 +53,7 @@
 		<version.lombok>1.18.30</version.lombok>
 		<version.gson>2.10.1</version.gson>
 		<version.pdfbox>3.0.1</version.pdfbox>
-		<version.poi>5.2.5</version.poi>
+		<version.poi>5.4.0</version.poi>
 		<version.retrofit>2.9.0</version.retrofit>
 		<version.protobuf>4.0.0-rc-2</version.protobuf>
 		<version.commons.beanutils>1.9.4</version.commons.beanutils>
@@ -314,8 +314,8 @@
 						<version>${version.maven.compiler.plugin}</version>
 						<configuration>
 							<encoding>utf8</encoding>
-							<source>17</source>
-							<target>17</target>
+							<source>21</source>
+							<target>21</target>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -346,7 +346,8 @@
 						<configuration>
 							<failOnError>false</failOnError>
 							<failOnWarnings>false</failOnWarnings>
-							<source>11</source>
+							<source>21</source>
+							<target>21</target>
 						</configuration>
 						<executions>
 							<execution>
@@ -408,8 +409,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<encoding>utf8</encoding>
-					<source>17</source>
-					<target>17</target>
+					<source>21</source>
+					<target>21</target>
 				</configuration>
 			</plugin>
 			<plugin>

@@ -170,7 +170,7 @@ public class TRHashFactory {
 	 * @return - generated hash
 	 */
 	public Set<String> generateHashForAllProviders(String input) {
-		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		ExecutorService service = Executors.newVirtualThreadPerTaskExecutor();
 		List<Future<String>> futures = new ArrayList<>();
 		Iterator<TRHashProvider> iterator = providers.values().iterator();
 		while (iterator.hasNext()) {

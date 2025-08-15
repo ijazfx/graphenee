@@ -78,7 +78,7 @@ public class GxDownloadButton extends Button {
 					beforeDownloadCallback.execute();
 				}
 				Optional<UI> optionalUI = getUI();
-				Executors.newSingleThreadExecutor().execute(() -> {
+				Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
 					try {
 						InputStream is = getInputStreamFactory().createInputStream();
 						StreamResource streamResource = new StreamResource(defaultFileName, () -> is);

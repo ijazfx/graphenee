@@ -28,7 +28,7 @@ public abstract class TRDelayEventListener<T extends ComponentEvent<?>> implemen
 					try {
 						onClick(event);
 					} finally {
-						Executors.newSingleThreadExecutor().execute(() -> {
+						Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
 							try {
 								Thread.sleep(sleepDuration);
 							} catch (InterruptedException e) {

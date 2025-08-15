@@ -92,7 +92,7 @@ public class FileStorageFactory {
 
 		@Override
 		public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
-			return Executors.newCachedThreadPool().submit(() -> {
+			return Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
 				String resourcePath = resourcePath(folder, fileName);
 				File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
 				resource.getParentFile().mkdirs();

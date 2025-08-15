@@ -57,7 +57,7 @@ public class GxExecuteUtil {
 	 * @param timeoutInMillis The timeout in milliseconds.
 	 */
 	public static <T> void parallel(List<T> list, int chunkSize, TRParamCallback<List<T>> onIterate, TRVoidCallback onComplete, TRErrorCallback onError, long timeoutInMillis) {
-		ExecutorService es = Executors.newCachedThreadPool();
+		ExecutorService es = Executors.newVirtualThreadPerTaskExecutor();
 		try {
 			CountDownLatch latch = new CountDownLatch(list.size() / chunkSize);
 			for (int from = 0, to = chunkSize; from < list.size(); from = to, to += chunkSize) {

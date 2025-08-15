@@ -37,7 +37,7 @@ public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 	}
 
 	private void createRootBucket() {
-		Executors.newCachedThreadPool().submit(() -> {
+		Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
 			try {
 				System.out.println("S3 root bucket: " + rootBucket + " created successfully....");
 				awsS3Client.createBucket(rootBucket);
@@ -91,7 +91,7 @@ public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 
 	@Override
 	public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
-		return Executors.newCachedThreadPool().submit(() -> {
+		return Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
 			String resourcePath = resourcePath(folder, fileName);
 			File resource = new File(rootBucket, resourcePath.replace('/', File.separatorChar));
 			try {

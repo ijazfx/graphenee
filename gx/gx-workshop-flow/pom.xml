@@ -111,8 +111,8 @@
 				<version>3.11.0</version>
 				<configuration>
 					<encoding>utf8</encoding>
-					<source>17</source>
-					<target>17</target>
+					<source>21</source>
+					<target>21</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -126,7 +126,7 @@
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>24.3.2</version>
+				<version>24.8.4</version>
 				<executions>
 					<execution>
 						<goals>
@@ -161,7 +161,7 @@
 					<plugin>
 						<groupId>com.vaadin</groupId>
 						<artifactId>vaadin-maven-plugin</artifactId>
-						<version>24.3.2</version>
+						<version>24.8.4</version>
 						<executions>
 							<execution>
 								<goals>

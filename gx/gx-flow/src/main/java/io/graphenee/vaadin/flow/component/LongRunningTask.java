@@ -73,7 +73,7 @@ public class LongRunningTask {
 
 		notification.open();
 		ui.push();
-		Executors.newCachedThreadPool().execute(() -> {
+		Executors.newVirtualThreadPerTaskExecutor().execute(() -> {
 			try {
 				taskCallback.execute(ui);
 				ui.access(() -> {

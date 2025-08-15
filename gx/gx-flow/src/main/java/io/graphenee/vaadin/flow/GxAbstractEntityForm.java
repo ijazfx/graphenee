@@ -82,6 +82,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Creates a new instance of this form.
+	 * 
 	 * @param entityClass The entity class.
 	 */
 	public GxAbstractEntityForm(Class<T> entityClass) {
@@ -196,7 +197,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 			add(toolbar);
 
-			PropertySet<T> bps = BeanPropertySet.get(entityClass, true, new PropertyFilterDefinition(1, Arrays.asList("java")));
+			PropertySet<T> bps = BeanPropertySet.get(entityClass, true,
+					new PropertyFilterDefinition(1, Arrays.asList("java")));
 			dataBinder = Binder.withPropertySet(bps);
 			bindFields(dataBinder);
 
@@ -215,6 +217,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Shows the form.
+	 * 
 	 * @param entity The entity to show.
 	 */
 	public void show(T entity) {
@@ -224,8 +227,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Shows the form.
+	 * 
 	 * @param entity The entity to show.
-	 * @param host The host component.
+	 * @param host   The host component.
 	 */
 	public void show(T entity, HasComponents host) {
 		setEntity(entity);
@@ -256,6 +260,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Validates the form.
+	 * 
 	 * @throws ValidationException If the form is invalid.
 	 */
 	public void validateForm() throws ValidationException {
@@ -348,17 +353,24 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected Component getFormComponent() {
 		FormLayout formLayout = new FormLayout();
-		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("600px", 2))); //, new ResponsiveStep("640px", 3)));
+		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("600px", 2))); // , new
+																												// ResponsiveStep("640px",
+																												// 3)));
 		formLayout.setSizeFull();
 		return formLayout;
 	}
 
-	protected void expand(Component c) {
-		setColspan(c, Integer.MAX_VALUE);
+	@Override
+	public void expand(Component... c) {
+		List.of(c).forEach(comp -> {
+			setColspan(comp, Integer.MAX_VALUE);
+		});
 	}
 
-	protected void shrink(Component c) {
-		setColspan(c, 1);
+	protected void shrink(Component... c) {
+		List.of(c).forEach(comp -> {
+			setColspan(comp, 1);
+		});
 	}
 
 	protected void setColspan(Component c, int colspan) {
@@ -371,6 +383,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Sets whether the form is editable.
+	 * 
 	 * @param editable Whether the form is editable.
 	 */
 	public void setEditable(boolean editable) {
@@ -382,6 +395,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Checks if the form is editable.
+	 * 
 	 * @return True if the form is editable, false otherwise.
 	 */
 	public boolean isEditable() {
@@ -390,6 +404,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Sets the entity.
+	 * 
 	 * @param entity The entity.
 	 */
 	public void setEntity(T entity) {
@@ -450,6 +465,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Gets the entity.
+	 * 
 	 * @return The entity.
 	 */
 	public T getEntity() {
@@ -458,6 +474,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Shows the form in a dialog.
+	 * 
 	 * @param entity The entity to show.
 	 * @return The dialog.
 	 */
@@ -466,7 +483,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected String dialogHeight() {
-		return "50rem";
+		return "auto";
 	}
 
 	protected String dialogWidth() {
@@ -474,7 +491,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	/**
-	 * This method has been deprecated in favor of {@link #show()} and will be removed in future.
+	 * This method has been deprecated in favor of {@link #show()} and will be
+	 * removed in future.
+	 * 
 	 * @param entity
 	 * @param width
 	 * @param height
@@ -495,6 +514,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		if (!dialog.isOpened()) {
 			dialog.setWidth(width);
 			dialog.setHeight(height);
+			dialog.setMinWidth("20rem");
+			dialog.setMinHeight("30rem");
 			dialog.open();
 		}
 		return dialog;
@@ -502,6 +523,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Sets the delegate.
+	 * 
 	 * @param delegate The delegate.
 	 */
 	public void setDelegate(EntityFormDelegate<T> delegate) {
@@ -575,12 +597,14 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	public interface EntityFormDelegate<T> {
 		/**
 		 * Called when the entity is saved.
+		 * 
 		 * @param entity The entity.
 		 */
 		void onSave(T entity);
 
 		/**
 		 * Called when the form is dismissed.
+		 * 
 		 * @param entity The entity.
 		 */
 		default void onDismiss(T entity) {
@@ -588,6 +612,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 		/**
 		 * Called when the form is reset.
+		 * 
 		 * @param entity The entity.
 		 */
 		default void onReset(T entity) {
@@ -602,6 +627,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Registers a listener.
+	 * 
 	 * @param listener The listener to register.
 	 */
 	public void registerListener(GxEntityFormEventListener<T> listener) {
@@ -610,6 +636,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	/**
 	 * Unregisters a listener.
+	 * 
 	 * @param listener The listener to unregister.
 	 */
 	public void unregisterListener(GxEntityFormEventListener<T> listener) {
@@ -650,7 +677,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 		/**
 		 * Called when an event occurs.
-		 * @param event The event.
+		 * 
+		 * @param event  The event.
 		 * @param entity The entity.
 		 */
 		void onEvent(GxEntityFormEvent event, T entity);
