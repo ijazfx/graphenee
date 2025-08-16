@@ -68,12 +68,12 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 
 	@Override
 	protected String dialogHeight() {
-		return "100%";
+		return "37.5rem";
 	}
-
+	
 	@Override
 	protected String dialogWidth() {
-		return "100%";
+		return "50rem";
 	}
 
 	@Override

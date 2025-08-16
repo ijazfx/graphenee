@@ -70,12 +70,12 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 
 	@Override
 	protected String dialogHeight() {
-		return "300px";
+		return "37.5rem";
 	}
 
 	@Override
 	protected String dialogWidth() {
-		return "500px";
+		return "50rem";
 	}
 
 	@Override

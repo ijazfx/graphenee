@@ -45,6 +45,13 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout {
 		rootLayout.addClassName("gx-reset-password-layout");
 		add(rootLayout);
 
+		Image appLogo = flowSetup().appLogo();
+		if (appLogo != null) {
+			Div appLogoDiv = new Div(appLogo);
+			appLogoDiv.addClassName("gx-login-app-logo");
+			rootLayout.add(appLogoDiv);
+		}
+
 		Div heading = new Div();
 		heading.addClassName("gx-login-header");
 		Span appTitle = new Span(flowSetup().appTitle());
@@ -56,24 +63,18 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout {
 		heading.add(appTitleVersion);
 		rootLayout.add(heading);
 
-		Image appLogo = flowSetup().appLogo();
-		if (appLogo != null) {
-			Div appLogoDiv = new Div(appLogo);
-			appLogoDiv.addClassName("gx-login-app-logo");
-			heading.add(appLogoDiv);
-		}
-
 		// add content to loginForm
 		Div form1 = new Div();
 		form1.addClassName("gx-reset-password-form");
-		usernameTextField = new TextField("Username");
+		usernameTextField = new TextField("Username or Email");
 		usernameTextField.setAutoselect(true);
 		usernameTextField.setRequired(true);
 
-		Button sendResetKeyButton = new Button("Send Security Pin");
-		sendResetKeyButton.setEnabled(false);
+		Button sendResetKeyButton = new Button("Send Security Code");
+		sendResetKeyButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		// sendResetKeyButton.setEnabled(false);
 
-		TextField resetKeyTextField = new TextField("Enter Security Pin");
+		TextField resetKeyTextField = new TextField("Enter Security Code");
 		resetKeyTextField.setMaxLength(6);
 		resetKeyTextField.setEnabled(false);
 
@@ -90,7 +91,7 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout {
 		passwordField = new PasswordField("New Password");
 		retypePasswordField = new PasswordField("Re-type Password");
 		retypePasswordField.setEnabled(false);
-		Button changeButton = new Button("Update Password");
+		Button changeButton = new Button("Save Password");
 		changeButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		changeButton.setEnabled(false);
 
@@ -109,20 +110,24 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout {
 		});
 		usernameTextField.setValueChangeMode(ValueChangeMode.EAGER);
 		sendResetKeyButton.addClickListener(event -> {
-			securityPin.set(RandomStringUtils.randomAlphanumeric(6));
-			sendSecurityPinToUser(securityPin.get(), usernameTextField.getValue(), () -> {
-				boolean shouldEnable = true;
-				resetKeyTextField.clear();
-				resetKeyTextField.setEnabled(shouldEnable);
-				resetKeyTextField.focus();
-				Notification.show("The reset pin has been sent to your registered email/phone.", 5000,
-						Position.BOTTOM_CENTER);
-			}, error -> {
+			if (usernameTextField.isEmpty()) {
 				usernameTextField.focus();
-				StringBuilder sb = new StringBuilder();
-				sb.append(error.getMessage());
-				Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
-			});
+			} else {
+				securityPin.set(RandomStringUtils.secureStrong().nextAlphabetic(6));
+				sendSecurityPinToUser(securityPin.get(), usernameTextField.getValue(), () -> {
+					boolean shouldEnable = true;
+					resetKeyTextField.clear();
+					resetKeyTextField.setEnabled(shouldEnable);
+					resetKeyTextField.focus();
+					Notification.show("The reset code has been sent to your registered email/phone.", 5000,
+							Position.BOTTOM_CENTER);
+				}, error -> {
+					usernameTextField.focus();
+					StringBuilder sb = new StringBuilder();
+					sb.append(error.getMessage());
+					Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
+				});
+			}
 		});
 
 		resetKeyTextField.addValueChangeListener(event -> {
@@ -133,7 +138,7 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout {
 				else {
 					nextButton.setEnabled(false);
 					StringBuilder sb = new StringBuilder();
-					sb.append("The reset pin is not valid, please try again.");
+					sb.append("The reset code is not valid, please try again.");
 					Notification.show(sb.toString(), 5000, Position.BOTTOM_CENTER);
 				}
 			} else {

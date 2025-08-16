@@ -15,26 +15,13 @@
 }
 
 html {
-    --lumo-font-family: "Roboto Flex";
-    --lumo-primary-text-color: #111111;
-    --lumo-primary-color-50pct: #9400FF80;
-    --lumo-primary-color-10pct: #9400FF20;
-    --lumo-error-text-color: #C62828;
-    --lumo-error-color-50pct: #C6282880;
-    --lumo-error-color-10pct: #C6282820;
-    --lumo-success-text-color: rgb(20, 184, 143);
-    --lumo-success-color-50pct: rgba(20, 184, 143, .5);
-    --lumo-success-color-10pct: rgba(20, 184, 143, .1);
-    --lumo-primary-color: #9400FF;
-    --lumo-error-color: #C62828;
-    --lumo-success-color: hsl(165, 80%, 40%);
-    --lumo-header-text-color: hsl(285, 35%, 15%);
-    --lumo-body-text-color: hsla(285, 40%, 16%, .94);
-    --lumo-secondary-text-color: hsla(285, 42%, 18%, .72);
-    --lumo-tertiary-text-color: hsla(285, 45%, 20%, .5);
-    --lumo-disabled-text-color: hsla(285, 50%, 22%, .26);
-    --background-text-color: #AED2FF;
-    --background-color: #27005D;
+    --lumo-font-family: 'IBM Plex Sans';
+    --lumo-secondary-color: #ff4081;
+    --lumo-secondary-variant: #03dac5;
+    --lumo-primary-color: #6200ee;
+    --lumo-primary-variant: #3700b3;
+    --background-text-color: white;
+    --background-color: black;
     font-size: 0.90rem;
     font-variation-settings:
         "slnt" -1,
@@ -50,6 +37,22 @@ html {
         "YTUC" 712;
 }
 
+.gx-login-root-layout {
+    width: 320px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.gx-reset-password-layout {
+    width: 320px;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 .gx-login-header {
     display: flex;
     flex-direction: row;
@@ -58,6 +61,8 @@ html {
 }
 
 .gx-login-app-logo {
+    display: flex;
+    justify-content: end;
     > img {
         max-height: 3rem;
         max-width: 9rem;
@@ -65,6 +70,7 @@ html {
 }
 
 .gx-login-app-title-version {
+    justify-content: space-between;
     display: flex;
     gap: 0.5rem;
     align-items: end;
@@ -72,7 +78,7 @@ html {
 
 .gx-login-app-title {
     font-size: var(--lumo-font-size-xxxl);
-    flex: 0;
+    flex: 1;
     line-height: normal;
 }
 
@@ -110,16 +116,6 @@ vaadin-app-layout::part(navbar) {
     color: var(--background-text-color);
 }
 
-.gx-reset-password-layout {
-    width: 320px;
-    max-width: 320;
-}
-
-.gx-login-root-layout {
-    width: 320px;
-    max-width: 320px;
-}
-
 .gx-reset-password-form {
     display: flex;
     flex-direction: column;
@@ -127,6 +123,38 @@ vaadin-app-layout::part(navbar) {
     border-radius: 0.5rem;
     padding: var(--lumo-space-l);
     gap: var(--lumo-space-m);
+}
+
+input,label,vaadin-button,textarea {
+    font-size: 0.9rem; 
+}
+
+.gx-grid {
+    border: none;
+}
+
+.gx-grid-footer {
+    padding: var(--lumo-space-s);
+}
+
+.gx-grid-search-layout {
+    padding: 0 var(--lumo-space-s) 0 var(--lumo-space-s);
+}
+
+.gx-form-title {
+    text-transform: uppercase;
+	color: var(--background-text-color);
+	font-weight: bold;
+	border-radius: var(--lumo-space-xs);
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+	margin: var(--lumo-space-m);
+	margin-top: 0;
+	margin-bottom: var(--lumo-space-xs)
+}
+
+.gx-form-title-layout {
+	background-color: var(--background-color);
 }
 
 ::-webkit-scrollbar {
@@ -145,26 +173,12 @@ vaadin-grid::part(last-row) {
     font-size: 0.9rem;
 }
 
+vaadin-grid vaadin-checkbox {
+    scale: 85%;
+}
+
 vaadin-grid::part(cell) {
     font-size: 0.9rem;
-}
-
-.gx-entity-list>* {
-    margin: 0px;
-    padding: 0px;
-}
-
-.gx-grid {
-    border-left: none;
-    border-right: none;
-}
-
-.gx-grid-footer {
-    padding: var(--lumo-space-s);
-}
-
-.gx-grid-search-layout {
-    padding: var(--lumo-space-s);
 }
 
 vaadin-menu-bar-button {
@@ -210,17 +224,39 @@ vaadin-login-form-wrapper {
     border-radius: var(--lumo-border-radius) var(--lumo-border-radius) 0 0;
 }
 
+.gx-app-layout-toggle {
+    color: var(--background-text-color);
+}
+
+.gx-app-layout-title {
+    color: var(--background-text-color);
+    font-size: var(--lumo-font-size-xl);
+}
+
+.gx-app-layout-version {
+    color: var(--background-text-color);
+    font-size: var(--lumo-font-size-xxs);
+}
+
+.gx-app-layout-title-version {
+    display: flex;
+    gap: var(--lumo-space-xs);
+}
+
 .gx-avatar-small {
     text-transform: uppercase;
-    width: 2rem;
-    height: 2rem;
+    color: var(--background-color);
+    font-size: large;
+    background-color: var(--background-text-color);
 }
 
 .gx-avatar-large {
     text-transform: uppercase;
     width: 6.5rem;
     height: 6.5rem;
-    margin: 2rem !important;
+    color: var(--background-color);
+    font-size: large;
+    background-color: var(--background-text-color);
 }
 
 .gx-app-layout-logout {
@@ -287,25 +323,12 @@ vaadin-checkbox::part(checkbox) {
     background: var(--background-color)
 }
 
-vaadin-button {
-    font-weight: bold;
-}
-
-vaadin-button[theme~="error"] {
-    border: 0.1rem solid;
-    font-weight: bold
-}
-
-vaadin-button[theme~="success"] {
-    border: 0.1rem solid;
-    font-weight: bold;
-}
-
 vaadin-context-menu-item,
 vaadin-menu-bar-button {
     font-weight: bold;
     text-transform: uppercase;
     font-size: var(--lumo-font-size-xs);
+    background-color: var(--lumo-shade-10pct);
 }
 
 vaadin-context-menu-item vaadin-icon {

@@ -457,9 +457,4 @@ public class GxSecurityPolicyForm extends GxAbstractEntityForm<GxSecurityPolicy>
         tabItems.add(GxTabItem.create(2, "Groups", securityGroups));
     }
 
-    @Override
-    protected String dialogWidth() {
-        return "800px";
-    }
-
 }

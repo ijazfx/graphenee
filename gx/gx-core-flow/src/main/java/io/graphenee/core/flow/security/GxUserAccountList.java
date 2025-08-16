@@ -88,7 +88,6 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccount> {
             refresh();
         });
         searchForm.add(namespaceComboBox);
-        searchForm.getStyle().set("margin-left","10px");
         //Making the namespace filter visible to Super Admin only
         Boolean flag = loggedInUser().canDoAction("namespace-filter","view",true);
         namespaceComboBox.setVisible(flag);

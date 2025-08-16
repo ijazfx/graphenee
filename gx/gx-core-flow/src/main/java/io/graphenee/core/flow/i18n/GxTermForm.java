@@ -107,11 +107,11 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 
 	@Override
 	protected String dialogHeight() {
-		return "650px";
+		return "37.5rem";
 	}
 
 	@Override
 	protected String dialogWidth() {
-		return "650px";
+		return "50rem";
 	}
 }

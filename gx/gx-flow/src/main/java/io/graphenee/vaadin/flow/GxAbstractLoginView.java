@@ -47,6 +47,13 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		rootLayout.addClassName("gx-login-root-layout");
 		add(rootLayout);
 
+		Image appLogo = flowSetup().appLogo();
+		if (appLogo != null) {
+			Div appLogoDiv = new Div(appLogo);
+			appLogoDiv.addClassName("gx-login-app-logo");
+			rootLayout.add(appLogoDiv);
+		}
+
 		Div heading = new Div();
 		heading.addClassName("gx-login-header");
 		Span appTitle = new Span(flowSetup().appTitle());
@@ -57,13 +64,6 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		appTitleVersion.addClassName("gx-login-app-title-version");
 		heading.add(appTitleVersion);
 		rootLayout.add(heading);
-
-		Image appLogo = flowSetup().appLogo();
-		if (appLogo != null) {
-			Div appLogoDiv = new Div(appLogo);
-			appLogoDiv.addClassName("gx-login-app-logo");
-			heading.add(appLogoDiv);
-		}
 
 		LoginForm loginForm = new LoginForm();
 		loginForm.addClassName("gx-login-form");

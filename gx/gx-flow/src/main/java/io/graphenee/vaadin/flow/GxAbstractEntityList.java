@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
@@ -41,7 +42,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -231,8 +231,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			dataGrid = dataGrid(entityClass);
 			dataGrid.setSizeFull();
 			dataGrid.addClassName("gx-grid");
-			
-			((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI)).setSelectionColumnFrozen(true);
+
+			((GridMultiSelectionModel<?>) dataGrid.setSelectionMode(SelectionMode.MULTI))
+					.setSelectionColumnFrozen(true);
 
 			DataProvider<T, ?> dataProvider = dataProvider(entityClass);
 			if (dataProvider != null) {
@@ -294,10 +295,10 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			customMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 			columnMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 
-			addMenuItem = crudMenuBar.addItem(VaadinIcon.PLUS.create());
+			addMenuItem = crudMenuBar.addItem(VaadinIcon.FILE_ADD.create());
 			customizeAddMenuItem(addMenuItem);
 
-			deleteMenuItem = crudMenuBar.addItem(VaadinIcon.TRASH.create());
+			deleteMenuItem = crudMenuBar.addItem(VaadinIcon.FILE_REMOVE.create());
 			customizeDeleteMenuItem(deleteMenuItem);
 
 			MenuItem optionsMenuItem = columnMenuBar.addItem(VaadinIcon.ELLIPSIS_DOTS_H.create());
@@ -402,16 +403,14 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			deleteMenuItem.setEnabled(false);
 
-			GxFormLayout searchForm = new GxFormLayout();
-			searchForm.addClassName("gx-grid-search-form");
+			GxFormLayout searchForm = new GxFormLayout(5);
+			searchForm.addClassName("gx-grid-search-layout");
 
 			decorateSearchForm(searchForm, searchBinder);
-			
-			Details searchFormDetails = new Details("Search...");
-			searchFormDetails.add(searchForm);
-			searchFormDetails.setVisible(searchForm.getChildren().count() > 0);
 
-			gridLayout.add(searchFormDetails);
+			searchForm.setVisible(searchForm.getChildren().count() > 0);
+
+			gridLayout.add(searchForm);
 
 			List<Column<T>> columns = new ArrayList<>();
 			List<String> userPreferences = new ArrayList<>();
@@ -458,10 +457,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 						}
 						configureDefaults(propertyName, column, propertyDefinition);
 						if (i == 0 || i == (preferenceProperties().length - 1)) {
-							column.setAutoWidth(true);
+							// column.setAutoWidth(true);
 						}
 
-						if (isGridFilterEnabled() && !(propertyDefinition.getType().equals(List.class) || propertyDefinition.getType().equals(Set.class))) {
+						if (isGridFilterEnabled() && !(propertyDefinition.getType().equals(List.class)
+								|| propertyDefinition.getType().equals(Set.class))) {
 							addFilteredColumn(column, propertyDefinition);
 						}
 
@@ -494,20 +494,23 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 				for (int i = 0; i < userPreferences.size(); i++) {
 					String prop = userPreferences.get(i);
-					Column<T> column = userColumns.stream().filter(c -> c.getKey().equals(prop)).findFirst().orElse(null);
+					Column<T> column = userColumns.stream().filter(c -> c.getKey().equals(prop)).findFirst()
+							.orElse(null);
 					if (column != null) {
 						columns.add(column);
 					}
 				}
 				columns.addAll(remainingColumns);
 				dataGrid.setColumnOrder(columns);
+				dataGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COMPACT);
 				decorateGrid(dataGrid);
 				Column<T> endColumn = dataGrid.addComponentColumn(source -> new Span());
 				endColumn.setKey("__gxLastColumn");
 				endColumn.setAutoWidth(true);
 			}
 
-			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column")).forEach(col -> col.setVisible(false));
+			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column"))
+					.forEach(col -> col.setVisible(false));
 
 			for (String key : preferenceProperties()) {
 				Column<T> columnByKey = dataGrid.getColumnByKey(key);
@@ -572,7 +575,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
 
-				String orderedColumns = listener.getColumns().stream().filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
+				String orderedColumns = listener.getColumns().stream()
+						.filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
 						.collect(Collectors.joining(","));
 			});
 		}
@@ -607,7 +611,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 					openForm(newInstance());
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
-					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+							.addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}
 
@@ -627,7 +632,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 					openForm(event.getItem().get());
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
-					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+							.addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}
 		});
@@ -670,7 +676,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean isGridInlineEditingEnabled() {
-		return false;
+		return true;
 	}
 
 	protected boolean isAuditLogEnabled() {
@@ -687,6 +693,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			editorComponent = defaultInlineEditorForProperty(column.getKey(), propertyDefinition);
 			if (editorComponent != null) {
 				dataGrid.getEditor().getBinder().forField(editorComponent).bind(column.getKey());
+				editorComponent.getElement().addEventListener("keydown", e -> {
+					dataGrid.getEditor().cancel();
+				}).setFilter("event.key === 'Escape'");
+				editorComponent.getElement().addEventListener("keydown", e -> {
+					dataGrid.getEditor().save();
+				}).setFilter("event.key === 'Enter'");
 				column.setEditorComponent(editorComponent);
 				editorComponentMap.put(column.getKey(), editorComponent);
 			}
@@ -698,16 +710,20 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		if (isGridInlineEditingEnabled()) {
 			String propertyName = icl.getColumn().getKey();
 			if (propertyName != null) {
-				// AbstractField<?, ?> editorComponent = editorComponentMap.get(propertyName);
+				if(dataGrid.getEditor().isOpen()) {
+					dataGrid.getEditor().save();
+				}
 				dataGrid.getEditor().editItem(icl.getItem());
-				// if (editorComponent instanceof Focusable) {
-				// ((Focusable<?>) editorComponent).focus();
-				// }
+				AbstractField<?, ?> editorComponent = editorComponentMap.get(propertyName);
+				if (editorComponent instanceof Focusable) {
+					((Focusable<?>) editorComponent).focus();
+				}
 			}
 		}
 	}
 
-	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		if (propertyDefinition.getSetter().isEmpty()) {
 			return null;
 		}
@@ -757,7 +773,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		c.getElement().getStyle().set("width", "100%");
 		// c.getElement().setProperty("clearButtonVisible", true);
 		// c.getElement().setProperty("autoselect", true);
-		c.getElement().setProperty("placeholder", propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+		c.getElement().setProperty("placeholder",
+				propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
 		return c;
 	}
 
@@ -777,7 +794,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		return p;
 	}
 
-	protected AbstractField<?, ?> inlineEditorForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	protected AbstractField<?, ?> inlineEditorForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		return null;
 	}
 
@@ -837,10 +855,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			// PropertyFilterDefinition(1, Arrays.asList("java")));
 			Binder<T> editBinder = Binder.withPropertySet(bps);
 			dataGrid.getEditor().setBinder(editBinder);
-			dataGrid.getEditor().setBuffered(false);
-			editBinder.addValueChangeListener(l -> {
-				dataGrid.getEditor().save();
-				onGridInlineEditorSave(dataGrid.getEditor().getItem());
+			dataGrid.getEditor().setBuffered(true);
+			dataGrid.getEditor().addSaveListener(sl -> {
+				onGridInlineEditorSave(sl.getItem());
 			});
 		}
 		List<Column<T>> removeList = new ArrayList<>(dataGrid.getColumns());
@@ -872,7 +889,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 					openForm(newInstance());
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
-					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+							.addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}
 		});
@@ -911,7 +929,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				try {
 					onDelete(selectedItems);
 					if (isAuditLogEnabled()) {
-						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE",
+								entityClass.getSimpleName(), dataGrid.getSelectedItems());
 					}
 					listeners.forEach(l -> {
 						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
@@ -921,14 +940,16 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 					dataGrid.deselectAll();
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
-					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+							.addThemeVariants(NotificationVariant.LUMO_ERROR);
 				}
 			}).open();
 		} else {
 			try {
 				onDelete(selectedItems);
 				if (isAuditLogEnabled()) {
-					auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE", entityClass.getSimpleName(), dataGrid.getSelectedItems());
+					auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE",
+							entityClass.getSimpleName(), dataGrid.getSelectedItems());
 				}
 				listeners.forEach(l -> {
 					l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
@@ -936,7 +957,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				refresh();
 			} catch (Exception e) {
 				log.warn(e.getMessage(), e);
-				Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+				Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+						.addThemeVariants(NotificationVariant.LUMO_ERROR);
 			}
 		}
 	}
@@ -978,7 +1000,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				});
 				dataProvider.refreshAll();
 			} else if (entityGrid().getDataProvider() instanceof ConfigurableFilterDataProvider) {
-				ConfigurableFilterDataProvider<T, Void, Object> dataProvider = (ConfigurableFilterDataProvider<T, Void, Object>) entityGrid().getDataProvider();
+				ConfigurableFilterDataProvider<T, Void, Object> dataProvider = (ConfigurableFilterDataProvider<T, Void, Object>) entityGrid()
+						.getDataProvider();
 				propertyDefinition.getSetter().ifPresent(setter -> {
 					if (event.getValue() == null || event.getValue().toString().isBlank()) {
 						setter.accept(searchEntity, null);
@@ -1054,7 +1077,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		}
 	}
 
-	private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		AbstractField<?, ?> filter = null;
 		if (propertyName.matches("dateTime.*|.*DateTime")) {
 			if (propertyDefinition.getType().equals(Long.class)) {
@@ -1102,11 +1126,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	 *             instead.
 	 */
 	@Deprecated
-	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition) {
+	protected AbstractField<?, ?> columnFilterForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition) {
 		return null;
 	}
 
-	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<T, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
+	protected AbstractField<?, ?> columnFilterForProperty(String propertyName,
+			PropertyDefinition<T, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
 		AbstractField<?, ?> customFilter = columnFilterForProperty(propertyName, propertyDefinition);
 		if (customFilter != null)
 			return customFilter;
@@ -1126,22 +1152,28 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		if (renderer == null) {
 			if (propertyName.matches("dateTime.*|.*DateTime")) {
 				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.DateTime);
+					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+							GxNumberToDateRenderer.GxDateResolution.DateTime);
 				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
+					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+							GxDateRenderer.GxDateResolution.DateTime);
 				}
 			}
 			if (renderer == null && propertyName.matches("date.*|.*Date")) {
 				if (propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), GxNumberToDateRenderer.GxDateResolution.Date);
+					renderer = new GxNumberToDateRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+							GxNumberToDateRenderer.GxDateResolution.Date);
 				} else if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
+					renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+							GxDateRenderer.GxDateResolution.Date);
 				}
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
-				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.DateTime);
+				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+						GxDateRenderer.GxDateResolution.DateTime);
 			}
-			if (renderer == null && (propertyDefinition.getType().equals(List.class) || propertyDefinition.getType().equals(Set.class))) {
+			if (renderer == null && (propertyDefinition.getType().equals(List.class)
+					|| propertyDefinition.getType().equals(Set.class))) {
 				// renderer = new ComponentRenderer<>(s -> {
 				// MultiComboBox<Object> c = new MultiComboBox<>();
 				// c.setItems(propertyDefinition.getGetter().apply((T) s));
@@ -1158,18 +1190,21 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				renderer = new TextRenderer<>();
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Date.class)) {
-				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(), GxDateRenderer.GxDateResolution.Date);
+				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+						GxDateRenderer.GxDateResolution.Date);
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Boolean.class)) {
 				renderer = new ComponentRenderer<>(s -> {
 					Boolean value = (Boolean) propertyDefinition.getGetter().apply(s);
-					GxToggleButton c = new GxToggleButton(VaadinIcon.CHECK_SQUARE_O.create(), VaadinIcon.THIN_SQUARE.create(), value);
+					GxToggleButton c = new GxToggleButton(VaadinIcon.CHECK_SQUARE_O.create(),
+							VaadinIcon.THIN_SQUARE.create(), value);
 					return c;
 				});
 			}
 			if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 				NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
-				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(), numberFormat);
+				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+						numberFormat);
 			}
 		}
 		return renderer;
@@ -1189,16 +1224,17 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		return null;
 	}
 
-	protected void configureDefaults(String propertyName, Column<T> column, PropertyDefinition<T, ?> propertyDefinition) {
+	protected void configureDefaults(String propertyName, Column<T> column,
+			PropertyDefinition<T, ?> propertyDefinition) {
 		column.setId(propertyName);
 		Span header = new Span(propertyDefinition.getCaption());
 		header.getStyle().set("white-space", "normal");
 		column.setHeader(header);
+		column.setAutoWidth(true);
 		column.setResizable(true);
-		column.setFlexGrow(0);
-		column.setWidth("8rem");
 		if (propertyDefinition != null) {
-			if (propertyDefinition.getType().getSuperclass() != null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+			if (propertyDefinition.getType().getSuperclass() != null
+					&& propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 				column.setTextAlign(ColumnTextAlign.END);
 			}
 			if (propertyDefinition.getType() != null && propertyDefinition.getType().equals(String.class)) {
@@ -1270,16 +1306,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		 * 5. else show form in dialog
 		 */
 		preEdit(entity);
-		if (isGridInlineEditingEnabled()) {
-			entityGrid().getEditor().editItem(entity);
-		} else {
-			GxAbstractEntityForm<T> entityForm = cachedForm(entity);
-			if (entityForm != null) {
-				if (shouldShowFormInDialog()) {
-					entityForm.showInDialog(entity);
-				} else {
-					entityForm.show(entity, rootLayout);
-				}
+		GxAbstractEntityForm<T> entityForm = cachedForm(entity);
+		if (entityForm != null) {
+			if (shouldShowFormInDialog()) {
+				entityForm.showInDialog(entity);
+			} else {
+				entityForm.show(entity, rootLayout);
 			}
 		}
 	}
@@ -1293,11 +1325,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected String dialogWidth() {
-		return "90%";
+		return "50rem";
 	}
 
 	protected String dialogHeight() {
-		return "90%";
+		return "37.5rem";
 	}
 
 	protected void preEdit(T entity) {
@@ -1333,7 +1365,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		GridPreferences gridPref = preferences().get(entityClass.getSimpleName());
 		if (gridPref != null) {
 			List<ColumnPreferences> columns = gridPref.visibleColumns();
-			return columns.stream().map(c -> c.getColumnName()).collect(Collectors.toList()).toArray(new String[columns.size()]);
+			return columns.stream().map(c -> c.getColumnName()).collect(Collectors.toList())
+					.toArray(new String[columns.size()]);
 		}
 		return availableProperties();
 	}
@@ -1348,7 +1381,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		Stream.of(preferenceProperties()).forEach(p -> {
 			dataGrid.getColumnByKey(p).setVisible(true);
 		});
-		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__editColumn")).forEach(c -> c.setVisible(isEditable()));
+		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__editColumn"))
+				.forEach(c -> c.setVisible(isEditable()));
 		if (isDragAndDropEnabled()) {
 			dataGrid.setRowsDraggable(isRowDraggable());
 			dataGrid.setDropMode(GridDropMode.ON_TOP_OR_BETWEEN);
@@ -1403,7 +1437,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 						GxAbstractEntityList.this.onSave(entity);
 						if (isAuditLogEnabled()) {
 							try {
-								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE", entityClass.getSimpleName(), List.of(entity));
+								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE",
+										entityClass.getSimpleName(), List.of(entity));
 							} catch (Exception ex) {
 
 							}
@@ -1414,7 +1449,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 						refresh();
 					} catch (Exception e) {
 						log.warn(e.getMessage(), e);
-						Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
+						Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+								.addThemeVariants(NotificationVariant.LUMO_ERROR);
 					}
 					refresh();
 				}
@@ -1425,7 +1461,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		return entityForm;
 	}
 
-	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity, Collection<T> entities) {
+	protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity,
+			Collection<T> entities) {
 		log.warn(this + " - Override auditLog(...) method to log this event.");
 	}
 
@@ -1543,7 +1580,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				String key = p.getName();
 				if (!key.contains(".")) {
 					@SuppressWarnings("unchecked")
-					com.vaadin.flow.data.binder.Setter<T, Object> setter = (com.vaadin.flow.data.binder.Setter<T, Object>) p.getSetter().orElse(null);
+					com.vaadin.flow.data.binder.Setter<T, Object> setter = (com.vaadin.flow.data.binder.Setter<T, Object>) p
+							.getSetter().orElse(null);
 					if (setter != null) {
 						Object convertedValue = null;
 						if (json.has(key)) {

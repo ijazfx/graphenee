@@ -10,8 +10,6 @@ import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -41,18 +39,18 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	private void postBuild() {
 		DrawerToggle toggle = new DrawerToggle();
 		toggle.addClassName("gx-app-layout-toggle");
-		toggle.getStyle().set("color", "var(--lumo-base-color)");
+		//toggle.getStyle().set("color", "var(--lumo-base-color)");
 
-		H1 title = new H1(flowSetup().appTitle());
+		Span title = new Span(flowSetup().appTitle());
 		title.addClassName("gx-app-layout-title");
-		title.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin", "0");
-		title.getStyle().set("color", "var(--lumo-base-color)");
+		// title.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin", "0");
+		// title.getStyle().set("color", "var(--lumo-base-color)");
 		// title.setWidthFull();
 
-		H5 version = new H5(flowSetup().appVersion());
+		Span version = new Span(flowSetup().appVersion());
 		version.addClassName("gx-app-layout-version");
-		version.getStyle().set("font-size", "var(--lumo-font-size-xs)").set("margin", "0");
-		version.getStyle().set("color", "var(--lumo-base-color)");
+		// version.getStyle().set("font-size", "var(--lumo-font-size-xs)").set("margin", "0");
+		// version.getStyle().set("color", "var(--lumo-base-color)");
 
 		SideNav drawer = new SideNav();
 		drawer.addClassName("gx-app-layout-drawer");
@@ -79,6 +77,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		navbarLayout.getStyle().setHeight("var(--lumo-size-xl)");
 
 		HorizontalLayout titleVersionLayout = new HorizontalLayout(title, version);
+		titleVersionLayout.addClassName("gx-app-layout-title-version");
 		titleVersionLayout.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
 
 		navbarLayout.add(toggle, titleVersionLayout);
@@ -92,7 +91,6 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			GxAuthenticatedUser user = flowSetup().loggedInUser();
 			avatar = new Avatar(user.getFirstNameLastName());
 			avatar.addThemeVariants(AvatarVariant.LUMO_LARGE);
-			avatar.setColorIndex(1);
 			customizeAvatar(avatar);
 			Span space = new Span("");
 			space.setWidth("12px");

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
@@ -37,6 +36,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
+import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import lombok.Setter;
@@ -107,7 +107,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				HasComponents c = (HasComponents) toolbar;
 				decorateToolbar(c);
 				saveButton = new Button("Save");
-				saveButton.addClickShortcut(Key.KEY_S, KeyModifier.ALT);
 				saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 				saveButton.setDisableOnClick(true);
 
@@ -115,6 +114,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 					if (entity != null) {
 						try {
 							validateForm();
+							dataBinder.writeBean(entity);
 							if (delegate != null)
 								delegate.onSave(entity);
 							listeners.forEach(l -> {
@@ -153,7 +153,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 				dismissButton = new Button("Dismiss");
 				dismissButton.addClickShortcut(Key.ESCAPE);
-				dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+				dismissButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
 				dismissButton.addClickListener(new TRDelayClickListener<Button>() {
 
@@ -161,12 +161,24 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 					@Override
 					public void onClick(ClickEvent<Button> event) {
-						dismiss();
-						if (delegate != null)
-							delegate.onDismiss(entity);
-						listeners.forEach(l -> {
-							l.onEvent(GxEntityFormEvent.DISMISS, entity);
-						});
+						if (dataBinder.hasChanges()) {
+							DialogFactory.confirmDialog(
+									"You have unsaved changes which will be lost. Do you want to continue?", dlg -> {
+										dismiss();
+										if (delegate != null)
+											delegate.onDismiss(entity);
+										listeners.forEach(l -> {
+											l.onEvent(GxEntityFormEvent.DISMISS, entity);
+										});
+									}).open();
+						} else {
+							dismiss();
+							if (delegate != null)
+								delegate.onDismiss(entity);
+							listeners.forEach(l -> {
+								l.onEvent(GxEntityFormEvent.DISMISS, entity);
+							});
+						}
 					}
 				});
 
@@ -265,29 +277,33 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 */
 	public void validateForm() throws ValidationException {
 		dataBinder.validate();
-		dataBinder.writeBean(entity);
 	}
 
 	private void buildFormTitle() {
 		if (formTitleLabel == null) {
 			formTitleLabel = new NativeLabel();
-			formTitleLabel.getStyle().set("text-transform", "uppercase");
-			formTitleLabel.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
-			formTitleLabel.getStyle().set("font-weight", "bold");
-			formTitleLabel.getStyle().set("color", "var(--lumo-primary-color)");
-			formTitleLabel.getStyle().set("border-bottom", "none");
-			formTitleLabel.getStyle().set("border-radius", "var(--lumo-border-radius)");
-			formTitleLabel.getStyle().set("border-bottom-right-radius", "0px");
-			formTitleLabel.getStyle().set("border-bottom-left-radius", "0px");
-			formTitleLabel.getStyle().set("padding-left", "0.5rem");
-			formTitleLabel.getStyle().set("padding-right", "0.5rem");
-			formTitleLabel.getStyle().set("padding-top", "0.25rem");
+			formTitleLabel.addClassName("gx-form-title");
+			// formTitleLabel.getStyle().set("text-transform", "uppercase");
+			// formTitleLabel.getStyle().set("background-color",
+			// "var(--lumo-primary-color-10pct)");
+			// formTitleLabel.getStyle().set("font-weight", "bold");
+			// formTitleLabel.getStyle().set("color", "var(--lumo-primary-color)");
+			// formTitleLabel.getStyle().set("border-bottom", "none");
+			// formTitleLabel.getStyle().set("border-radius", "var(--lumo-border-radius)");
+			// formTitleLabel.getStyle().set("border-bottom-right-radius", "0px");
+			// formTitleLabel.getStyle().set("border-bottom-left-radius", "0px");
+			// formTitleLabel.getStyle().set("padding-left", "0.5rem");
+			// formTitleLabel.getStyle().set("padding-right", "0.5rem");
+			// formTitleLabel.getStyle().set("padding-top", "0.25rem");
 			formTitleLayout = new HorizontalLayout();
+			formTitleLayout.addClassName("gx-form-title-layout");
 			formTitleLayout.addClassName("draggable");
-			formTitleLayout.getStyle().set("background-color", "var(--lumo-primary-color-10pct)");
-			formTitleLayout.getStyle().set("border-bottom", "5px solid var(--lumo-primary-color-10pct)");
-			formTitleLayout.getStyle().set("padding-left", "0.5rem");
-			formTitleLayout.getStyle().set("padding-top", "0.5rem");
+			// formTitleLayout.getStyle().set("background-color",
+			// "var(--lumo-primary-color-10pct)");
+			// formTitleLayout.getStyle().set("border-bottom", "5px solid
+			// var(--lumo-primary-color-10pct)");
+			// formTitleLayout.getStyle().set("padding-left", "0.5rem");
+			// formTitleLayout.getStyle().set("padding-top", "0.5rem");
 			formTitleLayout.setWidthFull();
 			formTitleLayout.add(formTitleLabel);
 			addComponentAsFirst(formTitleLayout);
@@ -438,7 +454,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			formTitleLabel.setText(formTitle);
 			formTitleLabel.setTitle("");
 		}
-		setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
+		// setFormTitleVisibility(!Strings.isNullOrEmpty(formTitle));
 		if (shouldFocusFirstFieldOnShow()) {
 			focusFirst(this);
 		}
@@ -447,7 +463,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected boolean shouldFocusFirstFieldOnShow() {
-		return false;
+		return true;
 	}
 
 	private boolean focusFirst(Component c) {
@@ -483,7 +499,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected String dialogHeight() {
-		return "auto";
+		return "50rem";
 	}
 
 	protected String dialogWidth() {
@@ -514,8 +530,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		if (!dialog.isOpened()) {
 			dialog.setWidth(width);
 			dialog.setHeight(height);
-			dialog.setMinWidth("20rem");
-			dialog.setMinHeight("30rem");
 			dialog.open();
 		}
 		return dialog;
