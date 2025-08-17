@@ -1,0 +1,1 @@
+alter table gx_password_policy rename column min_special_charaters to min_special_characters;
