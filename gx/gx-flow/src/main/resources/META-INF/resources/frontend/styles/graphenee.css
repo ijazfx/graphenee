@@ -146,19 +146,15 @@ vaadin-dialog-overlay .gx-entity-list {
 }
 
 .gx-form-title {
-    text-transform: uppercase;
+    text-transform: none;
 	color: var(--background-text-color);
 	font-weight: bold;
-	border-radius: var(--lumo-space-xs);
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
-	margin: var(--lumo-space-m);
-	margin-top: 0;
-	margin-bottom: var(--lumo-space-xs)
+    margin: 0;
+    padding: var(--lumo-space-s) var(--lumo-space-m) var(--lumo-space-s) var(--lumo-space-m)
 }
 
 .gx-form-title-layout {
-	background-color: var(--background-color);
+	background-color: var(--lumo-primary-color);
 }
 
 ::-webkit-scrollbar {

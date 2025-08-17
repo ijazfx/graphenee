@@ -39,6 +39,7 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm.GxEntityFormEventListener.G
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
+import io.graphenee.vaadin.flow.utils.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -133,7 +134,6 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 				resetButton = new Button("Reset");
 				resetButton.addClickShortcut(Key.KEY_R, KeyModifier.ALT);
-				resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 
 				resetButton.addClickListener(new TRDelayClickListener<Button>() {
 
@@ -183,6 +183,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 
 				dismissButton.getElement().getStyle().set("margin-right", "auto");
+				
 				customizeDismissButton(dismissButton);
 				c.add(saveButton, resetButton, dismissButton);
 
@@ -330,7 +331,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	protected String formTitle() {
-		return null;
+		return StringUtils.toTitleCase(entityClass.getSimpleName()).replaceFirst("Gx", "");
 	}
 
 	protected String formTitleProperty() {

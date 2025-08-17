@@ -10,7 +10,7 @@ CREATE TABLE gx_password_policy (
     min_uppercase INT NOT NULL DEFAULT 1,
     min_lowercase INT NOT NULL DEFAULT 1,
     min_numbers INT NOT NULL DEFAULT 1,
-    min_special_characters INT NOT NULL DEFAULT 1,
+    min_special_charaters INT NOT NULL DEFAULT 1,
     is_active BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (oid_namespace) REFERENCES gx_namespace(oid) ON DELETE CASCADE ON UPDATE CASCADE
 );
