@@ -141,6 +141,10 @@ input,label,vaadin-button,textarea {
     padding: 0 var(--lumo-space-s) 0 var(--lumo-space-s);
 }
 
+vaadin-dialog-overlay .gx-entity-list {
+    padding: 0 !important;
+}
+
 .gx-form-title {
     text-transform: uppercase;
 	color: var(--background-text-color);
