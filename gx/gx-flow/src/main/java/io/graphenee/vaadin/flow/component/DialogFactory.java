@@ -45,6 +45,9 @@ public class DialogFactory {
 	public static ConfirmDialog customDialog(String title, Component component, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
 		ConfirmDialog d = new ConfirmDialog(title, null, confirmText, dlg -> {
 			callback.execute(dlg);
+			if(dlg.getSource().isOpened()) {
+				dlg.getSource().close();
+			}
 		});
 		d.setText(component);
 		d.setCancelable(true);
@@ -85,8 +88,11 @@ public class DialogFactory {
 	 * @return The new dialog.
 	 */
 	public static ConfirmDialog customDialog(String title, String message, String confirmText, String cancelText, TRParamCallback<ConfirmEvent> callback) {
-		ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
+		final ConfirmDialog d = new ConfirmDialog(title, message, confirmText, dlg -> {
 			callback.execute(dlg);
+			if(dlg.getSource().isOpened()) {
+				dlg.getSource().close();
+			}
 		});
 		d.setCancelable(true);
 		d.setCancelButtonTheme(ButtonVariant.LUMO_ERROR.getVariantName());
