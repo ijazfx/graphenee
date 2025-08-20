@@ -97,8 +97,8 @@ public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass impl
 		if (grantActionSet != null && grantActionSet.contains("all"))
 			return true;
 
-		if (resource.contains("/")) {
-			resource = resource.substring(0, resource.lastIndexOf('/') - 1);
+		if (checkForResource.contains("/")) {
+			resource = checkForResource.substring(0, checkForResource.lastIndexOf('/') - 1);
 			return canDoAction(resource, actionLowerCase, false);
 		}
 
