@@ -1,5 +1,7 @@
 package io.graphenee.vaadin.flow;
 
+import java.util.Map;
+
 import io.graphenee.util.enums.GenderEnum;
 
 public final class MockUser extends AbstractDashboardUser<String> {
@@ -88,12 +90,12 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	}
 
 	@Override
-	public boolean canDoAction(String resource, String action) {
+	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap) {
 		return true;
 	}
 
 	@Override
-	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh) {
 		return true;
 	}
 

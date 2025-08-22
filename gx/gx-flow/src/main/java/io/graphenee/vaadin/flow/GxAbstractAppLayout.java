@@ -1,5 +1,8 @@
 package io.graphenee.vaadin.flow;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.logging.log4j.util.Strings;
 
 import com.vaadin.flow.component.UI;
@@ -39,17 +42,19 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	private void postBuild() {
 		DrawerToggle toggle = new DrawerToggle();
 		toggle.addClassName("gx-app-layout-toggle");
-		//toggle.getStyle().set("color", "var(--lumo-base-color)");
+		// toggle.getStyle().set("color", "var(--lumo-base-color)");
 
 		Span title = new Span(flowSetup().appTitle());
 		title.addClassName("gx-app-layout-title");
-		// title.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin", "0");
+		// title.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin",
+		// "0");
 		// title.getStyle().set("color", "var(--lumo-base-color)");
 		// title.setWidthFull();
 
 		Span version = new Span(flowSetup().appVersion());
 		version.addClassName("gx-app-layout-version");
-		// version.getStyle().set("font-size", "var(--lumo-font-size-xs)").set("margin", "0");
+		// version.getStyle().set("font-size", "var(--lumo-font-size-xs)").set("margin",
+		// "0");
 		// version.getStyle().set("color", "var(--lumo-base-color)");
 
 		SideNav drawer = new SideNav();
@@ -133,6 +138,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	/**
 	 * Customizes the avatar.
+	 * 
 	 * @param avatar The avatar to customize.
 	 */
 	protected void customizeAvatar(Avatar avatar) {
@@ -156,58 +162,72 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		}
 		if (Strings.isBlank(route))
 			return true;
-		return user.canDoAction(route, action);
+		Map<String, Object> keyValueMap = new HashMap<>();
+		keyValueMap.put("username", user.getUsername());
+		return user.canDoAction(route, action, keyValueMap);
 	}
 
 	private void generateMenuItems(SideNav drawer, GxAuthenticatedUser user) {
-		flowSetup().menuItems().forEach(mi -> {
-			if (canDoAction(user, "view", mi) || mi.hasChildren()) {
-				SideNavItem i = new SideNavItem(mi.getLabel());
-				i.addClassName("gx-nav-menuitem");
-				i.addClassName("gx-nav-menuitem-root");
-				i.setPrefixComponent(mi.getIcon());
+		for (GxMenuItem mi : flowSetup().menuItems()) {
+			SideNavItem i = new SideNavItem(mi.getLabel());
+			i.addClassName("gx-nav-menuitem");
+			i.addClassName("gx-nav-menuitem-root");
+			i.setPrefixComponent(mi.getIcon());
+			boolean added = false;
+			if (canDoAction(user, "view", mi)) {
 				if (mi.getRoute() != null) {
 					i.setPath(mi.getRoute());
+					drawer.addItem(i);
+					added = true;
 				} else if (mi.getComponentClass() != null) {
 					i.setPath(mi.getComponentClass());
-				}
-				if (mi.hasChildren()) {
-					i.addClassName("gx-nav-menuitem-parent");
-					generateMenuItems(i, mi, user);
-					if (i.getChildren().count() > 0)
-						drawer.addItem(i);
-				} else {
 					drawer.addItem(i);
+					added = true;
 				}
 			}
-		});
+			if (mi.hasChildren()) {
+				i.addClassName("gx-nav-menuitem-parent");
+				int count = generateMenuItems(i, mi, user);
+				if (count > 0 && !added)
+					drawer.addItem(i);
+			}
+		}
 	}
 
-	private void generateMenuItems(SideNavItem parent, GxMenuItem pmi, GxAuthenticatedUser user) {
-		pmi.getChildren().forEach(mi -> {
-			if (canDoAction(user, "view", mi) || mi.hasChildren()) {
-				SideNavItem i = new SideNavItem(mi.getLabel());
-				i.addClassName("gx-nav-menuitem");
-				i.setPrefixComponent(mi.getIcon());
+	private Integer generateMenuItems(SideNavItem parent, GxMenuItem pmi, GxAuthenticatedUser user) {
+		int count = 0;
+		for (GxMenuItem mi : pmi.getChildren()) {
+			SideNavItem i = new SideNavItem(mi.getLabel());
+			i.addClassName("gx-nav-menuitem");
+			i.addClassName("gx-nav-menuitem-child");
+			i.setPrefixComponent(mi.getIcon());
+			boolean added = false;
+			if (canDoAction(user, "view", mi)) {
 				if (mi.getRoute() != null) {
 					i.setPath(mi.getRoute());
+					parent.addItem(i);
+					added = true;
+					count++;
 				} else if (mi.getComponentClass() != null) {
 					i.setPath(mi.getComponentClass());
-				}
-				if (mi.hasChildren()) {
-					i.addClassName("gx-nav-menuitem-parent");
-					generateMenuItems(i, mi, user);
-					if (i.getChildren().count() > 0)
-						parent.addItem(i);
-				} else {
 					parent.addItem(i);
+					added = true;
+					count++;
 				}
 			}
-		});
+			if (mi.hasChildren()) {
+				i.addClassName("gx-nav-menuitem-parent");
+				count = generateMenuItems(i, mi, user);
+				if (count > 0 && !added)
+					parent.addItem(i);
+			}
+		}
+		return count;
 	}
 
 	/**
 	 * Gets the flow setup.
+	 * 
 	 * @return The flow setup.
 	 */
 	protected abstract GxAbstractFlowSetup flowSetup();
@@ -228,6 +248,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	/**
 	 * Gets the position of the logo.
+	 * 
 	 * @return The position of the logo.
 	 */
 	protected LogoPosition logoPosition() {
@@ -240,6 +261,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	public static interface GxAbstractAppLayoutDelegate {
 		/**
 		 * Called when the user logs out.
+		 * 
 		 * @param ui The UI.
 		 */
 		default void onLogout(UI ui) {

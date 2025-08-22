@@ -87,7 +87,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 					registerRoute(user, rc, mi);
 				});
 				getUI().ifPresent(ui -> {
-					if (lastRoute != null && user.canDoAction(lastRoute, "view")) {
+					if (lastRoute != null && user.canDoAction(lastRoute, "view", null)) {
 						ui.navigate(lastRoute);
 					} else {
 						ui.navigate(flowSetup().defaultRoute());

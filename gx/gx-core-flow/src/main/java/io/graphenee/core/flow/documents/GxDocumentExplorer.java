@@ -170,9 +170,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected void decorateColumn(String propertyName, Column<GxDocumentExplorerItem> column) {
 		if (propertyName.matches("(extension)")) {
-			column.setHeader("");
+			column.setHeader("Type");
 			column.setAutoWidth(false);
-			column.setWidth("50px");
+			column.setWidth("10px");
 			column.setTextAlign(ColumnTextAlign.CENTER);
 		}
 		if (propertyName.equals("name")) {

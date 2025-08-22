@@ -1,5 +1,7 @@
 package io.graphenee.core.flow;
 
+import java.util.Map;
+
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.util.enums.GenderEnum;
@@ -91,13 +93,13 @@ public class GxUserAccountDashboardUser extends AbstractDashboardUser<GxUserAcco
 	}
 
 	@Override
-	public boolean canDoAction(String resource, String action) {
-		return getUser().canDoAction(resource, action);
+	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap) {
+		return getUser().canDoAction(resource, action, keyValueMap);
 	}
 
 	@Override
-	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
-		return getUser().canDoAction(resource, action, forceRefresh);
+	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh) {
+		return getUser().canDoAction(resource, action, keyValueMap, forceRefresh);
 	}
 
 }
