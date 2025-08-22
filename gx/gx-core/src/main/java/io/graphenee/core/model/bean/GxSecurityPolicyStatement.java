@@ -1,8 +1,9 @@
 package io.graphenee.core.model.bean;
 
-import lombok.Getter;
+import java.util.Map;
 
-@Getter
+import io.graphenee.util.GxExpressionEvaluator;
+
 public class GxSecurityPolicyStatement {
     private String statementType;
     private String action;
@@ -11,8 +12,8 @@ public class GxSecurityPolicyStatement {
 
     public GxSecurityPolicyStatement(String statementType, String action, String resource, String condition) {
         this.statementType = statementType;
-        this.action = action;
-        this.resource = resource;
+        this.action = resource == null ? "all" : action;
+        this.resource = resource == null ? action : resource;
         this.condition = condition;
     }
 
@@ -24,8 +25,16 @@ public class GxSecurityPolicyStatement {
         return "revoke".equalsIgnoreCase(statementType);
     }
 
-    public String getAction() {
-        return action != null ? action : "all";
+    public String getResource() {
+        return resource != null ? resource : "all";
+    }
+
+    public String[] getActions() {
+        return (action != null ? "all" : action).splitWithDelimiters("\\s*,\\s*", 0);
+    }
+
+    public boolean evaluate(Map<String, Object> keyValueMap) {
+        return GxExpressionEvaluator.evaluate(condition, keyValueMap);
     }
 
 }

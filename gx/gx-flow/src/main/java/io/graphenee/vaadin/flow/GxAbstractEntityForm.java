@@ -34,11 +34,13 @@ import com.vaadin.flow.data.binder.PropertyFilterDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.binder.ValidationException;
 
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
+import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import io.graphenee.vaadin.flow.utils.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -416,6 +418,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 * @return True if the form is editable, false otherwise.
 	 */
 	public boolean isEditable() {
+		DashboardUtils.getLoggedInUser().canDoAction(entityClass.getSimpleName(), "edit", null);
 		return editable;
 	}
 

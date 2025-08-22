@@ -19,7 +19,9 @@ html {
     --lumo-secondary-color: #ff4081;
     --lumo-secondary-variant: #03dac5;
     --lumo-primary-color: #6200ee;
+    --lumo-primary-text-color: #5200ee;
     --lumo-primary-variant: #3700b3;
+    --lumo-primary-variant-text: #3700b3;
     --background-text-color: white;
     --background-color: black;
     font-size: 0.90rem;
@@ -306,8 +308,7 @@ vaadin-tab {
 }
 
 vaadin-side-nav-item::part(link) {
-    margin: 0.2rem;
-    border-radius: 0 1rem 1rem 0;
+    margin: 0rem;
 }
 
 vaadin-side-nav-item::part(link):hover {
@@ -316,7 +317,7 @@ vaadin-side-nav-item::part(link):hover {
 }
 
 vaadin-side-nav-item:hover {
-    background: var(--lumo-primary-color-10pct);
+    background: transparent;
 }
 
 vaadin-checkbox::part(checkbox) {

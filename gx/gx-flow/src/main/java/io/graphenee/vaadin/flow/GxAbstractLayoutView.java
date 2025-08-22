@@ -128,7 +128,7 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 			GxAuthenticatedUser user = VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
 			if (user == null) {
 				event.rerouteTo("login", route);
-			} else if (!route.equals("") && !user.canDoAction(route, "view")) {
+			} else if (!route.equals("") && !user.canDoAction(route, "view", null)) {
 				throw new ForbiddenException();
 			}
 		}

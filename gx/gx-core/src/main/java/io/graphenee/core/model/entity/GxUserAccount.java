@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONObject;
 
 import io.graphenee.core.model.GxMappedSuperclass;
+import io.graphenee.core.model.bean.GxSecurityPolicyStatement;
+import io.graphenee.security.GxSecurityPolicyParser;
+import io.graphenee.security.GxSecurityPolicyParserFactory;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -83,17 +87,20 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 	private GxGender gender;
 
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_security_group") })
+	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = {
+			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_security_group") })
 	private Set<GxSecurityGroup> securityGroups = new HashSet<>();
 
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_security_policy") })
+	@JoinTable(name = "gx_user_account_security_policy_join", joinColumns = {
+			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_security_policy") })
 	private Set<GxSecurityPolicy> securityPolicies = new HashSet<>();
 
 	@OneToMany
-	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = { @JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
+	@JoinTable(name = "gx_user_account_access_key_join", joinColumns = {
+			@JoinColumn(name = "oid_user_account") }, inverseJoinColumns = { @JoinColumn(name = "oid_access_key") })
 	private Set<GxAccessKey> accessKeys = new HashSet<>();
 
 	@ManyToOne
@@ -135,62 +142,72 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 	}
 
 	@Transient
-	private Map<String, Set<String>> grantMap;
+	private Map<String, Map<String, GxSecurityPolicyStatement>> grantMap;
 
 	@Transient
-	private Map<String, Set<String>> revokeMap;
+	private Map<String, Map<String, GxSecurityPolicyStatement>> revokeMap;
 
-	public boolean canDoAction(String resource, String action) {
-		return canDoAction(resource, action, false);
+	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap) {
+		return canDoAction(resource, action, keyValueMap, false);
 	}
 
-	public boolean canDoAction(String resource, String action, boolean forceRefresh) {
+	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh) {
+		if (keyValueMap == null)
+			keyValueMap = new HashMap<>();
 		if (forceRefresh) {
 			loadMaps();
 		}
 
-		String checkForResource = resource != null ? resource.toLowerCase() : "all";
-		String actionLowerCase = action.toLowerCase();
-		Set<String> grantActionSet = grantMap().get(checkForResource);
-		Set<String> revokeActionSet = revokeMap().get(checkForResource);
+		resource = resource != null ? resource.toLowerCase() : "all";
+		action = action.toLowerCase();
+		Map<String, GxSecurityPolicyStatement> grantActionSet = grantMap().get(resource);
+		Map<String, GxSecurityPolicyStatement> revokeActionSet = revokeMap().get(resource);
 
-		if (revokeActionSet != null && revokeActionSet.contains(actionLowerCase))
+		GxSecurityPolicyParser parser = GxSecurityPolicyParserFactory.defaultParser();
+
+		if (revokeActionSet != null && revokeActionSet.containsKey(action))
 			return false;
 
-		if (revokeActionSet != null && revokeActionSet.contains("all"))
+		if (revokeActionSet != null && revokeActionSet.containsKey("all"))
 			return false;
 
-		if (grantActionSet != null && grantActionSet.contains(actionLowerCase))
-			return true;
+		if (grantActionSet != null && grantActionSet.containsKey(action)) {
+			GxSecurityPolicyStatement spstmt = grantActionSet.get(action);
+			return spstmt.evaluate(keyValueMap);
+		}
 
-		if (grantActionSet != null && grantActionSet.contains("all"))
-			return true;
+		if (grantActionSet != null && grantActionSet.containsKey("all")) {
+			GxSecurityPolicyStatement spstmt = grantActionSet.get("all");
+			return spstmt.evaluate(keyValueMap);
+		}
 
 		if (resource.contains("/")) {
 			resource = resource.substring(0, resource.lastIndexOf('/') - 1);
-			return canDoAction(resource, actionLowerCase, false);
+			return canDoAction(resource, action, keyValueMap, false);
 		}
 
 		grantActionSet = grantMap().get("all");
 		revokeActionSet = revokeMap().get("all");
 
-		if (revokeActionSet != null && revokeActionSet.contains("all"))
+		if (revokeActionSet != null && revokeActionSet.containsKey("all"))
 			return false;
 
-		if (grantActionSet != null && grantActionSet.contains("all"))
-			return true;
+		if (grantActionSet != null && grantActionSet.containsKey("all")) {
+			GxSecurityPolicyStatement spstmt = grantActionSet.get("all");
+			return spstmt.evaluate(keyValueMap);
+		}
 
 		return false;
 	}
 
-	protected Map<String, Set<String>> grantMap() {
+	protected Map<String, Map<String, GxSecurityPolicyStatement>> grantMap() {
 		if (grantMap == null) {
 			loadMaps();
 		}
 		return grantMap;
 	}
 
-	protected Map<String, Set<String>> revokeMap() {
+	protected Map<String, Map<String, GxSecurityPolicyStatement>> revokeMap() {
 		if (revokeMap == null) {
 			loadMaps();
 		}
@@ -204,7 +221,8 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 
 			@Override
 			public int compare(GxSecurityPolicyDocument doc1, GxSecurityPolicyDocument doc2) {
-				return doc1.getSecurityPolicy().getPriority().intValue() < doc2.getSecurityPolicy().getPriority().intValue() ? -1 : 1;
+				return doc1.getSecurityPolicy().getPriority().intValue() < doc2.getSecurityPolicy().getPriority()
+						.intValue() ? -1 : 1;
 			}
 		});
 
@@ -222,48 +240,48 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 			}
 		});
 
+		GxSecurityPolicyParser parser = GxSecurityPolicyParserFactory.defaultParser();
+
 		documents.forEach(document -> {
 			String documentJson = document.getDocumentJson();
 			String[] statements = documentJson.split("(;|\n)");
 			for (String statement : statements) {
-				String[] parts = statement.trim().toLowerCase().split("\\s");
-				if (parts.length == 4) {
-					String resourceName = parts[3];
-					// initialize action set for grants
-					Set<String> grantActionSet = grantMap.get(resourceName);
-					if (grantActionSet == null) {
-						grantActionSet = new HashSet<>();
-						grantMap.put(resourceName, grantActionSet);
+
+				GxSecurityPolicyStatement spstmt = parser.parse(statement);
+
+				// initialize action set for grants
+				String resourceName = spstmt.getResource();
+				Map<String, GxSecurityPolicyStatement> grantActionSet = grantMap.get(resourceName);
+				if (grantActionSet == null) {
+					grantActionSet = new HashMap<>();
+					grantMap.put(resourceName, grantActionSet);
+				}
+				// initialize action set for revokes
+				Map<String, GxSecurityPolicyStatement> revokeActionSet = revokeMap.get(resourceName);
+				if (revokeActionSet == null) {
+					revokeActionSet = new HashMap<>();
+					revokeMap.put(resourceName, revokeActionSet);
+				}
+				// update grants and revokes such that if statement starts
+				// with grant, add to grants map and remove from revokes map
+				// and if statement starts with revoke, add to revokes map
+				// and remove from grants map.
+				if (spstmt.isGrant()) {
+					for (String action : spstmt.getActions()) {
+						grantActionSet.put(action, spstmt);
+						revokeActionSet.remove(action);
 					}
-					// initialize action set for revokes
-					Set<String> revokeActionSet = revokeMap.get(resourceName);
-					if (revokeActionSet == null) {
-						revokeActionSet = new HashSet<>();
-						revokeMap.put(resourceName, revokeActionSet);
-					}
-					// update grants and revokes such that if statement starts
-					// with grant, add to grants map and remove from revokes map
-					// and if statement starts with revoke, add to revokes map
-					// and remove from grants map.
-					String[] actions = parts[1].split(",");
-					if (parts[0].equalsIgnoreCase("grant")) {
-						for (String action : actions) {
-							grantActionSet.add(action);
-							revokeActionSet.remove(action);
-						}
-					} else if (parts[0].equalsIgnoreCase("revoke")) {
-						for (String action : actions) {
-							revokeActionSet.add(action);
-							grantActionSet.remove(action);
-						}
-					} else {
-						log.warn(String.format("%s is not a valid permission type.", parts[0]));
+				} else if (spstmt.isRevoke()) {
+					for (String action : spstmt.getActions()) {
+						revokeActionSet.put(action, spstmt);
+						grantActionSet.remove(action);
 					}
 				} else {
-					log.warn(String.format("[%s] is not a valid statement.", statement));
+					log.warn(String.format("%s is not a valid permission type.", statement));
 				}
 			}
 		});
+
 	}
 
 }

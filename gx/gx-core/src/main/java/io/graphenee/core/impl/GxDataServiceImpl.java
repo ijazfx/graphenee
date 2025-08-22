@@ -205,7 +205,7 @@ public class GxDataServiceImpl implements GxDataService {
 		GxResource resource = findResourceByResourceNameAndNamespace(resourceName, namespace);
 		if (resource == null)
 			throw new GxPermissionException("Rescource not found.");
-		return key.canDoAction(resourceName, "access");
+		return key.canDoAction(resourceName, "access", null);
 	}
 
 	@Override

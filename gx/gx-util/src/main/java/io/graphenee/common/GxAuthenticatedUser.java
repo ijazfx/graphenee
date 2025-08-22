@@ -1,5 +1,7 @@
 package io.graphenee.common;
 
+import java.util.Map;
+
 import io.graphenee.util.enums.GenderEnum;
 
 /**
@@ -153,7 +155,7 @@ public interface GxAuthenticatedUser {
 	 * @param action The action.
 	 * @return True if the user can do the action, false otherwise.
 	 */
-	boolean canDoAction(String resource, String action);
+	boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap);
 
 	/**
 	 * Checks if the user can do an action on a resource.
@@ -162,6 +164,6 @@ public interface GxAuthenticatedUser {
 	 * @param forceRefresh Whether to force a refresh.
 	 * @return True if the user can do the action, false otherwise.
 	 */
-	boolean canDoAction(String resource, String action, boolean forceRefresh);
+	boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh);
 
 }
