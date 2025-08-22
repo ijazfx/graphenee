@@ -35,7 +35,7 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 		name = new TextField("Name");
 
 		note = new TextArea("Note");
-		note.setHeight("100px");
+		note.setHeight("7rem");
 
 		issueDate = new DateTimePicker("Issue Date");
 		expiryDate = new DateTimePicker("Expiry Date");
@@ -52,6 +52,7 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
 	@Override
 	protected void bindFields(Binder<GxDocument> dataBinder) {
+		dataBinder.forMemberField(name).asRequired();
 		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateTimeConverter());
 		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateTimeConverter());
 		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateTimeConverter());

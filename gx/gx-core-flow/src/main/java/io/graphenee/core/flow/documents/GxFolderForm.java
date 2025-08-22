@@ -6,6 +6,7 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxFolder;
@@ -19,8 +20,6 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 	TextField name;
 	TextArea note;
 
-	IntegerField expiryReminderInDays;
-
 	public GxFolderForm() {
 		super(GxFolder.class);
 	}
@@ -29,16 +28,17 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 	protected void decorateForm(HasComponents entityForm) {
 		name = new TextField("Folder Name");
 		note = new TextArea("Note");
-		note.setHeight("100px");
+		note.setHeight("7rem");
 		entityForm.add(name, note);
 
-		expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
-		expiryReminderInDays.setMin(0);
+		entityForm.add(name, note);
 
-		entityForm.add(name, note, expiryReminderInDays);
+		expand(name, note);
+	}
 
-		setColspan(name, 2);
-		setColspan(note, 2);
+	@Override
+	protected void bindFields(Binder<GxFolder> dataBinder) {
+		dataBinder.forMemberField(name).asRequired();
 	}
 
 	@Override

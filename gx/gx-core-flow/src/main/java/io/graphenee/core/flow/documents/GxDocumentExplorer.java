@@ -164,7 +164,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "size" };
+		return new String[] { "extension", "name", "version", "size", "issueDate", "expiryDate", "expiryReminderInDays" };
 	}
 
 	@Override
@@ -177,7 +177,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	@Override
-	protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
+	protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName,
+			PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
 		if (propertyName.equalsIgnoreCase("extension")) {
 			return new ComponentRenderer<>(s -> {
 				Image image = null;
@@ -215,7 +216,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		GxDocument document = (GxDocument) s;
 		String mimeType = s.getMimeType();
 		String extension = s.getExtension();
-		if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+		if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
+				|| mimeType.startsWith("video")) {
 			try {
 				InputStream stream = null;
 				String src = document.getPath();
@@ -226,9 +228,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					e.printStackTrace();
 				}
 				byte[] bytes = IOUtils.toByteArray(stream);
-				StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
+				StreamResource resource = new StreamResource(document.getName(), () -> new ByteArrayInputStream(bytes));
 				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(s.getName(), resource);
-				resourcePreviewPanel.showInDialog("100%", "100%");
+				resourcePreviewPanel.showInDialog();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -392,7 +394,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				doc = doc.getDocument();
 			}
 			versionList.initializeWithDocumentAndStorage(doc, storage);
-			versionList.showInDialog(() -> {
+			versionList.showInDialog("Manage Versions", () -> {
 				refresh();
 			});
 		} else {

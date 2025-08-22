@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,6 +28,7 @@ import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Focusable;
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.ShortcutRegistration;
@@ -42,7 +43,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -78,6 +78,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertyFilterDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
+import com.vaadin.flow.data.converter.Converter;
+import com.vaadin.flow.data.converter.LocalDateTimeToDateConverter;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
@@ -92,12 +94,10 @@ import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
+import io.graphenee.vaadin.flow.GxAbstractDialog.GxDialogDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
 import io.graphenee.vaadin.flow.component.DialogFactory;
-import io.graphenee.vaadin.flow.component.DialogVariant;
-import io.graphenee.vaadin.flow.component.GxDialog;
-import io.graphenee.vaadin.flow.component.GxDialog.GxDialogDelegate;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
@@ -108,6 +108,8 @@ import io.graphenee.vaadin.flow.component.GxStackLayout;
 import io.graphenee.vaadin.flow.component.GxToggleButton;
 import io.graphenee.vaadin.flow.data.GxDateRenderer;
 import io.graphenee.vaadin.flow.data.GxNumberToDateRenderer;
+import io.graphenee.vaadin.flow.data.TimestampToDateConverter;
+import io.graphenee.vaadin.flow.data.TimestampToDateTimeConverter;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.event.TRDelayEventListener;
 import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
@@ -189,6 +191,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	private FlexLayout footerTextLayout;
 
 	private GxPreferences __preferences;
+
+	private GxAbstractDialog dialog;
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -690,7 +694,22 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		if (editorComponent == null) {
 			editorComponent = defaultInlineEditorForProperty(column.getKey(), propertyDefinition);
 			if (editorComponent != null) {
-				dataGrid.getEditor().getBinder().forField(editorComponent).bind(column.getKey());
+				Class<Object> classType = propertyDefinition.getType();
+				Converter conv = null;
+				if(classType.equals(Timestamp.class)) {
+					if(editorComponent instanceof DateTimePicker) {
+						conv = new TimestampToDateTimeConverter();
+					}
+				} else if(classType.equals(java.util.Date.class)) {
+					if(editorComponent instanceof DateTimePicker) {
+						conv = new TimestampToDateConverter();
+					}
+				}
+				if(conv != null) {
+					dataGrid.getEditor().getBinder().forField(editorComponent).withConverter(conv).bind(column.getKey());
+				} else {
+					dataGrid.getEditor().getBinder().forField(editorComponent).bind(column.getKey());
+				}
 				editorComponent.getElement().addEventListener("keydown", e -> {
 					dataGrid.getEditor().cancel();
 				}).setFilter("event.key === 'Escape'");
@@ -1510,27 +1529,28 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		menuBarLayout.setVisible(true);
 	}
 
-	public Dialog showInDialog(TRVoidCallback... callback) {
-		GxDialog dlg = new GxDialog(GxAbstractEntityList.this);
-		dlg.addThemeVariants(DialogVariant.NO_PADDING);
-		dlg.setId("dlg" + UUID.randomUUID().toString().replace("-", ""));
-		dlg.setWidth(dialogWidth());
-		dlg.setHeight(dialogHeight());
-		dlg.setDraggable(true);
-		dlg.setResizable(true);
+	public GxAbstractDialog showInDialog(String dialogTitle, TRVoidCallback... callback) {
+		if (dialog == null) {
+			dialog = new GxAbstractDialog() {
 
-		dlg.setDelegate(new GxDialogDelegate() {
-
-			@Override
-			public void onDismiss() {
-				if (callback != null) {
-					Stream.of(callback).forEach(cb -> cb.execute());
+				@Override
+				protected void decorateLayout(HasComponents layout) {
+					layout.add(GxAbstractEntityList.this);
 				}
-			}
-
-		});
-		dlg.open();
-		return dlg;
+				
+			};
+			dialog.setDelegate(new GxDialogDelegate() {
+				@Override
+				public void onDismiss() {
+					if(callback != null) {
+						Stream.of(callback).forEach(cb -> cb.execute());
+					}
+				}
+			});
+		}
+		dialog.setDialogTitle(dialogTitle);
+		dialog.show();
+		return dialog;
 	}
 
 	public void editItem(T item) {

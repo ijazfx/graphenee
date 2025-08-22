@@ -3,7 +3,7 @@ package io.graphenee.core.flow.documents;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -12,7 +12,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.data.TimestampToDateTimeConverter;
+import io.graphenee.vaadin.flow.data.TimestampToDateConverter;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -21,10 +21,10 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 
 	TextField name;
 	TextArea note;
-	DateTimePicker issueDate;
-	DateTimePicker expiryDate;
+	DatePicker issueDate;
+	DatePicker expiryDate;
 	IntegerField expiryReminderInDays;
-	DateTimePicker reminderDate;
+	DatePicker reminderDate;
 
 	public GxDocumentExplorerItemForm() {
 		super(GxDocumentExplorerItem.class);
@@ -36,24 +36,24 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		note = new TextArea("Note");
 		note.setHeight("100px");
 
-		issueDate = new DateTimePicker("Issue Date");
-		expiryDate = new DateTimePicker("Expiry Date");
+		issueDate = new DatePicker("Issue Date");
+		expiryDate = new DatePicker("Expiry Date");
 		expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
 		expiryReminderInDays.setMin(0);
 
-		reminderDate = new DateTimePicker("Reminder Date");
+		reminderDate = new DatePicker("Reminder Date");
 
 		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate);
 
-		setColspan(name, 2);
-		setColspan(note, 2);
+		expand(name, note);
 	}
 
 	@Override
 	protected void bindFields(Binder<GxDocumentExplorerItem> dataBinder) {
-		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateTimeConverter());
-		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateTimeConverter());
-		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateTimeConverter());
+		dataBinder.forMemberField(name).asRequired();
+		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateConverter());
 	}
 
 	@Override

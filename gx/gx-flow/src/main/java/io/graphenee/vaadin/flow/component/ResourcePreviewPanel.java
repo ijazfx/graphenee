@@ -1,25 +1,26 @@
 package io.graphenee.vaadin.flow.component;
 
 import com.vaadin.componentfactory.pdfviewer.PdfViewer;
-import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.server.StreamResource;
 
 import io.graphenee.util.TRFileContentUtil;
+import io.graphenee.vaadin.flow.GxAbstractDialog;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @SuppressWarnings("serial")
-public class ResourcePreviewPanel extends VerticalLayout {
+@Slf4j
+public class ResourcePreviewPanel extends GxAbstractDialog {
 
 	@Setter
 	@Getter
@@ -28,11 +29,6 @@ public class ResourcePreviewPanel extends VerticalLayout {
 	@Setter
 	@Getter
 	private StreamResource resource;
-
-	private GxDialog dialog = null;
-
-	public ResourcePreviewPanel() {
-	}
 
 	public ResourcePreviewPanel(String fileName, StreamResource resource) {
 		setSizeFull();
@@ -43,7 +39,8 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		this.resource = resource;
 	}
 
-	private synchronized ResourcePreviewPanel build() {
+	@Override
+	protected void decorateLayout(HasComponents layout) {
 		removeAll();
 		Scroller scroller = new Scroller();
 		scroller.setSizeFull();
@@ -63,7 +60,7 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		try {
 			if (mimeType.startsWith("image")) {
 				Image image = new Image();
-				//image.setHeightFull();
+				// image.setHeightFull();
 				image.getElement().setAttribute("src", resource);
 				bodyLayout.add(image);
 			} else if (mimeType.startsWith("audio")) {
@@ -90,55 +87,13 @@ public class ResourcePreviewPanel extends VerticalLayout {
 				bodyLayout.add(image);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
-		add(scroller, createToolbar());
-		return this;
+		layout.add(scroller);
 	}
 
-	public GxDialog showInDialog(String width, String height) {
-		if (fileName == null || resource == null) {
-			throw new IllegalStateException("Filename and Resource must be set before calling this method.");
-		}
-		build();
-		dialog = new GxDialog(ResourcePreviewPanel.this);
-		dialog.addThemeVariants(DialogVariant.NO_PADDING);
-		dialog.setWidth(width);
-		dialog.setHeight(height);
-		dialog.setResizable(true);
-		dialog.setModal(true);
-		dialog.setCloseOnEsc(true);
-		dialog.setDraggable(true);
-		dialog.setResizable(true);
-		dialog.open();
-		return dialog;
-	}
-
-	public void closeDialog() {
-		if (dialog != null) {
-			dialog.close();
-		}
-	}
-
-	private Component createToolbar() {
-		HorizontalLayout toolbar = new HorizontalLayout();
-		toolbar.setWidthFull();
-		toolbar.addClassName("gx-form-footer");
-		// toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
-		// toolbar.getStyle().set("border-top-right-radius", "0px");
-		// toolbar.getStyle().set("border-top-left-radius", "0px");
-		// toolbar.getStyle().set("background-color", "#F8F8F8");
-		// toolbar.setWidthFull();
-		// toolbar.setPadding(true);
-		// toolbar.setSpacing(false);
-		// toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-		Button dismissButton = new Button("Dismiss");
-		// dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-		dismissButton.addClickListener(cl -> {
-			if (dialog != null) {
-				dialog.close();
-			}
-		});
+	@Override
+	protected void decorateToolbar(HasComponents toolbar) {
 		Button downloadButton = new Button("Download");
 		downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		Anchor download = new Anchor("", "");
@@ -147,7 +102,6 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		download.getElement().setAttribute("download", true);
 		download.add(downloadButton);
 		toolbar.add(download);
-		toolbar.add(dismissButton);
-		return toolbar;
 	}
+
 }

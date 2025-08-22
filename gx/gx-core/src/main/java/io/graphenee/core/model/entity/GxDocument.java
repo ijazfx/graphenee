@@ -3,6 +3,7 @@ package io.graphenee.core.model.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,8 +44,8 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 
 	Integer sortOrder = 0;
 	Integer expiryReminderInDays = 30;
-	Timestamp issueDate;
-	Timestamp expiryDate;
+	Date issueDate;
+	Date expiryDate;
 
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
@@ -117,9 +118,15 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 		return getFolder();
 	}
 
+	public Integer getExpiryReminderInDays() {
+		return getParent() != null && getParent().getExpiryReminderInDays() != null
+				? getParent().getExpiryReminderInDays()
+				: expiryReminderInDays;
+	}
+
 	public Timestamp getReminderDate() {
 		if (expiryDate != null) {
-			return new Timestamp(TRCalendarUtil.minusDaysToDate(expiryDate, expiryReminderInDays).getTime());
+			return new Timestamp(TRCalendarUtil.minusDaysToDate(expiryDate, getExpiryReminderInDays()).getTime());
 		}
 		return null;
 	}

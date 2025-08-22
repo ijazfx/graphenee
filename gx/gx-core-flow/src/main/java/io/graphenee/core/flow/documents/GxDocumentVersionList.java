@@ -82,7 +82,8 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 	}
 
 	@Override
-	protected Renderer<GxDocument> rendererForProperty(String propertyName, PropertyDefinition<GxDocument, ?> propertyDefinition) {
+	protected Renderer<GxDocument> rendererForProperty(String propertyName,
+			PropertyDefinition<GxDocument, ?> propertyDefinition) {
 		if (propertyName.equals("extension")) {
 			return new ComponentRenderer<>(s -> {
 				Icon icon = null;
@@ -94,7 +95,8 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 						GxDocument document = (GxDocument) s;
 						String extension = s.getExtension();
 						String mimeType = s.getMimeType();
-						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio") || mimeType.startsWith("video")) {
+						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
+								|| mimeType.startsWith("video")) {
 							try {
 								InputStream stream = null;
 								String src = document.getPath();
@@ -105,9 +107,11 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 									e.printStackTrace();
 								}
 								byte[] bytes = IOUtils.toByteArray(stream);
-								StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
-								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(document.getName(), resource);
-								resourcePreviewPanel.showInDialog("100%", "100%");
+								StreamResource resource = new StreamResource(document.getName(),
+										() -> new ByteArrayInputStream(bytes));
+								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(document.getName(),
+										resource);
+								resourcePreviewPanel.showInDialog();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}

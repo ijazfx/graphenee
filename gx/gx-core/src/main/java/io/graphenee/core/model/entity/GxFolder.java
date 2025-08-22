@@ -3,6 +3,7 @@ package io.graphenee.core.model.entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -126,7 +127,7 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	}
 
 	@Override
-	public Timestamp getExpiryDate() {
+	public Date getExpiryDate() {
 		return null;
 	}
 
@@ -136,16 +137,16 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	}
 
 	@Override
-	public Timestamp getReminderDate() {
+	public Date getReminderDate() {
 		return null;
 	}
 
 	@Override
-	public void setIssueDate(Timestamp issueDate) {
+	public void setIssueDate(Date issueDate) {
 	}
 
 	@Override
-	public void setExpiryDate(Timestamp expiryDate) {
+	public void setExpiryDate(Date expiryDate) {
 	}
 
 	@Override
