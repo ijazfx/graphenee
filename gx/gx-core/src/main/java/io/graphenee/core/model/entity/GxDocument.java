@@ -103,8 +103,8 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 
 	@Override
 	public String getExtension() {
-		if (path != null) {
-			String[] parts = path.trim().split("\\.");
+		if (name != null) {
+			String[] parts = name.trim().split("\\.");
 			if (parts.length > 0) {
 				return parts[parts.length - 1].toLowerCase();
 			}

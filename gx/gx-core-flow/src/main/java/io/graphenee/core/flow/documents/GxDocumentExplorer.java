@@ -171,19 +171,14 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	protected void decorateColumn(String propertyName, Column<GxDocumentExplorerItem> column) {
 		if (propertyName.matches("(extension)")) {
 			column.setHeader("Type");
-			column.setAutoWidth(false);
-			column.setWidth("10px");
+			column.setWidth("3rem");
 			column.setTextAlign(ColumnTextAlign.CENTER);
-		}
-		if (propertyName.equals("name")) {
-			column.setAutoWidth(false);
-			column.setWidth("350px");
 		}
 	}
 
 	@Override
 	protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
-		if (propertyName.equals("extension")) {
+		if (propertyName.equalsIgnoreCase("extension")) {
 			return new ComponentRenderer<>(s -> {
 				Image image = null;
 				String extension = s.getExtension();
@@ -232,8 +227,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				}
 				byte[] bytes = IOUtils.toByteArray(stream);
 				StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
-				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
-				resourcePreviewPanel.showInDialog("80%", "80%");
+				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(s.getName(), resource);
+				resourcePreviewPanel.showInDialog("100%", "100%");
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

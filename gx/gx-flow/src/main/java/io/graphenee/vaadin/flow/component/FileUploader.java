@@ -274,7 +274,7 @@ public class FileUploader extends CustomField<String> {
 					StreamResource streamResource = new StreamResource(fileNameOnly, () -> new ByteArrayInputStream(bytes));
 					try {
 						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
-						resourcePreviewPanel.showInDialog("80%", "80%");
+						resourcePreviewPanel.showInDialog("100%", "100%");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

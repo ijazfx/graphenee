@@ -154,11 +154,11 @@ public class GxEmailTemplateForm extends GxAbstractEntityForm<GxEmailTemplate> {
 
 	@Override
 	protected String dialogHeight() {
-		return "37.5rem";
+		return "100%";
 	}
 
 	@Override
 	protected String dialogWidth() {
-		return "50rem";
+		return "100%";
 	}
 }

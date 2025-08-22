@@ -106,8 +106,8 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 								}
 								byte[] bytes = IOUtils.toByteArray(stream);
 								StreamResource resource = new StreamResource(src, () -> new ByteArrayInputStream(bytes));
-								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, resource);
-								resourcePreviewPanel.showInDialog("80%", "80%");
+								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(document.getName(), resource);
+								resourcePreviewPanel.showInDialog("100%", "100%");
 							} catch (Exception e) {
 								e.printStackTrace();
 							}

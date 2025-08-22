@@ -7,7 +7,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -48,12 +48,13 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		Scroller scroller = new Scroller();
 		scroller.setSizeFull();
 		VerticalLayout bodyLayout = new VerticalLayout();
-		bodyLayout.setAlignItems(Alignment.CENTER);
-		bodyLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-		bodyLayout.setSizeFull();
-		bodyLayout.setMargin(false);
-		bodyLayout.setSpacing(false);
-		bodyLayout.setPadding(true);
+		bodyLayout.addClassName("gx-preview-content-wrapper");
+		// bodyLayout.setAlignItems(Alignment.CENTER);
+		// bodyLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+		// bodyLayout.setSizeFull();
+		// bodyLayout.setMargin(false);
+		// bodyLayout.setSpacing(false);
+		// bodyLayout.setPadding(true);
 		scroller.setContent(bodyLayout);
 		String mimeType = TRFileContentUtil.getMimeType(fileName);
 		if (mimeType == null)
@@ -62,7 +63,7 @@ public class ResourcePreviewPanel extends VerticalLayout {
 		try {
 			if (mimeType.startsWith("image")) {
 				Image image = new Image();
-				image.setHeightFull();
+				//image.setHeightFull();
 				image.getElement().setAttribute("src", resource);
 				bodyLayout.add(image);
 			} else if (mimeType.startsWith("audio")) {
@@ -121,16 +122,18 @@ public class ResourcePreviewPanel extends VerticalLayout {
 
 	private Component createToolbar() {
 		HorizontalLayout toolbar = new HorizontalLayout();
-		toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
-		toolbar.getStyle().set("border-top-right-radius", "0px");
-		toolbar.getStyle().set("border-top-left-radius", "0px");
-		toolbar.getStyle().set("background-color", "#F8F8F8");
 		toolbar.setWidthFull();
-		toolbar.setPadding(true);
-		toolbar.setSpacing(false);
-		toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
-		Button dismissButton = new Button("DISMISS");
-		dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+		toolbar.addClassName("gx-form-footer");
+		// toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
+		// toolbar.getStyle().set("border-top-right-radius", "0px");
+		// toolbar.getStyle().set("border-top-left-radius", "0px");
+		// toolbar.getStyle().set("background-color", "#F8F8F8");
+		// toolbar.setWidthFull();
+		// toolbar.setPadding(true);
+		// toolbar.setSpacing(false);
+		// toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+		Button dismissButton = new Button("Dismiss");
+		// dismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 		dismissButton.addClickListener(cl -> {
 			if (dialog != null) {
 				dialog.close();

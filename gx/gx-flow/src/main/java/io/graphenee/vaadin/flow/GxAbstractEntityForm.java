@@ -22,7 +22,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.NativeLabel;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -34,11 +33,10 @@ import com.vaadin.flow.data.binder.PropertyFilterDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.binder.ValidationException;
 
-import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.KeyValueWrapper;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.GxEntityFormEventListener.GxEntityFormEvent;
 import io.graphenee.vaadin.flow.component.DialogFactory;
-import io.graphenee.vaadin.flow.component.GxDialog;
+import io.graphenee.vaadin.flow.component.GxFormDialog;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import io.graphenee.vaadin.flow.utils.StringUtils;
@@ -78,7 +76,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	private HasComponents parent;
 
-	private GxDialog dialog;
+	private GxFormDialog dialog;
 
 	@Setter
 	private boolean dialogAutoClose = true;
@@ -91,6 +89,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	public GxAbstractEntityForm(Class<T> entityClass) {
 		this.entityClass = entityClass;
 		setSizeFull();
+		addClassName("gx-entity-form");
 		setMargin(false);
 		setPadding(false);
 		setSpacing(false);
@@ -185,7 +184,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				});
 
 				dismissButton.getElement().getStyle().set("margin-right", "auto");
-				
+
 				customizeDismissButton(dismissButton);
 				c.add(saveButton, resetButton, dismissButton);
 
@@ -360,13 +359,15 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected Component getToolbarComponent() {
 		HorizontalLayout toolbar = new HorizontalLayout();
-		toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
-		toolbar.getStyle().set("border-top-right-radius", "0px");
-		toolbar.getStyle().set("border-top-left-radius", "0px");
-		toolbar.getStyle().set("background-color", "#F8F8F8");
 		toolbar.setWidthFull();
-		toolbar.setPadding(true);
-		toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+		toolbar.addClassName("gx-form-footer");
+		// toolbar.getStyle().set("border-radius", "var(--lumo-border-radius)");
+		// toolbar.getStyle().set("border-top-right-radius", "0px");
+		// toolbar.getStyle().set("border-top-left-radius", "0px");
+		// toolbar.getStyle().set("background-color", "#F8F8F8");
+		// toolbar.setWidthFull();
+		// toolbar.setPadding(true);
+		// toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 		return toolbar;
 	}
 
@@ -498,7 +499,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 * @param entity The entity to show.
 	 * @return The dialog.
 	 */
-	public GxDialog showInDialog(T entity) {
+	public GxFormDialog showInDialog(T entity) {
 		return showInDialog(entity, dialogWidth(), dialogHeight());
 	}
 
@@ -519,10 +520,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	 * @param height
 	 * @return
 	 */
-	private GxDialog showInDialog(T entity, String width, String height) {
+	private GxFormDialog showInDialog(T entity, String width, String height) {
 		setEntity(entity);
 		if (dialog == null) {
-			dialog = new GxDialog(GxAbstractEntityForm.this);
+			dialog = new GxFormDialog(GxAbstractEntityForm.this);
 			dialog.addThemeVariants(DialogVariant.LUMO_NO_PADDING);
 			dialog.setResizable(true);
 			dialog.setModal(true);

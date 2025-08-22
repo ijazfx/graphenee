@@ -136,7 +136,16 @@ input,label,vaadin-button,textarea {
 }
 
 .gx-grid-footer {
-    padding: var(--lumo-space-s);
+    padding: var(--lumo-space-s) var(--lumo-space-m) var(--lumo-space-s) var(--lumo-space-m);
+    gap: var(--lumo-space-s);
+    font-weight: bold;
+    border-top: 0.1rem solid var(--lumo-contrast-20pct);
+}
+
+.gx-form-footer {
+    padding: var(--lumo-space-s) var(--lumo-space-m) var(--lumo-space-s) var(--lumo-space-m);
+    gap: var(--lumo-space-s);
+    background-color: var(--lumo-contrast-5pct);
 }
 
 .gx-grid-search-layout {
@@ -188,7 +197,6 @@ vaadin-menu-bar-button {
 }
 
 .gx-dms-breadcrumb-layout {
-    padding: 0 var(--lumo-space-s) 0 var(--lumo-space-s);
     vaadin-button[theme="icon"] {
         width: 0px;
     }
@@ -346,4 +354,9 @@ vaadin-context-menu-item vaadin-icon {
 .gx-document-chooser-item label {
     font-size: smaller;
     line-height: normal;
+}
+
+.gx-preview-content-wrapper {
+    height: 100%;
+    width: 100%;
 }

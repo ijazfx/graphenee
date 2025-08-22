@@ -89,7 +89,6 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.common.GxAuthenticatedUser;
-import io.graphenee.util.HtmlSanitizer;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
@@ -98,6 +97,7 @@ import io.graphenee.vaadin.flow.GxAbstractEntityList.GxEntityListEventListner.Gx
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.DialogVariant;
 import io.graphenee.vaadin.flow.component.GxDialog;
+import io.graphenee.vaadin.flow.component.GxDialog.GxDialogDelegate;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
@@ -424,7 +424,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				});
 				editColumn.setKey("__editColumn");
 				editColumn.addClassName("gx-grid-edit-column");
-				editColumn.setAutoWidth(true);
+				editColumn.setAutoWidth(false);
+				editColumn.setWidth("2.5rem");
 				editColumn.setTextAlign(ColumnTextAlign.CENTER);
 				editColumn.setResizable(false);
 				editColumn.setFlexGrow(0);
@@ -456,9 +457,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 								column = dataGrid.addColumn(propertyName);
 						}
 						configureDefaults(propertyName, column, propertyDefinition);
-						if (i == 0 || i == (preferenceProperties().length - 1)) {
-							// column.setAutoWidth(true);
-						}
 
 						if (isGridFilterEnabled() && !(propertyDefinition.getType().equals(List.class)
 								|| propertyDefinition.getType().equals(Set.class))) {
@@ -710,7 +708,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		if (isGridInlineEditingEnabled()) {
 			String propertyName = icl.getColumn().getKey();
 			if (propertyName != null) {
-				if(dataGrid.getEditor().isOpen()) {
+				if (dataGrid.getEditor().isOpen()) {
 					dataGrid.getEditor().save();
 				}
 				dataGrid.getEditor().editItem(icl.getItem());
@@ -1206,6 +1204,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
 						numberFormat);
 			}
+			if (renderer == null && propertyDefinition.getType().getSuperclass().equals(String.class)) {
+				NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
+				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
+						numberFormat);
+			}
 		}
 		return renderer;
 	}
@@ -1230,19 +1233,23 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		Span header = new Span(propertyDefinition.getCaption());
 		header.getStyle().set("white-space", "normal");
 		column.setHeader(header);
-		column.setAutoWidth(true);
+		column.setAutoWidth(false);
 		column.setResizable(true);
+		column.setFlexGrow(0);
 		if (propertyDefinition != null) {
 			if (propertyDefinition.getType().getSuperclass() != null
 					&& propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+				column.setWidth("10rem");
 				column.setTextAlign(ColumnTextAlign.END);
 			}
 			if (propertyDefinition.getType() != null && propertyDefinition.getType().equals(String.class)) {
+				column.setWidth("20rem");
 				column.setTextAlign(ColumnTextAlign.START);
-				column.setRenderer(new ComponentRenderer<>(s -> {
-					String value = (String) propertyDefinition.getGetter().apply(s);
-					return new Span(HtmlSanitizer.clean(value));
-				}));
+			}
+			if (propertyName.matches("(.*Date.*|date.*|time.*)")
+					|| propertyDefinition.getType() != null && propertyDefinition.getType().equals(Timestamp.class)) {
+				column.setWidth("15rem");
+				column.setTextAlign(ColumnTextAlign.CENTER);
 			}
 		}
 	}
@@ -1325,11 +1332,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected String dialogWidth() {
-		return "50rem";
+		return "100%";
 	}
 
 	protected String dialogHeight() {
-		return "37.5rem";
+		return "100%";
 	}
 
 	protected void preEdit(T entity) {
@@ -1504,41 +1511,25 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	public Dialog showInDialog(TRVoidCallback... callback) {
-		Button dlgDismissButton = new Button("DISMISS");
-		dlgDismissButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-		HorizontalLayout dlgFooter = new HorizontalLayout(dlgDismissButton);
-		dlgFooter.setJustifyContentMode(JustifyContentMode.END);
-		dlgFooter.setWidthFull();
-		FlexLayout layout = new FlexLayout();
-		layout.setSizeFull();
-		layout.setFlexDirection(FlexDirection.COLUMN);
-		layout.setFlexWrap(FlexWrap.NOWRAP);
-		layout.add(GxAbstractEntityList.this, dlgFooter);
-		// layout.setFlexGrow(2, GxAbstractEntityList.this);
-		GxDialog dlg = new GxDialog(layout);
+		GxDialog dlg = new GxDialog(GxAbstractEntityList.this);
 		dlg.addThemeVariants(DialogVariant.NO_PADDING);
 		dlg.setId("dlg" + UUID.randomUUID().toString().replace("-", ""));
 		dlg.setWidth(dialogWidth());
 		dlg.setHeight(dialogHeight());
 		dlg.setDraggable(true);
 		dlg.setResizable(true);
-		dlg.open();
-		// dlgDismissButton.addClickShortcut(Key.ESCAPE);
 
-		dlgDismissButton.addClickListener(new TRDelayClickListener<Button>() {
-
-			private static final long serialVersionUID = 1L;
+		dlg.setDelegate(new GxDialogDelegate() {
 
 			@Override
-			public void onClick(ClickEvent<Button> event) {
-				try {
+			public void onDismiss() {
+				if (callback != null) {
 					Stream.of(callback).forEach(cb -> cb.execute());
-					dlg.close();
-				} catch (Exception ex) {
-					ex.printStackTrace();
 				}
 			}
+
 		});
+		dlg.open();
 		return dlg;
 	}
 

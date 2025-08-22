@@ -13,6 +13,7 @@ public class GxStackLayout extends VerticalLayout {
 
 	public GxStackLayout() {
 		setSizeFull();
+		addClassName("gx-stack-layout");
 		setMargin(false);
 		setSpacing(false);
 		setPadding(false);
