@@ -155,6 +155,27 @@ public interface GxAuthenticatedUser {
 	 * @param action The action.
 	 * @return True if the user can do the action, false otherwise.
 	 */
+	default boolean canDoAction(String resource, String action) {
+		return canDoAction(resource, action, null, false);
+	}
+
+	/**
+	 * Checks if the user can do an action on a resource.
+	 * @param resource The resource.
+	 * @param action The action.
+	 * @param forceRefresh Whether to force a refresh.
+	 * @return True if the user can do the action, false otherwise.
+	 */
+	default boolean canDoAction(String resource, String action, boolean forceRefresh) {
+		return canDoAction(resource, action, null, forceRefresh);
+	}
+
+	/**
+	 * Checks if the user can do an action on a resource.
+	 * @param resource The resource.
+	 * @param action The action.
+	 * @return True if the user can do the action, false otherwise.
+	 */
 	boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap);
 
 	/**

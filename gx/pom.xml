@@ -20,7 +20,6 @@
 		<module>gx-jbpm-embedded</module>
 		<module>gx-jbpm-flow</module>
 		<module>gx-blockchain</module>
-		<module>gx-workshop-flow</module>
 	</modules>
 
 	<!-- License -->
