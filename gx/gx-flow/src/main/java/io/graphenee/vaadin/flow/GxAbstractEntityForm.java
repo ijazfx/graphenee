@@ -2,11 +2,13 @@ package io.graphenee.vaadin.flow;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
@@ -23,6 +25,8 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -81,6 +85,8 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	@Setter
 	private boolean dialogAutoClose = true;
+
+	private Map<String, FlexLayout> groupedMap = new ConcurrentHashMap<>();
 
 	/**
 	 * Creates a new instance of this form.
@@ -374,9 +380,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	protected Component getFormComponent() {
 		FormLayout formLayout = new FormLayout();
-		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("600px", 2))); // , new
-																												// ResponsiveStep("640px",
-																												// 3)));
+		formLayout.setAutoResponsive(false);
+		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new
+		ResponsiveStep("600px", 2)));
 		formLayout.setSizeFull();
 		return formLayout;
 	}
@@ -388,10 +394,51 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		});
 	}
 
-	protected void shrink(Component... c) {
+	public void expand(String... name) {
+		List.of(name).forEach(n -> {
+			FlexLayout grouped = groupedMap.get(n);
+			if(grouped != null) {
+				expand(grouped);
+			}
+		});
+	}
+
+	protected void shrink(String... name) {
+		List.of(name).forEach(n -> {
+			FlexLayout grouped = groupedMap.get(n);
+			if(grouped != null) {
+				shrink(grouped);
+			}
+		});
+	}
+
+	public void shrink(Component... c) {
 		List.of(c).forEach(comp -> {
 			setColspan(comp, 1);
 		});
+	}
+
+	public FlexLayout group(String name, Component... c) {
+		if(groupedMap.containsKey(name))
+			throw new IllegalArgumentException(name + " is already assigned to another group.");
+		FlexLayout grouped = new FlexLayout(c);
+		groupedMap.put(name, grouped);
+		grouped.setWidthFull();
+		grouped.setFlexWrap(FlexWrap.WRAP);
+		grouped.addClassName("gx-layout-grouped");
+		return grouped;
+	}
+
+	public List<Component> ungroup(String name) {
+		FlexLayout grouped = groupedMap.get(name);
+		if(grouped != null) {
+			groupedMap.remove(name);
+			List<Component> clist = new ArrayList<>();
+			clist.addAll(grouped.getChildren().toList());
+			grouped.removeFromParent();
+			return clist;
+		}
+		return Collections.emptyList();
 	}
 
 	protected void setColspan(Component c, int colspan) {
@@ -453,7 +500,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 				formTitle = new KeyValueWrapper(entity).stringForKeyPath(keyPath);
 			}
 		}
-		if(Strings.isNullOrEmpty(formTitle)) {
+		if (Strings.isNullOrEmpty(formTitle)) {
 			formTitle = StringUtils.toTitleCase(entityClass.getSimpleName()).replaceFirst("Gx", "");
 		}
 		if (formTitle.length() > 50) {

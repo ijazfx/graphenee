@@ -113,13 +113,13 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
             System.err.println(event.getValue());
         });
 
-        entityForm.add(firstName, lastName, email, isActive, isLocked, isPasswordChangeRequired, username, newPassword,
-                confirmPassword, imageUploader);
+        entityForm.add(group("group0", firstName, lastName), email, group("group1", isActive, isLocked, isPasswordChangeRequired),
+                username, group("group2", newPassword,
+                        confirmPassword),
+                imageUploader);
+        
+        expand("group0", "group1", "group2");
 
-        setColspan(email, 2);
-        setColspan(username, 2);
-        setColspan(isPasswordChangeRequired, 2);
-        setColspan(imageUploader, 2);
     }
 
     @Override

@@ -5,7 +5,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +21,6 @@ import java.util.stream.Stream;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
@@ -79,7 +77,6 @@ import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertyFilterDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.converter.Converter;
-import com.vaadin.flow.data.converter.LocalDateTimeToDateConverter;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.InMemoryDataProvider;
@@ -88,6 +85,7 @@ import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
+import com.vaadin.flow.dom.DebouncePhase;
 import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.common.GxAuthenticatedUser;
@@ -129,13 +127,10 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
-	GxEventBus eventBus1;
-
-	// @Autowired
-	// GxPreferenceManager prefMan;
-
 	private Grid<T> dataGrid;
+
+	private T focusedItem;
+
 	private Class<T> entityClass;
 
 	private boolean isBuilt = false;
@@ -696,26 +691,27 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			if (editorComponent != null) {
 				Class<Object> classType = propertyDefinition.getType();
 				Converter conv = null;
-				if(classType.equals(Timestamp.class)) {
-					if(editorComponent instanceof DateTimePicker) {
+				if (classType.equals(Timestamp.class)) {
+					if (editorComponent instanceof DateTimePicker) {
 						conv = new TimestampToDateTimeConverter();
 					}
-				} else if(classType.equals(java.util.Date.class)) {
-					if(editorComponent instanceof DateTimePicker) {
+				} else if (classType.equals(java.util.Date.class)) {
+					if (editorComponent instanceof DateTimePicker) {
 						conv = new TimestampToDateConverter();
 					}
 				}
-				if(conv != null) {
-					dataGrid.getEditor().getBinder().forField(editorComponent).withConverter(conv).bind(column.getKey());
+				if (conv != null) {
+					dataGrid.getEditor().getBinder().forField(editorComponent).withConverter(conv)
+							.bind(column.getKey());
 				} else {
 					dataGrid.getEditor().getBinder().forField(editorComponent).bind(column.getKey());
 				}
 				editorComponent.getElement().addEventListener("keydown", e -> {
 					dataGrid.getEditor().cancel();
-				}).setFilter("event.key === 'Escape'");
+				}).setFilter("event.key === 'Escape'").debounce(300, DebouncePhase.LEADING);
 				editorComponent.getElement().addEventListener("keydown", e -> {
 					dataGrid.getEditor().save();
-				}).setFilter("event.key === 'Enter'");
+				}).setFilter("event.key === 'Enter'").debounce(300, DebouncePhase.LEADING);
 				column.setEditorComponent(editorComponent);
 				editorComponentMap.put(column.getKey(), editorComponent);
 			}
@@ -1537,12 +1533,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				protected void decorateLayout(HasComponents layout) {
 					layout.add(GxAbstractEntityList.this);
 				}
-				
+
 			};
 			dialog.setDelegate(new GxDialogDelegate() {
 				@Override
 				public void onDismiss() {
-					if(callback != null) {
+					if (callback != null) {
 						Stream.of(callback).forEach(cb -> cb.execute());
 					}
 				}

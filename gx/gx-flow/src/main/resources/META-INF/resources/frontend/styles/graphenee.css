@@ -37,6 +37,29 @@ html {
         "YTFI" 738,
         "YTLC" 514,
         "YTUC" 712;
+    --vaadin-form-layout-column-spacing: var(--lumo-space-m);
+}
+
+.gx-layout-grouped {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--vaadin-form-layout-column-spacing);
+    align-items: stretch;
+}
+
+.gx-layout-grouped > * {
+    flex: 1 1;
+    min-width: 200px;
+}
+
+.gx-layout-grouped > vaadin-checkbox {
+    flex: none;
+    min-width: fit-content;
+}
+
+.gx-layout-grouped > vaadin-radio-button {
+    flex: none;
+    min-width: fit-content;
 }
 
 .gx-login-root-layout {

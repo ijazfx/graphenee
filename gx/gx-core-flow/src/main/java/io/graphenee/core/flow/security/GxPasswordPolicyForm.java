@@ -62,11 +62,12 @@ public class GxPasswordPolicyForm extends GxAbstractEntityForm<GxPasswordPolicy>
 			}
 		});
 
-		entityForm.add(maxHistory, maxAge,
-				minLength, maxAllowedMatchingUserName, minUppercase, minLowercase,
-				minNumbers, minSpecialCharacters, isUserUsernameAllowed, isActive, new Hr(), username, testPolicy);
+		entityForm.add(group("group0", maxHistory, maxAge,
+				minLength, maxAllowedMatchingUserName), group("group1", minUppercase, minLowercase,
+				minNumbers, minSpecialCharacters), group("group2", isUserUsernameAllowed, isActive), new Hr(), group("group3", username, testPolicy));
 		
 		expand(username, testPolicy);
+		expand("group0", "group1", "group2", "group3");
 	}
 
 }
