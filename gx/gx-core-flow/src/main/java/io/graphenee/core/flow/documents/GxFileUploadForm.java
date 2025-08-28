@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.server.streams.FileUploadCallback;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
@@ -18,7 +17,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {

@@ -129,8 +129,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	private Grid<T> dataGrid;
 
-	private T focusedItem;
-
 	private Class<T> entityClass;
 
 	private boolean isBuilt = false;

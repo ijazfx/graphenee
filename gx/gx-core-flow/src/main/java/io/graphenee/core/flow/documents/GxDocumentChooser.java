@@ -1,9 +1,7 @@
 package io.graphenee.core.flow.documents;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.commons.io.IOUtils;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -17,13 +15,15 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadEvent;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
+import com.vaadin.flow.server.streams.InputStreamDownloadCallback;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 
-@SuppressWarnings("serial")
 public class GxDocumentChooser extends CustomField<GxDocument> {
 
 	private FlexLayout docsLayout;
@@ -67,10 +67,16 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 				String resourcePath = explorer.storage.resourcePath("documents", s.getPath());
 				try {
 					InputStream stream = explorer.storage.resolve(resourcePath);
-					byte[] bytes = IOUtils.toByteArray(stream);
-					StreamResource sr = new StreamResource(s.getName(), () -> new ByteArrayInputStream(bytes));
-					sr.setContentType(mimeType);
-					image = new Image(sr, s.getName());
+					DownloadHandler dh = DownloadHandler.fromInputStream(new InputStreamDownloadCallback() {
+
+						@Override
+						public DownloadResponse complete(DownloadEvent downloadEvent) throws IOException {
+							return new DownloadResponse(stream, s.getName(), s.getMimeType(), s.getSize());
+						}
+						
+					});
+					image = new Image(dh, s.getName());
+
 				} catch (Exception e) {
 					image = IconUtils.fileExtensionIconResource("image");
 				}
