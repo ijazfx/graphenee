@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import io.graphenee.core.model.entity.*;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
@@ -319,7 +318,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					d.setName(uploadedFile.getFileName());
 					d.setPath(metaData.getFileName());
 					d.setMimeType(uploadedFile.getMimeType());
-
 					if (uploadedFile.getFileTags() != null) {
 						d.getFileTags().addAll(uploadedFile.getFileTags());
 					}

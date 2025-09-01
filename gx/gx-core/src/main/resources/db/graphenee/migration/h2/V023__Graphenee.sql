@@ -3,5 +3,16 @@ CREATE TABLE gx_document_folder_tag (
     tag VARCHAR(255)
 );
 
-alter table gx_folder add constraint fk_gx_document_folder_tag foreign key (tag_oid) references gx_document_folder_tag(oid);
-alter table gx_document add constraint fk_gx_document_folder_tag foreign key (tag_oid) references gx_document_folder_tag(oid);
+create table gx_file_tag_document_join (
+	oid_tag integer,
+	oid_document integer,
+	constraint fk_gx_document foreign key (oid_document) references gx_document(oid),
+	constraint fk_gx_file_tag foreign key (oid_tag) references gx_file_tag(oid)
+);
+
+create table gx_file_tag_folder_join (
+	oid_tag integer,
+	oid_folder integer,
+	constraint fk_gx_document foreign key (oid_folder) references gx_folder(oid),
+	constraint fk_gx_file_tag foreign key (oid_tag) references gx_file_tag(oid)
+);

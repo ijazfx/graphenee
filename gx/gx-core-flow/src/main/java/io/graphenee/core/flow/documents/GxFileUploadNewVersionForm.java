@@ -6,6 +6,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.flowingcode.vaadin.addons.chipfield.ChipField;
+import io.graphenee.core.model.entity.GxFileTag;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
@@ -22,7 +26,11 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument> {
 
 	Upload upload;
+	ChipField<GxFileTag> fileTags;
 	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
+
+	@Autowired
+	GxFileTagRepository tagRepository;
 
 	public GxFileUploadNewVersionForm() {
 		super(GxDocument.class);
@@ -52,8 +60,25 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 		});
 		upload.setMaxFiles(1);
 		upload.setMaxFileSize(1024000000);
-		entityForm.add(upload);
+		fileTags = new ChipField<>("Add Tags");
+
+		fileTags.addValueChangeListener(l -> {
+			if (l.getValue() == null) {
+				uploadedFiles.forEach(f -> f.setFileTags(null));
+			} else {
+				uploadedFiles.forEach(f -> f.setFileTags(l.getValue()));
+			}
+		});
+		fileTags.setNewItemHandler(label -> {
+			GxFileTag newTag = new GxFileTag();
+			newTag.setTag(label);
+			newTag.setOid(null);
+			return newTag;
+		});
+
+		entityForm.add(upload, fileTags);
 		setColspan(upload, 2);
+		setColspan(fileTags, 2);
 	}
 
 	public void initializeWithFileUploadHandler(GxFileUploadNewVersionHandler handler) {
@@ -66,6 +91,7 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 	@Override
 	protected void preBinding(GxDocument entity) {
 		uploadedFiles.clear();
+		fileTags.setItems(tagRepository.findAll());
 	}
 
 	@Override

@@ -1,8 +1,6 @@
 package io.graphenee.core.flow.documents;
 
 import com.flowingcode.vaadin.addons.chipfield.ChipField;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,9 +84,9 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 	protected void postBinding(GxDocumentExplorerItem entity) {
 		super.postBinding(entity);
 		if (getEntity().isFile()) {
-			setColspan(fileTags, 2);
+			setColspan(expiryReminderInDays, 1);
 		} else {
-			setColspan(fileTags, 1);
+			setColspan(expiryReminderInDays, 2);
 		}
 	}
 

@@ -2,7 +2,6 @@ package io.graphenee.core.flow.documents;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import io.graphenee.core.model.entity.GxFileTag;
 import lombok.Data;

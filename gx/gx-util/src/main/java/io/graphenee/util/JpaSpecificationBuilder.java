@@ -493,8 +493,6 @@ public class JpaSpecificationBuilder<T> {
 		return this;
 	}
 
-
-
 	/**
 	 * Adds an in operator to the specification.
 	 * @param <VT> The value type.

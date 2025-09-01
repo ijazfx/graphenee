@@ -4,16 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import com.flowingcode.vaadin.addons.chipfield.ChipField;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
-import io.graphenee.vaadin.flow.data.ListToSetConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 

@@ -2,7 +2,6 @@ package io.graphenee.core.model.entity;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import io.graphenee.util.TRCalendarUtil;
 

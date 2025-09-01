@@ -1,8 +1,6 @@
 package io.graphenee.core.flow.documents;
 
 import com.flowingcode.vaadin.addons.chipfield.ChipField;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
