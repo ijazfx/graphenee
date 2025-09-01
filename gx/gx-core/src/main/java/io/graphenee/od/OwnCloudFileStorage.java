@@ -4,6 +4,7 @@ import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.util.storage.SaveFailedException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -60,7 +61,7 @@ public class OwnCloudFileStorage implements FileStorage {
                 .setMaxConnPerRoute(20)
                 .setMaxConnTotal(50)
                 .build();
-        if (createFolder(rootFolder)) {
+        if (createSingleDirectory(rootFolder)) {
             this.rootFolder = this.rootFolder  + File.separator + rootFolder;
         }
 
@@ -86,16 +87,22 @@ public class OwnCloudFileStorage implements FileStorage {
         }
         return false;
     }
-    public void createFolders(String folderPath) {
-        String [] folders = folderPath.split("/");
+
+    @Override
+    public void createDirectory(final String directoryPath) {
+        if (StringUtils.isBlank(directoryPath)) {
+            return;
+        }
+        String [] folders = directoryPath.split("/");
         String fPath = folders[0];
         for (String folder : folders) {
-            createFolder(fPath);
+            createSingleDirectory(fPath);
             fPath = fPath + File.separator + folder;
         }
     }
-    public boolean createFolder(String folderPath) {
-        String completePath = this.rootFolder + File.separator + folderPath;
+
+    private boolean createSingleDirectory(final String directoryPath) {
+        String completePath = this.rootFolder + File.separator + directoryPath;
         HttpMkcol httpMkcol = new HttpMkcol(completePath);
         HttpResponse response = null;
         try {

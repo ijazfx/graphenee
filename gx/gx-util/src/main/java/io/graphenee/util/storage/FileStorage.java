@@ -111,7 +111,13 @@ public interface FileStorage {
 		throw new SaveFailedException(fileToSave + " is not a file");
 	}
 
-	/**
+    /**
+     * Create Directory.
+     * @param directoryPath Directory name i.e. ABC
+     */
+    void createDirectory(String directoryPath);
+
+    /**
 	 * Saves a file.
 	 * @param folder The folder to save the file in.
 	 * @param fileName The name of the file.
