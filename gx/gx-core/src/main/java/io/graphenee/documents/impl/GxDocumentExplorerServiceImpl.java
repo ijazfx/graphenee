@@ -184,7 +184,6 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		if (parent.isFile()) {
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.eq("document", parent);
-//			dsb.in("fileTags.oid", tagIds);
 			dsb.join("fileTags", "oid", tagIds);
 			return docRepo.count(dsb.build());
 //			List<Integer> ids = searchEntity.getFileTags().stream().map(GxFileTag::getOid).toList();
