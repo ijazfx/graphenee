@@ -61,6 +61,7 @@
 		<version.grpc>1.59.1</version.grpc>
 		<version.firebase.admin>9.2.0</version.firebase.admin>
 		<version.rxjava>3.1.8</version.rxjava>
+        <version.webdav>2.22.2</version.webdav>
 	</properties>
 
 	<!-- Dependency Management -->
@@ -245,6 +246,11 @@
 				<artifactId>rxjava</artifactId>
 				<version>${version.rxjava}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.apache.jackrabbit</groupId>
+                <artifactId>jackrabbit-webdav</artifactId>
+                <version>${version.webdav}</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 

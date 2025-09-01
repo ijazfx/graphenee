@@ -18,6 +18,7 @@ import io.graphenee.aws.GxS3Service;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.util.storage.SaveFailedException;
+import org.apache.commons.lang3.StringUtils;
 
 public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 
@@ -31,25 +32,13 @@ public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 			builder.withRegion(region);
 		}
 		awsS3Client = builder.build();
-		if (!doesBucketExists(rootBucket)) {
-			createRootBucket();
-		}
-	}
+        createDirectory(rootBucket);
 
-	private void createRootBucket() {
-		Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
-			try {
-				System.out.println("S3 root bucket: " + rootBucket + " created successfully....");
-				awsS3Client.createBucket(rootBucket);
-			} catch (Exception e) {
-				System.err.println("Failed to create S3 root bucket \"" + rootBucket + "\": " + e.getMessage());
-			}
-		});
 	}
 
 	@Override
 	public boolean doesBucketExists(String bucketName) {
-		if (bucketName == null)
+		if (StringUtils.isBlank(bucketName))
 			return false;
 		return awsS3Client.doesBucketExistV2(bucketName);
 	}
@@ -108,4 +97,18 @@ public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 			}
 		});
 	}
+
+    @Override
+    public void createDirectory(String directoryPath) {
+        Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
+            try {
+                if (!doesBucketExists(directoryPath)) {
+                    System.out.println("S3 root bucket: " + directoryPath + " created successfully....");
+                    awsS3Client.createBucket(directoryPath);
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to create S3 root bucket \"" + rootBucket + "\": " + e.getMessage());
+            }
+        });
+    }
 }
