@@ -32,7 +32,7 @@ public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 			builder.withRegion(region);
 		}
 		awsS3Client = builder.build();
-        createDirectories(rootBucket);
+        createDirectory(rootBucket);
 
 	}
 
