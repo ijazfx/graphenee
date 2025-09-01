@@ -11,7 +11,7 @@
 		<groupId>com.trigsoft.graphenee</groupId>
 		<artifactId>gx</artifactId>
 		<version>4.1.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<!-- Properties -->
@@ -26,6 +26,10 @@
 		<repository>
 			<id>vaadin-addons</id>
 			<url>https://maven.vaadin.com/vaadin-addons/</url>
+		</repository>
+		<repository>
+			<id>flowingcode-maven</id>
+			<url>https://maven.flowingcode.com/artifactory/flowingcode-releases</url>
 		</repository>
 	</repositories>
 
@@ -100,6 +104,11 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.flowingcode.vaadin.addons.chipfield</groupId>
+			<artifactId>chipfield-addon</artifactId>
+			<version>2.4.2</version>
 		</dependency>
 	</dependencies>
 

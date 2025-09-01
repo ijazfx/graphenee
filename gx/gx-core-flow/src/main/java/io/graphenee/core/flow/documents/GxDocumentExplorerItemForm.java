@@ -1,5 +1,11 @@
 package io.graphenee.core.flow.documents;
 
+import com.flowingcode.vaadin.addons.chipfield.ChipField;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import io.graphenee.core.model.entity.GxFileTag;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
@@ -19,12 +25,16 @@ import io.graphenee.vaadin.flow.data.TimestampToDateConverter;
 @Scope("prototype")
 public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentExplorerItem> {
 
+	@Autowired
+	GxFileTagRepository tagRepository;
+
 	TextField name;
 	TextArea note;
 	DatePicker issueDate;
 	DatePicker expiryDate;
 	IntegerField expiryReminderInDays;
 	DatePicker reminderDate;
+	ChipField<GxFileTag> fileTags;
 
 	public GxDocumentExplorerItemForm() {
 		super(GxDocumentExplorerItem.class);
@@ -43,7 +53,18 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 
 		reminderDate = new DatePicker("Reminder Date");
 
-		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate);
+		fileTags = new ChipField<>("Add Tags");
+
+		fileTags.setNewItemHandler(label -> {
+			GxFileTag newTag = new GxFileTag();
+			newTag.setTag(label);
+			newTag.setOid(null);
+			return newTag;
+		});
+
+		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, fileTags);
+
+		setColspan(fileTags, 2);
 
 		expand(name, note);
 	}
@@ -54,6 +75,21 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateConverter());
 		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateConverter());
 		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateConverter());
+	}
+
+	@Override
+	protected void preBinding(GxDocumentExplorerItem entity) {
+		fileTags.setItems(tagRepository.findAll());
+	}
+
+	@Override
+	protected void postBinding(GxDocumentExplorerItem entity) {
+		super.postBinding(entity);
+		if (getEntity().isFile()) {
+			setColspan(fileTags, 2);
+		} else {
+			setColspan(fileTags, 1);
+		}
 	}
 
 	@Override
@@ -73,7 +109,7 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 
 	@Override
 	protected String dialogHeight() {
-		return "450px";
+		return "550px";
 	}
 
 }

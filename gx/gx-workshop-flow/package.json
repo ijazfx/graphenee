@@ -3,6 +3,16 @@
   "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
+    "@polymer/iron-a11y-keys": "^3.0.1",
+    "@polymer/iron-a11y-keys-behavior": "^3.0.1",
+    "@polymer/iron-icons": "^3.0.1",
+    "@polymer/paper-icon-button": "^3.0.2",
+    "@polymer/paper-input": "^3.0.1",
+    "@polymer/paper-item": "^3.0.1",
+    "@polymer/paper-listbox": "^3.0.1",
+    "@polymer/paper-material": "^3.0.1",
+    "@polymer/paper-ripple": "^3.0.1",
+    "@polymer/paper-styles": "^3.0.1",
     "@polymer/polymer": "3.5.2",
     "@vaadin-component-factory/vcf-pdf-viewer": "2.0.1",
     "@vaadin/bundles": "24.8.4",
@@ -48,6 +58,16 @@
   },
   "vaadin": {
     "dependencies": {
+      "@polymer/iron-a11y-keys": "^3.0.1",
+      "@polymer/iron-a11y-keys-behavior": "^3.0.1",
+      "@polymer/iron-icons": "^3.0.1",
+      "@polymer/paper-icon-button": "^3.0.2",
+      "@polymer/paper-input": "^3.0.1",
+      "@polymer/paper-item": "^3.0.1",
+      "@polymer/paper-listbox": "^3.0.1",
+      "@polymer/paper-material": "^3.0.1",
+      "@polymer/paper-ripple": "^3.0.1",
+      "@polymer/paper-styles": "^3.0.1",
       "@polymer/polymer": "3.5.2",
       "@vaadin-component-factory/vcf-pdf-viewer": "2.0.1",
       "@vaadin/bundles": "24.8.4",
@@ -91,7 +111,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "b69cd0007ea875fd900d8ba470755a2f27999afe4f4aa71dd116fe4af4baa3f7"
+    "hash": "9e9545c8a8ea7b1fb4519df789f53acf614be5f4f9f1104ab0fba991f5007e56"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -172,6 +192,16 @@
     "@vaadin/upload": "24.8.4",
     "@vaadin/router": "2.0.0",
     "@vaadin/vertical-layout": "24.8.4",
-    "@vaadin/virtual-list": "24.8.4"
+    "@vaadin/virtual-list": "24.8.4",
+    "@polymer/iron-icons": "$@polymer/iron-icons",
+    "@polymer/iron-a11y-keys": "$@polymer/iron-a11y-keys",
+    "@polymer/iron-a11y-keys-behavior": "$@polymer/iron-a11y-keys-behavior",
+    "@polymer/paper-icon-button": "$@polymer/paper-icon-button",
+    "@polymer/paper-material": "$@polymer/paper-material",
+    "@polymer/paper-ripple": "$@polymer/paper-ripple",
+    "@polymer/paper-listbox": "$@polymer/paper-listbox",
+    "@polymer/paper-item": "$@polymer/paper-item",
+    "@polymer/paper-styles": "$@polymer/paper-styles",
+    "@polymer/paper-input": "$@polymer/paper-input"
   }
 }

@@ -2,11 +2,7 @@ package io.graphenee.util;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -461,6 +457,43 @@ public class JpaSpecificationBuilder<T> {
 		specsQueue.add(spec);
 		return this;
 	}
+
+	/**
+	 * Adds a join with in() support for many-to-many relationships.
+	 *
+	 * @param <J>        The joined entity type
+	 * @param joinField  The name of the many-to-many field in the root entity
+	 * @param key        The attribute in the joined entity to filter (e.g., "oid")
+	 * @param values     Collection of values to match
+	 * @return This builder instance
+	 */
+	public <J, VT> JpaSpecificationBuilder<T> join(String joinField, String key, Collection<VT> values) {
+		if (joinField == null || key == null || values == null || values.isEmpty()) {
+			return this;
+		}
+
+		List<Object> filtered = new ArrayList<>();
+		for (VT value : values) {
+			if (value instanceof String) {
+				String trimmed = value.toString().trim();
+				if (!trimmed.isEmpty()) filtered.add(trimmed);
+			} else if (value != null) {
+				filtered.add(value);
+			}
+		}
+		if (filtered.isEmpty()) return this;
+
+		Specification<T> spec = (root, cq, cb) -> {
+			cq.distinct(true);  // Important to avoid duplicates for many-to-many
+			Join<T, J> join = root.join(joinField);
+			return join.get(key).in(filtered);
+		};
+
+		specsQueue.add(spec);
+		return this;
+	}
+
+
 
 	/**
 	 * Adds an in operator to the specification.

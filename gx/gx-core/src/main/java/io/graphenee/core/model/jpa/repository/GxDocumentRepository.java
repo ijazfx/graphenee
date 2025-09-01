@@ -23,4 +23,11 @@ public interface GxDocumentRepository extends GxJpaRepository<GxDocument, Intege
 	@Query(nativeQuery = true, value = "select * from gx_document gd  where version_no = (select max (version_no) from gx_document gd2 where gd2.name= gd.name limit 1) and oid_folder = ?1 order  by gd.name")
 	List<GxDocument> findByFolder(Integer oidFolder);
 
+	@Query(value = "select * from gx_document gd where version_no = (select max(gd2.version_no) from gx_document gd2 where gd2.name = gd.name) and oid_folder = ?1 and gd.oid in (select oid_document from gx_file_tag_document_join where oid_tag in (?2)) order by gd.name", nativeQuery = true)
+	List<GxDocument> findByFolderAndTag(Integer oidFolder, List<Integer> oidTags);
+
+	@Query(value = "select count(*) from gx_document gd where oid_document = ?1 and gd.oid in (select oid_document from gx_file_tag_document_join where oid_tag in (?2))", nativeQuery = true)
+	Integer countByParentAndTag(Integer oidParent, List<Integer> oidTags);
+
+
 }
