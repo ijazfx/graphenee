@@ -14,6 +14,11 @@ public class GxUserAccountDashboardUser extends AbstractDashboardUser<GxUserAcco
 	}
 
 	@Override
+	public Integer getOid() {
+		return getUser().getOid();
+	}
+
+	@Override
 	public byte[] getProfilePhoto() {
 		return getUser().getProfileImage();
 	}

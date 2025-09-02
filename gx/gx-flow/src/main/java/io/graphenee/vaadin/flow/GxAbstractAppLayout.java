@@ -3,6 +3,7 @@ package io.graphenee.vaadin.flow;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.vaadin.flow.server.StreamResource;
 import org.apache.logging.log4j.util.Strings;
 
 import com.vaadin.flow.component.UI;
@@ -96,6 +97,10 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			GxAuthenticatedUser user = flowSetup().loggedInUser();
 			avatar = new Avatar(user.getFirstNameLastName());
 			avatar.addThemeVariants(AvatarVariant.LUMO_LARGE);
+			if (user.getProfilePhoto() != null) {
+				StreamResource resource = new StreamResource("Profile Picture", () -> new java.io.ByteArrayInputStream(user.getProfilePhoto()));
+				avatar.setImageResource(resource);
+			}
 			customizeAvatar(avatar);
 			Span space = new Span("");
 			space.setWidth("12px");
