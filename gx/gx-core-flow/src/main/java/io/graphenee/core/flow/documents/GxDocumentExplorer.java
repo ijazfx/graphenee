@@ -224,7 +224,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			box.setItems(tagRepository.findAll());
 			box.setClearButtonVisible(true);
 			box.addValueChangeListener(l -> {
-				getSearchEntity().setFileTags(l.getValue().stream().toList());
+				getSearchEntity().setFileTags(l.getValue());
 				refresh();
 			});
 			return box;

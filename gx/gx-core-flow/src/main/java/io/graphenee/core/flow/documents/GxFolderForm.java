@@ -1,6 +1,6 @@
 package io.graphenee.core.flow.documents;
 
-import com.flowingcode.vaadin.addons.chipfield.ChipField;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,11 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
@@ -25,7 +30,7 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 
 	TextField name;
 	TextArea note;
-	ChipField<GxFileTag> fileTags;
+	MultiSelectComboBox<GxFileTag> fileTags;
 
 
 	public GxFolderForm() {
@@ -38,13 +43,24 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 		note = new TextArea("Note");
 		note.setHeight("7rem");
 
-		fileTags = new ChipField<>("Add Tags");
+		fileTags = new MultiSelectComboBox<>("Add Tags");
 
-		fileTags.setNewItemHandler(label -> {
+		fileTags.addCustomValueSetListener(l -> {
 			GxFileTag newTag = new GxFileTag();
-			newTag.setTag(label);
+			newTag.setTag(l.getDetail());
 			newTag.setOid(null);
-			return newTag;
+
+			// Copy current value into a mutable set
+			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			updated.add(newTag);
+
+			// Update items (so the combo knows this tag exists)
+			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
+			items.add(newTag);
+			fileTags.setItems(items);
+
+			// Set new value
+			fileTags.setValue(updated);
 		});
 
 		entityForm.add(name, note, fileTags);

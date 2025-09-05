@@ -101,6 +101,12 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 				StreamResource resource = new StreamResource("Profile Picture", () -> new java.io.ByteArrayInputStream(user.getProfilePhoto()));
 				avatar.setImageResource(resource);
 			}
+			avatar.getElement().addEventListener("click", e -> {
+				GxAbstractEntityForm<?> profileForm = getProfileForm(user);
+				if (profileForm != null) {
+					showProfileDialog(profileForm);
+				}
+			});
 			customizeAvatar(avatar);
 			Span space = new Span("");
 			space.setWidth("12px");
@@ -141,12 +147,40 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	}
 
+	private <T> void showProfileDialog(GxAbstractEntityForm<T> profileForm) {
+		T entity = profileForm.getEntity();
+		profileForm.showInDialog(entity);
+		profileForm.setDelegate(new GxAbstractEntityForm.EntityFormDelegate<T>() {
+			@Override
+			public void onSave(T entity) {
+				saveProfile(entity);
+			}
+		});
+	}
+
 	/**
 	 * Customizes the avatar.
 	 * 
 	 * @param avatar The avatar to customize.
 	 */
 	protected void customizeAvatar(Avatar avatar) {
+	}
+
+	/**
+	 * Get the profile form.
+	 *
+	 * @param user The user for form.
+	 */
+	protected GxAbstractEntityForm<?> getProfileForm(GxAuthenticatedUser user) {
+		return null;
+	}
+
+	/**
+	 * Saves the user profile.
+	 *
+	 * @param user The user to save.
+	 */
+	protected void saveProfile(Object user) {
 	}
 
 	private boolean canDoAction(GxAuthenticatedUser user, String action, GxMenuItem mi) {

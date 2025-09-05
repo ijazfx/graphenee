@@ -117,7 +117,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	public List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders) {
 		for (GxFolder folder : folders) {
 			if (folder.getOid() == null && folder.getFileTags() != null && !folder.getFileTags().isEmpty()) {
-				List<GxFileTag> managedTags = new ArrayList<>();
+				Set<GxFileTag> managedTags = new HashSet<>();
 				for (GxFileTag tag : folder.getFileTags()) {
 					if (tag.getOid() != null) {
 						managedTags.add(em.merge(tag));
@@ -136,7 +136,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	public List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents) {
 		for (GxDocument doc : documents) {
 			if (doc.getOid() == null && doc.getFileTags() != null && !doc.getFileTags().isEmpty()) {
-				List<GxFileTag> managedTags = new ArrayList<>();
+				Set<GxFileTag> managedTags = new HashSet<>();
 				for (GxFileTag tag : doc.getFileTags()) {
 					if (tag.getOid() != null) {
 						managedTags.add(em.merge(tag));

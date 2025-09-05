@@ -17,6 +17,12 @@ public interface GxAuthenticatedUser {
 
 	/**
 	 * Gets the profile photo.
+	 * @param picture The profile picture.
+	 */
+	void setProfilePhoto(byte[] picture);
+
+	/**
+	 * Sets the profile photo.
 	 * @return The profile photo.
 	 */
 	byte[] getProfilePhoto();

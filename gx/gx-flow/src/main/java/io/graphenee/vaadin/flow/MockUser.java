@@ -72,6 +72,10 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	}
 
 	@Override
+	public void setProfilePhoto(byte[] picture) {
+	}
+
+	@Override
 	public byte[] getProfilePhoto() {
 		return null;
 	}

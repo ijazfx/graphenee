@@ -10,55 +10,38 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.streams.InMemoryUploadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
-import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.validator.EmailValidator;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
-import io.graphenee.core.model.entity.GxUserAccount;
-import io.graphenee.security.GxPasswordPolicyDataService;
-import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
 @SpringComponent
 @Scope("prototype")
 @Slf4j
-public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxUserAccount> {
+public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticatedUser> {
     private static final long serialVersionUID = 1L;
 
     public GxUserAccountProfileForm() {
-        super(GxUserAccount.class);
+        super(GxAuthenticatedUser.class);
     }
 
     private TextField username;
     private TextField firstName;
     private TextField lastName;
     private TextField email;
-    private PasswordField newPassword;
-    private PasswordField confirmPassword;
     Upload imageUploader;
 
     Avatar pictureAvatar;
 
     Button tapToEdit;
-
-    @Autowired
-    private FileStorage storage;
-
-    @Autowired
-    GxPasswordPolicyDataService passwordPolicyService;
 
     @Override
     protected void decorateForm(HasComponents entityForm) {
@@ -69,24 +52,13 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxUserAccount
         lastName = new TextField("Last Name");
         email = new TextField("Email");
 
-        newPassword = new PasswordField("New Password");
-        newPassword.setAutocomplete(null);
-        newPassword.setValueChangeMode(ValueChangeMode.EAGER);
-
-        confirmPassword = new PasswordField("Confirm Password");
-        confirmPassword.setAutocomplete(null);
-        newPassword.addValueChangeListener(vcl -> {
-            confirmPassword.clear();
-            confirmPassword.setEnabled(vcl.getValue().length() > 0);
-        });
-
         InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory((metadata, data) -> {
             try {
                 // Display image in Avatar
                 StreamResource resource = new StreamResource(metadata.fileName(), () -> new java.io.ByteArrayInputStream(data));
                 pictureAvatar.setImageResource(resource);
 
-                getEntity().setProfileImage(data);
+                getEntity().setProfilePhoto(data);
 
             } catch (Exception e) {
                 log.error("Error while image upload: {}", e.getMessage());
@@ -132,12 +104,12 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxUserAccount
         Span gap = new Span();
         gap.getElement().getStyle().set("height", "10px");
 
-        entityForm.add(gap, tapToEdit, group("group0", firstName, lastName), username, group("group1", newPassword,
-                confirmPassword));
+        entityForm.add(gap, tapToEdit, group("group0", firstName, lastName), username, email);
         setColspan(username, 2);
+        setColspan(email, 2);
         setColspan(tapToEdit, 2);
         setColspan(gap, 2);
-        expand("group0", "group1");
+        expand("group0");
 
     }
 
@@ -149,52 +121,19 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxUserAccount
     }
 
     @Override
-    protected void bindFields(Binder<GxUserAccount> dataBinder) {
+    protected void bindFields(Binder<GxAuthenticatedUser> dataBinder) {
         dataBinder.forMemberField(username).asRequired();
         dataBinder.forMemberField(email).withValidator(new EmailValidator("Must be a valid email address"));
-        dataBinder.forMemberField(newPassword).withValidator(new Validator<String>() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public ValidationResult apply(String value, ValueContext context) {
-                if (Strings.isBlank(value))
-                    return ValidationResult.ok();
-                try {
-                    passwordPolicyService.assertPasswordPolicy(getEntity().getNamespace(), getEntity().getUsername(),
-                            value);
-                    return ValidationResult.ok();
-                } catch (AssertionError e) {
-                    return ValidationResult.error(e.getMessage());
-                }
-            }
-        });
-        dataBinder.forMemberField(confirmPassword).withValidator(new Validator<String>() {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public ValidationResult apply(String value, ValueContext context) {
-                if (newPassword.getValue().equals(value)) {
-                    return ValidationResult.ok();
-                }
-                return ValidationResult.error("Confirm password does not match with new password!");
-            }
-
-        });
     }
 
     @Override
-    protected void preBinding(GxUserAccount entity) {
-        newPassword.clear();
-        confirmPassword.setEnabled(false);
-
-        if (entity.getProfileImage() != null) {
-            StreamResource resource = new StreamResource("Profile Picture", () -> new java.io.ByteArrayInputStream(entity.getProfileImage()));
+    protected void preBinding(GxAuthenticatedUser entity) {
+        if (entity.getProfilePhoto() != null) {
+            StreamResource resource = new StreamResource("Profile Picture", () -> new java.io.ByteArrayInputStream(entity.getProfilePhoto()));
             pictureAvatar.setImageResource(resource);
         } else {
             pictureAvatar.setImageResource(null);
-            pictureAvatar.setName(entity.getFullNameNative());
+            pictureAvatar.setName(entity.getFirstNameLastName());
         }
     }
 

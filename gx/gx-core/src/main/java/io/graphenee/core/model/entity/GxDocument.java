@@ -69,7 +69,7 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 
 	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	@JoinTable(name = "gx_file_tag_document_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
-	List<GxFileTag> fileTags = new ArrayList<>();
+	Set<GxFileTag> fileTags = new HashSet<>();
 
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();

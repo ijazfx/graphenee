@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import com.flowingcode.vaadin.addons.chipfield.ChipField;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument> {
 
 	Upload upload;
-	ChipField<GxFileTag> fileTags;
+	MultiSelectComboBox<GxFileTag> fileTags;
 	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
 
 	@Autowired
@@ -60,20 +62,31 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 		});
 		upload.setMaxFiles(1);
 		upload.setMaxFileSize(1024000000);
-		fileTags = new ChipField<>("Add Tags");
+		fileTags = new MultiSelectComboBox<>("Add Tags");
 
 		fileTags.addValueChangeListener(l -> {
 			if (l.getValue() == null) {
 				uploadedFiles.forEach(f -> f.setFileTags(null));
 			} else {
-				uploadedFiles.forEach(f -> f.setFileTags(l.getValue()));
+				uploadedFiles.forEach(f -> f.setFileTags(l.getValue().stream().toList()));
 			}
 		});
-		fileTags.setNewItemHandler(label -> {
+		fileTags.addCustomValueSetListener(l -> {
 			GxFileTag newTag = new GxFileTag();
-			newTag.setTag(label);
+			newTag.setTag(l.getDetail());
 			newTag.setOid(null);
-			return newTag;
+
+			// Copy current value into a mutable set
+			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			updated.add(newTag);
+
+			// Update items (so the combo knows this tag exists)
+			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
+			items.add(newTag);
+			fileTags.setItems(items);
+
+			// Set new value
+			fileTags.setValue(updated);
 		});
 
 		entityForm.add(upload, fileTags);

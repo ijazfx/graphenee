@@ -58,7 +58,7 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 
 	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
 	@JoinTable(name = "gx_file_tag_folder_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
-	List<GxFileTag> fileTags = new ArrayList<>();
+	Set<GxFileTag> fileTags = new HashSet<>();
 
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();
