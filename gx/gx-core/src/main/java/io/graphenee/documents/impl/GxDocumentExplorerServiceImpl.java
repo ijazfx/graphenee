@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -35,6 +36,9 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 
 	@Autowired
 	GxDocumentTypeRepository docTypeRepo;
+
+	@Autowired
+	GxFileTagRepository tagRepository;
 
 	@PersistenceContext
 	private EntityManager em;
@@ -116,18 +120,32 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	@Transactional
 	@Override
 	public List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders) {
-		folders.stream().filter(folder -> folder.getOid() == null && ObjectUtils.isNotEmpty(folder.getFileTags()))
-				.flatMap(folder -> folder.getFileTags().stream())
-				.filter(tag -> tag.getOid() != null).forEach(tag -> em.merge(tag));
+		folders.forEach(folder -> {
+			if (folder.getFileTags() != null) {
+				folder.setFileTags(folder.getFileTags().stream().flatMap(tag -> {
+					if (tag.getOid() != null) {
+						return tagRepository.findById(tag.getOid()).stream();
+					}
+					return java.util.stream.Stream.of(tag);
+				}).collect(Collectors.toSet()));
+			}
+		});
 		return folderRepo.saveAll(folders);
 	}
 
 	@Override
 	@Transactional
 	public List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents) {
-		documents.stream().filter(doc -> doc.getOid() == null && ObjectUtils.isNotEmpty(doc.getFileTags()))
-				.flatMap(doc -> doc.getFileTags().stream())
-				.filter(tag -> tag.getOid() != null).forEach(tag -> em.merge(tag));
+		documents.forEach(document -> {
+			if (document.getFileTags() != null) {
+				document.setFileTags(document.getFileTags().stream().flatMap(tag -> {
+					if (tag.getOid() != null) {
+						return tagRepository.findById(tag.getOid()).stream();
+					}
+					return java.util.stream.Stream.of(tag);
+				}).collect(Collectors.toSet()));
+			}
+		});
 		return docRepo.saveAll(documents);
 	}
 
