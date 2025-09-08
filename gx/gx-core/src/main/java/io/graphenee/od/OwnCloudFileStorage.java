@@ -56,13 +56,13 @@ public class OwnCloudFileStorage implements FileStorage {
                 new BasicHeader(HttpHeaders.AUTHORIZATION,
                         "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes()))
         );
-        httpClient =  HttpClientBuilder.create()
+        httpClient = HttpClientBuilder.create()
                 .setDefaultHeaders(defaultHeaders)
                 .setMaxConnPerRoute(20)
                 .setMaxConnTotal(50)
                 .build();
         if (createSingleDirectory(rootFolder)) {
-            this.rootFolder = this.rootFolder  + File.separator + rootFolder;
+            this.rootFolder = this.rootFolder + "/" + rootFolder;
         }
 
     }
@@ -70,7 +70,7 @@ public class OwnCloudFileStorage implements FileStorage {
     @Override
     public boolean exists(String fileName) {
         try {
-            HttpPropfind httpPropfind = new HttpPropfind(rootFolder + File.separator + fileName,
+            HttpPropfind httpPropfind = new HttpPropfind(rootFolder + "/" + fileName,
                     getPropertyNamesForFetch(),
                     DEPTH_0);
             HttpResponse response = httpClient.execute(httpPropfind);
@@ -93,16 +93,16 @@ public class OwnCloudFileStorage implements FileStorage {
         if (StringUtils.isBlank(directoryPath)) {
             return;
         }
-        String [] folders = directoryPath.split("/");
+        String[] folders = directoryPath.split("/");
         String fPath = folders[0];
         for (String folder : folders) {
             createSingleDirectory(fPath);
-            fPath = fPath + File.separator + folder;
+            fPath = fPath + "/" + folder;
         }
     }
 
     private boolean createSingleDirectory(final String directoryPath) {
-        String completePath = this.rootFolder + File.separator + directoryPath;
+        String completePath = this.rootFolder + "/" + directoryPath;
         HttpMkcol httpMkcol = new HttpMkcol(completePath);
         HttpResponse response = null;
         try {
@@ -135,7 +135,7 @@ public class OwnCloudFileStorage implements FileStorage {
     @Override
     public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
         return Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
-            String resourcePath = this.resourcePath(folder, fileName).replace('/', File.separatorChar);
+            String resourcePath = this.resourcePath(folder, fileName);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
             int bytesRead;
@@ -151,7 +151,7 @@ public class OwnCloudFileStorage implements FileStorage {
             byte[] fileData = baos.toByteArray();
             long contentLength = fileData.length;
             try {
-                HttpPut httpPut = new HttpPut(this.rootFolder + File.separator + resourcePath);
+                HttpPut httpPut = new HttpPut(this.rootFolder + "/" + resourcePath);
                 InputStreamEntity entity = new InputStreamEntity(new ByteArrayInputStream(fileData), contentLength);
                 httpPut.setEntity(entity);
                 HttpResponse response = httpClient.execute(httpPut);
@@ -171,7 +171,7 @@ public class OwnCloudFileStorage implements FileStorage {
     public InputStream resolve(String resourcePath) throws ResolveFailedException {
         if (this.exists(resourcePath)) {
             try {
-                HttpGet httpGet = new HttpGet(this.rootFolder + File.separator + resourcePath);
+                HttpGet httpGet = new HttpGet(this.rootFolder + "/" + resourcePath);
 
                 // Execute the request and get the response.
                 HttpResponse response = httpClient.execute(httpGet);
