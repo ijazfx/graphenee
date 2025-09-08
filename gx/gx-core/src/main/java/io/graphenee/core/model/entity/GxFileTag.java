@@ -24,11 +24,11 @@ public class GxFileTag {
 
     String tag;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "gx_file_tag_document_join", joinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"))
     Set<GxDocument> documents = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "gx_file_tag_folder_join", joinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"))
     Set<GxFolder> folders = new HashSet<>();
 
