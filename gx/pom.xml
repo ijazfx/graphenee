@@ -55,7 +55,7 @@
 		<version.pdfbox>3.0.1</version.pdfbox>
 		<version.poi>5.4.0</version.poi>
 		<version.retrofit>2.9.0</version.retrofit>
-		<version.protobuf>4.0.0-rc-2</version.protobuf>
+		<version.protobuf>4.27.5</version.protobuf>
 		<version.commons.beanutils>1.9.4</version.commons.beanutils>
 		<version.commons.io>2.15.1</version.commons.io>
 		<version.jasper>6.21.0</version.jasper>
