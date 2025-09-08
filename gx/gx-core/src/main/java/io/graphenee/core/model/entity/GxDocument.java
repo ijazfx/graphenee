@@ -2,10 +2,8 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
@@ -69,6 +67,10 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 	@JoinTable(name = "gx_document_audit_log_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
 	List<GxAuditLog> auditLogs = new ArrayList<>();
 
+	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@JoinTable(name = "gx_file_tag_document_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
+	Set<GxFileTag> fileTags = new HashSet<>();
+
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();
 		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
@@ -130,6 +132,11 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 		}
 		return null;
 	}
+
+	public String getFileTagsJoined() {
+		return fileTags.stream().map(t -> t.getTag()).collect(Collectors.joining(", "));
+	}
+
 
 	public String getName() {
 		return this.name;

@@ -4,8 +4,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import io.graphenee.core.model.entity.GxFileTag;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
@@ -22,7 +28,11 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument> {
 
 	Upload upload;
+	MultiSelectComboBox<GxFileTag> fileTags;
 	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
+
+	@Autowired
+	GxFileTagRepository tagRepository;
 
 	public GxFileUploadNewVersionForm() {
 		super(GxDocument.class);
@@ -52,8 +62,36 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 		});
 		upload.setMaxFiles(1);
 		upload.setMaxFileSize(1024000000);
-		entityForm.add(upload);
+		fileTags = new MultiSelectComboBox<>("Add Tags");
+
+		fileTags.addValueChangeListener(l -> {
+			if (l.getValue() == null) {
+				uploadedFiles.forEach(f -> f.setFileTags(null));
+			} else {
+				uploadedFiles.forEach(f -> f.setFileTags(l.getValue().stream().toList()));
+			}
+		});
+		fileTags.addCustomValueSetListener(l -> {
+			GxFileTag newTag = new GxFileTag();
+			newTag.setTag(l.getDetail());
+			newTag.setOid(null);
+
+			// Copy current value into a mutable set
+			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			updated.add(newTag);
+
+			// Update items (so the combo knows this tag exists)
+			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
+			items.add(newTag);
+			fileTags.setItems(items);
+
+			// Set new value
+			fileTags.setValue(updated);
+		});
+
+		entityForm.add(upload, fileTags);
 		setColspan(upload, 2);
+		setColspan(fileTags, 2);
 	}
 
 	public void initializeWithFileUploadHandler(GxFileUploadNewVersionHandler handler) {
@@ -66,6 +104,7 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 	@Override
 	protected void preBinding(GxDocument entity) {
 		uploadedFiles.clear();
+		fileTags.setItems(tagRepository.findAll());
 	}
 
 	@Override

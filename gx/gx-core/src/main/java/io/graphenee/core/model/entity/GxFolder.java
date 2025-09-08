@@ -2,10 +2,8 @@ package io.graphenee.core.model.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
@@ -57,6 +55,10 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "gx_folder_audit_log_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
 	List<GxAuditLog> auditLogs = new ArrayList<>();
+
+	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@JoinTable(name = "gx_file_tag_folder_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
+	Set<GxFileTag> fileTags = new HashSet<>();
 
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();
@@ -151,6 +153,10 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 
 	@Override
 	public void setExpiryReminderInDays(Integer expiryReminderInDays) {
+	}
+
+	public String getFileTagsJoined() {
+		return fileTags.stream().map(t -> t.getTag()).collect(Collectors.joining(", "));
 	}
 
 	public String getName() {

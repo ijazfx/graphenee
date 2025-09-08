@@ -3,8 +3,14 @@ package io.graphenee.core.flow.documents;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import io.graphenee.core.model.entity.GxFileTag;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
@@ -22,12 +28,16 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 
 	Upload upload;
+	MultiSelectComboBox<GxFileTag> fileTags;
 
 	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
 
 	public GxFileUploadForm() {
 		super(GxFolder.class);
 	}
+
+	@Autowired
+	GxFileTagRepository tagRepository;
 
 	@Override
 	protected void decorateForm(HasComponents entityForm) {
@@ -40,33 +50,47 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 				uploadedFile.setFile(file);
 				uploadedFile.setFileName(uploadMetadata.fileName());
 				uploadedFile.setMimeType(uploadMetadata.contentType());
+				if (fileTags.getValue() != null) {
+					uploadedFile.setFileTags(fileTags.getValue().stream().toList());
+				}
 				uploadedFiles.add(uploadedFile);
 			}
 
 		}));
 
-		// upload = new Upload(new Receiver() {
-
-		// @Override
-		// public OutputStream receiveUpload(String fileName, String mimeType) {
-		// try {
-		// File file = File.createTempFile("uploaded", fileName);
-		// GxUploadedFile uploadedFile = new GxUploadedFile();
-		// uploadedFile.setFile(file);
-		// uploadedFile.setFileName(fileName);
-		// uploadedFile.setMimeType(mimeType);
-		// uploadedFiles.add(uploadedFile);
-		// FileOutputStream fos = new FileOutputStream(file);
-		// return fos;
-		// } catch (Exception e) {
-		// return null;
-		// }
-		// }
-
-		// });
 		upload.setMaxFiles(10);
 		upload.setMaxFileSize(1024000000);
-		entityForm.add(upload);
+
+		fileTags = new MultiSelectComboBox<>("Add Tags");
+
+		fileTags.addValueChangeListener(l -> {
+			if (l.getValue() == null) {
+				uploadedFiles.forEach(f -> f.setFileTags(null));
+			} else {
+				uploadedFiles.forEach(f -> f.setFileTags(l.getValue().stream().toList()));
+			}
+		});
+		fileTags.addCustomValueSetListener(l -> {
+			GxFileTag newTag = new GxFileTag();
+			newTag.setTag(l.getDetail());
+			newTag.setOid(null);
+
+			// Copy current value into a mutable set
+			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			updated.add(newTag);
+
+			// Update items (so the combo knows this tag exists)
+			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
+			items.add(newTag);
+			fileTags.setItems(items);
+
+			// Set new value
+			fileTags.setValue(updated);
+		});
+
+		entityForm.add(upload, fileTags);
+		setColspan(upload, 2);
+		setColspan(fileTags, 2);
 	}
 
 	public void initializeWithFileUploadHandler(GxFileUploadHandler handler) {
@@ -78,6 +102,7 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 	@Override
 	protected void preBinding(GxFolder entity) {
 		uploadedFiles.clear();
+		fileTags.setItems(tagRepository.findAll());
 	}
 
 	@Override

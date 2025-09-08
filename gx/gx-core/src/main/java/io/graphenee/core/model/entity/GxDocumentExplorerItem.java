@@ -2,6 +2,7 @@ package io.graphenee.core.model.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import io.graphenee.util.TRCalendarUtil;
 
@@ -11,9 +12,17 @@ public interface GxDocumentExplorerItem {
 
 	String getMimeType();
 
+	Integer getOid();
+
 	String getExtension();
 
 	String getName();
+
+	Set<GxFileTag> getFileTags();
+
+	String getFileTagsJoined();
+
+	void setFileTags(Set<GxFileTag> tags);
 
 	void setName(String name);
 

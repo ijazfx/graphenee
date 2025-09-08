@@ -10,6 +10,10 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import io.graphenee.core.model.entity.*;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -39,11 +43,6 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
-import io.graphenee.core.model.entity.GxDocument;
-import io.graphenee.core.model.entity.GxDocumentExplorerItem;
-import io.graphenee.core.model.entity.GxDocumentFilter;
-import io.graphenee.core.model.entity.GxFolder;
-import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.storage.FileStorage;
@@ -66,6 +65,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Autowired
 	GxDocumentExplorerService documentService;
+
+	@Autowired
+	GxFileTagRepository tagRepository;
 
 	@Autowired
 	GxDocumentExplorerItemForm form;
@@ -164,7 +166,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "size", "issueDate", "expiryDate", "expiryReminderInDays" };
+		return new String[] { "extension", "name", "version", "fileTagsJoined", "size", "issueDate", "expiryDate", "expiryReminderInDays" };
 	}
 
 	@Override
@@ -173,6 +175,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			column.setHeader("Type");
 			column.setWidth("3rem");
 			column.setTextAlign(ColumnTextAlign.CENTER);
+		}
+		if (propertyName.matches("(fileTagsJoined)")) {
+			column.setHeader("Tags");
+			column.setWidth("13rem");
 		}
 	}
 
@@ -209,6 +215,21 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			});
 		}
 		return super.rendererForProperty(propertyName, propertyDefinition);
+	}
+
+	@Override
+	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
+		if (propertyName.equalsIgnoreCase("fileTagsJoined")){
+			MultiSelectComboBox<GxFileTag> box = new MultiSelectComboBox<>();
+			box.setItems(tagRepository.findAll());
+			box.setClearButtonVisible(true);
+			box.addValueChangeListener(l -> {
+				getSearchEntity().setFileTags(l.getValue());
+				refresh();
+			});
+			return box;
+		}
+		return super.columnFilterForProperty(propertyName, propertyDefinition, defaultFilter);
 	}
 
 	public void previewDocument(GxDocumentExplorerItem s) {
@@ -297,12 +318,16 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					d.setName(uploadedFile.getFileName());
 					d.setPath(metaData.getFileName());
 					d.setMimeType(uploadedFile.getMimeType());
+					if (uploadedFile.getFileTags() != null) {
+						d.getFileTags().addAll(uploadedFile.getFileTags());
+					}
 					documentService.saveDocument(parentFolder, List.of(d));
 				} catch (Exception ex) {
 					log.error(ex.getMessage(), ex);
 				}
 				refresh();
 			});
+			refresh();
 		});
 
 		uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {

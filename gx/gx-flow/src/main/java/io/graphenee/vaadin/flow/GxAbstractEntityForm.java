@@ -364,6 +364,9 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	protected void bindFields(Binder<T> dataBinder) {
 	}
 
+	protected void decorateDialog(GxDialog dialog) {
+	}
+
 	protected Component getToolbarComponent() {
 		HorizontalLayout toolbar = new HorizontalLayout();
 		toolbar.setWidthFull();
@@ -587,6 +590,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 			dialog.setHeight(height);
 			dialog.open();
 		}
+		decorateDialog(dialog);
 		return dialog;
 	}
 

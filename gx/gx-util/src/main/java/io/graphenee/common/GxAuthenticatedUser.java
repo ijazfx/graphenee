@@ -10,7 +10,19 @@ import io.graphenee.util.enums.GenderEnum;
 public interface GxAuthenticatedUser {
 
 	/**
+	 * Gets the user id.
+	 * @return The user id.
+	 */
+	Integer getOid();
+
+	/**
 	 * Gets the profile photo.
+	 * @param picture The profile picture.
+	 */
+	void setProfilePhoto(byte[] picture);
+
+	/**
+	 * Sets the profile photo.
 	 * @return The profile photo.
 	 */
 	byte[] getProfilePhoto();
