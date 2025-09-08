@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -115,38 +116,18 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	@Transactional
 	@Override
 	public List<GxFolder> saveFolder(GxFolder parent, List<GxFolder> folders) {
-		for (GxFolder folder : folders) {
-			if (folder.getOid() == null && folder.getFileTags() != null && !folder.getFileTags().isEmpty()) {
-				Set<GxFileTag> managedTags = new HashSet<>();
-				for (GxFileTag tag : folder.getFileTags()) {
-					if (tag.getOid() != null) {
-						managedTags.add(em.merge(tag));
-					} else {
-						managedTags.add(tag);
-					}
-				}
-				folder.setFileTags(managedTags);
-			}
-		}
+		folders.stream().filter(folder -> folder.getOid() == null && ObjectUtils.isNotEmpty(folder.getFileTags()))
+				.flatMap(folder -> folder.getFileTags().stream())
+				.filter(tag -> tag.getOid() != null).forEach(tag -> em.merge(tag));
 		return folderRepo.saveAll(folders);
 	}
 
 	@Override
 	@Transactional
 	public List<GxDocument> saveDocument(GxFolder parent, List<GxDocument> documents) {
-		for (GxDocument doc : documents) {
-			if (doc.getOid() == null && doc.getFileTags() != null && !doc.getFileTags().isEmpty()) {
-				Set<GxFileTag> managedTags = new HashSet<>();
-				for (GxFileTag tag : doc.getFileTags()) {
-					if (tag.getOid() != null) {
-						managedTags.add(em.merge(tag));
-					} else {
-						managedTags.add(tag);
-					}
-				}
-				doc.setFileTags(managedTags);
-			}
-		}
+		documents.stream().filter(doc -> doc.getOid() == null && ObjectUtils.isNotEmpty(doc.getFileTags()))
+				.flatMap(doc -> doc.getFileTags().stream())
+				.filter(tag -> tag.getOid() != null).forEach(tag -> em.merge(tag));
 		return docRepo.saveAll(documents);
 	}
 
