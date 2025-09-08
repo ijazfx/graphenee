@@ -49,7 +49,7 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
     private Checkbox isPasswordChangeRequired;
     private PasswordField newPassword;
     private PasswordField confirmPassword;
-    FileUploader imageUploader;
+    private FileUploader imageUploader;
     private TwinColGrid<GxSecurityPolicy> securityPolicies;
     private TwinColGrid<GxSecurityGroup> securityGroups;
 

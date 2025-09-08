@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StreamUtils;
 
 /**
@@ -112,12 +113,22 @@ public class FileStorageFactory {
 
 		@Override
 		public boolean exists(String resourcePath) {
-			if (resourcePath == null)
+			if (StringUtils.isBlank(resourcePath))
 				return false;
 			File file = new File(rootFolder, resourcePath);
 			return file.exists();
 		}
-
+        @Override
+        public void createDirectory(final String directoryPath) {
+            if (!exists(directoryPath)) {
+                File directory = new File(rootFolder, directoryPath);
+                boolean created = directory.mkdirs(); // Using mkdirs() to create parent directories as well
+                if (created) {
+                    System.out.println("Directory created: " + directoryPath);
+                } else {
+                    System.err.println("Failed to create directory: " + directoryPath);
+                }
+            }
+        }
 	}
-
 }

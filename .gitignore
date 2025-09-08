@@ -29,3 +29,4 @@ package-lock.json
 webpack.generated.js
 webpack.config.js
 /gx/gx-workshop-flow/src/main/dev-bundle/
+/gx/gx-workshop-flow/src/main/bundles/
