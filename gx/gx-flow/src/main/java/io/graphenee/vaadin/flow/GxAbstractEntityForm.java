@@ -320,6 +320,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 	}
 
+	public Binder<T> getDataBinder() {
+		return this.dataBinder;
+	}
+
 	protected void setFormTitleVisibility(boolean isVisible) {
 		formTitleLayout.getChildren().forEach(c -> c.setVisible(isVisible));
 		formTitleLayout.getStyle().set("padding-top", isVisible ? "0.5rem" : "0.0rem");
