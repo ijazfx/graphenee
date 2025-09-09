@@ -29,7 +29,6 @@ import org.apache.jackrabbit.webdav.security.SecurityConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -135,7 +134,9 @@ public class OwnCloudFileStorage implements FileStorage {
     @Override
     public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
         return Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
-            String resourcePath = this.resourcePath(folder, fileName);
+            this.createDirectory(folder);
+            String regex = "[^a-zA-Z0-9.]";
+            String resourcePath = this.resourcePath(folder, fileName.replaceAll(regex, ""));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
             int bytesRead;
@@ -155,7 +156,7 @@ public class OwnCloudFileStorage implements FileStorage {
                 InputStreamEntity entity = new InputStreamEntity(new ByteArrayInputStream(fileData), contentLength);
                 httpPut.setEntity(entity);
                 HttpResponse response = httpClient.execute(httpPut);
-                if (response.getStatusLine().getStatusCode() == 204) {
+                if (response.getStatusLine().getStatusCode() == 204 || response.getStatusLine().getStatusCode() == 201) {
                     long fileSize = fileData.length;
                     return new FileStorage.FileMetaData(resourcePath, fileName, Long.valueOf(fileSize).intValue(),
                             String.valueOf(checksum));
