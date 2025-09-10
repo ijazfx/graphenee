@@ -182,7 +182,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.eq("document", parent);
 			dsb.join("fileTags", "oid", tagIds);
-			return docRepo.count(dsb.build());
+			return docRepo.findAll(dsb.build()).stream().distinct().count();
 		}
 		Long count = 0L;
 
@@ -192,13 +192,13 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		fsb.like("name", searchEntity.getName());
 		fsb.eq("folder", folder);
 		fsb.join("fileTags", "oid", tagIds);
-		count = folderRepo.count(fsb.build());
+		count = folderRepo.findAll(fsb.build()).stream().distinct().count();
 
 		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
 		dsb.join("fileTags", "oid", tagIds);
-		List<GxDocument> docs = docRepo.findAll(dsb.build());
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().collect(Collectors.toList());
 
 		if (filter != null) {
 			count = count + docs.stream().filter(f -> filter.test(f)).count();
@@ -218,9 +218,11 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("document", parent);
 			dsb.join("fileTags", "oid", tagIds);
-			List<GxDocument> docs = docRepo.findAll(dsb.build(), Sort.by(sortKey));
+			List<GxDocument> docs;
 			if (filter != null) {
-				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
+				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct().filter(f -> filter.test(f)).collect(Collectors.toList());
+			} else {
+				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct().collect(Collectors.toList());
 			}
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
@@ -231,7 +233,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			fsb.like("name", searchEntity.getName());
 			fsb.eq("folder", folder);
 			fsb.join("fileTags", "oid", tagIds);
-			List<GxFolder> folders = folderRepo.findAll(fsb.build(), Sort.by(sortKey));
+			List<GxFolder> folders = folderRepo.findAll(fsb.build(), Sort.by(sortKey)).stream().distinct().toList();
 			if (!folders.isEmpty()) {
 				items.addAll(folders);
 			}
@@ -240,9 +242,11 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("folder", folder);
 			dsb.join("fileTags", "oid", tagIds);
-			List<GxDocument> docs = docRepo.findAll(dsb.build());
+			List<GxDocument> docs;
 			if (filter != null) {
-				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
+				docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> filter.test(f)).collect(Collectors.toList());
+			} else {
+				docs = docRepo.findAll(dsb.build()).stream().distinct().collect(Collectors.toList());
 			}
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
