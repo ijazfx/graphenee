@@ -1,5 +1,6 @@
 package io.graphenee.od;
 
+import com.google.common.net.UrlEscapers;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.util.storage.SaveFailedException;
@@ -69,7 +70,8 @@ public class OwnCloudFileStorage implements FileStorage {
     @Override
     public boolean exists(String fileName) {
         try {
-            HttpPropfind httpPropfind = new HttpPropfind(rootFolder + "/" + fileName,
+            HttpPropfind httpPropfind = new HttpPropfind(rootFolder + "/" +
+                    UrlEscapers.urlPathSegmentEscaper().escape(fileName).replace("%2F", "/"),
                     getPropertyNamesForFetch(),
                     DEPTH_0);
             HttpResponse response = httpClient.execute(httpPropfind);
@@ -135,8 +137,7 @@ public class OwnCloudFileStorage implements FileStorage {
     public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
         return Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
             this.createDirectory(folder);
-            String regex = "[^a-zA-Z0-9.]";
-            String resourcePath = this.resourcePath(folder, fileName.replaceAll(regex, ""));
+            String resourcePath = this.resourcePath(folder, UrlEscapers.urlPathSegmentEscaper().escape(fileName));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
             int bytesRead;
@@ -172,7 +173,8 @@ public class OwnCloudFileStorage implements FileStorage {
     public InputStream resolve(String resourcePath) throws ResolveFailedException {
         if (this.exists(resourcePath)) {
             try {
-                HttpGet httpGet = new HttpGet(this.rootFolder + "/" + resourcePath);
+                HttpGet httpGet = new HttpGet(this.rootFolder + "/" +
+                        UrlEscapers.urlPathSegmentEscaper().escape(resourcePath).replace("%2F", "/"));
 
                 // Execute the request and get the response.
                 HttpResponse response = httpClient.execute(httpGet);
