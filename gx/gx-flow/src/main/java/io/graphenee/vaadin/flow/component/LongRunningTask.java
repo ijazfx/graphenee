@@ -78,7 +78,7 @@ public class LongRunningTask {
 				taskCallback.execute(ui);
 				ui.access(() -> {
 					notification.remove(notificationLoadingLayout);
-					notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+					notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
 					notification.setDuration(7000);
 					notification
 							.setText(successMessage != null ? successMessage : "Task has been completed successfully!");

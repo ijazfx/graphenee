@@ -1,27 +1,33 @@
 package io.graphenee.core.flow.security;
 
+import java.io.IOException;
+
+import org.springframework.context.annotation.Scope;
+
+import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.server.StreamResource;
-import com.vaadin.flow.server.streams.InMemoryUploadHandler;
-import com.vaadin.flow.server.streams.UploadHandler;
-import io.graphenee.common.GxAuthenticatedUser;
-import io.graphenee.vaadin.flow.component.GxDialog;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Scope;
-
-import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
+import com.vaadin.flow.server.streams.DownloadEvent;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
+import com.vaadin.flow.server.streams.InMemoryUploadHandler;
+import com.vaadin.flow.server.streams.InputStreamDownloadCallback;
+import com.vaadin.flow.server.streams.InputStreamDownloadHandler;
+import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.component.GxDialog;
+import lombok.extern.slf4j.Slf4j;
 
 @SpringComponent
 @Scope("prototype")
@@ -47,6 +53,7 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
     protected void decorateForm(HasComponents entityForm) {
 
         username = new TextField("Username");
+        username.setReadOnly(true);
 
         firstName = new TextField("First Name");
         lastName = new TextField("Last Name");
@@ -55,8 +62,17 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
         InMemoryUploadHandler inMemoryHandler = UploadHandler.inMemory((metadata, data) -> {
             try {
                 // Display image in Avatar
-                StreamResource resource = new StreamResource(metadata.fileName(), () -> new java.io.ByteArrayInputStream(data));
-                pictureAvatar.setImageResource(resource);
+                DownloadHandler dh = new InputStreamDownloadHandler(new InputStreamDownloadCallback() {
+
+                    @Override
+                    public DownloadResponse complete(DownloadEvent downloadEvent) throws IOException {
+                        return new DownloadResponse(new java.io.ByteArrayInputStream(data), metadata.fileName(),
+                                metadata.contentType(), metadata.contentLength());
+                    }
+
+                });
+
+                pictureAvatar.setImageHandler(dh);
 
                 getEntity().setProfilePhoto(data);
 
@@ -71,7 +87,7 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
         pictureAvatar = new Avatar("Picture");
         pictureAvatar.addThemeVariants(AvatarVariant.LUMO_XLARGE);
         pictureAvatar.setName("Picture");
-        pictureAvatar.getStyle().set("width", "130px");  // Set custom width
+        pictureAvatar.getStyle().set("width", "130px"); // Set custom width
         pictureAvatar.getStyle().set("height", "130px");
         pictureAvatar.getStyle().set("font-size", "20px"); // For initials
         pictureAvatar.getStyle().set("cursor", "pointer");
@@ -102,22 +118,20 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
         setColspan(horizontalLayout, 2);
 
         Span gap = new Span();
-        gap.getElement().getStyle().set("height", "10px");
+        gap.getElement().getStyle().set("height", "1rem");
 
-        entityForm.add(gap, tapToEdit, group("group0", firstName, lastName), username, email);
-        setColspan(username, 2);
-        setColspan(email, 2);
-        setColspan(tapToEdit, 2);
-        setColspan(gap, 2);
-        expand("group0");
+        entityForm.add(gap, tapToEdit, firstName, lastName, username, email);
+        expand(firstName, lastName, username, email, tapToEdit, gap);
 
     }
 
     @Override
     protected void decorateDialog(GxDialog dialog) {
         super.decorateDialog(dialog);
-        dialog.setTop("5%");
-        dialog.setLeft("70%");
+        dialog.setCloseOnOutsideClick(true);
+        dialog.setCloseOnEsc(true);
+        dialog.setTop("3rem");
+        dialog.setLeft("calc(100% - 20rem)");
     }
 
     @Override
@@ -129,10 +143,19 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
     @Override
     protected void preBinding(GxAuthenticatedUser entity) {
         if (entity.getProfilePhoto() != null) {
-            StreamResource resource = new StreamResource("Profile Picture", () -> new java.io.ByteArrayInputStream(entity.getProfilePhoto()));
-            pictureAvatar.setImageResource(resource);
+            DownloadHandler dh = new InputStreamDownloadHandler(new InputStreamDownloadCallback() {
+
+                @Override
+                public DownloadResponse complete(DownloadEvent downloadEvent) throws IOException {
+                    return new DownloadResponse(new java.io.ByteArrayInputStream(entity.getProfilePhoto()),
+                            "Profile Picture", null,
+                            entity.getProfilePhoto().length);
+                }
+
+            });
+            pictureAvatar.setImageHandler(dh);
         } else {
-            pictureAvatar.setImageResource(null);
+            pictureAvatar.setImageHandler(null);
             pictureAvatar.setName(entity.getFirstNameLastName());
         }
     }
@@ -144,11 +167,17 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
 
     @Override
     protected String dialogHeight() {
-        return "60%";
+        return "80%";
     }
 
     @Override
     protected String dialogWidth() {
-        return "30%";
+        return "20rem";
     }
+
+    @Override
+    protected void customizeDismissButton(Button dismissButton) {
+        dismissButton.setVisible(false);
+    }
+
 }

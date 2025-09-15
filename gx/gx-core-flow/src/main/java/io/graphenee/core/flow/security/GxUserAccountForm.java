@@ -2,12 +2,11 @@ package io.graphenee.core.flow.security;
 
 import java.util.List;
 
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.flowingcode.vaadin.addons.twincolgrid.TwinColGrid;
-//import com.vaadin.flow.component.Component;
+import com.google.common.base.Strings;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.tabs.Tab;
@@ -113,11 +112,12 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
             System.err.println(event.getValue());
         });
 
-        entityForm.add(group("group0", firstName, lastName), email, group("group1", isActive, isLocked, isPasswordChangeRequired),
+        entityForm.add(group("group0", firstName, lastName), email,
+                group("group1", isActive, isLocked, isPasswordChangeRequired),
                 username, group("group2", newPassword,
                         confirmPassword),
                 imageUploader);
-        
+
         expand("group0", "group1", "group2");
 
     }
@@ -132,7 +132,7 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
 
             @Override
             public ValidationResult apply(String value, ValueContext context) {
-                if (Strings.isBlank(value))
+                if (Strings.isNullOrEmpty(value))
                     return ValidationResult.ok();
                 try {
                     passwordPolicyService.assertPasswordPolicy(getEntity().getNamespace(), getEntity().getUsername(),
