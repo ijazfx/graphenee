@@ -18,6 +18,7 @@ public class GxRegisteredDeviceForm extends GxAbstractEntityForm<GxRegisteredDev
 
 	private TextField systemName;
 	private TextField deviceToken;
+	private TextField awsDeviceArn;
 	private TextField brand;
 	private TextField ownerId;
 	private Checkbox isActive;
@@ -44,7 +45,11 @@ public class GxRegisteredDeviceForm extends GxAbstractEntityForm<GxRegisteredDev
 		isActive = new Checkbox("Is Active?");
 		isTablet = new Checkbox("Is Tablet?");
 
-		entityForm.add(systemName, brand, deviceToken, ownerId, isActive, isTablet);
+		awsDeviceArn = new TextField("AWS Device ARN");
+		awsDeviceArn.setMaxLength(1000);
+
+		entityForm.add(systemName, brand, deviceToken, ownerId, isActive, isTablet, awsDeviceArn);
+		expand(deviceToken, ownerId, awsDeviceArn);
 	}
 
 	@Override
@@ -61,7 +66,12 @@ public class GxRegisteredDeviceForm extends GxAbstractEntityForm<GxRegisteredDev
 
 	@Override
 	protected String dialogHeight() {
-		return "400px";
+		return "37.5rem";
+	}
+
+	@Override
+	protected String dialogWidth() {
+		return "50rem";
 	}
 
 }

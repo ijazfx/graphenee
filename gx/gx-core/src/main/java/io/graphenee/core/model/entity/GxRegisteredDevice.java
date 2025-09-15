@@ -1,7 +1,5 @@
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -14,12 +12,13 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_registered_device")
-public class GxRegisteredDevice extends GxMappedSuperclass implements Serializable {
+public class GxRegisteredDevice extends GxMappedSuperclass {
 
 	private static final long serialVersionUID = 1L;
 
 	private String systemName;
 	private String deviceToken;
+	private String awsDeviceArn;
 	private String brand;
 	private String ownerId;
 
