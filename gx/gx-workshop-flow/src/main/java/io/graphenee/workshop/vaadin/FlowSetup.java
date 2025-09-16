@@ -48,4 +48,13 @@ public class FlowSetup extends GxAbstractFlowSetup {
         return new Image("frontend/images/graphenee.png", "logo");
     }
 
+    @Override
+    public String appDescription() {
+        return "Graphenee word itself is a combination of Graphene and Enterprise Edition (ee). It is developed using Java, Spring Boot and Vaadin.";
+    }
+
+//    @Override
+//    public Image backgroundImage() {
+//        return new Image("frontend/images/background.png", "background-image");
+//    }
 }

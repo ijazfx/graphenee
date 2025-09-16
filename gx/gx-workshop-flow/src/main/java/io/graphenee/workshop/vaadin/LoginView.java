@@ -1,5 +1,6 @@
 package io.graphenee.workshop.vaadin;
 
+import io.graphenee.vaadin.flow.GxAbstractEnhancedLoginView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -15,12 +16,11 @@ import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
-import io.graphenee.vaadin.flow.GxAbstractLoginView;
 
 @Route(value = "login")
 @Scope("prototype")
 @PreserveOnRefresh
-public class LoginView extends GxAbstractLoginView {
+public class LoginView extends GxAbstractEnhancedLoginView {
 
     private static final long serialVersionUID = 1L;
 

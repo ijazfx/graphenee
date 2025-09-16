@@ -129,9 +129,106 @@ vaadin-app-layout::part(navbar) {
 
 .gx-login-view {
     display: flex;
-    flex-flow: column;
-    background-color: var(--background-color);
-    color: var(--background-text-color);
+    flex-direction: row;
+    align-items: stretch;
+    width: 100vw;
+    height: 100vh;
+}
+
+.gx-login-left-panel {
+    color: white;
+    flex-basis: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--lumo-primary-color);
+}
+
+.gx-login-left-panel.has-background-image {
+    background-color: transparent;
+}
+
+.gx-login-left-panel.has-background-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #000;
+    opacity: 0.5;
+    z-index: 0;
+}
+
+.gx-login-background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.gx-login-info-layout {
+    z-index: 1;
+}
+
+.gx-login-left-panel.has-background-image .gx-login-info-layout {
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+
+.gx-login-left-panel .gx-login-app-logo {
+    max-height: 6rem;
+}
+
+.gx-login-title-layout {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.gx-login-left-panel .gx-login-app-title {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.gx-login-left-panel .gx-login-app-description {
+    font-size: 1.5rem;
+}
+
+.gx-login-right-panel {
+    flex-basis: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: var(--lumo-base-color);
+}
+
+.gx-login-form {
+    width: 100%;
+    max-width: 22rem;
+}
+
+.gx-login-form [part="form"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.gx-login-form h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
 }
 
 .gx-reset-password-view {
@@ -255,6 +352,12 @@ vaadin-login-form-wrapper {
     background: var(--lumo-primary-color);
     padding: 1rem;
     border-radius: var(--lumo-border-radius) var(--lumo-border-radius) 0 0;
+}
+
+.gx-login-left-panel.has-background-image .gx-login-title-layout {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
 }
 
 .gx-app-layout-toggle {

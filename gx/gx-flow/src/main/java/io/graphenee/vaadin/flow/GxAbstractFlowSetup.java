@@ -40,4 +40,12 @@ public abstract class GxAbstractFlowSetup {
 		return i;
 	}
 
+	public String appDescription() {
+		return null;
+	}
+
+	public Image backgroundImage() {
+		return null;
+	}
+
 }

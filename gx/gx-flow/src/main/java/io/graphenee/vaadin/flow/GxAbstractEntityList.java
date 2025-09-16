@@ -671,7 +671,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean isGridInlineEditingEnabled() {
-		return true;
+		return false;
 	}
 
 	protected boolean isAuditLogEnabled() {
