@@ -127,7 +127,15 @@ public interface FileStorage {
 	 */
 	Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException;
 
-	/**
+    /**
+     * Creating file sharing path.
+     * @param filePath file name with complete path
+     * @return shared url.
+     * @throws FileSharingFailedException
+     */
+    String share(String filePath) throws FileSharingFailedException;
+
+    /**
 	 * A delegate for file storage.
 	 */
 	public static interface FileStorageDelegate {
