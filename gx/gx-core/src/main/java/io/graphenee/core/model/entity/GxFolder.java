@@ -163,6 +163,11 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 		return this.name;
 	}
 
+	@Override
+	public String getPath() {
+		return null;
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}

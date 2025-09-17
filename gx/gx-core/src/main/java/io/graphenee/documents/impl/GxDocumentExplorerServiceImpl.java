@@ -161,7 +161,6 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		newDocument.setName(parentDocument.getName());
 		newDocument.setVersionNo(maxVersion + 1);
 		newDocument.setDocument(parentDocument);
-		newDocument.setFolder(parentDocument.getFolder());
 		return docRepo.save(newDocument);
 	}
 

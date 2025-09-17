@@ -1,21 +1,22 @@
 package io.graphenee.core.flow.documents;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.server.streams.FileUploadCallback;
+import com.vaadin.flow.server.streams.UploadHandler;
+import com.vaadin.flow.server.streams.UploadMetadata;
 import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.upload.Receiver;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
@@ -40,26 +41,22 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 
 	@Override
 	protected void decorateForm(HasComponents entityForm) {
-		upload = new Upload(new Receiver() {
+		upload = new Upload();
+		upload.setUploadHandler(UploadHandler.toFile(new FileUploadCallback() {
 
 			@Override
-			public OutputStream receiveUpload(String fileName, String mimeType) {
-				try {
-					File file = File.createTempFile("uploaded", fileName);
-					GxUploadedFile uploadedFile = new GxUploadedFile();
-					uploadedFile.setFile(file);
-					uploadedFile.setFileName(fileName);
-					uploadedFile.setMimeType(mimeType);
-					uploadedFiles.clear();
-					uploadedFiles.add(uploadedFile);
-					FileOutputStream fos = new FileOutputStream(file);
-					return fos;
-				} catch (Exception e) {
-					return null;
+			public void complete(UploadMetadata uploadMetadata, File file) throws IOException {
+				GxUploadedFile uploadedFile = new GxUploadedFile();
+				uploadedFile.setFile(file);
+				uploadedFile.setFileName(uploadMetadata.fileName());
+				uploadedFile.setMimeType(uploadMetadata.contentType());
+				if (fileTags.getValue() != null) {
+					uploadedFile.setFileTags(fileTags.getValue().stream().toList());
 				}
+				uploadedFiles.add(uploadedFile);
 			}
 
-		});
+		}, new GxFileFactory()));
 		upload.setMaxFiles(1);
 		upload.setMaxFileSize(1024000000);
 		fileTags = new MultiSelectComboBox<>("Add Tags");
