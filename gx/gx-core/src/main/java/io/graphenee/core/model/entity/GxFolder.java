@@ -115,6 +115,21 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 		return getFolder();
 	}
 
+	@Override
+	public String getRelativePath() {
+		if (getFolder() == null) {
+			return getGenericName();
+		}
+		return getFolder().getRelativePath() + "/" + getGenericName();
+	}
+
+	public String getGenericName() {
+		if (getName().matches("io.graphenee.system")) {
+			return "home";
+		}
+		return getName();
+	}
+
 	public GxDocument addDocument(GxDocument document) {
 		if (!documents.contains(document)) {
 			documents.add(document);

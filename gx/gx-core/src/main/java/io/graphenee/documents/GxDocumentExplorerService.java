@@ -40,6 +40,10 @@ public interface GxDocumentExplorerService {
 
 	List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey);
 
+	List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item);
+
+	Long countAll(GxDocumentExplorerItem item);
+
 	void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
 
 	void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);

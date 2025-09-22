@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -106,6 +108,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	private List<GxDocumentExplorerItem> draggedItems;
 
 	private GxDocumentFilter filter;
+
+	private GxDocumentSearchList searchList = null;
+	private SplitLayout splitLayout = null;
 
 	public GxDocumentExplorer() {
 		super(GxDocumentExplorerItem.class);
@@ -398,11 +403,13 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		return "name";
 	}
 
-	public void initializeWithNamespaceAndStorage(GxNamespace namespace, FileStorage storage) {
+	public void initializeWithNamespaceAndStorageAndSearchListAndLayout(GxNamespace namespace, FileStorage storage, GxDocumentSearchList sList, SplitLayout sLayout) {
 		this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
 		this.selectedFolder = this.topFolder;
 		this.namespace = namespace;
 		this.storage = storage;
+		this.searchList = sList;
+		this.splitLayout = sLayout;
 		generateBreadcrumb(this.selectedFolder);
 		refresh();
 	}
@@ -438,7 +445,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		}
 	}
 
-	private void select(GxDocumentExplorerItem item) {
+	public void select(GxDocumentExplorerItem item) {
 		this.selectedFolder = (item instanceof GxDocument) ? (GxFolder) item.getParent() : (GxFolder) item;
 		generateBreadcrumb(item);
 		refresh();
@@ -455,7 +462,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		downloadButton.getStyle().set("margin", "0");
 		downloadButton.setInputStreamFactory(this::downloadFile);
 		downloadButton.setEnabled(false);
-		toolbarLayout.add(downloadButton);
+
+		Button searchButton = new Button(VaadinIcon.SEARCH.create());
+		searchButton.addClickListener(l -> {
+			splitLayout.setSplitterPosition(0);
+		});
+		toolbarLayout.add(downloadButton, searchButton);
 		super.decorateToolbarLayout(toolbarLayout);
 	}
 

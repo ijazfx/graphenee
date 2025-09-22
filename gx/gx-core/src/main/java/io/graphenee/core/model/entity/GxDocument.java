@@ -117,7 +117,11 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 
 	@Override
 	public GxDocumentExplorerItem getParent() {
-		return getFolder();
+		GxFolder f = getFolder();
+		if (f == null) {
+			return getDocument().getFolder();
+		}
+		return f;
 	}
 
 	public Integer getExpiryReminderInDays() {
@@ -141,6 +145,26 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 	public String getName() {
 		return this.name;
 	}
+
+	@Override
+	public String getRelativePath() {
+		GxFolder f = getFolder();
+		if (getDocument() != null) {
+			f = getDocument().getFolder();
+		}
+		if (f == null) {
+			// root folder -> just return its name
+			return getName();
+		}
+		return f.getRelativePath() + "/" + getName();
+	}
+
+//	public String getGenericFolderName() {
+//		if (getName().matches("io.graphenee.system")) {
+//			return "root";
+//		}
+//		return getName();
+//	}
 
 	public void setName(String name) {
 		this.name = name;
