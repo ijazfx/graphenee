@@ -4,8 +4,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import ch.qos.logback.core.util.StringUtil;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -181,7 +183,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.eq("document", parent);
 			dsb.join("fileTags", "oid", tagIds);
-			return docRepo.findAll(dsb.build()).stream().distinct().count();
+			return docRepo.count(dsb.build());
 		}
 		Long count = 0L;
 
@@ -191,13 +193,13 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		fsb.like("name", searchEntity.getName());
 		fsb.eq("folder", folder);
 		fsb.join("fileTags", "oid", tagIds);
-		count = folderRepo.findAll(fsb.build()).stream().distinct().count();
+		count = folderRepo.count(fsb.build());
 
 		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
 		dsb.join("fileTags", "oid", tagIds);
-		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().collect(Collectors.toList());
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().toList();
 
 		if (filter != null) {
 			count = count + docs.stream().filter(f -> filter.test(f)).count();
@@ -232,7 +234,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			fsb.like("name", searchEntity.getName());
 			fsb.eq("folder", folder);
 			fsb.join("fileTags", "oid", tagIds);
-			List<GxFolder> folders = folderRepo.findAll(fsb.build(), Sort.by(sortKey)).stream().distinct().toList();
+			List<GxFolder> folders = folderRepo.findAll(fsb.build(), Sort.by(sortKey));
 			if (!folders.isEmpty()) {
 				items.addAll(folders);
 			}
@@ -253,6 +255,51 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		}
 		items.sort((a, b) -> b.isFile().compareTo(a.isFile()));
 		return items;
+	}
+
+	@Override
+	public List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item) {
+		List<GxDocumentExplorerItem> items = new ArrayList<>();
+
+		List<Integer> tagIds = item.getFileTags().stream().map(GxFileTag::getOid).toList();
+
+		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+		dsb.like("name", item.getName());
+		dsb.join("fileTags", "oid", tagIds);
+		List<GxDocument> docs = docRepo.findAll(dsb.build());
+		items.addAll(docs);
+
+		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+		if (StringUtil.notNullNorEmpty(item.getName())) {
+			fsb.like("name", item.getName());
+		} else {
+			fsb.ne("name", "io.graphenee.system");
+		}
+		fsb.join("fileTags", "oid", tagIds);
+		List<GxFolder> folders = folderRepo.findAll(fsb.build());
+		items.addAll(folders);
+
+		return items;
+	}
+
+	@Override
+	public Long countAll(GxDocumentExplorerItem item) {
+		List<Integer> tagIds = item.getFileTags().stream().map(GxFileTag::getOid).toList();
+
+		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+		dsb.like("name", item.getName());
+		dsb.join("fileTags", "oid", tagIds);
+		Long docCount = docRepo.count(dsb.build());
+
+		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+		if (StringUtil.notNullNorEmpty(item.getName())) {
+			fsb.like("name", item.getName());
+		} else {
+			fsb.ne("name", "io.graphenee.system");
+		}
+		fsb.join("fileTags", "oid", tagIds);
+		Long folderCount = folderRepo.count(fsb.build());
+		return docCount + folderCount;
 	}
 
 	@Override

@@ -20,6 +20,8 @@ public interface GxDocumentExplorerItem {
 
 	String getPath();
 
+	String getRelativePath();
+
 	Set<GxFileTag> getFileTags();
 
 	String getFileTagsJoined();
