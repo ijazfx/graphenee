@@ -59,7 +59,7 @@
 		<version.commons.beanutils>1.9.4</version.commons.beanutils>
 		<version.commons.io>2.15.1</version.commons.io>
 		<version.jasper>6.21.0</version.jasper>
-		<version.grpc>1.59.1</version.grpc>
+		<version.grpc>1.75.0</version.grpc>
 		<version.firebase.admin>9.2.0</version.firebase.admin>
 		<version.rxjava>3.1.8</version.rxjava>
         <version.webdav>2.22.2</version.webdav>
