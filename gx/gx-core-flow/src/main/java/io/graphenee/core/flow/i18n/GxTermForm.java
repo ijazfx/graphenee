@@ -87,16 +87,6 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 		termTablePanel.initializeWithEntity(entity);
 	}
 
-	public void saveGxTermEntities() {
-		termTablePanel.availableTerms.forEach(term -> {
-			term.setTermKey(termKey.getValue());
-			term.setNamespace(getEntity().getNamespace());
-			term.setIsActive(isActive.getValue());
-			termRepo.save(term);
-			localizer.invalidateTerm(term.getTermKey());
-		});
-	}
-
 	@Override
 	protected String formTitle() {
 		if (getEntity().getOid() == null) {
@@ -112,6 +102,6 @@ public class GxTermForm extends GxAbstractEntityForm<GxTerm> {
 
 	@Override
 	protected String dialogWidth() {
-		return "50rem";
+		return "70rem";
 	}
 }

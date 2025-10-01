@@ -15,15 +15,10 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.graphenee.core.model.GxMappedSuperclass;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,32 +26,32 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "gx_term")
-public class GxTerm extends GxMappedSuperclass {
+@Table(name = "gx_term_translation")
+public class GxTermTranslation extends GxMappedSuperclass implements Comparable<GxTermTranslation> {
 
 	private static final long serialVersionUID = 1L;
 
-	private Boolean isActive = true;
-	private Boolean isProtected = false;
-	private String termKey;
+	private String termPlural;
+	private String termSingular;
 
 	@ManyToOne
-	@JoinColumn(name = "oid_namespace")
-	private GxNamespace namespace;
+	@JoinColumn(name = "oid_term")
+	private GxTerm term;
 
-	@OneToMany(mappedBy = "term", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<GxTermTranslation> translations = new ArrayList<>();
+	@ManyToOne
+	@JoinColumn(name = "oid_supported_locale")
+	private GxSupportedLocale supportedLocale;
 
-	public GxTermTranslation addToTranslations(GxTermTranslation translation) {
-		translations.add(translation);
-		translation.setTerm(this);
-		return translation;
+	public String getLanguage() {
+		return supportedLocale != null ? supportedLocale.getLocaleName() : null;
 	}
 
-	public GxTermTranslation removeFromTranslations(GxTermTranslation translation) {
-		translations.remove(translation);
-		translation.setTerm(null);
-		return translation;
+	@Override
+	public int compareTo(GxTermTranslation o) {
+		if(o != null && o.getSupportedLocale() != null && supportedLocale != null) {
+			return supportedLocale.getLocaleName().compareTo(o.getSupportedLocale().getLocaleName());
+		}
+		return -1;
 	}
 
 }

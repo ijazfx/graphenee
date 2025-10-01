@@ -44,6 +44,7 @@ import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.security.exception.GxPermissionException;
 
@@ -156,11 +157,6 @@ public interface GxDataService {
 	GxCurrency findCurrencyByCurrencyAlpha3Code(String alpha3Code);
 
 	GxCurrency findCurrencyByCurrencyNumericCode(Integer numericCode);
-
-	List<GxTerm> findDistinctTermByNamespaceAndSupportedLocale(GxNamespace namespace,
-			GxSupportedLocale supportedLocale);
-
-	GxTerm findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale);
 
 	List<GxEmailTemplate> findEmailTemplate();
 
@@ -284,14 +280,13 @@ public interface GxDataService {
 
 	List<GxSupportedLocale> findSupportedLocale();
 
-	List<GxTerm> findTermByLocale(Locale locale);
-
-	List<GxTerm> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespace namespace,
-			GxSupportedLocale supportedLocale);
-
+	List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace);
+	
 	List<GxTerm> findTermByTermKey(String termKey);
 
-	List<GxTerm> findTermByTermKeyAndLocale(String termKey, Locale locale);
+	List<GxTermTranslation> findTermTranslationByLocale(Locale locale);
+
+	GxTermTranslation findEffectiveTermTranslationByTermKeyAndLocale(String termKey, Locale locale);
 
 	List<GxUserAccount> findUserAccount();
 

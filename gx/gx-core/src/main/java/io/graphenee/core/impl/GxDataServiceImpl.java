@@ -16,8 +16,6 @@
 package io.graphenee.core.impl;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +64,7 @@ import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.repository.GxAccessKeyRepository;
 import io.graphenee.core.model.jpa.repository.GxAccessLogRepository;
@@ -517,42 +516,6 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public List<GxTerm> findDistinctTermByNamespaceAndSupportedLocale(GxNamespace namespace,
-			GxSupportedLocale supportedLocale) {
-		List<GxTerm> distinctTerms = new ArrayList<>();
-		Collection<GxTerm> entities = null;
-		if (namespace != null && supportedLocale != null) {
-			entities = termRepo.findByNamespaceOidAndSupportedLocaleOid(namespace.getOid(), supportedLocale.getOid());
-		} else if (namespace != null) {
-			entities = termRepo.findByNamespaceOid(namespace.getOid());
-		} else if (supportedLocale != null) {
-			entities = termRepo.findBySupportedLocaleOid(supportedLocale.getOid());
-		}
-		if (entities != null) {
-			Set<String> termKeySet = new HashSet<>();
-			entities.forEach(term -> {
-				if (!termKeySet.contains(term.getTermKey())) {
-					distinctTerms.add(term);
-					termKeySet.add(term.getTermKey());
-				}
-			});
-		}
-		return distinctTerms;
-	}
-
-	@Override
-	public GxTerm findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale) {
-		String localeCode = locale.toString();
-		GxTerm term = termRepo.findTopByTermKeyAndSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey,
-				localeCode);
-		if (term == null) {
-			localeCode = locale.getLanguage();
-			term = termRepo.findTopByTermKeyAndSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey, localeCode);
-		}
-		return term;
-	}
-
-	@Override
 	public List<GxEmailTemplate> findEmailTemplate() {
 		return emailTemplateRepo.findAll(Sort.by("templateName"));
 	}
@@ -933,7 +896,7 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public List<GxTerm> findTermByLocale(Locale locale) {
+	public List<GxTermTranslation> findTermTranslationByLocale(Locale locale) {
 		String localeCode = locale.toString();
 		GxSupportedLocale supportedLocale = supportedLocaleRepo.findByLocaleCodeStartingWith(localeCode);
 		if (supportedLocale == null) {
@@ -941,23 +904,25 @@ public class GxDataServiceImpl implements GxDataService {
 			supportedLocale = supportedLocaleRepo.findByLocaleCodeStartingWith(localeCode);
 		}
 		if (supportedLocale != null) {
-			return supportedLocale.getTerms();
+			return supportedLocale.getTranslations();
 		}
 		return Collections.emptyList();
 	}
 
 	@Override
-	public List<GxTerm> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespace namespace,
-			GxSupportedLocale supportedLocale) {
+	public GxTermTranslation findEffectiveTermTranslationByTermKeyAndLocale(String termKey, Locale locale) {
+		List<GxTerm> terms = termRepo.findByTermKey(termKey);
+		return terms.stream().flatMap(term -> term.getTranslations().stream())
+				.filter(t -> t.getSupportedLocale().getLocaleCode().startsWith(locale.getLanguage())).findFirst()
+				.orElse(null);
+	}
+
+	@Override
+	public List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace) {
 		PageRequest pageRequest = PageRequest.of(page, size);
 		Page<GxTerm> result = null;
-		if (namespace != null && supportedLocale != null) {
-			result = termRepo.findByNamespaceOidAndSupportedLocaleOid(pageRequest, namespace.getOid(),
-					supportedLocale.getOid());
-		} else if (namespace != null) {
+		if (namespace != null) {
 			result = termRepo.findByNamespaceOid(pageRequest, namespace.getOid());
-		} else if (supportedLocale != null) {
-			result = termRepo.findBySupportedLocaleOid(pageRequest, supportedLocale.getOid());
 		} else {
 			result = termRepo.findAll(pageRequest);
 		}
@@ -970,18 +935,6 @@ public class GxDataServiceImpl implements GxDataService {
 			return termRepo.findByTermKey(termKey);
 		}
 		return Collections.emptyList();
-	}
-
-	@Override
-	public List<GxTerm> findTermByTermKeyAndLocale(String termKey, Locale locale) {
-
-		String localeCode = locale.toString();
-		List<GxTerm> terms = termRepo.findByTermKeyAndSupportedLocaleLocaleCodeStartingWith(termKey, localeCode);
-		if (terms.isEmpty()) {
-			localeCode = locale.getLanguage();
-			terms = termRepo.findByTermKeyAndSupportedLocaleLocaleCodeStartingWith(termKey, localeCode);
-		}
-		return terms;
 	}
 
 	@Override

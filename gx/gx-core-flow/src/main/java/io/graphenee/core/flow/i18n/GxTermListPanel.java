@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -58,7 +59,7 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "supportedLocale", "termKey", "termSingular", "termPlural" };
+		return new String[] { "termKey" };
 	}
 
 	@Override
@@ -82,6 +83,11 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 		if (propertyName.matches("supportedLocale")) {
 			column.setHeader("Language");
 		}
+	}
+
+	@Override
+	protected void decorateGrid(Grid<GxTerm> dataGrid) {
+
 	}
 
 	@Override
@@ -116,9 +122,7 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected void onDelete(Collection<GxTerm> entities) {
-		for (GxTerm entity : entities) {
-			termRepo.deleteByTermKeyAndNamespace(entity.getTermKey(), entity.getNamespace());
-		}
+		termRepo.deleteAllInBatch(entities);
 	}
 
 }
