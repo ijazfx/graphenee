@@ -29,8 +29,10 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
@@ -41,6 +43,9 @@ import io.graphenee.vaadin.flow.component.GxFormLayout;
 @SpringComponent
 @Scope("prototype")
 public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
+
+	@Autowired
+	private GxDataService dataService;
 
 	@Autowired
 	private GxTermRepository termRepo;
@@ -87,7 +92,24 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected void decorateGrid(Grid<GxTerm> dataGrid) {
-
+		dataService.findSupportedLocale().forEach(sl -> {
+			addColumn(sl.getLocaleCode(), sl.getLocaleName(), term -> {
+				GxTermTranslation translation = term.translationMap().get(sl);
+				if (translation != null) {
+					return translation.getTermSingular();
+				}
+				return null;
+			}, (term, value) -> {
+				GxTermTranslation translation = term.translationMap().get(sl);
+				if (translation == null) {
+					translation = new GxTermTranslation();
+					translation.setSupportedLocale(sl);
+					term.addToTranslations(translation);
+				}
+				translation.setTermSingular(value);
+				termRepo.save(term);
+			}, String.class);
+		});
 	}
 
 	@Override
@@ -123,6 +145,11 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 	@Override
 	protected void onDelete(Collection<GxTerm> entities) {
 		termRepo.deleteAllInBatch(entities);
+	}
+
+	@Override
+	protected boolean isGridInlineEditingEnabled() {
+		return true;
 	}
 
 }

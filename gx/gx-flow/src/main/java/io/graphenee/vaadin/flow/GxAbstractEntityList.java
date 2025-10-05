@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,13 +91,13 @@ import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.TRCalendarUtil;
+import io.graphenee.util.callback.TRBiParamCallback;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.GxAbstractDialog.GxDialogDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
 import io.graphenee.vaadin.flow.component.DialogFactory;
-import io.graphenee.vaadin.flow.component.GxCopyToClipboardWrapper;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
@@ -187,6 +188,25 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	private GxPreferences __preferences;
 
 	private GxAbstractDialog dialog;
+
+	private Set<String> __availablePropertySet;
+	private Set<String> __visiblePropertySet;
+
+	protected Set<String> availablePropertySet() {
+		if (__availablePropertySet == null) {
+			__availablePropertySet = new LinkedHashSet<>();
+			Stream.of(availableProperties()).forEach(propName -> __availablePropertySet.add(propName));
+		}
+		return __availablePropertySet;
+	}
+
+	protected Set<String> visiblePropertySet() {
+		if (__visiblePropertySet == null) {
+			__visiblePropertySet = new LinkedHashSet<>();
+			Stream.of(visibleProperties()).forEach(propName -> __visiblePropertySet.add(propName));
+		}
+		return __visiblePropertySet;
+	}
 
 	public GxAbstractEntityList(Class<T> entityClass) {
 		this.entityClass = entityClass;
@@ -309,8 +329,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 				@Override
 				public void onClick(ClickEvent<MenuItem> event) {
-					Set<String> propNameSet = new HashSet<>();
-					for (String propName : preferenceProperties()) {
+					Set<String> propNameSet = new LinkedHashSet<>();
+					for (String propName : preferencePropertySet()) {
 						propNameSet.add(propName);
 					}
 					final Observable<T> observable = Observable.create(emitter -> {
@@ -349,8 +369,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 				@Override
 				public void onClick(ClickEvent<MenuItem> event) {
-					Set<String> propNameSet = new HashSet<>();
-					for (String propName : GxAbstractEntityList.this.availableProperties()) {
+					Set<String> propNameSet = new LinkedHashSet<>();
+					for (String propName : GxAbstractEntityList.this.availablePropertySet()) {
 						propNameSet.add(propName);
 					}
 
@@ -412,7 +432,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			List<Column<T>> columns = new ArrayList<>();
 			List<String> userPreferences = new ArrayList<>();
-			if (availableProperties() != null && availableProperties().length > 0) {
+			if (!availablePropertySet().isEmpty()) {
 				// PropertySet<T> propertySet = BeanPropertySet.get(entityClass);
 				editColumn = dataGrid.addComponentColumn(source -> {
 					Button rowEditButton = new Button(VaadinIcon.EDIT.create());
@@ -429,13 +449,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				editColumn.setFlexGrow(0);
 				editColumn.setFrozen(true);
 				columns.add(editColumn);
-				for (int i = 0; i < preferenceProperties().length; i++) {
-					userPreferences.add(preferenceProperties()[i]);
+				for (String propName : preferencePropertySet()) {
+					userPreferences.add(propName);
 				}
 				List<Column<T>> remainingColumns = new ArrayList<>();
-				List<Column<T>> userColumns = new ArrayList<>(preferenceProperties().length);
-				for (int i = 0; i < availableProperties().length; i++) {
-					String propertyName = availableProperties()[i];
+				List<Column<T>> userColumns = new ArrayList<>(preferencePropertySet().size());
+				for (String propertyName : availablePropertySet()) {
 					Column<T> column = dataGrid.getColumnByKey(propertyName);
 					PropertyDefinition<T, Object> propertyDefinition;
 					try {
@@ -508,7 +527,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			dataGrid.getColumns().stream().filter(c -> c.getKey() != null && !c.getKey().matches("__gx.*Column"))
 					.forEach(col -> col.setVisible(false));
 
-			for (String key : preferenceProperties()) {
+			for (String key : preferencePropertySet()) {
 				Column<T> columnByKey = dataGrid.getColumnByKey(key);
 				if (columnByKey != null) {
 					columnByKey.setVisible(true);
@@ -549,11 +568,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			dataGrid.addItemDoubleClickListener(cl -> onGridItemDoubleClicked(cl));
 
-			for (String p : availableProperties()) {
+			for (String p : availablePropertySet()) {
 				setColumnVisibility(p, false);
 			}
 
-			for (String p : preferenceProperties()) {
+			for (String p : preferencePropertySet()) {
 				setColumnVisibility(p, true);
 			}
 
@@ -734,6 +753,52 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	private <V> AbstractField<?, V> inlineEditorForProperty(String propertyName, Class<V> valueClass) {
+		AbstractField<?, ?> c = null;
+		if (propertyName.matches("date.*|.*Date")) {
+			if (valueClass.equals(Long.class)) {
+				c = createDatePicker();
+			} else if (c == null && valueClass.equals(Timestamp.class)) {
+				c = createDatePicker();
+			}
+		}
+		if (c == null && propertyName.matches("dateTime.*|.*DateTime")) {
+			if (valueClass.equals(Long.class)) {
+				c = createDateTimePicker();
+			}
+		}
+		if (c == null && valueClass.equals(Timestamp.class)) {
+			c = createDateTimePicker();
+		}
+		if (c == null && valueClass.equals(Date.class)) {
+			c = createDatePicker();
+		}
+		if (c == null && valueClass.equals(Boolean.class)) {
+			c = new Checkbox();
+		}
+		if (c == null && valueClass.equals(Integer.class)) {
+			c = new IntegerField();
+		}
+		if (c == null && valueClass.equals(Long.class)) {
+			c = new IntegerField();
+		}
+		if (c == null && valueClass.equals(Float.class)) {
+			c = new NumberField();
+		}
+		if (c == null && valueClass.equals(Double.class)) {
+			c = new NumberField();
+		}
+		if (c == null && valueClass.equals(Boolean.class)) {
+			c = new Checkbox();
+		}
+		if (c == null) {
+			c = new TextField();
+		}
+		c.getElement().getStyle().set("width", "100%");
+		return (AbstractField<?, V>) c;
+	}
+
 	private AbstractField<?, ?> defaultInlineEditorForProperty(String propertyName,
 			PropertyDefinition<T, Object> propertyDefinition) {
 		if (propertyDefinition.getSetter().isEmpty()) {
@@ -873,7 +938,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			});
 		}
 		List<Column<T>> removeList = new ArrayList<>(dataGrid.getColumns());
-		for (String key : preferenceProperties()) {
+		for (String key : preferencePropertySet()) {
 			Column<T> column = dataGrid.getColumnByKey(key);
 			if (column != null) {
 				column.setVisible(true);
@@ -1377,24 +1442,29 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		return "{}";
 	}
 
-	private String[] preferenceProperties() {
+	private Set<String> __preferencePropertySet;
+
+	private Set<String> preferencePropertySet() {
+		if (__preferencePropertySet == null) {
+			__preferencePropertySet = new LinkedHashSet<>();
+		}
 		GridPreferences gridPref = preferences().get(entityClass.getSimpleName());
 		if (gridPref != null) {
 			List<ColumnPreferences> columns = gridPref.visibleColumns();
-			return columns.stream().map(c -> c.getColumnName()).collect(Collectors.toList())
-					.toArray(new String[columns.size()]);
+			columns.stream().forEach(c -> __availablePropertySet.add(c.getColumnName()));
+			return __availablePropertySet;
 		}
-		return availableProperties();
+		return availablePropertySet();
 	}
 
 	public void refresh() {
 		build();
 		entityGrid().deselectAll();
 		crudMenuBar.setVisible(isEditable());
-		Stream.of(availableProperties()).forEach(p -> {
+		availablePropertySet().forEach(p -> {
 			dataGrid.getColumnByKey(p).setVisible(false);
 		});
-		Stream.of(preferenceProperties()).forEach(p -> {
+		preferencePropertySet().forEach(p -> {
 			dataGrid.getColumnByKey(p).setVisible(true);
 		});
 		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__editColumn"))
@@ -1418,6 +1488,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		if (entityGrid() instanceof TreeGrid) {
 			((TreeGrid<T>) entityGrid()).expand(entityGrid().getSelectedItems());
 		}
+		dataGrid.recalculateColumnWidths();
 	}
 
 	protected final void updateTotalCountFooter(int count) {
@@ -1617,6 +1688,52 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	@Override
 	public Object convertValueForProperty(String key, Object value) {
 		return value;
+	}
+
+	protected <V> Column<T> addColumn(String key, String header, ValueProvider<T, V> valueProvider,
+			TRBiParamCallback<T, V> valueConsumer,
+			Class<V> valueClass) {
+		return addColumn(key, header, valueProvider, valueConsumer, valueClass, null);
+	}
+
+	protected <V> Column<T> addColumn(String key, String header, ValueProvider<T, V> valueProvider,
+			TRBiParamCallback<T, V> valueConsumer,
+			Class<V> valueClass, AbstractField<?, V> editorComponent) {
+		Column<T> column = dataGrid.getColumnByKey(key);
+		if (column == null) {
+			column = dataGrid.addColumn(valueProvider);
+			column.setKey(key);
+			column.setHeader(header);
+			if (editorComponent == null) {
+				editorComponent = inlineEditorForProperty(header, valueClass);
+			}
+			if (editorComponent != null) {
+				column.setEditorComponent(editorComponent);
+				dataGrid.getEditor().getBinder().forField(editorComponent).bind(valueProvider, (item, value) -> {
+					valueConsumer.execute(item, value);
+				});
+				editorComponent.getElement().addEventListener("keydown", e -> {
+					dataGrid.getEditor().cancel();
+				}).setFilter("event.key === 'Escape'").debounce(300, DebouncePhase.LEADING);
+				editorComponent.getElement().addEventListener("keydown", e -> {
+					dataGrid.getEditor().save();
+				}).setFilter("event.key === 'Enter'").debounce(300, DebouncePhase.LEADING);
+				editorComponentMap.put(key, editorComponent);
+			}
+			if (!availablePropertySet().contains(key)) {
+				availablePropertySet().add(key);
+				preferencePropertySet().add(key);
+			}
+		}
+		return column;
+	}
+
+	protected void removeColumn(String key) {
+		Column<T> column = dataGrid.getColumnByKey(key);
+		if (column != null) {
+			dataGrid.removeColumn(column);
+			availablePropertySet().remove(key);
+		}
 	}
 
 }

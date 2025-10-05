@@ -17,6 +17,9 @@ package io.graphenee.core.model.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.CascadeType;
@@ -57,6 +60,10 @@ public class GxTerm extends GxMappedSuperclass {
 		translations.remove(translation);
 		translation.setTerm(null);
 		return translation;
+	}
+
+	public Map<GxSupportedLocale, GxTermTranslation> translationMap() {
+		return translations.stream().collect(Collectors.toMap(GxTermTranslation::getSupportedLocale, Function.identity()));
 	}
 
 }

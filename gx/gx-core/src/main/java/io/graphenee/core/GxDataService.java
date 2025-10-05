@@ -287,6 +287,8 @@ public interface GxDataService {
 	List<GxTermTranslation> findTermTranslationByLocale(Locale locale);
 
 	GxTermTranslation findEffectiveTermTranslationByTermKeyAndLocale(String termKey, Locale locale);
+	
+	GxTermTranslation findEffectiveTermTranslationByTermKeyAndSupportedLocale(String termKey, GxSupportedLocale supportedLocale);
 
 	List<GxUserAccount> findUserAccount();
 

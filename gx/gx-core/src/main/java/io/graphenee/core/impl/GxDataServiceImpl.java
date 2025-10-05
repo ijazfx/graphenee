@@ -918,6 +918,14 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxTermTranslation findEffectiveTermTranslationByTermKeyAndSupportedLocale(String termKey, GxSupportedLocale supportedLocale) {
+		List<GxTerm> terms = termRepo.findByTermKey(termKey);
+		return terms.stream().flatMap(term -> term.getTranslations().stream())
+				.filter(t -> t.getSupportedLocale().equals(supportedLocale)).findFirst()
+				.orElse(null);
+	}
+
+	@Override
 	public List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace) {
 		PageRequest pageRequest = PageRequest.of(page, size);
 		Page<GxTerm> result = null;
