@@ -27,6 +27,7 @@ import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
@@ -43,7 +44,7 @@ public class GxTermTablePanel extends GxAbstractEntityList<GxTermTranslation> {
 	@Autowired
 	GxSupportedLocaleRepository localeRepo;
 
-	Map<String, GxTermTranslation> terms;
+	Map<GxSupportedLocale, GxTermTranslation> terms;
 
 	public GxTermTablePanel() {
 		super(GxTermTranslation.class);
@@ -68,14 +69,14 @@ public class GxTermTablePanel extends GxAbstractEntityList<GxTermTranslation> {
 	@Override
 	protected Stream<GxTermTranslation> getData() {
 		selectedTerm.getTranslations().forEach(t -> {
-			terms.put(t.getLanguage(), t);
+			terms.put(t.getSupportedLocale(), t);
 		});
 		localeRepo.findAll().forEach(l -> {
-			if (!terms.containsKey(l.getLocaleName())) {
+			if (!terms.containsKey(l)) {
 				GxTermTranslation newTranslation = new GxTermTranslation();
 				newTranslation.setSupportedLocale(l);
 				selectedTerm.addToTranslations(newTranslation);
-				terms.put(l.getLocaleName(), newTranslation);
+				terms.put(l, newTranslation);
 			}
 		});
 		return terms.values().stream().sorted();
