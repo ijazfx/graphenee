@@ -3,9 +3,11 @@ package io.graphenee.workshop.vaadin;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 

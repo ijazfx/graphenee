@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.logging.log4j.util.Strings;
 
+import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -22,6 +23,8 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.streams.DownloadEvent;
@@ -37,7 +40,7 @@ import lombok.Setter;
 /**
  * An abstract app layout.
  */
-public abstract class GxAbstractAppLayout extends AppLayout {
+public abstract class GxAbstractAppLayout extends AppLayout implements LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
 
@@ -223,7 +226,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	private void generateMenuItems(SideNav drawer, GxAuthenticatedUser user) {
 		for (GxMenuItem mi : flowSetup().menuItems()) {
-			SideNavItem i = new SideNavItem(mi.getLabel());
+			SideNavItem i = new SideNavItem(getTranslation(mi.getLabel()));
 			i.addClassName("gx-nav-menuitem");
 			i.addClassName("gx-nav-menuitem-root");
 			i.setPrefixComponent(mi.getIcon());
@@ -251,7 +254,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	private Integer generateMenuItems(SideNavItem parent, GxMenuItem pmi, GxAuthenticatedUser user) {
 		int count = 0;
 		for (GxMenuItem mi : pmi.getChildren()) {
-			SideNavItem i = new SideNavItem(mi.getLabel());
+			SideNavItem i = new SideNavItem(getTranslation(mi.getLabel()));
 			i.addClassName("gx-nav-menuitem");
 			i.addClassName("gx-nav-menuitem-child");
 			i.setPrefixComponent(mi.getIcon());
@@ -321,6 +324,13 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		default void onLogout(UI ui) {
 			ui.navigate("/");
 		}
+	}
+
+	@Override
+	public void localeChange(LocaleChangeEvent event) {
+		String lang = event.getLocale().getLanguage().split("_")[0];
+		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
+		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
 	}
 
 }

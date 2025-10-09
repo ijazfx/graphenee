@@ -30,7 +30,8 @@ import io.graphenee.i18n.GrapheneeI18nConfiguration;
 
 @Service
 @ConditionalOnClass(GrapheneeI18nConfiguration.class)
-//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
+// @ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled",
+// havingValue = "true")
 public class LocalizerMapServiceImpl implements LocalizerMapService {
 
 	@Autowired
@@ -79,8 +80,15 @@ public class LocalizerMapServiceImpl implements LocalizerMapService {
 	@Override
 	public List<Locale> getAvailableLocales() {
 		List<Locale> locales = new ArrayList<>();
+		Locale.Builder lb = new Locale.Builder();
 		dataService.findSupportedLocale().forEach(bean -> {
-			locales.add(new Locale(bean.getLocaleCode()));
+			String[] parts = bean.getLocaleCode().split("_");
+			lb.setLanguage(parts[0]);
+			if (parts.length > 1)
+				lb.setRegion(parts[1]);
+			if (parts.length > 2)
+				lb.setVariant(parts[2]);
+			locales.add(lb.build());
 		});
 		return locales;
 	}

@@ -2,8 +2,13 @@ package io.graphenee.vaadin.flow;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -15,6 +20,10 @@ import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.i18n.I18NProvider;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
@@ -28,10 +37,15 @@ import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.annotation.PostConstruct;
 
 @CssImport(value = "./styles/graphenee.css")
-public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlParameter<String> {
+public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlParameter<String>, LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
+
+	@Autowired
+	I18NProvider i18nProvider;
+
+	private LoginForm loginForm;
 
 	public GxAbstractLoginView() {
 		addClassName("gx-login-view");
@@ -65,16 +79,9 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		heading.add(appTitleVersion);
 		rootLayout.add(heading);
 
-		LoginForm loginForm = new LoginForm();
+		loginForm = new LoginForm();
 		loginForm.addClassName("gx-login-form");
 		loginForm.setForgotPasswordButtonVisible(true);
-		LoginI18n loginI18n = LoginI18n.createDefault();
-		loginI18n.getForm().setSubmit("Login");
-		loginI18n.getForm().setTitle("");
-		loginI18n.getForm().setForgotPassword("Forgot Password? Click here!");
-		loginI18n.getForm().setUsername("Username or Email");
-		loginI18n.getForm().setPassword("Password");
-		loginForm.setI18n(loginI18n);
 
 		loginForm.addLoginListener(e -> {
 			try {
@@ -108,6 +115,23 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		});
 
 		rootLayout.add(loginForm);
+
+		buildLanguageSelectionLayout(rootLayout);
+
+	}
+
+	private void buildLanguageSelectionLayout(Div rootLayout) {
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.addClassName("lang-selection-bar");
+		i18nProvider.getProvidedLocales().forEach(l -> {
+			Button langButton = new Button(l.getLanguage());
+			langButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+			langButton.addClickListener(cl -> {
+				VaadinSession.getCurrent().setLocale(l);
+			});
+			layout.add(langButton);
+		});
+		rootLayout.add(layout);
 	}
 
 	protected Image appLogo() {
@@ -139,7 +163,8 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 	protected abstract GxAbstractFlowSetup flowSetup();
 
-	protected abstract GxAuthenticatedUser onLogin(LoginEvent event) throws AuthenticationFailedException, PasswordChangeRequiredException;
+	protected abstract GxAuthenticatedUser onLogin(LoginEvent event)
+			throws AuthenticationFailedException, PasswordChangeRequiredException;
 
 	protected void onForgotPassword(ForgotPasswordEvent event) {
 		getUI().ifPresent(ui -> {
@@ -154,6 +179,26 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 	public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
 		if (parameter != null && !parameter.startsWith("login"))
 			this.lastRoute = parameter;
+	}
+
+	@Override
+	public void localeChange(LocaleChangeEvent event) {
+		String lang = event.getLocale().getLanguage().split("_")[0];
+		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
+		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
+		event.getUI().access(() -> {
+			localizeUI(event.getUI());
+		});
+	}
+
+	protected void localizeUI(UI ui) {
+		LoginI18n loginI18n = LoginI18n.createDefault();
+		loginI18n.getForm().setSubmit(getTranslation("login.button")); //"Login");
+		loginI18n.getForm().setTitle(getTranslation("login.title")); //"");
+		loginI18n.getForm().setForgotPassword(getTranslation("login.forgot.password")); //"Forgot Password? Click here!");
+		loginI18n.getForm().setUsername(getTranslation("login.username")); //"Username or Email");
+		loginI18n.getForm().setPassword(getTranslation("login.password")); //"Password");
+		loginForm.setI18n(loginI18n);
 	}
 
 }
