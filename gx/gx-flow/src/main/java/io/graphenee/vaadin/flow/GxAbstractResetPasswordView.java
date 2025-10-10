@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,15 +17,13 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
 
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import jakarta.annotation.PostConstruct;
 
 @CssImport("./styles/graphenee.css")
-public abstract class GxAbstractResetPasswordView extends FlexLayout implements LocaleChangeObserver {
+public abstract class GxAbstractResetPasswordView extends FlexLayout {
 
 	private static final long serialVersionUID = 1L;
 
@@ -201,12 +198,5 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout implements 
 
 	protected abstract void changePassword(String username, String password, TRVoidCallback success,
 			TRErrorCallback error);
-
-	@Override
-	public void localeChange(LocaleChangeEvent event) {
-		String lang = event.getLocale().getLanguage().split("_")[0];
-		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
-		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
-	}
 
 }

@@ -1,5 +1,6 @@
 package io.graphenee.vaadin.flow;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.springframework.context.annotation.Scope;
@@ -17,31 +18,37 @@ import com.vaadin.flow.server.VaadinSession;
 public class GxLanguageBar extends FlexLayout {
 
     public GxLanguageBar(I18NProvider i18nProvider) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.addClassName("gx-lang-selection-bar");
-        i18nProvider.getProvidedLocales().forEach(l -> {
-            Button langButton = new Button(l.getLanguage());
-            langButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            langButton.addClassName("gx-lang-button");
-            // langButton.getStyle().set("font-size",
-            // "var(--lumo-font-size-m)").set("margin", "0");
-            // langButton.getStyle().set("color", "var(--lumo-base-color)");
-            langButton.addThemeVariants(ButtonVariant.LUMO_ICON);
-            langButton.addClickListener(cl -> {
-                cl.getSource().getParent().get().getChildren().forEach(c -> {
-                    c.removeClassName("gx-lang-selected");
+        List<Locale> locales = i18nProvider.getProvidedLocales();
+        if (locales.size() > 1) {
+            HorizontalLayout layout = new HorizontalLayout();
+            layout.addClassName("gx-lang-selection-bar");
+            locales.forEach(l -> {
+                Button langButton = new Button(l.getDisplayLanguage(l));
+                langButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+                langButton.addClassName("gx-lang-button");
+                // langButton.getStyle().set("font-size",
+                // "var(--lumo-font-size-m)").set("margin", "0");
+                // langButton.getStyle().set("color", "var(--lumo-base-color)");
+                // langButton.addThemeVariants(ButtonVariant.LUMO_ICON);
+                langButton.addClickListener(cl -> {
+                    cl.getSource().getParent().get().getChildren().forEach(c -> {
+                        c.removeClassName("gx-lang-selected");
+                        layout.remove(cl.getSource());
+                        layout.addComponentAsFirst(cl.getSource());
+                    });
+                    cl.getSource().addClassName("gx-lang-selected");
+                    VaadinSession.getCurrent().setLocale(l);
                 });
-                cl.getSource().addClassName("gx-lang-selected");
-
-                VaadinSession.getCurrent().setLocale(l);
+                Locale selectedLocale = VaadinSession.getCurrent().getLocale();
+                if (l.equals(selectedLocale)) {
+                    langButton.addClassName("gx-lang-selected");
+                    layout.addComponentAsFirst(langButton);
+                } else {
+                    layout.add(langButton);
+                }
             });
-            Locale selectedLocale = VaadinSession.getCurrent().getLocale();
-            if (l.equals(selectedLocale)) {
-                langButton.addClassName("gx-lang-selected");
-            }
-            layout.add(langButton);
-        });
-        add(layout);
+            add(layout);
+        }
     }
 
 }

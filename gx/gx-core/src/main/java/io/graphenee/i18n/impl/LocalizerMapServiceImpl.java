@@ -82,13 +82,15 @@ public class LocalizerMapServiceImpl implements LocalizerMapService {
 		List<Locale> locales = new ArrayList<>();
 		Locale.Builder lb = new Locale.Builder();
 		dataService.findSupportedLocale().forEach(bean -> {
-			String[] parts = bean.getLocaleCode().split("_");
-			lb.setLanguage(parts[0]);
-			if (parts.length > 1)
-				lb.setRegion(parts[1]);
-			if (parts.length > 2)
-				lb.setVariant(parts[2]);
-			locales.add(lb.build());
+			if (bean.getIsActive()) {
+				String[] parts = bean.getLocaleCode().split("_");
+				lb.setLanguage(parts[0]);
+				if (parts.length > 1)
+					lb.setRegion(parts[1]);
+				if (parts.length > 2)
+					lb.setVariant(parts[2]);
+				locales.add(lb.build());
+			}
 		});
 		return locales;
 	}

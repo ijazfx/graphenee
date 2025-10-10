@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -20,7 +18,6 @@ import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.BeforeEvent;
@@ -176,12 +173,11 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 	protected void localizeUI(UI ui) {
 		LoginI18n loginI18n = LoginI18n.createDefault();
-		loginI18n.getForm().setSubmit(getTranslation("login.button")); // "Login");
-		loginI18n.getForm().setTitle(getTranslation("login.title")); // "");
-		loginI18n.getForm().setForgotPassword(getTranslation("login.forgot.password")); // "Forgot Password? Click
-																						// here!");
-		loginI18n.getForm().setUsername(getTranslation("login.username")); // "Username or Email");
-		loginI18n.getForm().setPassword(getTranslation("login.password")); // "Password");
+		loginI18n.getForm().setSubmit(getTranslation("Login"));
+		loginI18n.getForm().setTitle(getTranslation("Enter Credentials")); // "");
+		loginI18n.getForm().setForgotPassword(getTranslation("Forgot Password? Click here!"));
+		loginI18n.getForm().setUsername(getTranslation("Username or Email"));
+		loginI18n.getForm().setPassword(getTranslation("Password"));
 		loginForm.setI18n(loginI18n);
 	}
 

@@ -27,7 +27,8 @@ import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.GxForbiddenView.ForbiddenException;
 import jakarta.annotation.PostConstruct;
 
-public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver, LocaleChangeObserver {
+public abstract class GxAbstractLayoutView extends FlexLayout
+		implements BeforeEnterObserver, AfterNavigationObserver, LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
 	private Tabs tabs;
