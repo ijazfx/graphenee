@@ -21,12 +21,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
  * An interface for file storage.
  */
 public interface FileStorage {
+
+	Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt");
+	Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv", "image/jpeg", "image/png", "image/gif");
 
 	/**
 	 * The default implementation of method returns "folder/fileName"
@@ -100,15 +105,29 @@ public interface FileStorage {
 	 */
 	default Future<FileMetaData> save(String folder, String fileToSave) throws SaveFailedException {
 		File file = new File(fileToSave);
-		if (file.isFile()) {
-			try {
-				FileInputStream inputStream = new FileInputStream(file);
-				return save(folder, file.getName(), inputStream);
-			} catch (IOException e) {
-				throw new SaveFailedException(e);
-			}
+
+		if (!file.isFile()) {
+			throw new SaveFailedException(fileToSave + " is not a valid file");
 		}
-		throw new SaveFailedException(fileToSave + " is not a file");
+		String fileName = file.getName();
+		String lowerName = fileName.toLowerCase();
+		if (ALLOWED_EXTENSIONS.stream().noneMatch(lowerName::endsWith)) {
+			throw new SaveFailedException("File type not allowed: " + fileName);
+		}
+
+		try {
+			String mimeType = Files.probeContentType(file.toPath());
+			if (mimeType == null || ALLOWED_MIME_TYPES.stream().noneMatch(m -> m.equalsIgnoreCase(mimeType))) {
+				throw new SaveFailedException("Unsupported or suspicious file type: " + mimeType);
+			}
+
+			try (FileInputStream inputStream = new FileInputStream(file)) {
+				return save(folder, file.getName(), inputStream);
+			}
+
+		} catch (IOException e) {
+			throw new SaveFailedException("Failed to save file: " + fileToSave, e);
+		}
 	}
 
 	/**
