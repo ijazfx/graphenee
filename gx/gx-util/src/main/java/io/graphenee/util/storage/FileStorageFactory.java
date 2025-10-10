@@ -15,12 +15,11 @@
  *******************************************************************************/
 package io.graphenee.util.storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
@@ -92,13 +91,32 @@ public class FileStorageFactory {
 
 		@Override
 		public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
+			String lowerName = fileName.toLowerCase();
+			if (ALLOWED_EXTENSIONS.stream().noneMatch(lowerName::endsWith)) {
+				throw new SaveFailedException("File type not allowed: " + fileName);
+			}
+
+			Path tempFile;
+			try {
+				tempFile = Files.createTempFile("upload-", "-" + fileName);
+				try (OutputStream tempOut = Files.newOutputStream(tempFile)) {
+					StreamUtils.copy(inputStream, tempOut);
+				}
+				String mimeType = Files.probeContentType(tempFile);
+				if (mimeType == null || ALLOWED_MIME_TYPES.stream().noneMatch(m -> m.equalsIgnoreCase(mimeType))) {
+					Files.deleteIfExists(tempFile);
+					throw new SaveFailedException("Unsupported or suspicious file type: " + mimeType);
+				}
+			} catch (IOException e) {
+				throw new SaveFailedException("Failed to validate file before saving: " + fileName, e);
+			}
+
 			return Executors.newCachedThreadPool().submit(() -> {
 				String resourcePath = resourcePath(folder, fileName);
 				File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
 				resource.getParentFile().mkdirs();
 				try {
-					FileOutputStream fout = new FileOutputStream(resource);
-					StreamUtils.copy(inputStream, fout);
+					Files.move(tempFile, resource.toPath(), StandardCopyOption.REPLACE_EXISTING);
 					long fileSize = resource.length();
 					// checksum will be computed in future...
 					String checksum = null;
