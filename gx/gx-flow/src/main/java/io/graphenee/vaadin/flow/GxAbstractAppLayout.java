@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
@@ -43,6 +44,9 @@ import lombok.Setter;
 public abstract class GxAbstractAppLayout extends AppLayout implements LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
+
+	@Autowired
+	GxLanguageBar languageBar;
 
 	@Setter
 	private GxAbstractAppLayoutDelegate delegate;
@@ -99,6 +103,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 		Div spacer = new Div();
 		navbarLayout.add(spacer);
 		navbarLayout.expand(spacer);
+		navbarLayout.add(languageBar);
 
 		Avatar avatar = null;
 		if (flowSetup().loggedInUser() != null) {
@@ -145,13 +150,9 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 				});
 			});
 
-			HorizontalLayout hl = new HorizontalLayout();
-			hl.add(avatar, logout);
-			hl.setMargin(true);
-
 			if (logoPosition() == LogoPosition.TITLE_BAR) {
 				avatar.addClassName("gx-avatar-small");
-				navbarLayout.add(avatar, logout);
+				navbarLayout.add(avatar);
 			} else {
 				avatar.addClassName("gx-avatar-large");
 				drawerLayout.addComponentAsFirst(avatar);

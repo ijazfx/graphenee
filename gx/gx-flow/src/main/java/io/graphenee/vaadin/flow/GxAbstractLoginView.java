@@ -21,7 +21,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.i18n.LocaleChangeEvent;
 import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.BeforeEvent;
@@ -42,10 +41,10 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 	private static final long serialVersionUID = 1L;
 	private String lastRoute;
 
-	@Autowired
-	I18NProvider i18nProvider;
-
 	private LoginForm loginForm;
+
+	@Autowired
+	GxLanguageBar languageBar;
 
 	public GxAbstractLoginView() {
 		addClassName("gx-login-view");
@@ -115,23 +114,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		});
 
 		rootLayout.add(loginForm);
-
-		buildLanguageSelectionLayout(rootLayout);
-
-	}
-
-	private void buildLanguageSelectionLayout(Div rootLayout) {
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.addClassName("lang-selection-bar");
-		i18nProvider.getProvidedLocales().forEach(l -> {
-			Button langButton = new Button(l.getLanguage());
-			langButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-			langButton.addClickListener(cl -> {
-				VaadinSession.getCurrent().setLocale(l);
-			});
-			layout.add(langButton);
-		});
-		rootLayout.add(layout);
+		rootLayout.add(languageBar);
 	}
 
 	protected Image appLogo() {
@@ -193,11 +176,12 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 	protected void localizeUI(UI ui) {
 		LoginI18n loginI18n = LoginI18n.createDefault();
-		loginI18n.getForm().setSubmit(getTranslation("login.button")); //"Login");
-		loginI18n.getForm().setTitle(getTranslation("login.title")); //"");
-		loginI18n.getForm().setForgotPassword(getTranslation("login.forgot.password")); //"Forgot Password? Click here!");
-		loginI18n.getForm().setUsername(getTranslation("login.username")); //"Username or Email");
-		loginI18n.getForm().setPassword(getTranslation("login.password")); //"Password");
+		loginI18n.getForm().setSubmit(getTranslation("login.button")); // "Login");
+		loginI18n.getForm().setTitle(getTranslation("login.title")); // "");
+		loginI18n.getForm().setForgotPassword(getTranslation("login.forgot.password")); // "Forgot Password? Click
+																						// here!");
+		loginI18n.getForm().setUsername(getTranslation("login.username")); // "Username or Email");
+		loginI18n.getForm().setPassword(getTranslation("login.password")); // "Password");
 		loginForm.setI18n(loginI18n);
 	}
 
