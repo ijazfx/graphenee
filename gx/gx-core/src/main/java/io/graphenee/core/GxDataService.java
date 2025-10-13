@@ -284,6 +284,8 @@ public interface GxDataService {
 	
 	List<GxTerm> findTermByTermKey(String termKey);
 
+	List<GxTerm> findTermByNamespace(GxNamespace namespace);
+
 	List<GxTermTranslation> findTermTranslationByLocale(Locale locale);
 
 	GxTermTranslation findEffectiveTermTranslationByTermKeyAndLocale(String termKey, Locale locale);

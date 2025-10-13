@@ -88,6 +88,8 @@ import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.dom.DebouncePhase;
 import com.vaadin.flow.function.ValueProvider;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.TRCalendarUtil;
@@ -125,7 +127,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends FlexLayout implements ImportDataFormDelegate<T> {
+public abstract class GxAbstractEntityList<T> extends FlexLayout implements ImportDataFormDelegate<T>, LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
 
@@ -691,7 +693,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean isGridInlineEditingEnabled() {
-		return false;
+		return true;
 	}
 
 	protected boolean isAuditLogEnabled() {
@@ -1394,6 +1396,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			} else {
 				entityForm.show(entity, rootLayout);
 			}
+		} else if (isGridInlineEditingEnabled()) {
+			if (!items.contains(entity)) {
+				items.add(entity);
+			}
+			dataGrid.getEditor().editItem(entity);
 		}
 	}
 
@@ -1494,11 +1501,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	protected final void updateTotalCountFooter(int count) {
 		if (shouldDisplayGridFooter()) {
 			if (count == 0) {
-				totalCountFooterText.setText("No records");
+				totalCountFooterText.setText(getTranslation("No records"));
 			} else if (count == 1) {
-				totalCountFooterText.setText("1 record");
+				totalCountFooterText.setText("1 " + getTranslation("record"));
 			} else {
-				totalCountFooterText.setText(DecimalFormat.getNumberInstance().format(count) + " records");
+				totalCountFooterText.setText(DecimalFormat.getNumberInstance().format(count) + " " + getTranslation("records"));
 			}
 		}
 	}
@@ -1734,6 +1741,15 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			dataGrid.removeColumn(column);
 			availablePropertySet().remove(key);
 		}
+	}
+
+	@Override
+	public void localeChange(LocaleChangeEvent event) {
+		localizeUI(event.getUI());
+	}
+
+	protected void localizeUI(UI ui) {
+		
 	}
 
 }

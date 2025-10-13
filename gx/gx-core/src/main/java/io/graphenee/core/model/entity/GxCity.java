@@ -15,8 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -29,8 +28,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_city")
-public class GxCity extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxCity extends GxMappedSuperclass {
 
 	@Column(name = "city_name")
 	private String cityName;

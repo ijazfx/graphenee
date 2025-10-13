@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 import io.graphenee.core.model.GxMappedSuperclass;
@@ -30,8 +29,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_access_log")
-public class GxAccessLog extends GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxAccessLog extends GxMappedSuperclass {
 
 	@ManyToOne
 	@JoinColumn(name = "oid_access_key")

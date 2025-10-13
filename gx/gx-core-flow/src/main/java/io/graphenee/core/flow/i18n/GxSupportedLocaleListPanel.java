@@ -45,7 +45,7 @@ public class GxSupportedLocaleListPanel extends GxAbstractEntityList<GxSupported
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "localeName", "localeCode" };
+		return new String[] { "localeName", "localeCode", "isActive" };
 	}
 
 	@Override

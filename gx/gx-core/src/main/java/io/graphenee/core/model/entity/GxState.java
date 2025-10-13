@@ -15,10 +15,10 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -32,9 +32,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_state")
-public class GxState extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxState extends GxMappedSuperclass {
 
 	private Boolean isActive;
 

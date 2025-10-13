@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -38,8 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Entity
 @Table(name = "gx_access_key")
-public class GxAccessKey extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxAccessKey extends GxMappedSuperclass {
 
 	private UUID accessKey = UUID.randomUUID();
 	private String secret = RandomStringUtils.secureStrong().nextAlphanumeric(64);

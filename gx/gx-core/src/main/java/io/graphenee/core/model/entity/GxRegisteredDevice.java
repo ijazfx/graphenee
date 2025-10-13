@@ -14,8 +14,6 @@ import lombok.Setter;
 @Table(name = "gx_registered_device")
 public class GxRegisteredDevice extends GxMappedSuperclass {
 
-	private static final long serialVersionUID = 1L;
-
 	private String systemName;
 	private String deviceToken;
 	private String awsDeviceArn;

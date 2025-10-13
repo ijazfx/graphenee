@@ -21,7 +21,6 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
@@ -34,21 +33,20 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.jpa.repository.GxNamespaceRepository;
-import io.graphenee.core.model.jpa.repository.GxTermRepository;
+import io.graphenee.i18n.LocalizerService;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Autowired
-	private GxDataService dataService;
+	LocalizerService localizerService;
 
 	@Autowired
-	private GxTermRepository termRepo;
+	private GxDataService dataService;
 
 	@Autowired
 	private GxNamespaceRepository namespaceRepo;
@@ -92,7 +90,7 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected void decorateGrid(Grid<GxTerm> dataGrid) {
-		dataService.findSupportedLocale().forEach(sl -> {
+		dataService.findSupportedLocale().stream().filter(sl -> sl.getIsActive()).forEach(sl -> {
 			addColumn(sl.getLocaleCode(), sl.getLocaleName(), term -> {
 				GxTermTranslation translation = term.translationMap().get(sl);
 				if (translation != null) {
@@ -107,7 +105,7 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 					term.addToTranslations(translation);
 				}
 				translation.setTermSingular(value);
-				termRepo.save(term);
+				dataService.save(term);
 			}, String.class);
 		});
 	}
@@ -127,7 +125,7 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 	@Override
 	protected Stream<GxTerm> getData() {
 		if (getSearchEntity().getNamespace() != null) {
-			return termRepo.findByNamespace(getSearchEntity().getNamespace(), Sort.by("termKey")).stream();
+			return dataService.findTermByNamespace(getSearchEntity().getNamespace()).stream();
 		}
 		return Stream.empty();
 	}
@@ -139,12 +137,14 @@ public class GxTermListPanel extends GxAbstractEntityList<GxTerm> {
 
 	@Override
 	protected void onSave(GxTerm entity) {
-		termRepo.save(entity);
+		dataService.save(entity);
+		localizerService.invalidateTerm(entity.getTermKey());
 	}
 
 	@Override
 	protected void onDelete(Collection<GxTerm> entities) {
-		termRepo.deleteAllInBatch(entities);
+		entities.forEach(dataService::delete);
+		entities.forEach(e -> localizerService.invalidateTerm(e.getTermKey()));
 	}
 
 	@Override

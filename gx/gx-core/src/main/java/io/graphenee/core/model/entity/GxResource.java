@@ -15,8 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -28,9 +27,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_resource")
-public class GxResource extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxResource extends GxMappedSuperclass {
 
 	private String resourceName;
 	private String resourceDescription;

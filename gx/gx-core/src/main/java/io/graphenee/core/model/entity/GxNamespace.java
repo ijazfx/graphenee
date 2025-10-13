@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,9 +33,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_namespace")
-public class GxNamespace extends GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxNamespace extends GxMappedSuperclass {
 
 	public static final String SYSTEM = "io.graphenee.system";
 

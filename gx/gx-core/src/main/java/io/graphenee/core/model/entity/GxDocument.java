@@ -1,8 +1,12 @@
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -26,8 +30,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_document")
-public class GxDocument extends GxMappedSuperclass implements Serializable, GxDocumentExplorerItem {
-	private static final long serialVersionUID = 1L;
+public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorerItem {
 
 	String name;
 
@@ -140,7 +143,6 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 	public String getFileTagsJoined() {
 		return fileTags.stream().map(t -> t.getTag()).collect(Collectors.joining(", "));
 	}
-
 
 	public String getName() {
 		return this.name;

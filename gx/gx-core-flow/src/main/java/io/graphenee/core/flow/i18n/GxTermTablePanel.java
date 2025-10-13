@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
+import com.google.common.base.Strings;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -34,7 +35,6 @@ import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxTermTablePanel extends GxAbstractEntityList<GxTermTranslation> {
@@ -68,14 +68,13 @@ public class GxTermTablePanel extends GxAbstractEntityList<GxTermTranslation> {
 
 	@Override
 	protected Stream<GxTermTranslation> getData() {
-		selectedTerm.getTranslations().forEach(t -> {
+		selectedTerm.getTranslations().stream().filter(t -> t.getSupportedLocale().getIsActive()).forEach(t -> {
 			terms.put(t.getSupportedLocale(), t);
 		});
-		localeRepo.findAll().forEach(l -> {
+		localeRepo.findAll().stream().filter(l -> l.getIsActive()).forEach(l -> {
 			if (!terms.containsKey(l)) {
 				GxTermTranslation newTranslation = new GxTermTranslation();
 				newTranslation.setSupportedLocale(l);
-				selectedTerm.addToTranslations(newTranslation);
 				terms.put(l, newTranslation);
 			}
 		});
@@ -94,6 +93,13 @@ public class GxTermTablePanel extends GxAbstractEntityList<GxTermTranslation> {
 
 	@Override
 	protected void onSave(GxTermTranslation entity) {
+		for (GxTermTranslation translation : terms.values()) {
+			if (!Strings.isNullOrEmpty(translation.getTermSingular())) {
+				selectedTerm.addToTranslations(translation);
+			} else {
+				selectedTerm.removeFromTranslations(translation);
+			}
+		}
 	}
 
 	@Override
@@ -109,7 +115,7 @@ public class GxTermTablePanel extends GxAbstractEntityList<GxTermTranslation> {
 			PropertyDefinition<GxTermTranslation, Object> propertyDefinition) {
 		if (propertyName.matches("(termSingular|termPlural)")) {
 			AbstractField<?, ?> tf = super.inlineEditorForProperty(propertyName, propertyDefinition);
-			if(tf != null) {
+			if (tf != null) {
 				tf.getStyle().set("director", "rtl");
 			}
 			return tf;

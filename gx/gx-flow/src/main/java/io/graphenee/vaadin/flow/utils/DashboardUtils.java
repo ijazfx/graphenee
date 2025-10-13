@@ -19,8 +19,9 @@ public class DashboardUtils {
 
 	/**
 	 * Sets the current UI for a user.
+	 * 
 	 * @param user The user.
-	 * @param ui The UI.
+	 * @param ui   The UI.
 	 */
 	public static void setCurrentUI(GxAuthenticatedUser user, UI ui) {
 		UI_MAP.put(user, ui);
@@ -28,6 +29,7 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the current UI for a user.
+	 * 
 	 * @param user The user.
 	 * @return The UI.
 	 */
@@ -41,6 +43,7 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the logged in user.
+	 * 
 	 * @param <T> The user type.
 	 * @return The logged in user.
 	 */
@@ -51,7 +54,8 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the logged in user.
-	 * @param <T> The user type.
+	 * 
+	 * @param <T>           The user type.
 	 * @param vaadinSession The Vaadin session.
 	 * @return The logged in user.
 	 */
@@ -62,6 +66,7 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the logged in username.
+	 * 
 	 * @return The logged in username.
 	 */
 	public static String getLoggedInUsername() {
@@ -77,6 +82,7 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the query map.
+	 * 
 	 * @return The query map.
 	 */
 	@SuppressWarnings("unchecked")
@@ -90,6 +96,7 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the query map.
+	 * 
 	 * @param vaadinSession The Vaadin session.
 	 * @return The query map.
 	 */
@@ -104,6 +111,7 @@ public class DashboardUtils {
 
 	/**
 	 * Gets the remote address.
+	 * 
 	 * @return The remote address.
 	 */
 	public static String getRemoteAddress() {

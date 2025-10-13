@@ -1,5 +1,6 @@
 package io.graphenee.common;
 
+import java.security.Principal;
 import java.util.Map;
 
 import io.graphenee.util.enums.GenderEnum;
@@ -7,7 +8,7 @@ import io.graphenee.util.enums.GenderEnum;
 /**
  * An interface that represents an authenticated user.
  */
-public interface GxAuthenticatedUser {
+public interface GxAuthenticatedUser extends Principal {
 
 	/**
 	 * Gets the user id.
@@ -198,5 +199,10 @@ public interface GxAuthenticatedUser {
 	 * @return True if the user can do the action, false otherwise.
 	 */
 	boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh);
+
+	@Override
+	default String getName() {
+		return getUsername();
+	}
 
 }

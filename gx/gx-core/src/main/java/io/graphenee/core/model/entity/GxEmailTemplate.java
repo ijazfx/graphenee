@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -31,12 +29,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-
 @Entity
 @Table(name = "gx_email_template")
-public class GxEmailTemplate extends GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxEmailTemplate extends GxMappedSuperclass {
 
 	private String bccList;
 	private String body;

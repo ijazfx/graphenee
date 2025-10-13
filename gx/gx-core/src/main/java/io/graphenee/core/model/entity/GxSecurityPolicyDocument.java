@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
 import io.graphenee.core.model.GxMappedSuperclass;
@@ -30,9 +29,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_security_policy_document")
-public class GxSecurityPolicyDocument extends GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxSecurityPolicyDocument extends GxMappedSuperclass {
 
 	private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 

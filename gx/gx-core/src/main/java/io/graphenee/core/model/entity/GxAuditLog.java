@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
 import io.graphenee.core.model.GxMappedSuperclass;
@@ -30,8 +29,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_audit_log")
-public class GxAuditLog extends GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxAuditLog extends GxMappedSuperclass {
 
 	private Timestamp auditDate;
 	private String auditEntity;

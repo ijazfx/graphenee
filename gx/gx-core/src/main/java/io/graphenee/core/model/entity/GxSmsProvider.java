@@ -15,11 +15,10 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import io.graphenee.core.enums.SmsProvider;
+import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.sms.proto.GxSmsConfigProtos.AwsSmsConfig;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -31,9 +30,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_sms_provider")
-public class GxSmsProvider extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxSmsProvider extends GxMappedSuperclass {
 
 	private String providerName;
 	private String implementationClass;

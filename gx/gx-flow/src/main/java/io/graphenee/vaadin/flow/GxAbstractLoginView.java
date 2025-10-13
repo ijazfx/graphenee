@@ -2,8 +2,6 @@ package io.graphenee.vaadin.flow;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
@@ -39,9 +37,8 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 	private String lastRoute;
 
 	private LoginForm loginForm;
-
-	@Autowired
-	GxLanguageBar languageBar;
+	private Span appTitle = new Span();
+	private Span appVersion = new Span();
 
 	public GxAbstractLoginView() {
 		addClassName("gx-login-view");
@@ -66,9 +63,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 		Div heading = new Div();
 		heading.addClassName("gx-login-header");
-		Span appTitle = new Span(flowSetup().appTitle());
 		appTitle.addClassName("gx-login-app-title");
-		Span appVersion = new Span(flowSetup().appVersion());
 		appVersion.addClassName("gx-login-app-version");
 		Div appTitleVersion = new Div(appTitle, appVersion);
 		appTitleVersion.addClassName("gx-login-app-title-version");
@@ -111,7 +106,7 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		});
 
 		rootLayout.add(loginForm);
-		rootLayout.add(languageBar);
+		rootLayout.add(new GxLanguageBar());
 	}
 
 	protected Image appLogo() {
@@ -172,6 +167,8 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 	}
 
 	protected void localizeUI(UI ui) {
+		appTitle.setText(flowSetup().appTitle());
+		appVersion.setText(flowSetup().appVersion());
 		LoginI18n loginI18n = LoginI18n.createDefault();
 		loginI18n.getForm().setSubmit(getTranslation("Login"));
 		loginI18n.getForm().setTitle(getTranslation("Enter Credentials")); // "");

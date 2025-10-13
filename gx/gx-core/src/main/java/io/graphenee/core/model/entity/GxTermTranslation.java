@@ -29,8 +29,6 @@ import lombok.Setter;
 @Table(name = "gx_term_translation")
 public class GxTermTranslation extends GxMappedSuperclass implements Comparable<GxTermTranslation> {
 
-	private static final long serialVersionUID = 1L;
-
 	private String termPlural;
 	private String termSingular;
 

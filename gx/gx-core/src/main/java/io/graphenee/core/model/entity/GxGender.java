@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,8 +27,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "gx_gender")
-public class GxGender extends GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxGender extends GxMappedSuperclass {
 
 	@Column(name = "gender_code")
 

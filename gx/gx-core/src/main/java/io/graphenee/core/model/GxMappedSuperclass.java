@@ -16,30 +16,58 @@
 package io.graphenee.core.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 public class GxMappedSuperclass implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	// @Version
-	// protected Integer version;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer oid;
+
+	@CreatedBy
+	private String createdBy;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@CreatedDate
+	private LocalDateTime dateCreated;
+
+	@LastModifiedBy
+	private String modifiedBy;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@LastModifiedDate
+	private LocalDateTime dateModified;
+
+	@Version
+	private Long recordVersion;
+
+	private Integer sortOrder = 1;
 
 	@Transient
 	private UUID uuid = UUID.randomUUID();
@@ -49,9 +77,9 @@ public class GxMappedSuperclass implements Serializable {
 		if (obj == null)
 			return false;
 		GxMappedSuperclass src = (GxMappedSuperclass) obj;
-		if (oid == null && src.oid == null)
-			return uuid.equals(src.uuid);
-		return oid.equals(src.oid);
+		if (oid != null && src.oid != null)
+			return oid.equals(src.oid);
+		return uuid.equals(src.uuid);
 	}
 
 	@Override

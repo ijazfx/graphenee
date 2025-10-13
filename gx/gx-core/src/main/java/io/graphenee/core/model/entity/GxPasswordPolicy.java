@@ -1,7 +1,6 @@
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -13,8 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_password_policy")
-public class GxPasswordPolicy extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxPasswordPolicy extends GxMappedSuperclass {
 
 	private Integer maxHistory = 3;
 	private Integer maxAge = 60;

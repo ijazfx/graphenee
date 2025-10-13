@@ -896,6 +896,11 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public List<GxTerm> findTermByNamespace(GxNamespace namespace) {
+		return termRepo.findByNamespace(namespace, Sort.by("termKey"));
+	}
+
+	@Override
 	public List<GxTermTranslation> findTermTranslationByLocale(Locale locale) {
 		String localeCode = locale.toString();
 		GxSupportedLocale supportedLocale = supportedLocaleRepo.findByLocaleCodeStartingWith(localeCode);
@@ -918,7 +923,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxTermTranslation findEffectiveTermTranslationByTermKeyAndSupportedLocale(String termKey, GxSupportedLocale supportedLocale) {
+	public GxTermTranslation findEffectiveTermTranslationByTermKeyAndSupportedLocale(String termKey,
+			GxSupportedLocale supportedLocale) {
 		List<GxTerm> terms = termRepo.findByTermKey(termKey);
 		return terms.stream().flatMap(term -> term.getTranslations().stream())
 				.filter(t -> t.getSupportedLocale().equals(supportedLocale)).findFirst()

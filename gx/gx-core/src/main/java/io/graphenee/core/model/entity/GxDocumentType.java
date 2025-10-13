@@ -1,7 +1,5 @@
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import org.json.JSONObject;
 
 import io.graphenee.core.model.GxMappedSuperclass;
@@ -18,9 +16,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_document_type")
-public class GxDocumentType extends GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxDocumentType extends GxMappedSuperclass {
 
 	String name;
 	String note;

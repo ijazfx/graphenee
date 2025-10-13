@@ -16,8 +16,11 @@
 package io.graphenee.core.flow;
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.documents.GrapheneeDocumentsConfiguration;
@@ -26,11 +29,17 @@ import io.graphenee.security.GrapheneeSecurityConfiguration;
 import io.graphenee.sms.GrapheneeSmsConfiguration;
 
 @Configuration
+@EnableJpaAuditing
 @AutoConfigureAfter({ GrapheneeCoreConfiguration.class, GrapheneeI18nConfiguration.class, GrapheneeSecurityConfiguration.class, GrapheneeSmsConfiguration.class,
 		GrapheneeDocumentsConfiguration.class })
 @ComponentScan(basePackages = { GrapheneeCoreFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE })
 public class GrapheneeCoreFlowConfiguration {
 
 	public static final String COMPONENT_SCAN_BASE_PACKAGE = "io.graphenee.core.flow";
+
+	@Bean
+	public AuditorAware<String> auditorProvider() {
+		return new GxAuditorAwareImpl();
+	}
 
 }

@@ -1,8 +1,8 @@
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,12 +12,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 @Entity
 @Table(name = "gx_password_history")
-public class GxPasswordHistory extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxPasswordHistory extends GxMappedSuperclass {
 
 	private String hashedPassword;
 	private Timestamp passwordDate;

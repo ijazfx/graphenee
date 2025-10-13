@@ -3,22 +3,18 @@ package io.graphenee.vaadin.flow;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.server.VaadinSession;
 
-@Component
-@Scope("prototype")
+import io.graphenee.vaadin.flow.utils.GxTranslationUtils;
+
 public class GxLanguageBar extends FlexLayout {
 
-    public GxLanguageBar(I18NProvider i18nProvider) {
-        List<Locale> locales = i18nProvider.getProvidedLocales();
+    public GxLanguageBar() {
+        List<Locale> locales = GxTranslationUtils.getProvidedLocales();
         if (locales.size() > 1) {
             HorizontalLayout layout = new HorizontalLayout();
             layout.addClassName("gx-lang-selection-bar");

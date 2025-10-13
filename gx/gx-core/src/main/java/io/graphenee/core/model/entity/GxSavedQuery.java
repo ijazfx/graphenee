@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -27,9 +25,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_saved_query")
-public class GxSavedQuery extends GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxSavedQuery extends GxMappedSuperclass {
 
 	private String queryBeanJson;
 	private String queryName;

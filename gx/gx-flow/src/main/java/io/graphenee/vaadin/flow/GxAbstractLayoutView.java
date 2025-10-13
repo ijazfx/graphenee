@@ -9,6 +9,7 @@ import java.util.Map;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -156,6 +157,13 @@ public abstract class GxAbstractLayoutView extends FlexLayout
 		String lang = event.getLocale().getLanguage().split("_")[0];
 		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
 		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
+		event.getUI().access(() -> {
+			localizeUI(event.getUI());
+		});
+	}
+
+	protected void localizeUI(UI ui) {
+		
 	}
 
 }

@@ -15,8 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -33,14 +31,13 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "gx_namespace_property")
-public class GxNamespaceProperty extends GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxNamespaceProperty extends GxMappedSuperclass {
 
 	private String propertyDefaultValue;
 	private String propertyKey;
 	private String propertyValue;
 
-	//bi-directional many-to-one association to GxNamespace
+	// bi-directional many-to-one association to GxNamespace
 	@ManyToOne
 	@JoinColumn(name = "oid_namespace")
 	private GxNamespace namespace;

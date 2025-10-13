@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -23,6 +24,8 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexDirection;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.i18n.LocaleChangeEvent;
+import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.streams.DownloadEvent;
@@ -38,15 +41,18 @@ import lombok.Setter;
 /**
  * An abstract app layout.
  */
-public abstract class GxAbstractAppLayout extends AppLayout {
+public abstract class GxAbstractAppLayout extends AppLayout implements LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
-	GxLanguageBar languageBar;
-
 	@Setter
 	private GxAbstractAppLayoutDelegate delegate;
+
+	private Span title = new Span();
+
+	private Span version = new Span();
+
+	private SideNav drawer = new SideNav();
 
 	@PostConstruct
 	private void postBuild() {
@@ -54,24 +60,19 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		toggle.addClassName("gx-app-layout-toggle");
 		// toggle.getStyle().set("color", "var(--lumo-base-color)");
 
-		Span title = new Span(flowSetup().appTitle());
 		title.addClassName("gx-app-layout-title");
 		// title.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin",
 		// "0");
 		// title.getStyle().set("color", "var(--lumo-base-color)");
 		// title.setWidthFull();
 
-		Span version = new Span(flowSetup().appVersion());
 		version.addClassName("gx-app-layout-version");
 		// version.getStyle().set("font-size", "var(--lumo-font-size-xs)").set("margin",
 		// "0");
 		// version.getStyle().set("color", "var(--lumo-base-color)");
 
-		SideNav drawer = new SideNav();
 		drawer.addClassName("gx-app-layout-drawer");
 		drawer.setWidthFull();
-
-		generateMenuItems(drawer, flowSetup().loggedInUser());
 
 		FlexLayout drawerLayout = new FlexLayout();
 		drawerLayout.setFlexDirection(FlexDirection.COLUMN);
@@ -100,7 +101,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		Div spacer = new Div();
 		navbarLayout.add(spacer);
 		navbarLayout.expand(spacer);
-		navbarLayout.add(languageBar);
+		navbarLayout.add(new GxLanguageBar());
 
 		Avatar avatar = null;
 		if (flowSetup().loggedInUser() != null) {
@@ -136,6 +137,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			logout.getStyle().set("color", "var(--lumo-base-color)");
 			logout.addThemeVariants(ButtonVariant.LUMO_ICON);
 			logout.addClickListener(cl -> {
+				SecurityContextHolder.clearContext();
 				VaadinSession.getCurrent().getSession().invalidate();
 				VaadinSession.getCurrent().close();
 				getUI().ifPresent(ui -> {
@@ -223,6 +225,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	}
 
 	private void generateMenuItems(SideNav drawer, GxAuthenticatedUser user) {
+		drawer.removeAll();
 		for (GxMenuItem mi : flowSetup().menuItems()) {
 			SideNavItem i = new SideNavItem(getTranslation(mi.getLabel()));
 			i.addClassName("gx-nav-menuitem");
@@ -322,6 +325,22 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		default void onLogout(UI ui) {
 			ui.navigate("/");
 		}
+	}
+
+	@Override
+	public void localeChange(LocaleChangeEvent event) {
+		String lang = event.getLocale().getLanguage().split("_")[0];
+		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
+		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
+		event.getUI().access(() -> {
+			localizeUI(event.getUI());
+		});
+	}
+
+	protected void localizeUI(UI ui) {
+		title.setText(flowSetup().appTitle());
+		version.setText(flowSetup().appVersion());
+		generateMenuItems(drawer, flowSetup().loggedInUser());
 	}
 
 }

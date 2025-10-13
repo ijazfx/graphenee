@@ -31,8 +31,6 @@ import lombok.Setter;
 @Table(name = "gx_supported_locale")
 public class GxSupportedLocale extends GxMappedSuperclass {
 
-	private static final long serialVersionUID = 1L;
-
 	private Boolean isActive = true;
 	private Boolean isLeftToRight = true;
 	private Boolean isProtected = false;

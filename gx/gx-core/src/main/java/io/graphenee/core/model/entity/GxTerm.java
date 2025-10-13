@@ -37,8 +37,6 @@ import lombok.Setter;
 @Table(name = "gx_term")
 public class GxTerm extends GxMappedSuperclass {
 
-	private static final long serialVersionUID = 1L;
-
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
 	private String termKey;
@@ -51,19 +49,24 @@ public class GxTerm extends GxMappedSuperclass {
 	private List<GxTermTranslation> translations = new ArrayList<>();
 
 	public GxTermTranslation addToTranslations(GxTermTranslation translation) {
-		translations.add(translation);
-		translation.setTerm(this);
+		if (!translations.contains(translation)) {
+			translations.add(translation);
+			translation.setTerm(this);
+		}
 		return translation;
 	}
 
 	public GxTermTranslation removeFromTranslations(GxTermTranslation translation) {
-		translations.remove(translation);
-		translation.setTerm(null);
+		if (translations.contains(translation)) {
+			translations.remove(translation);
+			translation.setTerm(null);
+		}
 		return translation;
 	}
 
 	public Map<GxSupportedLocale, GxTermTranslation> translationMap() {
-		return translations.stream().collect(Collectors.toMap(GxTermTranslation::getSupportedLocale, Function.identity()));
+		return translations.stream()
+				.collect(Collectors.toMap(GxTermTranslation::getSupportedLocale, Function.identity(), (first, second) -> first));
 	}
 
 }

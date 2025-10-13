@@ -15,8 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-
+import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -30,8 +29,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_currency")
-public class GxCurrency extends io.graphenee.core.model.GxMappedSuperclass implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class GxCurrency extends GxMappedSuperclass {
 
 	@Column(name = "alpha3_code")
 	private String alpha3Code;

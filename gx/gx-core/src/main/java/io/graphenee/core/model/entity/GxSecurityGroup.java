@@ -15,13 +15,8 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
@@ -30,19 +25,14 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Getter
 @Setter
 @Entity
 @Table(name = "gx_security_group")
-public class GxSecurityGroup extends GxMappedSuperclass implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GxSecurityGroup extends GxMappedSuperclass {
 
 	private Boolean isActive = true;
 	private Boolean isProtected = false;
