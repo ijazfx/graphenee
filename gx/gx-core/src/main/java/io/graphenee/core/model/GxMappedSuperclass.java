@@ -65,7 +65,7 @@ public class GxMappedSuperclass implements Serializable {
 	private LocalDateTime dateModified;
 
 	@Version
-	private Long recordVersion;
+	private Integer recordVersion;
 
 	private Integer sortOrder = 1;
 
