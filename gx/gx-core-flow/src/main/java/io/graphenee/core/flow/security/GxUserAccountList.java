@@ -42,7 +42,7 @@ public class GxUserAccountList extends GxAbstractEntityList<GxUserAccount> {
 
     @Override
     protected String[] visibleProperties() {
-        return new String[] { "firstName", "lastName", "username", "email", "isActive", "createdBy", "dateCreated", "modifiedBy", "dateModified" };
+        return new String[] { "firstName", "lastName", "username", "email", "isActive" };
     }
 
     @Override

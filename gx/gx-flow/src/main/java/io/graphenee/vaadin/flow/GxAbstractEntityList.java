@@ -127,7 +127,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends FlexLayout implements ImportDataFormDelegate<T>, LocaleChangeObserver {
+public abstract class GxAbstractEntityList<T> extends FlexLayout
+		implements ImportDataFormDelegate<T>, LocaleChangeObserver {
 
 	private static final long serialVersionUID = 1L;
 
@@ -483,7 +484,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 						}
 
 						if (isGridInlineEditingEnabled()) {
-							addInlineEditColumn(column, propertyDefinition);
+							if (!propertyName.matches("(dateCreated|createdBy|dateModified|modifiedBy)")) // skip auditing columns
+								addInlineEditColumn(column, propertyDefinition);
 						}
 
 						decorateColumn(propertyName, column);
@@ -1505,7 +1507,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			} else if (count == 1) {
 				totalCountFooterText.setText("1 " + getTranslation("record"));
 			} else {
-				totalCountFooterText.setText(DecimalFormat.getNumberInstance().format(count) + " " + getTranslation("records"));
+				totalCountFooterText
+						.setText(DecimalFormat.getNumberInstance().format(count) + " " + getTranslation("records"));
 			}
 		}
 	}
@@ -1749,7 +1752,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected void localizeUI(UI ui) {
-		
+
 	}
 
 }

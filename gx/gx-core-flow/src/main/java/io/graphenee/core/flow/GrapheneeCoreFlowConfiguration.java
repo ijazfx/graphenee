@@ -29,7 +29,7 @@ import io.graphenee.security.GrapheneeSecurityConfiguration;
 import io.graphenee.sms.GrapheneeSmsConfiguration;
 
 @Configuration
-@EnableJpaAuditing
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 @AutoConfigureAfter({ GrapheneeCoreConfiguration.class, GrapheneeI18nConfiguration.class, GrapheneeSecurityConfiguration.class, GrapheneeSmsConfiguration.class,
 		GrapheneeDocumentsConfiguration.class })
 @ComponentScan(basePackages = { GrapheneeCoreFlowConfiguration.COMPONENT_SCAN_BASE_PACKAGE })

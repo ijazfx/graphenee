@@ -49,6 +49,8 @@ public class DashboardUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends GxAuthenticatedUser> T getLoggedInUser() {
+		if(VaadinSession.getCurrent() == null)
+			return null;
 		return (T) VaadinSession.getCurrent().getAttribute(GxAuthenticatedUser.class);
 	}
 

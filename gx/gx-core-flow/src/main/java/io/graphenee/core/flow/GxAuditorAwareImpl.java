@@ -10,10 +10,7 @@ public class GxAuditorAwareImpl implements AuditorAware<String> {
 
     @Override
     public Optional<String> getCurrentAuditor() {
-        if(DashboardUtils.getLoggedInUser() != null) {
-            return Optional.of(DashboardUtils.getLoggedInUsername());
-        }
-        return Optional.of("system");
+        return Optional.ofNullable(DashboardUtils.getLoggedInUsername());
     }
     
 }
