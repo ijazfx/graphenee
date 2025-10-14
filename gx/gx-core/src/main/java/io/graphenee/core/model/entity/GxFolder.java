@@ -1,8 +1,8 @@
 package io.graphenee.core.model.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,7 +63,7 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();
-		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
+		log.setAuditDate(LocalDateTime.now());
 		log.setAuditEvent(event);
 		log.setUserAccount(user);
 		auditLogs.add(log);
@@ -140,12 +140,12 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 	}
 
 	@Override
-	public Timestamp getIssueDate() {
+	public LocalDate getIssueDate() {
 		return null;
 	}
 
 	@Override
-	public Date getExpiryDate() {
+	public LocalDate getExpiryDate() {
 		return null;
 	}
 
@@ -155,16 +155,16 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 	}
 
 	@Override
-	public Date getReminderDate() {
+	public LocalDate getReminderDate() {
 		return null;
 	}
 
 	@Override
-	public void setIssueDate(Date issueDate) {
+	public void setIssueDate(LocalDate issueDate) {
 	}
 
 	@Override
-	public void setExpiryDate(Date expiryDate) {
+	public void setExpiryDate(LocalDate expiryDate) {
 	}
 
 	@Override

@@ -16,6 +16,7 @@
 package io.graphenee.core.impl;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -213,6 +214,51 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public void access(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
+			throws GxPermissionException {
+		if (canAccessResource(namespace, accessKey, resourceName, timeStamp)) {
+			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
+		} else {
+			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), false);
+			throw new GxPermissionException("Access denied");
+		}
+	}
+
+	@Override
+	public void checkIn(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
+			throws GxPermissionException {
+		if (canAccessResource(namespace, accessKey, resourceName, timeStamp)) {
+			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
+		} else {
+			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), false);
+			throw new GxPermissionException("Check-in denied");
+		}
+	}
+
+	@Override
+	public void checkOut(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
+			throws GxPermissionException {
+		if (canAccessResource(namespace, accessKey, resourceName, timeStamp)) {
+			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
+		} else {
+			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), false);
+			throw new GxPermissionException("Check-out denied");
+		}
+	}
+
+	@Override
+	public boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName,
+			LocalDateTime timeStamp)
+			throws GxPermissionException {
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		GxAccessKey key = findAccessKey(accessKeyUuid);
+		GxResource resource = findResourceByResourceNameAndNamespace(resourceName, namespace);
+		if (resource == null)
+			throw new GxPermissionException("Rescource not found.");
+		return key.canDoAction(resourceName, "access", null);
+	}
+
+	@Override
 	public GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent,
 			GxUserAccount userAccount) {
 		return auditEntityEventByUserWithAdditionalData(auditEntity, oidAuditEntity, auditEvent, userAccount, null);
@@ -222,7 +268,7 @@ public class GxDataServiceImpl implements GxDataService {
 	public GxAuditLog auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity,
 			String auditEvent, GxUserAccount userAccount, byte[] additionalData) {
 		GxAuditLog entity = new GxAuditLog();
-		entity.setAuditDate(new Timestamp(System.currentTimeMillis()));
+		entity.setAuditDate(LocalDateTime.now());
 		entity.setAuditEntity(auditEntity);
 		entity.setAuditEvent(auditEvent);
 		entity.setOidAuditEntity(oidAuditEntity);
@@ -1084,6 +1130,19 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp,
+			Integer accessType, Boolean isSuccess) {
+		GxAccessLog accessLog = new GxAccessLog();
+		accessLog.setIsSuccess(isSuccess);
+		accessLog.setAccessTime(timeStamp.toLocalDateTime());
+		UUID accessKeyUuid = UUID.fromString(accessKey);
+		accessLog.setAccessKey(accessKeyRepo.findByAccessKey(accessKeyUuid));
+		accessLog.setResource(resourceRepo.findOneByResourceNameAndNamespaceAndIsActiveTrue(resourceName, namespace));
+		accessLog.setAccessType(accessType);
+		accessLogRepo.save(accessLog);
+	}
+
+	@Override
+	public void log(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp,
 			Integer accessType, Boolean isSuccess) {
 		GxAccessLog accessLog = new GxAccessLog();
 		accessLog.setIsSuccess(isSuccess);

@@ -43,7 +43,7 @@ public class GxAuditLogList extends GxAbstractEntityLazyList<GxAuditLog> {
 
     @Override
     protected String[] visibleProperties() {
-        return new String[] { "timestamp", "username", "remoteAddress", "auditEvent", "detail", "auditEntity",
+        return new String[] { "auditDate", "username", "remoteAddress", "auditEvent", "detail", "auditEntity",
                 "oidAuditEntity" };
     }
 

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
@@ -31,7 +31,7 @@ import lombok.Setter;
 @Table(name = "gx_audit_log")
 public class GxAuditLog extends GxMappedSuperclass {
 
-	private Timestamp auditDate;
+	private LocalDateTime auditDate;
 	private String auditEntity;
 	private String auditEvent;
 	private Integer oidAuditEntity;
@@ -49,14 +49,6 @@ public class GxAuditLog extends GxMappedSuperclass {
 			username = userAccount.getUsername();
 		}
 		return username;
-	}
-
-	public Timestamp getTimestamp() {
-		return auditDate;
-	}
-
-	public void setTimestamp(Timestamp timestamp) {
-		this.auditDate = timestamp;
 	}
 
 }

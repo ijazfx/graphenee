@@ -16,6 +16,7 @@
 package io.graphenee.core;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -319,6 +320,9 @@ public interface GxDataService {
 
 	void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType,
 			Boolean isSuccess);
+	
+	void log(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp, Integer accessType,
+			Boolean isSuccess);
 
 	void markAsPrimary(GxSmsProvider entity);
 
@@ -379,6 +383,18 @@ public interface GxDataService {
 			throws GxPermissionException;
 
 	boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException;
+	
+	void access(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
+			throws GxPermissionException;
+
+	void checkIn(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
+			throws GxPermissionException;
+
+	void checkOut(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
+			throws GxPermissionException;
+
+	boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, LocalDateTime timeStamp)
 			throws GxPermissionException;
 
 	List<GxAccessKey> findAccessKeyByUserAccount(GxUserAccount user);

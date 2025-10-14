@@ -1,8 +1,8 @@
 package io.graphenee.core.model.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
-import io.graphenee.util.TRCalendarUtil;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -45,8 +44,8 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 
 	Integer sortOrder = 0;
 	Integer expiryReminderInDays = 30;
-	Date issueDate;
-	Date expiryDate;
+	LocalDate issueDate;
+	LocalDate expiryDate;
 
 	@Convert(converter = GxStringToJsonConverter.class)
 	JSONObject tags;
@@ -76,7 +75,7 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();
-		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
+		log.setAuditDate(LocalDateTime.now());
 		log.setAuditEvent(event);
 		log.setUserAccount(user);
 		auditLogs.add(log);
@@ -133,9 +132,9 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 				: expiryReminderInDays;
 	}
 
-	public Timestamp getReminderDate() {
+	public LocalDate getReminderDate() {
 		if (expiryDate != null) {
-			return new Timestamp(TRCalendarUtil.minusDaysToDate(expiryDate, getExpiryReminderInDays()).getTime());
+			return expiryDate.minusDays(getExpiryReminderInDays());
 		}
 		return null;
 	}

@@ -1,6 +1,7 @@
 package io.graphenee.security.impl;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,7 +24,6 @@ import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.security.GrapheneeSecurityConfiguration;
 import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.util.CryptoUtil;
-import io.graphenee.util.TRCalendarUtil;
 
 @Service
 @ConditionalOnClass(GrapheneeSecurityConfiguration.class)
@@ -244,7 +244,7 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 					GxPasswordHistory passwordHistory = new GxPasswordHistory();
 					passwordHistory.setUserAccount(userAccount);
 					passwordHistory.setHashedPassword(userAccount.getPassword());
-					passwordHistory.setPasswordDate(new Timestamp(System.currentTimeMillis()));
+					passwordHistory.setPasswordDate(LocalDate.now());
 					passwordHistoryRepo.save(passwordHistory);
 				}
 			}
@@ -272,13 +272,13 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			return false;
 
 		List<GxPasswordHistory> passwordHistoryList = passwordHistoryRepo.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
-		Timestamp currentTime = TRCalendarUtil.getCurrentTimeStamp();
+		LocalDate currentTime = LocalDate.now();
 		Long diff = 0L;
 		GxPasswordHistory passwordHistory = passwordHistoryList != null && !passwordHistoryList.isEmpty() ? passwordHistoryList.get(0) : null;
 		if (passwordHistory != null && passwordHistory.getPasswordDate() != null) {
-			diff = TRCalendarUtil.daysBetween(passwordHistory.getPasswordDate(), currentTime);
+			diff = ChronoUnit.DAYS.between(passwordHistory.getPasswordDate(), currentTime);
 		} else if (userAccount.getAccountActivationDate() != null) {
-			diff = TRCalendarUtil.daysBetween(userAccount.getAccountActivationDate(), currentTime);
+			diff = ChronoUnit.DAYS.between(userAccount.getAccountActivationDate(), currentTime);
 		}
 		return diff != 0 && diff > passwordPolicy.getMaxAge();
 

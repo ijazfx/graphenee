@@ -1,12 +1,15 @@
 package io.graphenee.core.flow.documents;
 
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import io.graphenee.core.model.entity.GxFileTag;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -15,13 +18,9 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxFileTag;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
-import io.graphenee.vaadin.flow.data.TimestampToDateConverter;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -86,9 +85,9 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 	@Override
 	protected void bindFields(Binder<GxDocumentExplorerItem> dataBinder) {
 		dataBinder.forMemberField(name).asRequired();
-		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateConverter());
-		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateConverter());
-		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(issueDate); //.withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(expiryDate); //.withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(reminderDate); //.withConverter(new TimestampToDateConverter());
 	}
 
 	@Override

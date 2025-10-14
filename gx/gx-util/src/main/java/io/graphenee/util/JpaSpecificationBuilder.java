@@ -1,8 +1,15 @@
 package io.graphenee.util;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -358,6 +365,56 @@ public class JpaSpecificationBuilder<T> {
 	}
 
 	/**
+	 * Adds a between operator to the specification.
+	 * @param key The key.
+	 * @param value1 The first value.
+	 * @param value2 The second value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> between(String key, LocalDateTime value1, LocalDateTime value2) {
+		if (value1 == null || value2 == null)
+			return this;
+		Specification<T> spec = (root, cq, cb) -> {
+			if (key.contains(".")) {
+				String[] parts = key.split("\\.");
+				Join<Object, Object> join = root.join(parts[0]);
+				for (int i = 1; i < parts.length - 1; i++) {
+					join = join.join(parts[i]);
+				}
+				return cb.between(join.get(parts[parts.length - 1]), value1, value2);
+			}
+			return cb.between(root.get(key), value1, value2);
+		};
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
+	 * Adds a between operator to the specification.
+	 * @param key The key.
+	 * @param value1 The first value.
+	 * @param value2 The second value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> between(String key, LocalDate value1, LocalDate value2) {
+		if (value1 == null || value2 == null)
+			return this;
+		Specification<T> spec = (root, cq, cb) -> {
+			if (key.contains(".")) {
+				String[] parts = key.split("\\.");
+				Join<Object, Object> join = root.join(parts[0]);
+				for (int i = 1; i < parts.length - 1; i++) {
+					join = join.join(parts[i]);
+				}
+				return cb.between(join.get(parts[parts.length - 1]), value1, value2);
+			}
+			return cb.between(root.get(key), value1, value2);
+		};
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
 	 * Adds a before operator to the specification.
 	 * @param key The key.
 	 * @param value The value.
@@ -367,6 +424,56 @@ public class JpaSpecificationBuilder<T> {
 		if (value == null)
 			return this;
 		Timestamp fromValue = new Timestamp(0);
+		Specification<T> spec = (root, cq, cb) -> {
+			if (key.contains(".")) {
+				String[] parts = key.split("\\.");
+				Join<Object, Object> join = root.join(parts[0]);
+				for (int i = 1; i < parts.length - 1; i++) {
+					join = join.join(parts[i]);
+				}
+				return cb.between(join.get(parts[parts.length - 1]), fromValue, value);
+			}
+			return cb.between(root.get(key), fromValue, value);
+		};
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
+	 * Adds a before operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> before(String key, LocalDateTime value) {
+		if (value == null)
+			return this;
+		LocalDateTime fromValue = LocalDateTime.MIN;
+		Specification<T> spec = (root, cq, cb) -> {
+			if (key.contains(".")) {
+				String[] parts = key.split("\\.");
+				Join<Object, Object> join = root.join(parts[0]);
+				for (int i = 1; i < parts.length - 1; i++) {
+					join = join.join(parts[i]);
+				}
+				return cb.between(join.get(parts[parts.length - 1]), fromValue, value);
+			}
+			return cb.between(root.get(key), fromValue, value);
+		};
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
+	 * Adds a before operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> before(String key, LocalDate value) {
+		if (value == null)
+			return this;
+		LocalDate fromValue = LocalDate.MIN;
 		Specification<T> spec = (root, cq, cb) -> {
 			if (key.contains(".")) {
 				String[] parts = key.split("\\.");
@@ -399,6 +506,22 @@ public class JpaSpecificationBuilder<T> {
 	}
 
 	/**
+	 * Adds a day operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> day(String key, LocalDate value) {
+		if (value == null)
+			return this;
+		LocalDateTime startOfDay = value.atStartOfDay();
+		LocalDateTime endOfDay = value.atTime(LocalTime.MAX);
+		Specification<T> spec = between(key, startOfDay, endOfDay).build();
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
 	 * Adds an after operator to the specification.
 	 * @param key The key.
 	 * @param value The value.
@@ -408,6 +531,56 @@ public class JpaSpecificationBuilder<T> {
 		if (value == null)
 			return this;
 		Timestamp toValue = Timestamp.valueOf(LocalDateTime.now().plusYears(1000));
+		Specification<T> spec = (root, cq, cb) -> {
+			if (key.contains(".")) {
+				String[] parts = key.split("\\.");
+				Join<Object, Object> join = root.join(parts[0]);
+				for (int i = 1; i < parts.length - 1; i++) {
+					join = join.join(parts[i]);
+				}
+				return cb.between(join.get(parts[parts.length - 1]), value, toValue);
+			}
+			return cb.between(root.get(key), value, toValue);
+		};
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
+	 * Adds an after operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> after(String key, LocalDateTime value) {
+		if (value == null)
+			return this;
+		LocalDateTime toValue = LocalDateTime.MAX;
+		Specification<T> spec = (root, cq, cb) -> {
+			if (key.contains(".")) {
+				String[] parts = key.split("\\.");
+				Join<Object, Object> join = root.join(parts[0]);
+				for (int i = 1; i < parts.length - 1; i++) {
+					join = join.join(parts[i]);
+				}
+				return cb.between(join.get(parts[parts.length - 1]), value, toValue);
+			}
+			return cb.between(root.get(key), value, toValue);
+		};
+		specsQueue.add(spec);
+		return this;
+	}
+
+	/**
+	 * Adds an after operator to the specification.
+	 * @param key The key.
+	 * @param value The value.
+	 * @return This instance.
+	 */
+	public JpaSpecificationBuilder<T> after(String key, LocalDate value) {
+		if (value == null)
+			return this;
+		LocalDate toValue = LocalDateTime.MAX.toLocalDate();
 		Specification<T> spec = (root, cq, cb) -> {
 			if (key.contains(".")) {
 				String[] parts = key.split("\\.");

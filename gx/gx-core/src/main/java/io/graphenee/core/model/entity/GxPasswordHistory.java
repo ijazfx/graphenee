@@ -1,6 +1,6 @@
 package io.graphenee.core.model.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
@@ -17,7 +17,7 @@ import lombok.Setter;
 public class GxPasswordHistory extends GxMappedSuperclass {
 
 	private String hashedPassword;
-	private Timestamp passwordDate;
+	private LocalDate passwordDate;
 
 	@ManyToOne
 	@JoinColumn(name = "oid_user_account")

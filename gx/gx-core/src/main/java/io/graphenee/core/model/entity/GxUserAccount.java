@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,7 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Table(name = "gx_user_account")
 public class GxUserAccount extends GxMappedSuperclass {
 
-	private Timestamp accountActivationDate;
+	private LocalDateTime accountActivationDate;
 	private Integer countLoginFailed = 0;
 	private String email;
 	private String firstName;
@@ -60,15 +60,15 @@ public class GxUserAccount extends GxMappedSuperclass {
 	private Boolean isLocked = false;
 	private Boolean isPasswordChangeRequired = false;
 	private Boolean isProtected = false;
-	private Timestamp lastLoginDate;
-	private Timestamp lastLoginFailedDate;
+	private LocalDateTime lastLoginDate;
+	private LocalDateTime lastLoginFailedDate;
 	private String lastName;
 	private String password;
 	private byte[] profileImage;
 	private String username;
 	private String verificationToken;
 	private String preferences = "{}";
-	private Timestamp verificationTokenExpiryDate;
+	private LocalDateTime verificationTokenExpiryDate;
 
 	@Transient
 	private String newPassword;

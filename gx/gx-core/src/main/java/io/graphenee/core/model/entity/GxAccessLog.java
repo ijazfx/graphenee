@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
@@ -39,7 +39,7 @@ public class GxAccessLog extends GxMappedSuperclass {
 	@JoinColumn(name = "oid_resource")
 	private GxResource resource;
 
-	private Timestamp accessTime;
+	private LocalDateTime accessTime;
 	private Boolean isSuccess;
 	private Integer accessType;
 

@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -71,6 +73,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.component.timepicker.TimePicker.TimePickerI18n;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.Binder;
@@ -484,8 +488,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 						}
 
 						if (isGridInlineEditingEnabled()) {
-							if (!propertyName.matches("(dateCreated|createdBy|dateModified|modifiedBy)")) // skip auditing columns
+							if (!propertyName.matches("(dateCreated|createdBy|dateModified|modifiedBy)")) {
 								addInlineEditColumn(column, propertyDefinition);
+							}
 						}
 
 						decorateColumn(propertyName, column);
@@ -823,6 +828,15 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 					c = createDateTimePicker();
 				}
 			}
+			if (c == null && propertyDefinition.getType().equals(LocalDateTime.class)) {
+				c = createLocalDateTimePicker();
+			}
+			if (c == null && propertyDefinition.getType().equals(LocalDate.class)) {
+				c = createLocalDatePicker();
+			}
+			if (c == null && propertyDefinition.getType().equals(LocalTime.class)) {
+				c = createLocalTimePicker();
+			}
 			if (c == null && propertyDefinition.getType().equals(Timestamp.class)) {
 				c = createDateTimePicker();
 			}
@@ -859,6 +873,22 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 		return c;
 	}
 
+	protected DateTimePicker createLocalDateTimePicker() {
+		DateTimePicker p = new DateTimePicker();
+		DatePickerI18n i = new DatePickerI18n();
+		i.setDateFormat(TRCalendarUtil.getCustomDateTimeFormatter().toPattern());
+		p.setDatePickerI18n(i);
+		return p;
+	}
+
+	protected DatePicker createLocalDatePicker() {
+		DatePicker p = new DatePicker();
+		DatePickerI18n i = new DatePickerI18n();
+		i.setDateFormat(TRCalendarUtil.getCustomDateTimeFormatter().toPattern());
+		p.setI18n(i);
+		return p;
+	}
+
 	protected DateTimePicker createDateTimePicker() {
 		DateTimePicker p = new DateTimePicker();
 		DatePickerI18n i = new DatePickerI18n();
@@ -871,6 +901,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 		DatePicker p = new DatePicker();
 		DatePickerI18n i = new DatePickerI18n();
 		i.setDateFormat(TRCalendarUtil.getCustomDateFormatter().toPattern());
+		p.setI18n(i);
+		return p;
+	}
+
+	protected TimePicker createLocalTimePicker() {
+		TimePicker p = new TimePicker();
+		TimePickerI18n i = new TimePickerI18n();
 		p.setI18n(i);
 		return p;
 	}
@@ -1161,35 +1198,37 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 	private AbstractField<?, ?> defaultColumnFilterForProperty(String propertyName,
 			PropertyDefinition<T, Object> propertyDefinition) {
 		AbstractField<?, ?> filter = null;
-		if (propertyName.matches("dateTime.*|.*DateTime")) {
+		if (propertyDefinition.getType().equals(LocalDateTime.class)) {
+			filter = createLocalDateTimePicker();
+		} else if (propertyDefinition.getType().equals(LocalDate.class)) {
+			filter = createLocalDatePicker();
+		} else if (propertyDefinition.getType().equals(LocalTime.class)) {
+			filter = createLocalTimePicker();
+		} else if (propertyName.matches("dateTime.*|.*DateTime")) {
 			if (propertyDefinition.getType().equals(Long.class)) {
 				filter = createDateTimePicker();
 			}
-		}
-		if (filter == null && propertyName.matches("date.*|.*Date")) {
+		} else if (filter == null && propertyName.matches("date.*|.*Date")) {
 			if (propertyDefinition.getType().equals(Long.class)) {
 				filter = createDatePicker();
 			} else if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
 				filter = createDatePicker();
 			}
-		}
-		if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
+		} else if (filter == null && propertyDefinition.getType().equals(Timestamp.class)) {
 			filter = createDateTimePicker();
-		}
-		if (filter == null && propertyDefinition.getType().equals(Date.class)) {
+		} else if (filter == null && propertyDefinition.getType().equals(Date.class)) {
 			filter = createDatePicker();
-		}
-		if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
+		} else if (filter == null && propertyDefinition.getType().equals(Boolean.class)) {
 			ComboBox<Boolean> booleanComboBox = new ComboBox<Boolean>();
 			booleanComboBox.setItems(true, false);
 			booleanComboBox.setItemLabelGenerator(v -> {
 				return v == null ? "" : v == true ? "Checked" : "Unchecked";
 			});
 			filter = booleanComboBox;
-		}
-		if (filter == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
+		} else if (filter == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
 			filter = new NumberField();
 		}
+
 		if (filter == null) {
 			filter = new TextField();
 		}
@@ -1471,10 +1510,10 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 		entityGrid().deselectAll();
 		crudMenuBar.setVisible(isEditable());
 		availablePropertySet().forEach(p -> {
-			dataGrid.getColumnByKey(p).setVisible(false);
+			Optional.ofNullable(dataGrid.getColumnByKey(p)).ifPresent(c -> c.setVisible(false));
 		});
 		preferencePropertySet().forEach(p -> {
-			dataGrid.getColumnByKey(p).setVisible(true);
+			Optional.ofNullable(dataGrid.getColumnByKey(p)).ifPresent(c -> c.setVisible(true));
 		});
 		dataGrid.getColumns().stream().filter(c -> c.getKey() != null && c.getKey().equals("__editColumn"))
 				.forEach(c -> c.setVisible(isEditable()));

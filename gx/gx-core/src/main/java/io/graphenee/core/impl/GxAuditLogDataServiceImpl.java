@@ -1,6 +1,7 @@
 package io.graphenee.core.impl;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.repository.GxAuditLogRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.util.JpaSpecificationBuilder;
-import io.graphenee.util.TRCalendarUtil;
 
 @Service
 @DependsOn({ "flyway", "flywayInitializer" })
@@ -40,7 +40,7 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 	public GxAuditLog log(String username, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity) {
 		GxAuditLog l = new GxAuditLog();
 		l.setRemoteAddress(remoteAddress);
-		l.setAuditDate(TRCalendarUtil.getCurrentTimeStamp());
+		l.setAuditDate(LocalDateTime.now());
 		l.setUsername(username);
 		l.setAuditEvent(auditEvent);
 		l.setDetail(detail);
@@ -59,7 +59,7 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 	public GxAuditLog log(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity) {
 		GxAuditLog l = new GxAuditLog();
 		l.setRemoteAddress(remoteAddress);
-		l.setAuditDate(TRCalendarUtil.getCurrentTimeStamp());
+		l.setAuditDate(LocalDateTime.now());
 		l.setUsername(user.getUsername());
 		l.setAuditEvent(auditEvent);
 		l.setDetail(detail);
@@ -78,7 +78,7 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 	public GxAuditLog log(GxUserAccount user, String remoteAddress, String auditEvent, String detail, String auditEntity, Integer oidAuditEntity) {
 		GxAuditLog l = new GxAuditLog();
 		l.setRemoteAddress(remoteAddress);
-		l.setAuditDate(TRCalendarUtil.getCurrentTimeStamp());
+		l.setAuditDate(LocalDateTime.now());
 		l.setUsername(user.getUsername());
 		l.setUserAccount(user);
 		l.setAuditEvent(auditEvent);
@@ -110,8 +110,8 @@ public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 			sb.eq("oidAuditEntity", se.getOidAuditEntity());
 		}
 		if (se.getAuditDate() != null) {
-			Timestamp start = TRCalendarUtil.startOfDayAsTimestamp(se.getAuditDate());
-			Timestamp end = TRCalendarUtil.endOfDayAsTimestamp(start);
+			LocalDateTime start = se.getAuditDate().toLocalDate().atStartOfDay();
+			LocalDateTime end = start.toLocalDate().atTime(LocalTime.MAX);
 			sb.between("auditDate", start, end);
 		}
 		return sb.build();

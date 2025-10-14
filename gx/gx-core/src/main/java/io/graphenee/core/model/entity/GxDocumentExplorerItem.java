@@ -1,10 +1,8 @@
 package io.graphenee.core.model.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-
-import io.graphenee.util.TRCalendarUtil;
 
 public interface GxDocumentExplorerItem {
 
@@ -48,22 +46,22 @@ public interface GxDocumentExplorerItem {
 
 	Integer getSortOrder();
 
-	Date getIssueDate();
+	LocalDate getIssueDate();
 
-	Date getExpiryDate();
+	LocalDate getExpiryDate();
 
 	Integer getExpiryReminderInDays();
 
-	default Date getReminderDate() {
+	default LocalDate getReminderDate() {
 		if(getExpiryDate() != null && getExpiryReminderInDays() != null) {
-			return TRCalendarUtil.minusDaysToDate(getExpiryDate(), getExpiryReminderInDays());
+			return getExpiryDate().minusDays(getExpiryReminderInDays());
 		}
 		return null;
 	}
 
-	void setIssueDate(Date issueDate);
+	void setIssueDate(LocalDate issueDate);
 
-	void setExpiryDate(Date expiryDate);
+	void setExpiryDate(LocalDate expiryDate);
 
 	void setExpiryReminderInDays(Integer expiryReminderInDays);
 
