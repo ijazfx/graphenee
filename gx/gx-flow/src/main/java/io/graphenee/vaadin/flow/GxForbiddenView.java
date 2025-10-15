@@ -25,7 +25,6 @@ public class GxForbiddenView extends VerticalLayout implements HasErrorParameter
 		return HttpServletResponse.SC_FORBIDDEN;
 	}
 
-	@SuppressWarnings("serial")
 	public static class ForbiddenException extends RuntimeException {
 
 	}

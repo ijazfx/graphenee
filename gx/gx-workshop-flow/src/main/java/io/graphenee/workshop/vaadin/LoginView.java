@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
-import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 
 import io.graphenee.common.GxAuthenticatedUser;
@@ -19,7 +18,6 @@ import io.graphenee.vaadin.flow.GxAbstractLoginView;
 
 @Route(value = "login")
 @Scope("prototype")
-@PreserveOnRefresh
 public class LoginView extends GxAbstractLoginView {
 
     private static final long serialVersionUID = 1L;

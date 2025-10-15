@@ -12,7 +12,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.flow.GxCoreMenuItemFactory;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
 import io.graphenee.vaadin.flow.GxMenuItem;
-import io.graphenee.vaadin.flow.utils.GxTranslationUtils;
 
 @SpringComponent
 @Scope("prototype")
@@ -36,7 +35,7 @@ public class FlowSetup extends GxAbstractFlowSetup {
 
     @Override
     public String appTitle() {
-        return GxTranslationUtils.getTranslation("Graphenee");
+        return "Graphenee";
     }
 
     @Override

@@ -18,7 +18,6 @@ package io.graphenee.util.storage;
 /**
  * An exception that is thrown when a resolve fails.
  */
-@SuppressWarnings("serial")
 public class ResolveFailedException extends Exception {
 
 	/**

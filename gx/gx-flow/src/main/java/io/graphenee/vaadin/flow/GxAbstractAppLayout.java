@@ -48,29 +48,24 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 	@Setter
 	private GxAbstractAppLayoutDelegate delegate;
 
-	private Span title = new Span();
-
-	private Span version = new Span();
-
-	private SideNav drawer = new SideNav();
-
 	@PostConstruct
 	private void postBuild() {
 		DrawerToggle toggle = new DrawerToggle();
 		toggle.addClassName("gx-app-layout-toggle");
 		// toggle.getStyle().set("color", "var(--lumo-base-color)");
-
+		Span title = new Span(getTranslation(flowSetup().appTitle()));
 		title.addClassName("gx-app-layout-title");
 		// title.getStyle().set("font-size", "var(--lumo-font-size-xl)").set("margin",
 		// "0");
 		// title.getStyle().set("color", "var(--lumo-base-color)");
 		// title.setWidthFull();
-
+		Span version = new Span(flowSetup().appVersion());
 		version.addClassName("gx-app-layout-version");
 		// version.getStyle().set("font-size", "var(--lumo-font-size-xs)").set("margin",
 		// "0");
 		// version.getStyle().set("color", "var(--lumo-base-color)");
 
+		SideNav drawer = new SideNav();
 		drawer.addClassName("gx-app-layout-drawer");
 		drawer.setWidthFull();
 
@@ -131,7 +126,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 			Span space = new Span("");
 			space.setWidth("12px");
 
-			Button logout = new Button("Logout");
+			Button logout = new Button(getTranslation("Logout"));
 			logout.addClassName("gx-app-layout-logout");
 			logout.getStyle().set("font-size", "var(--lumo-font-size-m)").set("margin", "0");
 			logout.getStyle().set("color", "var(--lumo-base-color)");
@@ -156,6 +151,8 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 				avatar.addClassName("gx-avatar-large");
 				drawerLayout.addComponentAsFirst(avatar);
 			}
+
+			generateMenuItems(drawer, flowSetup().loggedInUser());
 
 			navbarLayout.add(logout);
 		}
@@ -329,18 +326,15 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 
 	@Override
 	public void localeChange(LocaleChangeEvent event) {
-		String lang = event.getLocale().getLanguage().split("_")[0];
-		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
-		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
-		event.getUI().access(() -> {
-			localizeUI(event.getUI());
-		});
-	}
-
-	protected void localizeUI(UI ui) {
-		title.setText(flowSetup().appTitle());
-		version.setText(flowSetup().appVersion());
-		generateMenuItems(drawer, flowSetup().loggedInUser());
+		if (VaadinSession.getCurrent().getAttribute("localeReloaded") == null) {
+			VaadinSession.getCurrent().setAttribute("localeReloaded", true);
+			event.getUI().refreshCurrentRoute(true);
+		} else {
+			VaadinSession.getCurrent().setAttribute("localeReloaded", null);
+			String lang = event.getLocale().getLanguage().split("_")[0];
+			boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
+			event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
+		}
 	}
 
 }

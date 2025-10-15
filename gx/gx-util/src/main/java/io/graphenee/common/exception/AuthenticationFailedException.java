@@ -18,7 +18,6 @@ package io.graphenee.common.exception;
 /**
  * An exception that is thrown when authentication fails.
  */
-@SuppressWarnings("serial")
 public class AuthenticationFailedException extends Exception {
 
 	/**

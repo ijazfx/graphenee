@@ -12,7 +12,6 @@ import io.graphenee.core.model.entity.GxNamespaceProperty;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxNamespacePropertyList extends GxAbstractEntityList<GxNamespaceProperty> {

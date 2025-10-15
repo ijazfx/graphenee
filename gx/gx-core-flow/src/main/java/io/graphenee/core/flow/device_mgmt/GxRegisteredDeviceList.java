@@ -23,7 +23,6 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegisteredDevice> {

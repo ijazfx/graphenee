@@ -14,7 +14,6 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 /**
  * A form for selecting an assignee.
  */
-@SuppressWarnings("serial")
 public class GxSelectAssigneeForm extends GxAbstractEntityForm<GxAssigneeHolder> {
 
 	/**

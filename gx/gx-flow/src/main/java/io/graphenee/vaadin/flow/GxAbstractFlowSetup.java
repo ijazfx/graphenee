@@ -7,12 +7,11 @@ import com.vaadin.flow.router.RouterLayout;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
-import io.graphenee.vaadin.flow.utils.GxTranslationUtils;
 
 public abstract class GxAbstractFlowSetup {
 
 	public String appTitle() {
-		return GxTranslationUtils.getTranslation("Graphenee");
+		return "Graphenee";
 	}
 
 	public String appVersion() {

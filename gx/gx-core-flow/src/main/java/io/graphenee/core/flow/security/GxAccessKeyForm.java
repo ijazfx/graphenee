@@ -11,7 +11,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxAccessKey;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxAccessKeyForm extends GxAbstractEntityForm<GxAccessKey> {

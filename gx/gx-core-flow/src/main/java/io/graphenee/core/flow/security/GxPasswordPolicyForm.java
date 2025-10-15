@@ -14,7 +14,6 @@ import io.graphenee.core.model.entity.GxPasswordPolicy;
 import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxPasswordPolicyForm extends GxAbstractEntityForm<GxPasswordPolicy> {

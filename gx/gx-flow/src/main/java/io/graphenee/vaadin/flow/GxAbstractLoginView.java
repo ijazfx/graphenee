@@ -74,6 +74,16 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 		loginForm.addClassName("gx-login-form");
 		loginForm.setForgotPasswordButtonVisible(true);
 
+		appTitle.setText(getTranslation(appTitle()));
+		appVersion.setText(getTranslation(appVersion()));
+		LoginI18n loginI18n = LoginI18n.createDefault();
+		loginI18n.getForm().setSubmit(getTranslation("Login"));
+		loginI18n.getForm().setTitle(getTranslation("Enter Credentials")); // "");
+		loginI18n.getForm().setForgotPassword(getTranslation("Forgot Password? Click here!"));
+		loginI18n.getForm().setUsername(getTranslation("Username or Email"));
+		loginI18n.getForm().setPassword(getTranslation("Password"));
+		loginForm.setI18n(loginI18n);
+
 		loginForm.addLoginListener(e -> {
 			try {
 				GxAuthenticatedUser user = onLogin(e);
@@ -158,24 +168,15 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 
 	@Override
 	public void localeChange(LocaleChangeEvent event) {
-		String lang = event.getLocale().getLanguage().split("_")[0];
-		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
-		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
-		event.getUI().access(() -> {
-			localizeUI(event.getUI());
-		});
-	}
-
-	protected void localizeUI(UI ui) {
-		appTitle.setText(flowSetup().appTitle());
-		appVersion.setText(flowSetup().appVersion());
-		LoginI18n loginI18n = LoginI18n.createDefault();
-		loginI18n.getForm().setSubmit(getTranslation("Login"));
-		loginI18n.getForm().setTitle(getTranslation("Enter Credentials")); // "");
-		loginI18n.getForm().setForgotPassword(getTranslation("Forgot Password? Click here!"));
-		loginI18n.getForm().setUsername(getTranslation("Username or Email"));
-		loginI18n.getForm().setPassword(getTranslation("Password"));
-		loginForm.setI18n(loginI18n);
+		if (VaadinSession.getCurrent().getAttribute("localeReloaded") == null) {
+			VaadinSession.getCurrent().setAttribute("localeReloaded", true);
+			event.getUI().refreshCurrentRoute(true);
+		} else {
+			VaadinSession.getCurrent().setAttribute("localeReloaded", null);
+			String lang = event.getLocale().getLanguage().split("_")[0];
+			boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
+			event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
+		}
 	}
 
 }

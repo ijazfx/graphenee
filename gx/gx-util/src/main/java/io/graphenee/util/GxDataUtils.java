@@ -35,8 +35,6 @@ public class GxDataUtils {
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			L.warn(e.getMessage());
 		}
-
-		// TODO:Copy faults and collection faults.
 	}
 
 }

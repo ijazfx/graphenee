@@ -16,7 +16,6 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxEmailTemplateList extends GxAbstractEntityLazyList<GxEmailTemplate> {

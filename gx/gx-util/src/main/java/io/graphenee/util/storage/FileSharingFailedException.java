@@ -18,7 +18,6 @@ package io.graphenee.util.storage;
 /**
  * An exception that is thrown when a save fails.
  */
-@SuppressWarnings("serial")
 public class FileSharingFailedException extends Exception {
 
 	/**

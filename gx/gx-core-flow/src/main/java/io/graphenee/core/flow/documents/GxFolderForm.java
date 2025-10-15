@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {

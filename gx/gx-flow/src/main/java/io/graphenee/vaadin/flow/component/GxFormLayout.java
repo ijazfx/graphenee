@@ -11,7 +11,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap;
 
-@SuppressWarnings("serial")
 public class GxFormLayout extends FormLayout {
 
 	private Map<String, FlexLayout> groupedMap = new ConcurrentHashMap<>();

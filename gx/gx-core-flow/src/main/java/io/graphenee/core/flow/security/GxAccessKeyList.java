@@ -16,7 +16,6 @@ import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxAccessKeyList extends GxAbstractEntityList<GxAccessKey> {

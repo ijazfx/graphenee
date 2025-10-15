@@ -35,7 +35,6 @@ public class GxComboBoxSearchForm<T> extends VerticalLayout {
 		addClassName("gx-entity-form");
 	}
 
-	@SuppressWarnings("serial")
 	public GxComboBoxSearchForm<T> build() {
 		removeAll();
 		if (searchGrid != null) {

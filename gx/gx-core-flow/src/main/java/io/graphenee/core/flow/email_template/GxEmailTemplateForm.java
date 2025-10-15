@@ -17,7 +17,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
-@SuppressWarnings("serial")
 @Scope("prototype")
 @SpringComponent
 public class GxEmailTemplateForm extends GxAbstractEntityForm<GxEmailTemplate> {

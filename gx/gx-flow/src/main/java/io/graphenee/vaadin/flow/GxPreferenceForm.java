@@ -14,7 +14,6 @@ import io.graphenee.vaadin.flow.model.ColumnPreferences;
 import io.graphenee.vaadin.flow.model.GridPreferences;
 import io.graphenee.vaadin.flow.model.GxPreferences;
 
-@SuppressWarnings("serial")
 public class GxPreferenceForm<T> extends GxAbstractEntityForm<GxPreferences> {
 
 	private HasComponents entityForm;

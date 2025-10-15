@@ -44,6 +44,7 @@ import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import io.graphenee.vaadin.flow.event.TRDelayClickListener;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
+import io.graphenee.vaadin.flow.utils.GxTranslationUtils;
 import io.graphenee.vaadin.flow.utils.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -510,6 +511,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		if (Strings.isNullOrEmpty(formTitle)) {
 			formTitle = StringUtils.toTitleCase(entityClass.getSimpleName()).replaceFirst("Gx", "");
 		}
+		formTitle = getTranslation(formTitle);
 		if (formTitle.length() > 50) {
 			formTitleLabel.setText(formTitle.substring(0, 47) + "...");
 			formTitleLabel.setTitle(formTitle);
@@ -522,6 +524,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 		}
 		saveButton.setVisible(isEditable());
 		resetButton.setVisible(isEditable());
+		GxTranslationUtils.localizeRecursive(this);
 	}
 
 	protected boolean shouldFocusFirstFieldOnShow() {

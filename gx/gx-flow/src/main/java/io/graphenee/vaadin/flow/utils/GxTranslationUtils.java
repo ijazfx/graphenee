@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import com.google.common.base.Strings;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasHelper;
+import com.vaadin.flow.component.HasLabel;
+import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.i18n.I18NProvider;
 import com.vaadin.flow.internal.LocaleUtil;
 import com.vaadin.flow.server.VaadinService;
@@ -68,6 +73,32 @@ public class GxTranslationUtils {
     public static List<Locale> getProvidedLocales() {
         return LocaleUtil.getI18NProvider()
                 .map(i18n -> i18n.getProvidedLocales()).orElse(Collections.emptyList());
+    }
+
+    public static void localizeRecursive(Component c) {
+        if (c instanceof HasText) {
+            HasText x = (HasText) c;
+            if (!Strings.isNullOrEmpty(x.getText())) {
+                x.setText(getTranslation(x.getText()));
+            }
+        }
+        if (c instanceof HasLabel) {
+            HasLabel x = (HasLabel) c;
+            if (!Strings.isNullOrEmpty(x.getLabel())) {
+                x.setLabel(getTranslation(x.getLabel()));
+            }
+        }
+        if (c instanceof HasHelper) {
+            HasHelper x = (HasHelper) c;
+            if (x.getHelperComponent() != null) {
+                localizeRecursive(x.getHelperComponent());
+            } else {
+                if (!Strings.isNullOrEmpty(x.getHelperText())) {
+                    x.setHelperText(getTranslation(x.getHelperText()));
+                }
+            }
+        }
+        c.getChildren().forEach(ch -> localizeRecursive(ch));
     }
 
 }

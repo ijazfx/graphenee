@@ -1,6 +1,5 @@
 package io.graphenee.sms.exception;
 
-@SuppressWarnings("serial")
 public class GxSmsSendException extends Exception {
 	private Integer code;
 

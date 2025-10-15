@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.exception;
 
-@SuppressWarnings("serial")
 public class UnregisterDeviceFailedException extends Exception {
 
 	public UnregisterDeviceFailedException() {

@@ -22,7 +22,6 @@ import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentExplorerItem> {

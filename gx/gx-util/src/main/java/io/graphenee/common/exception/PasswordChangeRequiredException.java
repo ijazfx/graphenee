@@ -18,7 +18,6 @@ package io.graphenee.common.exception;
 /**
  * An exception that is thrown when a password change is required.
  */
-@SuppressWarnings("serial")
 public class PasswordChangeRequiredException extends Exception {
 
 	/**

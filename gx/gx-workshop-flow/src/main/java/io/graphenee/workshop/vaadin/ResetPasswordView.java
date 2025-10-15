@@ -3,7 +3,6 @@ package io.graphenee.workshop.vaadin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 
 import io.graphenee.common.exception.ChangePasswordFailedException;
@@ -16,7 +15,6 @@ import io.graphenee.vaadin.flow.GxAbstractResetPasswordView;
 
 @Route(value = "reset-password")
 @Scope("prototype")
-@PreserveOnRefresh
 public class ResetPasswordView extends GxAbstractResetPasswordView {
 
     private static final long serialVersionUID = 1L;
@@ -46,7 +44,7 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
     protected void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error) {
         try {
             passwordService.changePassword(dataService.systemNamespace(), username,
-            password);
+                    password);
             success.execute();
         } catch (ChangePasswordFailedException e) {
             error.execute(e);

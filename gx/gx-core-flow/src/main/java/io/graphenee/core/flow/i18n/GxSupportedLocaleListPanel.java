@@ -28,7 +28,6 @@ import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxSupportedLocaleListPanel extends GxAbstractEntityList<GxSupportedLocale> {

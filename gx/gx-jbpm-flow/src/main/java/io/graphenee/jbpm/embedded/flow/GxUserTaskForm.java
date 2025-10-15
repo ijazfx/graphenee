@@ -143,7 +143,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					getUserTask().complete(taskData);
 					onPostReject(getEntity());
 					notifyGxTaskActionListeners(GxTaskAction.REJECTED, getUserTask(), getEntity());
-					closeDialog();
+					dismiss();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
 					GxNotification.error(message);
@@ -153,7 +153,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 			@Override
 			public void cancel() {
-				closeDialog();
+				dismiss();
 			}
 
 			@Override
@@ -185,7 +185,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					getUserTask().complete(taskData);
 					onPostApprove(getEntity());
 					notifyGxTaskActionListeners(GxTaskAction.APPROVED, getUserTask(), getEntity());
-					closeDialog();
+					dismiss();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
 					GxNotification.error(message);
@@ -195,7 +195,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 			@Override
 			public void cancel() {
-				closeDialog();
+				dismiss();
 			}
 
 			@Override
@@ -235,8 +235,8 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 									getUserTask().assign(assignee.getUsername());
 									GxUserTaskForm.this.onPostAssign(assignee, getEntity());
 									notifyGxTaskActionListeners(GxTaskAction.ASSIGNED, getUserTask(), getEntity());
-									assigneeForm.closeDialog();
-									closeDialog();
+									assigneeForm.dismiss();
+									dismiss();
 								} catch (GxAssignTaskException ex) {
 									GxNotification.error(ex.getMessage());
 									L.error(ex.getMessage(), ex);
@@ -253,7 +253,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 			@Override
 			public void cancel() {
-				closeDialog();
+				dismiss();
 			}
 
 			@Override
@@ -284,7 +284,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					getUserTask().skip();
 					onPostSkip(getEntity());
 					notifyGxTaskActionListeners(GxTaskAction.SKIPPED, getUserTask(), getEntity());
-					closeDialog();
+					dismiss();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
 					GxNotification.error(message);
@@ -294,7 +294,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 			@Override
 			public void cancel() {
-				closeDialog();
+				dismiss();
 			}
 
 			@Override
@@ -325,7 +325,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 					getUserTask().complete(taskData);
 					onPostComplete(getEntity());
 					notifyGxTaskActionListeners(GxTaskAction.COMPLETED, getUserTask(), getEntity());
-					closeDialog();
+					dismiss();
 				} catch (Exception ex) {
 					String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
 					GxNotification.error(message);
@@ -335,7 +335,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 
 			@Override
 			public void cancel() {
-				closeDialog();
+				dismiss();
 			}
 
 			@Override

@@ -33,7 +33,6 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.GxEventBus;
 
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxSmsProviderListPanel extends GxAbstractEntityList<GxSmsProvider> {

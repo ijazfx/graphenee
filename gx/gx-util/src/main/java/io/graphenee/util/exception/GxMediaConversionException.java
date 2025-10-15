@@ -18,7 +18,6 @@ package io.graphenee.util.exception;
 /**
  * An exception that is thrown when a media conversion fails.
  */
-@SuppressWarnings("serial")
 public class GxMediaConversionException extends Exception {
 
 	/**

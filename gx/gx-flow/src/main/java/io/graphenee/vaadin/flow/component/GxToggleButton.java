@@ -9,7 +9,6 @@ import com.vaadin.flow.shared.Registration;
 
 import io.graphenee.util.callback.TRParamCallback;
 
-@SuppressWarnings("serial")
 public class GxToggleButton extends Button {
 
 	private Component trueStateIcon;

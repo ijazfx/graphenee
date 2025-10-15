@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.security.exception;
 
-@SuppressWarnings("serial")
 public class GxPermissionException extends Exception {
 	public GxPermissionException(Exception e) {
 		super(e);

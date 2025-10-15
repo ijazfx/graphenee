@@ -25,7 +25,6 @@ import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.GxSecuredView;
 import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
-@SuppressWarnings("serial")
 @GxSecuredView(GxTermView.VIEW_NAME)
 @Scope("prototype")
 public class GxTermView extends GxVerticalLayoutView {

@@ -92,8 +92,6 @@ import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.dom.DebouncePhase;
 import com.vaadin.flow.function.ValueProvider;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.util.TRCalendarUtil;
@@ -131,8 +129,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @CssImport(value = "./styles/graphenee.css", themeFor = "vaadin-grid")
-public abstract class GxAbstractEntityList<T> extends FlexLayout
-		implements ImportDataFormDelegate<T>, LocaleChangeObserver {
+public abstract class GxAbstractEntityList<T> extends FlexLayout implements ImportDataFormDelegate<T> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -599,7 +596,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 			dataGrid.setColumnReorderingAllowed(true);
 			dataGrid.addColumnReorderListener(listener -> {
 
-				String orderedColumns = listener.getColumns().stream()
+				listener.getColumns().stream()
 						.filter(c -> !c.getKey().matches("__gx.*Column") && c.isVisible()).map(c -> c.getKey())
 						.collect(Collectors.joining(","));
 			});
@@ -647,7 +644,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 		return entityClass.getDeclaredConstructor().newInstance();
 	}
 
-	@SuppressWarnings("serial")
 	protected void customizeEditContextMenuItem(GridMenuItem<T> editItem) {
 		editItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
 			@Override
@@ -1542,12 +1538,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 	protected final void updateTotalCountFooter(int count) {
 		if (shouldDisplayGridFooter()) {
 			if (count == 0) {
-				totalCountFooterText.setText(getTranslation("No records"));
+				totalCountFooterText.setText("No records");
 			} else if (count == 1) {
-				totalCountFooterText.setText("1 " + getTranslation("record"));
+				totalCountFooterText.setText("1 record");
 			} else {
 				totalCountFooterText
-						.setText(DecimalFormat.getNumberInstance().format(count) + " " + getTranslation("records"));
+						.setText(DecimalFormat.getNumberInstance().format(count) + " records");
 			}
 		}
 	}
@@ -1783,15 +1779,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout
 			dataGrid.removeColumn(column);
 			availablePropertySet().remove(key);
 		}
-	}
-
-	@Override
-	public void localeChange(LocaleChangeEvent event) {
-		localizeUI(event.getUI());
-	}
-
-	protected void localizeUI(UI ui) {
-
 	}
 
 }

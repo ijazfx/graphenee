@@ -18,7 +18,6 @@ package io.graphenee.jbpm.embedded.exception;
 /**
  * An exception that is thrown when a task cannot be completed.
  */
-@SuppressWarnings("serial")
 public class GxCompleteTaskException extends GxTaskException {
 
 	/**

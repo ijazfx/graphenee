@@ -7,16 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Direction;
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.i18n.LocaleChangeEvent;
-import com.vaadin.flow.i18n.LocaleChangeObserver;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -28,8 +24,7 @@ import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.vaadin.flow.GxForbiddenView.ForbiddenException;
 import jakarta.annotation.PostConstruct;
 
-public abstract class GxAbstractLayoutView extends FlexLayout
-		implements BeforeEnterObserver, AfterNavigationObserver, LocaleChangeObserver {
+public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeEnterObserver, AfterNavigationObserver {
 
 	private static final long serialVersionUID = 1L;
 	private Tabs tabs;
@@ -150,20 +145,6 @@ public abstract class GxAbstractLayoutView extends FlexLayout
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-	}
-
-	@Override
-	public void localeChange(LocaleChangeEvent event) {
-		String lang = event.getLocale().getLanguage().split("_")[0];
-		boolean isRtl = "ar, he, fa, ur, ps, sd, ckb, ug, yi".contains(lang);
-		event.getUI().setDirection(isRtl ? Direction.RIGHT_TO_LEFT : Direction.LEFT_TO_RIGHT);
-		event.getUI().access(() -> {
-			localizeUI(event.getUI());
-		});
-	}
-
-	protected void localizeUI(UI ui) {
-		
 	}
 
 }

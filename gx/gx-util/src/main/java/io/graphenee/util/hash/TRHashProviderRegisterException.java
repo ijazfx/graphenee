@@ -20,7 +20,6 @@ package io.graphenee.util.hash;
  *
  * @author ijazfx
  */
-@SuppressWarnings("serial")
 public class TRHashProviderRegisterException extends TRHashProviderException {
 
 	public TRHashProviderRegisterException() {

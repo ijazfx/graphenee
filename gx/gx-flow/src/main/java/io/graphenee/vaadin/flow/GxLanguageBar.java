@@ -34,6 +34,7 @@ public class GxLanguageBar extends FlexLayout {
                     });
                     cl.getSource().addClassName("gx-lang-selected");
                     VaadinSession.getCurrent().setLocale(l);
+                    getUI().ifPresent(ui -> ui.setLocale(l));
                 });
                 Locale selectedLocale = VaadinSession.getCurrent().getLocale();
                 if (l.equals(selectedLocale)) {
