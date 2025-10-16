@@ -735,6 +735,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				editorComponent.getElement().addEventListener("keydown", e -> {
 					dataGrid.getEditor().save();
 				}).setFilter("event.key === 'Enter'").debounce(300, DebouncePhase.LEADING);
+
 				column.setEditorComponent(editorComponent);
 				editorComponentMap.put(column.getKey(), editorComponent);
 			}

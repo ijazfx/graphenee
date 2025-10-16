@@ -13,16 +13,8 @@
     font-style: normal;
 }
 
-@font-face {
-    font-family: 'IBM Plex Sans Arabic';
-    src: url('/frontend/fonts/IBM_Plex_Sans_Arabic/IBMPlexSansArabic-Regular.ttf');
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-}
-
 html {
-    --lumo-font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', 'Roboto Flex', serif;
+    --lumo-font-family: 'IBM Plex Sans', 'Roboto Flex', serif;
     --lumo-secondary-color: #ff4081;
     --lumo-secondary-variant: #03dac5;
     --lumo-primary-color: #6200ee;
