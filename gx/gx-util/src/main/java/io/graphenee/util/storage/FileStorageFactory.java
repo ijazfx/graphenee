@@ -15,15 +15,15 @@
  *******************************************************************************/
 package io.graphenee.util.storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.tika.Tika;
 import org.springframework.util.StreamUtils;
 
 /**
@@ -92,17 +92,56 @@ public class FileStorageFactory {
 
 		@Override
 		public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
+            String lowerName = fileName.toLowerCase();
+            if (ALLOWED_EXTENSIONS.stream().noneMatch(lowerName::endsWith)) {
+                throw new SaveFailedException("File extension not allowed: " + fileName);
+            }
+
+            Tika tika = new Tika();
+            byte[] headerBuffer;
+            Path tempFile;
+
+            try {
+                final int MAX_HEADER_SIZE = 16 * 1024; // using 16kb for mime detection
+                ByteArrayOutputStream headerOut = new ByteArrayOutputStream();
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                int totalRead = 0;
+
+                while ((bytesRead = inputStream.read(buffer)) != -1 && totalRead < MAX_HEADER_SIZE) {
+                    int toWrite = Math.min(bytesRead, MAX_HEADER_SIZE - totalRead);
+                    headerOut.write(buffer, 0, toWrite);
+                    totalRead = totalRead + toWrite;
+                    if (totalRead >= MAX_HEADER_SIZE) {
+                        break;
+                    }
+                }
+                headerBuffer = headerOut.toByteArray();
+
+                String detectedMimeType = tika.detect(headerBuffer, fileName);
+                if (detectedMimeType == null || ALLOWED_MIME_TYPES.stream().noneMatch(m -> m.equalsIgnoreCase(detectedMimeType))) {
+                    throw new SaveFailedException("Unsupported or suspicious file type: " + detectedMimeType);
+                }
+
+                tempFile = Files.createTempFile("upload-", "-" + fileName);
+                try (OutputStream tempOut = Files.newOutputStream(tempFile)) {
+                    tempOut.write(headerBuffer);
+                    StreamUtils.copy(inputStream, tempOut);
+                }
+            } catch (IOException e) {
+                throw new SaveFailedException("Failed to validate file before saving: " + fileName, e);
+            }
+
 			return Executors.newCachedThreadPool().submit(() -> {
-				String resourcePath = resourcePath(folder, fileName);
+				String resourcePath = resourcePath(folder, tempFile.getFileName().toString());
 				File resource = new File(rootFolder, resourcePath.replace('/', File.separatorChar));
 				resource.getParentFile().mkdirs();
 				try {
-					FileOutputStream fout = new FileOutputStream(resource);
-					StreamUtils.copy(inputStream, fout);
+					Files.move(tempFile, resource.toPath(), StandardCopyOption.REPLACE_EXISTING);
 					long fileSize = resource.length();
 					// checksum will be computed in future...
 					String checksum = null;
-					FileMetaData fileMetaData = new FileMetaData(resourcePath, fileName, Long.valueOf(fileSize).intValue(), checksum);
+					FileMetaData fileMetaData = new FileMetaData(resourcePath, tempFile.getFileName().toString(), Long.valueOf(fileSize).intValue(), checksum);
 					return fileMetaData;
 				} catch (Exception e) {
 					throw new SaveFailedException(e);

@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
@@ -28,9 +29,12 @@ import java.util.concurrent.Future;
  */
 public interface FileStorage {
 
+    Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt");
+    Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv", "image/jpeg", "image/png", "image/gif");
+
 	/**
 	 * The default implementation of method returns "folder/fileName"
-	 * 
+	 *
 	 * @param folder - must be a valid folder path where file needs to upload.
 	 * @param filePath - file to upload.
 	 * @return - depends on implementation and should return logical resource
