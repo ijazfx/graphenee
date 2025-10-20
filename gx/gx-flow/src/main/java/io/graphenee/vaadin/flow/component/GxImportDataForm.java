@@ -17,10 +17,7 @@ package io.graphenee.vaadin.flow.component;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,9 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -43,7 +41,6 @@ import org.json.JSONObject;
 
 import com.google.common.base.Strings;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -56,13 +53,13 @@ import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.FinishedEvent;
-import com.vaadin.flow.component.upload.Receiver;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.BeanPropertySet;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.binder.PropertySet;
 import com.vaadin.flow.data.provider.IdentifierProvider;
+import com.vaadin.flow.server.streams.UploadHandler;
+import com.vaadin.flow.server.streams.UploadMetadata;
 
 import io.graphenee.util.TRCalendarUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -75,14 +72,13 @@ public class GxImportDataForm<T> extends Dialog {
 	private GxStackLayout stackLayout = new GxStackLayout();
 
 	private Class<T> entityClass;
-	private File uploadedFile;
 	private Grid<JSONObject> importGrid;
 	private Grid<JSONObject> failedGrid;
 	private Grid<T> successGrid;
 	private ArrayList<JSONObject> rows;
 	private ImportDataFormDelegate<T> delegate;
 
-	Map<Integer, String> colMap = new HashMap<>();
+	Map<String, String> colMap = new HashMap<>();
 	Map<String, String> patternMap = new HashMap<>();
 	Map<String, String> missingMap = new HashMap<>();
 	Map<String, PropertyDefinition<T, ?>> pdMap = new HashMap<>();
@@ -120,7 +116,9 @@ public class GxImportDataForm<T> extends Dialog {
 			if (delegate != null && converted != null && !converted.isEmpty()) {
 				LongRunningTask.newTask(UI.getCurrent(), ui -> {
 					delegate.saveConverted(converted);
-					delegate.onImportCompletion(converted, ui);
+					ui.access(() -> {
+						delegate.onImportCompletion(converted, ui);
+					});
 				}).withProgressMessage("Saving records...").withSuccessMessage("Records have been saved.").start();
 			}
 			this.close();
@@ -155,11 +153,10 @@ public class GxImportDataForm<T> extends Dialog {
 		successGrid.setSizeFull();
 		successGrid.getColumns().forEach(c -> c.setVisible(false));
 		List<Column<T>> ordered = new ArrayList<>();
-		colMap.keySet().stream().sorted().forEach(i -> {
-			String jsonKey = colMap.get(i);
-			PropertyDefinition<T, ?> pd = pdMap.get(jsonKey);
-			String key = pd.getName();
-			Column<T> c = successGrid.getColumnByKey(key);
+		colMap.keySet().stream().sorted().forEach(key -> {
+			PropertyDefinition<T, ?> pd = pdMap.get(key);
+			String colKey = pd.getName();
+			Column<T> c = successGrid.getColumnByKey(colKey);
 			if (c != null) {
 				ordered.add(c);
 				c.setVisible(true);
@@ -172,12 +169,13 @@ public class GxImportDataForm<T> extends Dialog {
 		});
 		successGrid.setColumnOrder(ordered);
 
-		colMap.entrySet().stream().sorted((a, b) -> a.getKey() < b.getKey() ? -1 : 1).forEach(e -> {
-			PropertyDefinition<T, ?> pd = pdMap.get(e.getValue());
+		colMap.entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).forEach(e -> {
+			PropertyDefinition<T, ?> pd = pdMap.get(e.getKey());
 			if (pd != null) {
 				final Column<JSONObject> column = failedGrid.addColumn(vp -> {
-					return vp.get(pd.getName());
+					return vp.get(e.getKey());
 				});
+				column.setKey(e.getKey());
 				column.setHeader(pd.getCaption());
 			}
 		});
@@ -193,7 +191,7 @@ public class GxImportDataForm<T> extends Dialog {
 				PropertyDefinition<T, ?> pd = pdMap.get(key);
 				if (pd != null) {
 					try {
-						Object convertedValue = convertSourceToTarget(value.toString(), pd, pattern, missing);
+						Object convertedValue = convertSourceToTarget(value, pd, pattern, missing);
 						json.put(pd.getName(), convertedValue);
 					} catch (ParseException e) {
 						json.put(pd.getName(), missing);
@@ -210,8 +208,8 @@ public class GxImportDataForm<T> extends Dialog {
 			}
 		});
 
-		successGrid.getListDataView().addItems(converted);
-		failedGrid.getListDataView().addItems(failed);
+		successGrid.setItems(converted);
+		failedGrid.setItems(failed);
 
 		layout.add(convertedHeading, successGrid, failedHeading, failedGrid, finishButton);
 		return layout;
@@ -236,21 +234,28 @@ public class GxImportDataForm<T> extends Dialog {
 		JSONObject item = importGrid.getListDataView().getItem(0);
 
 		PropertySet<T> pset = BeanPropertySet.get(entityClass);
-		List<PropertyDefinition<T, ?>> props = pset.getProperties().filter(p -> p.getSetter().isPresent() && !p.getName().contains(".")).collect(Collectors.toList());
+		List<PropertyDefinition<T, ?>> props = pset.getProperties()
+				.filter(p -> p.getSetter().isPresent() && !p.getName().contains(".")).collect(Collectors.toList());
 
-		form.add(new H5("Source"), new H5("Data"), new H5("Target"), new H5("Type"), new H5("Pattern"), new H5("If Missing"), new H5("Output"));
+		form.add(new H5("Source"), new H5("Data"), new H5("Target"), new H5("Type"), new H5("Pattern"),
+				new H5("If Missing"), new H5("Output"));
 
 		for (int i = 0; i < cols.size(); i++) {
 			Column<JSONObject> column = cols.get(i);
-			String key = column.getHeaderText();
+			String key = column.getKey();
 			TextField sourceKey = new TextField();
-			sourceKey.setValue(key);
+			sourceKey.setValue(colMap.get(key));
+			sourceKey.setReadOnly(true);
 			TextField data = new TextField();
-			data.setValue(item.getString(key));
+			Object jsonValue = item.get(key);
+			if (jsonValue != null) {
+				data.setValue(jsonValue.toString());
+			}
 
 			TextField targetType = new TextField();
 
-			List<String> patternList = new ArrayList<>(List.of("yyyy-MM-dd", "yyyy-dd-MM", "dd-MM-yyyy", "MM-dd-yyyy", "dd/MM/yyyy", "MM/dd/yyyy", "dd-MMM-yy"));
+			List<String> patternList = new ArrayList<>(List.of("yyyy-MM-dd", "yyyy-dd-MM", "dd-MM-yyyy", "MM-dd-yyyy",
+					"dd/MM/yyyy", "MM/dd/yyyy", "dd-MMM-yy"));
 			ComboBox<String> pattern = new ComboBox<>();
 			pattern.setAllowCustomValue(true);
 			pattern.setItems(patternList);
@@ -267,7 +272,8 @@ public class GxImportDataForm<T> extends Dialog {
 				targetType.setValue(vcl.getValue().getType().getTypeName());
 				try {
 					pdMap.put(key, vcl.getValue());
-					Object value = convertSourceToTarget(item.getString(key), vcl.getValue(), pattern.getValue(), ifMissing.getValue());
+					Object value = convertSourceToTarget(item.get(key), vcl.getValue(), pattern.getValue(),
+							ifMissing.getValue());
 					output.setValue(value.toString());
 				} catch (Exception e) {
 					output.setErrorMessage(e.getMessage());
@@ -291,7 +297,8 @@ public class GxImportDataForm<T> extends Dialog {
 
 			ifMissing.addValueChangeListener(vcl -> {
 				try {
-					Object value = convertSourceToTarget(item.getString(key), targetField.getValue(), pattern.getValue(), vcl.getValue());
+					Object value = convertSourceToTarget(item.getString(key), targetField.getValue(),
+							pattern.getValue(), vcl.getValue());
 					output.setValue(value.toString());
 					missingMap.put(key, vcl.getValue());
 				} catch (Exception e) {
@@ -302,7 +309,8 @@ public class GxImportDataForm<T> extends Dialog {
 
 			pattern.addValueChangeListener(vcl -> {
 				try {
-					Object value = convertSourceToTarget(item.getString(key), targetField.getValue(), vcl.getValue(), ifMissing.getValue());
+					Object value = convertSourceToTarget(item.getString(key), targetField.getValue(), vcl.getValue(),
+							ifMissing.getValue());
 					output.setValue(value.toString());
 					patternMap.put(key, vcl.getValue());
 				} catch (Exception e) {
@@ -320,37 +328,156 @@ public class GxImportDataForm<T> extends Dialog {
 		return layout;
 	}
 
-	private Object convertSourceToTarget(String source, PropertyDefinition<T, ?> pd, String pattern, String missing) throws ParseException {
+	private Object convertSourceToTarget(Object source, PropertyDefinition<T, ?> pd, String pattern, String missing)
+			throws ParseException {
 		Object output = null;
 		if (source == null) {
 			source = missing;
 		}
 		if (pd == null) {
 			output = source;
-		} else if (pd.getType().equals(Integer.TYPE)) {
-			output = Integer.parseInt(source);
-		} else if (pd.getType().equals(Long.TYPE)) {
-			output = Long.parseLong(source);
-		} else if (pd.getType().equals(Boolean.TYPE)) {
-			output = Boolean.parseBoolean(source);
+		} else if (pd.getType().equals(Integer.class) && source instanceof Number) {
+			output = ((Number) source).intValue();
+		} else if (pd.getType().equals(Long.class) && source instanceof Number) {
+			output = ((Number) source).longValue();
+		} else if (pd.getType().equals(Double.class) && source instanceof Number) {
+			output = ((Number) source).doubleValue();
+		} else if (pd.getType().equals(Float.class) && source instanceof Number) {
+			output = ((Number) source).floatValue();
+		} else if (pd.getType().equals(Boolean.class) && source instanceof Boolean) {
+			output = (Boolean) source;
 		} else if (pd.getType().equals(java.util.Date.class)) {
 			if (Strings.isNullOrEmpty(pattern)) {
-				output = TRCalendarUtil.getCustomDateFormatter().parse(source);
+				output = TRCalendarUtil.getCustomDateFormatter().parse(source.toString());
 			} else {
 				SimpleDateFormat sdf = new SimpleDateFormat(pattern.trim());
-				output = sdf.parse(source);
+				output = sdf.parse(source.toString());
 			}
 		} else if (pd.getType().equals(java.sql.Timestamp.class)) {
 			if (Strings.isNullOrEmpty(pattern)) {
-				output = new Timestamp(TRCalendarUtil.getCustomDateTimeFormatter().parse(source).getTime());
+				output = new Timestamp(TRCalendarUtil.getCustomDateTimeFormatter().parse(source.toString()).getTime());
 			} else {
 				SimpleDateFormat sdf = new SimpleDateFormat(pattern.trim());
-				output = new Timestamp(sdf.parse(source).getTime());
+				output = new Timestamp(sdf.parse(source.toString()).getTime());
 			}
 		} else {
 			output = source;
 		}
 		return output;
+	}
+
+	private void updateGrid(UploadMetadata metadata, File file) {
+		if (metadata.fileName().endsWith("csv")) {
+			updateGridFromCsv(file);
+		} else if (metadata.fileName().endsWith(".xlsx") || metadata.fileName().endsWith(".xls")) {
+			updateGridFromExcel(file);
+		}
+
+	}
+
+	private void updateGridFromExcel(File file) {
+		importGrid.removeAllColumns();
+		rows = new ArrayList<>();
+
+		try (Workbook workbook = WorkbookFactory.create(file)) {
+			/*
+			 * 1. Get first sheet
+			 * 2. Prepare column map using the first row. The column should be mapped
+			 * against a PropertyDefinition
+			 * 3. Process remaining rows as follows:
+			 * 3a. Get the column value. If it's null, take default value for the property.
+			 * 3b. If it's true/false, yes/no, 1/0 then apply boolean converter.
+			 * 3c. If it's string and value is like yyyy-MM-dd or yy-MM-dd, then apply
+			 * LocalDate formatter.
+			 * 3d. If it's string and value is like yyyy-MM-ddThh:mm:ss then apply
+			 * LocalDateTime formatter
+			 * 3e. If it's string and value is like hh:mm or hh:mm:ss then apply LocalTime
+			 * formatter
+			 * 3f. If it's string and value appears to be number, then apply number
+			 * formatter based on PropertyDefinition type.
+			 * 3g. If it's number then apply number formatter based on PropertyDefinition
+			 * type.
+			 */
+			Sheet sheet = workbook.getSheetAt(0);
+			Row line = sheet.getRow(0); // column headings
+			if (line != null) {
+				AtomicInteger index = new AtomicInteger(0);
+				line.cellIterator().forEachRemaining(cell -> {
+					String key = "col" + index.getAndIncrement();
+					colMap.put(key, cell.getStringCellValue());
+					Column<JSONObject> column = importGrid.addColumn(vp -> {
+						if (vp.has(key))
+							return vp.get(key);
+						return null;
+					});
+					column.setKey(key);
+					column.setHeader(colMap.get(key));
+				});
+				for (int rc = 1; rc <= sheet.getLastRowNum(); rc++) {
+					JSONObject json = new JSONObject();
+					line = sheet.getRow(rc);
+					index.set(0);
+					line.cellIterator().forEachRemaining(cell -> {
+						String key = "col" + index.getAndIncrement();
+						if (colMap.containsKey(key)) {
+							switch (cell.getCellType()) {
+								case STRING:
+									json.put(key, cell.getStringCellValue());
+									break;
+								case BOOLEAN:
+									json.put(key, cell.getBooleanCellValue());
+									break;
+								case NUMERIC:
+									json.put(key, cell.getNumericCellValue());
+									break;
+								case BLANK, ERROR, FORMULA, _NONE:
+								default:
+							}
+						}
+					});
+					rows.add(json);
+				}
+			}
+			importGrid.setItems(rows);
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
+	}
+
+	private void updateGridFromCsv(File file) {
+		importGrid.removeAllColumns();
+		rows = new ArrayList<>();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line = reader.readLine();
+			if (line != null) {
+				AtomicInteger index = new AtomicInteger(0);
+				String[] hc = line.split(",");
+				Stream.of(hc).forEach(cell -> {
+					String key = "col" + index.getAndIncrement();
+					colMap.put(key, cell);
+					Column<JSONObject> column = importGrid.addColumn(vp -> {
+						if (vp.has(key))
+							return vp.get(key);
+						return null;
+					});
+					column.setKey(key);
+					column.setHeader(colMap.get(key));
+				});
+				while ((line = reader.readLine()) != null) {
+					JSONObject json = new JSONObject();
+					String[] dc = line.split(",");
+					index.set(0);
+					Stream.of(dc).forEach(cell -> {
+						String key = "col" + index.getAndIncrement();
+						json.put(key, cell);
+					});
+					rows.add(json);
+				}
+			}
+			importGrid.setItems(rows);
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 
 	private Component browseFileTab() {
@@ -362,114 +489,13 @@ public class GxImportDataForm<T> extends Dialog {
 			stackLayout.add(mapColumnsTab());
 		});
 
-		Receiver r = new Receiver() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public OutputStream receiveUpload(String fileName, String mimeType) {
-				try {
-					String[] parts = fileName.split("\\.");
-					String ext = null;
-					if (parts.length > 1) {
-						ext = parts[parts.length - 1];
-					} else {
-						ext = "tmp";
-					}
-					uploadedFile = File.createTempFile("gximp", "." + ext);
-					return new FileOutputStream(uploadedFile);
-				} catch (IOException e) {
-					log.error(e.getMessage(), e);
-					return null;
-				}
-			}
-		};
-
-		Upload upload = new Upload(r);
-		upload.setAcceptedFileTypes(".csv", ".xls", ".xlsx");
-
-		upload.addFinishedListener(new ComponentEventListener<FinishedEvent>() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void onComponentEvent(FinishedEvent event) {
-				updateGrid();
-				nextButton.setEnabled(true);
-			}
-
-			private void updateGrid() {
-				if (uploadedFile.getName().endsWith("csv")) {
-					updateGridFromCsv();
-				} else if (uploadedFile.getName().endsWith(".xlsx") || uploadedFile.getName().endsWith(".xls")) {
-					updateGridFromExcel();
-				}
-
-			}
-
-			private void updateGridFromExcel() {
-				rows = new ArrayList<>();
-
-				try (Workbook workbook = WorkbookFactory.create(uploadedFile)) {
-					Sheet sheet = workbook.getSheetAt(0);
-					Row line = sheet.getRow(0); // header
-					if (line != null) {
-						for (int i = 0; i < line.getLastCellNum(); i++) {
-							Cell cell = line.getCell(i);
-							final String key = cell.getStringCellValue();
-							final Column<JSONObject> column = importGrid.addColumn(vp -> {
-								return vp.get(key);
-							});
-							column.setHeader(key);
-						}
-						for (int rc = 1; rc < sheet.getLastRowNum(); rc++) {
-							line = sheet.getRow(rc);
-							JSONObject json = new JSONObject();
-							for (int i = 0; i < line.getLastCellNum(); i++) {
-								Cell cell = line.getCell(i);
-								String key = colMap.get(i);
-								json.put(key, cell.getStringCellValue());
-							}
-							rows.add(json);
-						}
-					}
-					importGrid.getListDataView().addItems(rows);
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-				}
-			}
-
-			private void updateGridFromCsv() {
-				rows = new ArrayList<>();
-				try (BufferedReader reader = new BufferedReader(new FileReader(uploadedFile))) {
-					String line = reader.readLine();
-					if (line != null) {
-						String[] hc = line.split(",");
-						for (int i = 0; i < hc.length; i++) {
-							colMap.put(i, hc[i]);
-							final String key = hc[i];
-							final Column<JSONObject> column = importGrid.addColumn(vp -> {
-								return vp.get(key);
-							});
-							column.setHeader(hc[i]);
-						}
-						while ((line = reader.readLine()) != null) {
-							JSONObject json = new JSONObject();
-							String[] dc = line.split(",");
-							for (int i = 0; i < dc.length; i++) {
-								String key = colMap.get(i);
-								json.put(key, dc[i]);
-							}
-							rows.add(json);
-						}
-					}
-					importGrid.getListDataView().addItems(rows);
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-				}
-			}
-
+		UploadHandler uploadHandler = UploadHandler.toTempFile((metadata, file) -> {
+			updateGrid(metadata, file);
+			nextButton.setEnabled(true);
 		});
+
+		Upload upload = new Upload(uploadHandler);
+		upload.setAcceptedFileTypes(".csv", ".xls", ".xlsx");
 
 		VerticalLayout layout = new VerticalLayout();
 		layout.setMargin(false);

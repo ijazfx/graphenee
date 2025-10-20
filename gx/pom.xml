@@ -56,11 +56,11 @@
 		<version.lombok>1.18.30</version.lombok>
 		<version.gson>2.10.1</version.gson>
 		<version.pdfbox>3.0.1</version.pdfbox>
-		<version.poi>5.4.0</version.poi>
+		<version.poi>5.4.1</version.poi>
 		<version.retrofit>2.9.0</version.retrofit>
 		<version.protobuf>4.32.1</version.protobuf>
 		<version.commons.beanutils>1.11.0</version.commons.beanutils>
-		<version.commons.io>2.15.1</version.commons.io>
+		<version.commons.io>2.20.0</version.commons.io>
 		<version.jasper>6.21.0</version.jasper>
 		<version.grpc>1.59.1</version.grpc>
 		<version.firebase.admin>9.2.0</version.firebase.admin>

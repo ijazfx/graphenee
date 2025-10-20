@@ -51,7 +51,8 @@ public class GxRegisteredDeviceList extends GxAbstractEntityLazyList<GxRegistere
 	}
 
 	@Override
-	protected Stream<GxRegisteredDevice> getData(int pageNumber, int pageSize, GxRegisteredDevice searchEntity, List<QuerySortOrder> sortOrders) {
+	protected Stream<GxRegisteredDevice> getData(int pageNumber, int pageSize, GxRegisteredDevice searchEntity,
+			List<QuerySortOrder> sortOrders) {
 		PageRequest request = PageRequest.of(pageNumber, pageSize, createSort(sortOrders, Sort.by("deviceToken")));
 		return dataService.findRegisteredDevice(searchEntity, request).stream();
 	}

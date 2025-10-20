@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.login.AbstractLogin.LoginEvent;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinServletRequest;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
@@ -39,6 +41,7 @@ public class LoginView extends GxAbstractLoginView {
     @Override
     protected GxAuthenticatedUser onLogin(LoginEvent event)
             throws AuthenticationFailedException, PasswordChangeRequiredException {
+        String domain = VaadinServletRequest.getCurrent().getServerName();
         String username = event.getUsername();
         String password = event.getPassword();
         GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);

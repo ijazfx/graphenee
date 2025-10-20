@@ -26,6 +26,8 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import io.graphenee.common.GxAuditable;
+import io.graphenee.common.GxSortable;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,7 +36,6 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.Transient;
-import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,7 +43,7 @@ import lombok.Setter;
 @Setter
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
-public class GxMappedSuperclass implements Serializable {
+public class GxMappedSuperclass implements Serializable, GxSortable, GxAuditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +65,9 @@ public class GxMappedSuperclass implements Serializable {
 	@LastModifiedDate
 	private LocalDateTime dateModified;
 
-	@Version
+	// @TODO: To be used in future after careful review and modification to the
+	// framework.
+	// @Version
 	private Integer recordVersion;
 
 	private Integer sortOrder = 1;

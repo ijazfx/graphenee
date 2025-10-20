@@ -80,6 +80,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Creates a new instance of this component.
+	 * 
 	 * @param label The label of the component.
 	 */
 	public FileUploader(String label) {
@@ -160,6 +161,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the allowed file types.
+	 * 
 	 * @param fileTypes The allowed file types.
 	 */
 	public void setAllowedFileTypes(String... fileTypes) {
@@ -169,6 +171,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the maximum number of files.
+	 * 
 	 * @param maxFiles The maximum number of files.
 	 */
 	public void setMaxFiles(int maxFiles) {
@@ -177,6 +180,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the maximum file size.
+	 * 
 	 * @param maxFileSize The maximum file size.
 	 */
 	public void setMaxFileSize(int maxFileSize) {
@@ -186,6 +190,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets whether to auto upload.
+	 * 
 	 * @param autoUpload Whether to auto upload.
 	 */
 	public void setAutoUpload(Boolean autoUpload) {
@@ -195,6 +200,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the drop file label.
+	 * 
 	 * @param dropFileLabel The drop file label.
 	 */
 	public void setDropFileLabel(String dropFileLabel) {
@@ -271,7 +277,8 @@ public class FileUploader extends CustomField<String> {
 					}
 					byte[] bytes = IOUtils.toByteArray(stream);
 					String fileNameOnly = extractFileNameOnly(src);
-					StreamResource streamResource = new StreamResource(fileNameOnly, () -> new ByteArrayInputStream(bytes));
+					StreamResource streamResource = new StreamResource(fileNameOnly,
+							() -> new ByteArrayInputStream(bytes));
 					try {
 						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
 						resourcePreviewPanel.showInDialog();

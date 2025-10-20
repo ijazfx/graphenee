@@ -94,6 +94,7 @@ import com.vaadin.flow.dom.DebouncePhase;
 import com.vaadin.flow.function.ValueProvider;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.common.GxSortable;
 import io.graphenee.util.TRCalendarUtil;
 import io.graphenee.util.callback.TRBiParamCallback;
 import io.graphenee.util.callback.TRParamCallback;
@@ -200,6 +201,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		if (__availablePropertySet == null) {
 			__availablePropertySet = new LinkedHashSet<>();
 			Stream.of(availableProperties()).forEach(propName -> __availablePropertySet.add(propName));
+			if (GxSortable.class.isAssignableFrom(entityClass)) {
+				__availablePropertySet.add("sortOrder");
+			}
 		}
 		return __availablePropertySet;
 	}
@@ -325,7 +329,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			MenuItem optionsMenuItem = columnMenuBar.addItem(VaadinIcon.ELLIPSIS_DOTS_H.create());
 
-			exportDataMenuItem = optionsMenuItem.getSubMenu().addItem("Export to Excel...");
+			exportDataMenuItem = optionsMenuItem.getSubMenu().addItem("Export...");
 			exportDataMenuItem.setVisible(shouldShowExportDataMenu());
 			exportDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
@@ -365,7 +369,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				}
 			});
 
-			importDataMenuItem = optionsMenuItem.getSubMenu().addItem("Import from Excel...");
+			importDataMenuItem = optionsMenuItem.getSubMenu().addItem("Import...");
 			importDataMenuItem.setVisible(shouldShowExportDataMenu());
 			importDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
@@ -545,7 +549,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			add(rootLayout);
 			footerTextLayout = new FlexLayout();
-			totalCountFooterText = new Text("No Records");
+			totalCountFooterText = new Text(getTranslation("No Records"));
 
 			footerTextLayout.add(totalCountFooterText);
 			footerTextLayout.addClassName("gx-grid-footer");
@@ -605,11 +609,14 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected void decorateContextMenu(GridContextMenu<T> contextMenu) {
-		GridMenuItem<T> addItem = contextMenu.addItem(new Span(VaadinIcon.PLUS.create(), new Text("New...")));
+		GridMenuItem<T> addItem = contextMenu
+				.addItem(new Span(VaadinIcon.PLUS.create(), new Text(getTranslation("New..."))));
 		customizeAddContextMenuItem(addItem);
-		GridMenuItem<T> editItem = contextMenu.addItem(new Span(VaadinIcon.EDIT.create(), new Text("Edit")));
+		GridMenuItem<T> editItem = contextMenu
+				.addItem(new Span(VaadinIcon.EDIT.create(), new Text(getTranslation("Edit"))));
 		customizeEditContextMenuItem(editItem);
-		GridMenuItem<T> deleteItem = contextMenu.addItem(new Span(VaadinIcon.TRASH.create(), new Text("Delete")));
+		GridMenuItem<T> deleteItem = contextMenu
+				.addItem(new Span(VaadinIcon.TRASH.create(), new Text(getTranslation("Delete"))));
 		customizeDeleteContextMenuItem(deleteItem);
 		contextMenu.addGridContextMenuOpenedListener(e -> {
 			boolean present = e.getItem().isPresent();
@@ -622,7 +629,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		return false;
 	}
 
-	@SuppressWarnings("serial")
 	protected void customizeAddContextMenuItem(GridMenuItem<T> addItem) {
 		addItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
 
@@ -659,7 +665,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		});
 	}
 
-	@SuppressWarnings("serial")
 	protected void customizeDeleteContextMenuItem(GridMenuItem<T> deleteItem) {
 		deleteItem.addMenuItemClickListener(new TRDelayMenuClickListener<T, GridMenuItem<T>>() {
 			@Override
@@ -865,8 +870,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		c.getElement().getStyle().set("width", "100%");
 		// c.getElement().setProperty("clearButtonVisible", true);
 		// c.getElement().setProperty("autoselect", true);
-		c.getElement().setProperty("placeholder",
-				propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption());
+		c.getElement().setProperty("placeholder", getTranslation(
+				propertyDefinition.getCaption() == null ? "" : propertyDefinition.getCaption()));
 		return c;
 	}
 
@@ -1040,25 +1045,26 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	private void deleteRows(Collection<T> selectedItems) {
 		if (shouldShowDeleteConfirmation()) {
-			DialogFactory.questionDialog("Confirmation", "Are you sure to delete selected record(s)?", dlg -> {
-				try {
-					onDelete(selectedItems);
-					if (isAuditLogEnabled()) {
-						auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE",
-								entityClass.getSimpleName(), dataGrid.getSelectedItems());
-					}
-					listeners.forEach(l -> {
-						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
-					});
-					refresh();
-					deleteMenuItem.setEnabled(false);
-					dataGrid.deselectAll();
-				} catch (Exception e) {
-					log.warn(e.getMessage(), e);
-					Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
-							.addThemeVariants(NotificationVariant.LUMO_ERROR);
-				}
-			}).open();
+			DialogFactory.questionDialog("Confirmation", getTranslation("Are you sure to delete selected record(s)?"),
+					dlg -> {
+						try {
+							onDelete(selectedItems);
+							if (isAuditLogEnabled()) {
+								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE",
+										entityClass.getSimpleName(), dataGrid.getSelectedItems());
+							}
+							listeners.forEach(l -> {
+								l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
+							});
+							refresh();
+							deleteMenuItem.setEnabled(false);
+							dataGrid.deselectAll();
+						} catch (Exception e) {
+							log.warn(e.getMessage(), e);
+							Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+									.addThemeVariants(NotificationVariant.LUMO_ERROR);
+						}
+					}).open();
 		} else {
 			try {
 				onDelete(selectedItems);
@@ -1539,12 +1545,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	protected final void updateTotalCountFooter(int count) {
 		if (shouldDisplayGridFooter()) {
 			if (count == 0) {
-				totalCountFooterText.setText("No records");
+				totalCountFooterText.setText(getTranslation("No records"));
 			} else if (count == 1) {
-				totalCountFooterText.setText("1 record");
+				totalCountFooterText.setText("1 " + getTranslation("record"));
 			} else {
 				totalCountFooterText
-						.setText(DecimalFormat.getNumberInstance().format(count) + " records");
+						.setText(DecimalFormat.getNumberInstance().format(count) + " " + getTranslation("records"));
 			}
 		}
 	}
@@ -1566,25 +1572,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 				@Override
 				public void onSave(T entity) {
-					try {
-						GxAbstractEntityList.this.onSave(entity);
-						if (isAuditLogEnabled()) {
-							try {
-								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE",
-										entityClass.getSimpleName(), List.of(entity));
-							} catch (Exception ex) {
-
-							}
-						}
-						listeners.forEach(l -> {
-							l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
-						});
-						refresh();
-					} catch (Exception e) {
-						log.warn(e.getMessage(), e);
-						Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
-								.addThemeVariants(NotificationVariant.LUMO_ERROR);
-					}
+					saveEntity(entity);
 					refresh();
 				}
 
@@ -1608,7 +1596,35 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected void onGridInlineEditorSave(T entity) {
-		this.onSave(entity);
+		saveEntity(entity);
+	}
+
+	/**
+	 * Do not override this method, unless there is a specific need which needs to
+	 * be addressed. Implement {@link #onSave(Object)} instead. Because this method
+	 * calls onSave method, followed by audit logging and refreshing the grid.
+	 * 
+	 * @param entity
+	 */
+	protected void saveEntity(T entity) {
+		try {
+			onSave(entity);
+			if (isAuditLogEnabled()) {
+				try {
+					auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE",
+							entityClass.getSimpleName(), List.of(entity));
+				} catch (Exception ex) {
+					log.error("Audit log failed for entity", ex);
+				}
+			}
+			listeners.forEach(l -> {
+				l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
+			});
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+			Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+					.addThemeVariants(NotificationVariant.LUMO_ERROR);
+		}
 	}
 
 	protected abstract void onSave(T entity);
@@ -1694,22 +1710,16 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 		try {
 			T o = newInstance();
 			preEdit(o);
-			bps.getProperties().forEach(p -> {
-				String key = p.getName();
-				if (!key.contains(".")) {
+			json.toMap().entrySet().forEach(e -> {
+				Optional<PropertyDefinition<T, ?>> op = bps.getProperty(e.getKey());
+				op.ifPresent(p -> {
 					@SuppressWarnings("unchecked")
 					com.vaadin.flow.data.binder.Setter<T, Object> setter = (com.vaadin.flow.data.binder.Setter<T, Object>) p
 							.getSetter().orElse(null);
 					if (setter != null) {
-						Object convertedValue = null;
-						if (json.has(key)) {
-							convertedValue = GxAbstractEntityList.this.convertValueForProperty(key, json.get(key));
-						} else {
-							convertedValue = GxAbstractEntityList.this.convertValueForProperty(key, null);
-						}
-						setter.accept(o, convertedValue);
+						setter.accept(o, e.getValue());
 					}
-				}
+				});
 			});
 			return o;
 		} catch (Throwable e) {
@@ -1720,15 +1730,13 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	@Override
 	public void saveConverted(Collection<T> converted) {
 		converted.forEach(c -> {
-			onSave(c);
+			saveEntity(c);
 		});
 	}
 
 	@Override
 	public void onImportCompletion(List<T> converted, UI ui) {
-		ui.access(() -> {
-			refresh();
-		});
+		refresh();
 	}
 
 	@Override

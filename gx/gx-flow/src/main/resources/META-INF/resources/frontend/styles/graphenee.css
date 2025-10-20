@@ -11,10 +11,54 @@
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+    unicode-range: U+0000-00FF; /* Latin */
+}
+
+@font-face {
+    font-family: 'IBM Plex Sans';
+    src: url('/frontend/fonts/IBM_Plex_Sans/IBMPlexSans-Italic-VariableFont_wdth,wght.ttf');
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: italic;
+    unicode-range:
+        U+0000–05FF,     /* Basic Latin + Latin-1 Supplement + Greek + Cyrillic */
+        U+0780–08A0,     /* Thaana, Samaritan, Mandaic */
+        U+0900–FB4F,     /* Devanagari to Hebrew */
+        U+FE00–FE6F,     /* Variation Selectors, Combining Half Marks */
+        U+FF00–FFFF;     /* Fullwidth Latin, Specials */
+
+}
+
+@font-face {
+    font-family: 'Lateef';
+    src: url('/frontend/fonts/Lateef/Lateef-Regular.ttf');
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    unicode-range:
+        U+0600–06FF,
+        U+0750–077F,
+        U+08A0–08FF,
+        U+FB50–FDFF,
+        U+FE70–FEFF;
+}
+
+@font-face {
+    font-family: 'Lateef';
+    src: url('/frontend/fonts/Lateef/Lateef-Bold.ttf');
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    unicode-range:
+        U+0600–06FF,
+        U+0750–077F,
+        U+08A0–08FF,
+        U+FB50–FDFF,
+        U+FE70–FEFF;
 }
 
 html {
-    --lumo-font-family: 'IBM Plex Sans', 'Roboto Flex', serif;
+    --lumo-font-family: 'IBM Plex Sans', 'Lateef', 'Roboto Flex', serif;
     --lumo-secondary-color: #ff4081;
     --lumo-secondary-variant: #03dac5;
     --lumo-primary-color: #6200ee;
@@ -23,7 +67,8 @@ html {
     --lumo-primary-variant-text: #3700b3;
     --background-text-color: white;
     --background-color: black;
-    font-size: 0.90rem;
+    font-size: 0.9rem;
+    font-size-adjust: 0.5;
     font-variation-settings:
         "slnt" -1,
         "wdth" 87.5,
@@ -119,6 +164,10 @@ html {
 vaadin-app-layout::part(navbar) {
     background-color: var(--background-color);
     color: var(--background-text-color);
+}
+
+vaadin-app-layout::part(drawer) {
+    width: 18rem;
 }
 
 .gx-right-drawer {
@@ -275,10 +324,14 @@ vaadin-login-form-wrapper {
     gap: var(--lumo-space-xs);
 }
 
+:host([theme~='large']) [part='abbr'] {
+    font-size: 1.5rem;
+    margin-top: 0.3rem;
+}
+
 .gx-avatar-small {
     text-transform: uppercase;
     color: var(--background-color);
-    font-size: large;
     background-color: var(--background-text-color);
 }
 
