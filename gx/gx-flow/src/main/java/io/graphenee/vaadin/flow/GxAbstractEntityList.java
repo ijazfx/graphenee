@@ -1048,7 +1048,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			DialogFactory.questionDialog("Confirmation", getTranslation("Are you sure to delete selected record(s)?"),
 					dlg -> {
 						try {
-							onDelete(selectedItems);
+							deleteEntity(selectedItems);
 							if (isAuditLogEnabled()) {
 								auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "DELETE",
 										entityClass.getSimpleName(), dataGrid.getSelectedItems());
@@ -1573,6 +1573,17 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				@Override
 				public void onSave(T entity) {
 					saveEntity(entity);
+					if (isAuditLogEnabled()) {
+						try {
+							auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE",
+									entityClass.getSimpleName(), List.of(entity));
+						} catch (Exception ex) {
+							log.error("Audit log failed for entity", ex);
+						}
+					}
+					listeners.forEach(l -> {
+						l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
+					});
 					refresh();
 				}
 
@@ -1607,19 +1618,12 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	 * @param entity
 	 */
 	protected void saveEntity(T entity) {
+		saveEntity(List.of(entity));
+	}
+
+	protected void saveEntity(Collection<T> entities) {
 		try {
-			onSave(entity);
-			if (isAuditLogEnabled()) {
-				try {
-					auditLog(DashboardUtils.getLoggedInUser(), DashboardUtils.getRemoteAddress(), "SAVE",
-							entityClass.getSimpleName(), List.of(entity));
-				} catch (Exception ex) {
-					log.error("Audit log failed for entity", ex);
-				}
-			}
-			listeners.forEach(l -> {
-				l.onEvent(GxEntityListEvent.SAVE, List.of(entity));
-			});
+			entities.forEach(GxAbstractEntityList.this::onSave);
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
 			Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
@@ -1628,6 +1632,20 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected abstract void onSave(T entity);
+
+	protected void deleteEntity(T entity) {
+		deleteEntity(List.of(entity));
+	}
+
+	protected void deleteEntity(Collection<T> entities) {
+		try {
+			onDelete(entities);
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+			Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+					.addThemeVariants(NotificationVariant.LUMO_ERROR);
+		}
+	}
 
 	protected abstract void onDelete(Collection<T> entities);
 
@@ -1729,9 +1747,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 	@Override
 	public void saveConverted(Collection<T> converted) {
-		converted.forEach(c -> {
-			saveEntity(c);
-		});
+		saveEntity(converted);
 	}
 
 	@Override
