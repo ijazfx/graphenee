@@ -63,6 +63,7 @@
 		<version.firebase.admin>9.2.0</version.firebase.admin>
 		<version.rxjava>3.1.8</version.rxjava>
         <version.webdav>2.22.2</version.webdav>
+		<version.tika>3.2.3</version.tika>
 	</properties>
 
 	<!-- Dependency Management -->
@@ -252,6 +253,11 @@
                 <artifactId>jackrabbit-webdav</artifactId>
                 <version>${version.webdav}</version>
             </dependency>
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-core</artifactId>
+				<version>${version.tika}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
