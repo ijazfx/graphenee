@@ -49,7 +49,7 @@ public class GxMappedSuperclass implements Serializable {
 		if (obj == null)
 			return false;
 		GxMappedSuperclass src = (GxMappedSuperclass) obj;
-		if (oid == null && src.oid == null)
+		if ((oid == null && src.oid == null) || !getClass().equals(obj.getClass()))
 			return uuid.equals(src.uuid);
 		return oid.equals(src.oid);
 	}

@@ -1,12 +1,15 @@
 package io.graphenee.core.flow.documents;
 
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import io.graphenee.core.model.entity.GxFileTag;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -15,13 +18,10 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
+import io.graphenee.core.model.entity.GxTag;
+import io.graphenee.core.model.jpa.repository.GxTagRepository;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.data.TimestampToDateTimeConverter;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -34,14 +34,14 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 	DateTimePicker expiryDate;
 	IntegerField expiryReminderInDays;
 	DateTimePicker reminderDate;
-	MultiSelectComboBox<GxFileTag> fileTags;
+	MultiSelectComboBox<GxTag> tags;
 
 	public GxDocumentForm() {
 		super(GxDocument.class);
 	}
 
 	@Autowired
-	GxFileTagRepository tagRepository;
+	GxTagRepository tagRepository;
 
 	@Override
 	protected void decorateForm(HasComponents entityForm) {
@@ -57,36 +57,36 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
 		reminderDate = new DateTimePicker("Reminder Date");
 
-		fileTags = new MultiSelectComboBox<>("Add Tags");
+		tags = new MultiSelectComboBox<>("Add Tags");
 
-		fileTags.addCustomValueSetListener(l -> {
-			GxFileTag newTag = new GxFileTag();
+		tags.addCustomValueSetListener(l -> {
+			GxTag newTag = new GxTag();
 			newTag.setTag(l.getDetail());
 			newTag.setOid(null);
 
 			// Copy current value into a mutable set
-			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			Set<GxTag> updated = new HashSet<>(tags.getValue());
 			updated.add(newTag);
 
 			// Update items (so the combo knows this tag exists)
-			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
+			List<GxTag> items = new ArrayList<>(tags.getListDataView().getItems().toList());
 			items.add(newTag);
-			fileTags.setItems(items);
+			tags.setItems(items);
 
 			// Set new value
-			fileTags.setValue(updated);
+			tags.setValue(updated);
 		});
 
-		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, fileTags);
+		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags);
 
-		setColspan(fileTags, 2);
+		setColspan(tags, 2);
 		setColspan(name, 2);
 		setColspan(note, 2);
 	}
 
 	@Override
 	protected void preBinding(GxDocument entity) {
-		fileTags.setItems(tagRepository.findAll());
+		tags.setItems(tagRepository.findAll());
 	}
 
 	@Override

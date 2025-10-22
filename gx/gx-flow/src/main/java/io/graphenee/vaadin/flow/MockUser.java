@@ -22,18 +22,8 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	}
 
 	@Override
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	@Override
 	public String getLastName() {
 		return lastName;
-	}
-
-	@Override
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 
 	@Override
@@ -42,37 +32,8 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	}
 
 	@Override
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	@Override
-	public String getPassword() {
-		return password;
-	}
-
-	@Override
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	@Override
-	public GenderEnum getGender() {
-		return this.gender;
-	}
-
-	@Override
-	public void setGender(GenderEnum gender) {
-		this.gender = gender;
-	}
-
-	@Override
 	public Integer getOid() {
 		return 0;
-	}
-
-	@Override
-	public void setProfilePhoto(byte[] picture) {
 	}
 
 	@Override
@@ -86,16 +47,8 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	}
 
 	@Override
-	public void setEmail(String email) {
-	}
-
-	@Override
 	public String getMobileNumber() {
 		return null;
-	}
-
-	@Override
-	public void setMobileNumber(String mobileNumber) {
 	}
 
 	@Override
@@ -106,6 +59,11 @@ public final class MockUser extends AbstractDashboardUser<String> {
 	@Override
 	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh) {
 		return true;
+	}
+
+	@Override
+	public String getName() {
+		return getUser();
 	}
 
 }

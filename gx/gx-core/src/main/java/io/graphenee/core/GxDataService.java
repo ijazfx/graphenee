@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +44,7 @@ import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
+import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
@@ -281,7 +283,7 @@ public interface GxDataService {
 	List<GxSupportedLocale> findSupportedLocale();
 
 	List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace);
-	
+
 	List<GxTerm> findTermByTermKey(String termKey);
 
 	List<GxTermTranslation> findTermTranslationByLocale(Locale locale);
@@ -382,5 +384,9 @@ public interface GxDataService {
 	List<GxAccessKey> findAccessKeyBySecurityGroup(GxSecurityGroup group);
 
 	List<GxAccessKey> findAccessKeyBySecurityPolicy(GxSecurityPolicy policy);
+
+	List<Principal> findPrincipalActiveByNamespace(GxNamespace namespace);
+
+	List<GxTag> findTagByNamespace(GxNamespace namespace);
 
 }

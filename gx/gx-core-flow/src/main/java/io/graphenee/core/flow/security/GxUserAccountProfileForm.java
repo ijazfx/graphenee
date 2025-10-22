@@ -24,7 +24,7 @@ import com.vaadin.flow.server.streams.InputStreamDownloadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
-import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.component.GxDialog;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @SpringComponent
 @Scope("prototype")
 @Slf4j
-public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticatedUser> {
+public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxUserAccount> {
     private static final long serialVersionUID = 1L;
 
     public GxUserAccountProfileForm() {
-        super(GxAuthenticatedUser.class);
+        super(GxUserAccount.class);
     }
 
     private TextField username;
@@ -74,7 +74,7 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
 
                 pictureAvatar.setImageHandler(dh);
 
-                getEntity().setProfilePhoto(data);
+                getEntity().setProfileImage(data);
 
             } catch (Exception e) {
                 log.error("Error while image upload: {}", e.getMessage());
@@ -135,13 +135,13 @@ public class GxUserAccountProfileForm extends GxAbstractEntityForm<GxAuthenticat
     }
 
     @Override
-    protected void bindFields(Binder<GxAuthenticatedUser> dataBinder) {
+    protected void bindFields(Binder<GxUserAccount> dataBinder) {
         dataBinder.forMemberField(username).asRequired();
         dataBinder.forMemberField(email).withValidator(new EmailValidator("Must be a valid email address"));
     }
 
     @Override
-    protected void preBinding(GxAuthenticatedUser entity) {
+    protected void preBinding(GxUserAccount entity) {
         if (entity.getProfilePhoto() != null) {
             DownloadHandler dh = new InputStreamDownloadHandler(new InputStreamDownloadCallback() {
 
