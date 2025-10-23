@@ -90,6 +90,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	GxFileUploadForm uploadForm;
 
 	@Autowired
+	GxFileUploadForm quickUploadForm;
+
+	@Autowired
 	GxFileUploadNewVersionForm uploadNewVersionForm;
 
 	@Autowired
@@ -570,7 +573,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	public void uploadSingle(GxDocumentFilter filter, TRParamCallback<GxDocument> onChoose) {
-		GxFileUploadForm quickUploadForm = new GxFileUploadForm();
 		quickUploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
