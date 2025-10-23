@@ -111,7 +111,7 @@ public abstract class GxUserTaskForm<T> extends GxAbstractEntityForm<T> {
 		completeButton = new Button(completeButtonCaption(), event -> {
 			completeTask();
 		});
-		completeButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+		completeButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
 
 		skipButton = new Button("Skip", event -> {
 			skipTask();

@@ -22,7 +22,7 @@ public class GxI18nProvider implements com.vaadin.flow.i18n.I18NProvider {
 
 	@Override
 	public String getTranslation(String key, Locale locale, Object... params) {
-		String value = service.getLocalizedValue(locale, key);
+		String value = service.getLocalizedValue(locale, key, true);
 		if (params != null && params.length > 0) {
 			return String.format(locale, value, params);
 		}

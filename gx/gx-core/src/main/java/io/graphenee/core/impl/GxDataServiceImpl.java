@@ -16,12 +16,11 @@
 package io.graphenee.core.impl;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -65,6 +64,7 @@ import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.repository.GxAccessKeyRepository;
 import io.graphenee.core.model.jpa.repository.GxAccessLogRepository;
@@ -169,7 +169,8 @@ public class GxDataServiceImpl implements GxDataService {
 	GxPasswordHistoryRepository passwordHistoryRepo;
 
 	@Override
-	public void access(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+	public void access(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException {
 		if (canAccessResource(namespace, accessKey, resourceName, timeStamp)) {
 			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.ACCESS.statusCode(), true);
 		} else {
@@ -179,7 +180,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public void checkIn(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+	public void checkIn(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException {
 		if (canAccessResource(namespace, accessKey, resourceName, timeStamp)) {
 			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKIN.statusCode(), true);
 		} else {
@@ -189,7 +191,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public void checkOut(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+	public void checkOut(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException {
 		if (canAccessResource(namespace, accessKey, resourceName, timeStamp)) {
 			log(namespace, accessKey, resourceName, timeStamp, AccessTypeStatus.CHECKOUT.statusCode(), true);
 		} else {
@@ -199,7 +202,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException {
+	public boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException {
 		UUID accessKeyUuid = UUID.fromString(accessKey);
 		GxAccessKey key = findAccessKey(accessKeyUuid);
 		GxResource resource = findResourceByResourceNameAndNamespace(resourceName, namespace);
@@ -209,12 +213,14 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccount userAccount) {
+	public GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent,
+			GxUserAccount userAccount) {
 		return auditEntityEventByUserWithAdditionalData(auditEntity, oidAuditEntity, auditEvent, userAccount, null);
 	}
 
 	@Override
-	public GxAuditLog auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccount userAccount, byte[] additionalData) {
+	public GxAuditLog auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity,
+			String auditEvent, GxUserAccount userAccount, byte[] additionalData) {
 		GxAuditLog entity = new GxAuditLog();
 		entity.setAuditDate(new Timestamp(System.currentTimeMillis()));
 		entity.setAuditEntity(auditEntity);
@@ -238,7 +244,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxAuditLog auditEventByUserWithAdditionalData(String auditEvent, GxUserAccount userAccount, byte[] additionalData) {
+	public GxAuditLog auditEventByUserWithAdditionalData(String auditEvent, GxUserAccount userAccount,
+			byte[] additionalData) {
 		return auditEntityEventByUserWithAdditionalData(null, null, auditEvent, userAccount, additionalData);
 	}
 
@@ -509,40 +516,6 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public List<GxTerm> findDistinctTermByNamespaceAndSupportedLocale(GxNamespace namespace, GxSupportedLocale supportedLocale) {
-		List<GxTerm> distinctTerms = new ArrayList<>();
-		Collection<GxTerm> entities = null;
-		if (namespace != null && supportedLocale != null) {
-			entities = termRepo.findByNamespaceOidAndSupportedLocaleOid(namespace.getOid(), supportedLocale.getOid());
-		} else if (namespace != null) {
-			entities = termRepo.findByNamespaceOid(namespace.getOid());
-		} else if (supportedLocale != null) {
-			entities = termRepo.findBySupportedLocaleOid(supportedLocale.getOid());
-		}
-		if (entities != null) {
-			Set<String> termKeySet = new HashSet<>();
-			entities.forEach(term -> {
-				if (!termKeySet.contains(term.getTermKey())) {
-					distinctTerms.add(term);
-					termKeySet.add(term.getTermKey());
-				}
-			});
-		}
-		return distinctTerms;
-	}
-
-	@Override
-	public GxTerm findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale) {
-		String localeCode = locale.toString();
-		GxTerm term = termRepo.findTopByTermKeyAndSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey, localeCode);
-		if (term == null) {
-			localeCode = locale.getLanguage();
-			term = termRepo.findTopByTermKeyAndSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(termKey, localeCode);
-		}
-		return term;
-	}
-
-	@Override
 	public List<GxEmailTemplate> findEmailTemplate() {
 		return emailTemplateRepo.findAll(Sort.by("templateName"));
 	}
@@ -577,7 +550,8 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespace namespace = findNamespace(GxNamespace.SYSTEM);
 		GxEmailTemplate emailTemplate = null;
 		if (namespace != null) {
-			emailTemplate = emailTemplateRepo.findOneByTemplateCodeAndNamespaceAndIsActive(templateCode, namespace, true);
+			emailTemplate = emailTemplateRepo.findOneByTemplateCodeAndNamespaceAndIsActive(templateCode, namespace,
+					true);
 		} else {
 			emailTemplate = emailTemplateRepo.findOneByTemplateCodeAndIsActive(templateCode, true);
 		}
@@ -585,7 +559,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxEmailTemplate findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode, GxNamespace namespace) {
+	public GxEmailTemplate findEmailTemplateByTemplateCodeAndNamespaceActive(String templateCode,
+			GxNamespace namespace) {
 		return emailTemplateRepo.findOneByTemplateCodeAndNamespaceAndIsActive(templateCode, namespace, true);
 	}
 
@@ -594,7 +569,8 @@ public class GxDataServiceImpl implements GxDataService {
 		GxNamespace namespace = findNamespace(GxNamespace.SYSTEM);
 		GxEmailTemplate emailTemplate = null;
 		if (namespace != null) {
-			emailTemplate = emailTemplateRepo.findOneByTemplateNameAndNamespaceAndIsActive(templateName, namespace, true);
+			emailTemplate = emailTemplateRepo.findOneByTemplateNameAndNamespaceAndIsActive(templateName, namespace,
+					true);
 		} else {
 			emailTemplate = emailTemplateRepo.findOneByTemplateNameAndIsActive(templateName, true);
 		}
@@ -602,7 +578,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxEmailTemplate findEmailTemplateByTemplateNameAndNamespaceActive(String templateName, GxNamespace namespace) {
+	public GxEmailTemplate findEmailTemplateByTemplateNameAndNamespaceActive(String templateName,
+			GxNamespace namespace) {
 		return emailTemplateRepo.findOneByTemplateNameAndNamespaceAndIsActive(templateName, namespace, true);
 	}
 
@@ -652,7 +629,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxNamespaceProperty findNamespacePropertyByNamespaceAndPropertyKey(GxNamespace namespace, String propertyKey) {
+	public GxNamespaceProperty findNamespacePropertyByNamespaceAndPropertyKey(GxNamespace namespace,
+			String propertyKey) {
 		return namespacePropertyRepo.findOneByNamespaceAndPropertyKey(namespace, propertyKey);
 	}
 
@@ -722,7 +700,8 @@ public class GxDataServiceImpl implements GxDataService {
 		return registeredDeviceRepo.findByNamespaceNamespaceAndDeviceToken(namespace, deviceToken);
 	}
 
-	private GxRegisteredDevice findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace, String deviceToken, String ownerId) {
+	private GxRegisteredDevice findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(String namespace,
+			String deviceToken, String ownerId) {
 		return registeredDeviceRepo.findByNamespaceNamespaceAndDeviceTokenAndOwnerId(namespace, deviceToken, ownerId);
 	}
 
@@ -775,31 +754,35 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxSecurityGroup> findSecurityGroupByNamespaceActive(GxNamespace namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityGroupRepo.findByNamespace(entity).stream().filter(securityGroup -> securityGroup.getIsActive() == true).collect(Collectors.toList());
+		return securityGroupRepo.findByNamespace(entity).stream()
+				.filter(securityGroup -> securityGroup.getIsActive() == true).collect(Collectors.toList());
 	}
 
 	@Override
 	public GxSecurityGroup findSecurityGroupByNamespaceAndGroupName(GxNamespace namespace, String groupName) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		Optional<GxSecurityGroup> securityGroupOptional = securityGroupRepo.findByNamespace(entity).stream().filter(sg -> {
-			return sg.getSecurityGroupName().equalsIgnoreCase(groupName);
-		}).findFirst();
+		Optional<GxSecurityGroup> securityGroupOptional = securityGroupRepo.findByNamespace(entity).stream()
+				.filter(sg -> {
+					return sg.getSecurityGroupName().equalsIgnoreCase(groupName);
+				}).findFirst();
 		return securityGroupOptional.isPresent() ? securityGroupOptional.get() : null;
 	}
 
 	@Override
 	public GxSecurityGroup findSecurityGroupByNamespaceAndGroupNameActive(GxNamespace namespace, String groupName) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		Optional<GxSecurityGroup> securityGroupOptional = securityGroupRepo.findByNamespace(entity).stream().filter(sg -> {
-			return sg.getIsActive() && sg.getSecurityGroupName().equalsIgnoreCase(groupName);
-		}).findFirst();
+		Optional<GxSecurityGroup> securityGroupOptional = securityGroupRepo.findByNamespace(entity).stream()
+				.filter(sg -> {
+					return sg.getIsActive() && sg.getSecurityGroupName().equalsIgnoreCase(groupName);
+				}).findFirst();
 		return securityGroupOptional.isPresent() ? securityGroupOptional.get() : null;
 	}
 
 	@Override
 	public List<GxSecurityGroup> findSecurityGroupByNamespaceInactive(GxNamespace namespace) {
 		GxNamespace entity = namespaceRepo.findOne(namespace.getOid());
-		return securityGroupRepo.findByNamespace(entity).stream().filter(securityGroup -> securityGroup.getIsActive() == false).collect(Collectors.toList());
+		return securityGroupRepo.findByNamespace(entity).stream()
+				.filter(securityGroup -> securityGroup.getIsActive() == false).collect(Collectors.toList());
 	}
 
 	@Override
@@ -913,7 +896,7 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public List<GxTerm> findTermByLocale(Locale locale) {
+	public List<GxTermTranslation> findTermTranslationByLocale(Locale locale) {
 		String localeCode = locale.toString();
 		GxSupportedLocale supportedLocale = supportedLocaleRepo.findByLocaleCodeStartingWith(localeCode);
 		if (supportedLocale == null) {
@@ -921,21 +904,25 @@ public class GxDataServiceImpl implements GxDataService {
 			supportedLocale = supportedLocaleRepo.findByLocaleCodeStartingWith(localeCode);
 		}
 		if (supportedLocale != null) {
-			return supportedLocale.getTerms();
+			return supportedLocale.getTranslations();
 		}
 		return Collections.emptyList();
 	}
 
 	@Override
-	public List<GxTerm> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespace namespace, GxSupportedLocale supportedLocale) {
+	public GxTermTranslation findEffectiveTermTranslationByTermKeyAndLocale(String termKey, Locale locale) {
+		List<GxTerm> terms = termRepo.findByTermKey(termKey);
+		return terms.stream().flatMap(term -> term.getTranslations().stream())
+				.filter(t -> t.getSupportedLocale().getLocaleCode().startsWith(locale.getLanguage())).findFirst()
+				.orElse(null);
+	}
+
+	@Override
+	public List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace) {
 		PageRequest pageRequest = PageRequest.of(page, size);
 		Page<GxTerm> result = null;
-		if (namespace != null && supportedLocale != null) {
-			result = termRepo.findByNamespaceOidAndSupportedLocaleOid(pageRequest, namespace.getOid(), supportedLocale.getOid());
-		} else if (namespace != null) {
+		if (namespace != null) {
 			result = termRepo.findByNamespaceOid(pageRequest, namespace.getOid());
-		} else if (supportedLocale != null) {
-			result = termRepo.findBySupportedLocaleOid(pageRequest, supportedLocale.getOid());
 		} else {
 			result = termRepo.findAll(pageRequest);
 		}
@@ -948,18 +935,6 @@ public class GxDataServiceImpl implements GxDataService {
 			return termRepo.findByTermKey(termKey);
 		}
 		return Collections.emptyList();
-	}
-
-	@Override
-	public List<GxTerm> findTermByTermKeyAndLocale(String termKey, Locale locale) {
-
-		String localeCode = locale.toString();
-		List<GxTerm> terms = termRepo.findByTermKeyAndSupportedLocaleLocaleCodeStartingWith(termKey, localeCode);
-		if (terms.isEmpty()) {
-			localeCode = locale.getLanguage();
-			terms = termRepo.findByTermKeyAndSupportedLocaleLocaleCodeStartingWith(termKey, localeCode);
-		}
-		return terms;
 	}
 
 	@Override
@@ -1027,7 +1002,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxUserAccount findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespace namespace) {
+	public GxUserAccount findUserAccountByUsernamePasswordAndNamespace(String username, String password,
+			GxNamespace namespace) {
 		GxUserAccount userAccount = userAccountRepo.findByUsernameAndNamespace(username, namespace);
 		if (userAccount == null) {
 			userAccount = userAccountRepo.findByUsernameAndNamespace(username, systemNamespace());
@@ -1093,7 +1069,8 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess) {
+	public void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp,
+			Integer accessType, Boolean isSuccess) {
 		GxAccessLog accessLog = new GxAccessLog();
 		accessLog.setIsSuccess(isSuccess);
 		accessLog.setAccessTime(timeStamp);
@@ -1118,14 +1095,17 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
-	public GxRegisteredDevice registerDevice(String namespace, String deviceToken, String systemName, String brand, boolean isTablet, String ownerId)
+	public GxRegisteredDevice registerDevice(String namespace, String deviceToken, String systemName, String brand,
+			boolean isTablet, String ownerId)
 			throws RegisterDeviceFailedException {
 		GxNamespace ns = findNamespace(namespace);
 		if (ns == null)
 			throw new RegisterDeviceFailedException("Namespace " + namespace + " does not exist.");
-		GxRegisteredDevice device = findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(namespace, deviceToken, ownerId);
+		GxRegisteredDevice device = findRegisteredDeviceByNamespaceAndDeviceTokenAndOwner(namespace, deviceToken,
+				ownerId);
 		if (device != null)
-			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + "and ownerId " + ownerId + " for namespace " + namespace + " already registered");
+			throw new RegisterDeviceFailedException("Device with deviceToken " + deviceToken + "and ownerId " + ownerId
+					+ " for namespace " + namespace + " already registered");
 		GxRegisteredDevice entity = new GxRegisteredDevice();
 		entity.setBrand(brand);
 		entity.setIsActive(true);
@@ -1135,6 +1115,28 @@ public class GxDataServiceImpl implements GxDataService {
 		entity.setDeviceToken(deviceToken);
 		entity.setNamespace(ns);
 		return registeredDeviceRepo.save(entity);
+	}
+
+	@Override
+	public void updateAwsDeviceArn(String namespace, String deviceToken, String awsDeviceArn) {
+		GxRegisteredDevice device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
+		if (device != null) {
+			device.setAwsDeviceArn(awsDeviceArn);
+			registeredDeviceRepo.save(device);
+		}
+	}
+
+	@Override
+	public void updateAwsDeviceArn(String namespace, Map<String, String> deviceTokenArnMap) {
+		Set<GxRegisteredDevice> devices = new HashSet<>();
+		deviceTokenArnMap.keySet().stream().forEach(deviceToken -> {
+			GxRegisteredDevice device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
+			if (device != null) {
+				device.setAwsDeviceArn(deviceTokenArnMap.get(deviceToken));
+				devices.add(device);
+			}
+		});
+		registeredDeviceRepo.saveAll(devices);
 	}
 
 	@Override
@@ -1251,7 +1253,8 @@ public class GxDataServiceImpl implements GxDataService {
 	public void unregisterDevice(String namespace, String deviceToken) throws UnregisterDeviceFailedException {
 		GxRegisteredDevice device = findRegisteredDeviceByNamespaceAndDeviceToken(namespace, deviceToken);
 		if (device == null)
-			throw new UnregisterDeviceFailedException("Device with deviceToken " + deviceToken + " for namespace " + namespace + " does not exist.");
+			throw new UnregisterDeviceFailedException(
+					"Device with deviceToken " + deviceToken + " for namespace " + namespace + " does not exist.");
 		registeredDeviceRepo.deleteById(device.getOid());
 	}
 

@@ -42,7 +42,7 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 	@Override
 	protected void decorateForm(HasComponents entityForm) {
 		upload = new Upload();
-		upload.setUploadHandler(UploadHandler.toTempFile(new FileUploadCallback() {
+		upload.setUploadHandler(UploadHandler.toFile(new FileUploadCallback() {
 
 			@Override
 			public void complete(UploadMetadata uploadMetadata, File file) throws IOException {
@@ -56,7 +56,7 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 				uploadedFiles.add(uploadedFile);
 			}
 
-		}));
+		}, new GxFileFactory()));
 
 		upload.setMaxFiles(10);
 		upload.setMaxFileSize(1024000000);

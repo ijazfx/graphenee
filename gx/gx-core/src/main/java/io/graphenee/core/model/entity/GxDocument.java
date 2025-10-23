@@ -67,7 +67,7 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 	@JoinTable(name = "gx_document_audit_log_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
 	List<GxAuditLog> auditLogs = new ArrayList<>();
 
-	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "gx_file_tag_document_join", joinColumns = @JoinColumn(name = "oid_document", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
 	Set<GxFileTag> fileTags = new HashSet<>();
 
@@ -117,7 +117,11 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 
 	@Override
 	public GxDocumentExplorerItem getParent() {
-		return getFolder();
+		GxFolder f = getFolder();
+		if (f == null) {
+			return getDocument().getFolder();
+		}
+		return f;
 	}
 
 	public Integer getExpiryReminderInDays() {
@@ -140,6 +144,18 @@ public class GxDocument extends GxMappedSuperclass implements Serializable, GxDo
 
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	public String getRelativePath() {
+		GxFolder f = getFolder();
+		if (getDocument() != null) {
+			f = getDocument().getFolder();
+		}
+		if (f == null) {
+			return getName();
+		}
+		return f.getRelativePath() + "/" + getName();
 	}
 
 	public void setName(String name) {

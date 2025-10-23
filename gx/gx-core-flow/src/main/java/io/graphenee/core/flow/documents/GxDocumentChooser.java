@@ -118,7 +118,7 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 		rootLayout.setWidthFull();
 
 		Button attachDocument = new Button(buttonCaption);
-		attachDocument.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+		attachDocument.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
 		attachDocument.addClickListener(cl -> {
 			explorer.uploadSingle(filter, doc -> {
 				setPresentationValue(doc);
@@ -126,7 +126,7 @@ public class GxDocumentChooser extends CustomField<GxDocument> {
 		});
 
 		Button browseDocument = new Button(VaadinIcon.FOLDER_SEARCH.create());
-		browseDocument.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+		browseDocument.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
 		browseDocument.addClickListener(cl -> {
 			explorer.chooseSingle(filter, doc -> {
 				setPresentationValue(doc);

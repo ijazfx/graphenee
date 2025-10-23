@@ -15,6 +15,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
 import io.graphenee.aws.GxS3Service;
+import io.graphenee.util.storage.FileSharingFailedException;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.util.storage.SaveFailedException;
@@ -97,6 +98,11 @@ public class GxS3ServiceImpl implements GxS3Service, FileStorage {
 			}
 		});
 	}
+
+    @Override
+    public String share(String filePath) throws FileSharingFailedException {
+        throw new UnsupportedOperationException("This feature is not yet implemented.");
+    }
 
     @Override
     public void createDirectory(String directoryPath) {

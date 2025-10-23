@@ -1,9 +1,9 @@
 package io.graphenee.vaadin.flow;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.vaadin.flow.server.StreamResource;
 import org.apache.logging.log4j.util.Strings;
 
 import com.vaadin.flow.component.UI;
@@ -24,6 +24,11 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.streams.DownloadEvent;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
+import com.vaadin.flow.server.streams.InputStreamDownloadCallback;
+import com.vaadin.flow.server.streams.InputStreamDownloadHandler;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import jakarta.annotation.PostConstruct;
@@ -98,8 +103,17 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			avatar = new Avatar(user.getFirstNameLastName());
 			avatar.addThemeVariants(AvatarVariant.LUMO_LARGE);
 			if (user.getProfilePhoto() != null) {
-				StreamResource resource = new StreamResource("Profile Picture", () -> new java.io.ByteArrayInputStream(user.getProfilePhoto()));
-				avatar.setImageResource(resource);
+				DownloadHandler dh = new InputStreamDownloadHandler(new InputStreamDownloadCallback() {
+
+					@Override
+					public DownloadResponse complete(DownloadEvent downloadEvent) throws IOException {
+						return new DownloadResponse(new java.io.ByteArrayInputStream(user.getProfilePhoto()),
+								"Profile Picture", null,
+								user.getProfilePhoto().length);
+					}
+
+				});
+				avatar.setImageHandler(dh);
 			}
 			avatar.getElement().addEventListener("click", e -> {
 				GxAbstractEntityForm<?> profileForm = getProfileForm(user);
@@ -154,6 +168,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			@Override
 			public void onSave(T entity) {
 				saveProfile(entity);
+
 			}
 		});
 	}

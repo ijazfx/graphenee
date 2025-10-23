@@ -18,6 +18,7 @@ package io.graphenee.core;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,7 @@ import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
 import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.security.exception.GxPermissionException;
 
@@ -50,9 +52,11 @@ public interface GxDataService {
 
 	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
 
-	GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccount userAccount);
+	GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent,
+			GxUserAccount userAccount);
 
-	GxAuditLog auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent, GxUserAccount userAccount, byte[] additionalData);
+	GxAuditLog auditEntityEventByUserWithAdditionalData(String auditEntity, Integer oidAuditEntity, String auditEvent,
+			GxUserAccount userAccount, byte[] additionalData);
 
 	GxAuditLog auditEvent(String auditEvent);
 
@@ -153,10 +157,6 @@ public interface GxDataService {
 	GxCurrency findCurrencyByCurrencyAlpha3Code(String alpha3Code);
 
 	GxCurrency findCurrencyByCurrencyNumericCode(Integer numericCode);
-
-	List<GxTerm> findDistinctTermByNamespaceAndSupportedLocale(GxNamespace namespace, GxSupportedLocale supportedLocale);
-
-	GxTerm findEffectiveTermByTermKeyAndLocale(String termKey, Locale locale);
 
 	List<GxEmailTemplate> findEmailTemplate();
 
@@ -280,13 +280,13 @@ public interface GxDataService {
 
 	List<GxSupportedLocale> findSupportedLocale();
 
-	List<GxTerm> findTermByLocale(Locale locale);
-
-	List<GxTerm> findTermByNamespaceAndSupportedLocale(Integer page, Integer size, GxNamespace namespace, GxSupportedLocale supportedLocale);
-
+	List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace);
+	
 	List<GxTerm> findTermByTermKey(String termKey);
 
-	List<GxTerm> findTermByTermKeyAndLocale(String termKey, Locale locale);
+	List<GxTermTranslation> findTermTranslationByLocale(Locale locale);
+
+	GxTermTranslation findEffectiveTermTranslationByTermKeyAndLocale(String termKey, Locale locale);
 
 	List<GxUserAccount> findUserAccount();
 
@@ -308,15 +308,22 @@ public interface GxDataService {
 
 	GxUserAccount findUserAccountByUsernameAndPassword(String username, String password);
 
-	GxUserAccount findUserAccountByUsernamePasswordAndNamespace(String username, String password, GxNamespace namespace);
+	GxUserAccount findUserAccountByUsernamePasswordAndNamespace(String username, String password,
+			GxNamespace namespace);
 
 	List<GxUserAccount> findUserAccountInactive();
 
-	void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType, Boolean isSuccess);
+	void log(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp, Integer accessType,
+			Boolean isSuccess);
 
 	void markAsPrimary(GxSmsProvider entity);
 
-	GxRegisteredDevice registerDevice(String namespace, String uniqueId, String systemName, String brand, boolean isTablet, String ownerId) throws RegisterDeviceFailedException;
+	GxRegisteredDevice registerDevice(String namespace, String uniqueId, String systemName, String brand,
+			boolean isTablet, String ownerId) throws RegisterDeviceFailedException;
+
+	void updateAwsDeviceArn(String namespace, String deviceToken, String awsDeviceArn);
+
+	void updateAwsDeviceArn(String namespace, Map<String, String> deviceTokenArnMap);
 
 	GxAccessKey save(GxAccessKey entity);
 
@@ -358,13 +365,17 @@ public interface GxDataService {
 
 	void unregisterDevice(String namespace, String uniqueId) throws UnregisterDeviceFailedException;
 
-	void access(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+	void access(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException;
 
-	void checkIn(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+	void checkIn(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException;
 
-	void checkOut(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+	void checkOut(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException;
 
-	boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp) throws GxPermissionException;
+	boolean canAccessResource(GxNamespace namespace, String accessKey, String resourceName, Timestamp timeStamp)
+			throws GxPermissionException;
 
 	List<GxAccessKey> findAccessKeyByUserAccount(GxUserAccount user);
 

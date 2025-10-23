@@ -28,7 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 import io.graphenee.core.GxDataService;
-import io.graphenee.core.model.entity.GxTerm;
+import io.graphenee.core.model.entity.GxTermTranslation;
 
 final class Localizer {
 
@@ -51,17 +51,19 @@ final class Localizer {
 	public Localizer(Locale locale, GxDataService dataService) {
 		this.dataService = dataService;
 		setLocale(locale);
-		singularTerms = CacheBuilder.newBuilder().maximumSize(DEFAULT_SINGULAR_MAP_MAX_SIZE).expireAfterWrite(15, TimeUnit.MINUTES).build();
-		termPlurals = CacheBuilder.newBuilder().maximumSize(DEFAULT_PLURAL_MAP_MAX_SIZE).expireAfterWrite(15, TimeUnit.MINUTES).build();
+		singularTerms = CacheBuilder.newBuilder().maximumSize(DEFAULT_SINGULAR_MAP_MAX_SIZE)
+				.expireAfterWrite(15, TimeUnit.MINUTES).build();
+		termPlurals = CacheBuilder.newBuilder().maximumSize(DEFAULT_PLURAL_MAP_MAX_SIZE)
+				.expireAfterWrite(15, TimeUnit.MINUTES).build();
 
-		List<GxTerm> terms = dataService.findTermByLocale(locale);
-		if (terms.size() > 0) {
-			terms.parallelStream().forEach(term -> {
-				if (term.getTermSingular() != null) {
-					singularTerms.put(term.getTermKey(), term.getTermSingular());
+		List<GxTermTranslation> translations = dataService.findTermTranslationByLocale(locale);
+		if (translations.size() > 0) {
+			translations.parallelStream().forEach(t -> {
+				if (t.getTermSingular() != null) {
+					singularTerms.put(t.getTerm().getTermKey(), t.getTermSingular());
 				}
-				if (term.getTermPlural() != null) {
-					termPlurals.put(term.getTermKey(), term.getTermPlural());
+				if (t.getTermPlural() != null) {
+					termPlurals.put(t.getTerm().getTermKey(), t.getTermPlural());
 				}
 			});
 		}
@@ -111,9 +113,11 @@ final class Localizer {
 				@Override
 				public String call() throws Exception {
 
-					GxTerm term = dataService.findEffectiveTermByTermKeyAndLocale(termKey, locale);
-					if (term != null && term.getTermKey().equals(termKey) && !Strings.isNullOrEmpty(term.getTermSingular())) {
-						return term.getTermSingular();
+					GxTermTranslation translation = dataService.findEffectiveTermTranslationByTermKeyAndLocale(termKey,
+							locale);
+					if (translation != null && translation.getTerm().getTermKey().equals(termKey)
+							&& !Strings.isNullOrEmpty(translation.getTermSingular())) {
+						return translation.getTermSingular();
 					}
 
 					return termKey;
@@ -138,9 +142,11 @@ final class Localizer {
 				@Override
 				public String call() throws Exception {
 
-					GxTerm term = dataService.findEffectiveTermByTermKeyAndLocale(termKey, locale);
-					if (term != null && term.getTermKey().equals(termKey) && !Strings.isNullOrEmpty(term.getTermPlural())) {
-						return term.getTermPlural();
+					GxTermTranslation translation = dataService.findEffectiveTermTranslationByTermKeyAndLocale(termKey,
+							locale);
+					if (translation != null && translation.getTerm().getTermKey().equals(termKey)
+							&& !Strings.isNullOrEmpty(translation.getTermPlural())) {
+						return translation.getTermPlural();
 					}
 
 					return termKey;

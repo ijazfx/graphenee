@@ -96,6 +96,7 @@ import io.graphenee.vaadin.flow.GxAbstractDialog.GxDialogDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityList.GxEntityListEventListner.GxEntityListEvent;
 import io.graphenee.vaadin.flow.component.DialogFactory;
+import io.graphenee.vaadin.flow.component.GxCopyToClipboardWrapper;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent;
 import io.graphenee.vaadin.flow.component.GxExportDataComponent.GxExportDataComponentDelegate;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
@@ -671,7 +672,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean isGridInlineEditingEnabled() {
-		return true;
+		return false;
 	}
 
 	protected boolean isAuditLogEnabled() {
@@ -1213,11 +1214,6 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				});
 			}
 			if (renderer == null && propertyDefinition.getType().getSuperclass().equals(Number.class)) {
-				NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
-				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
-						numberFormat);
-			}
-			if (renderer == null && propertyDefinition.getType().getSuperclass().equals(String.class)) {
 				NumberFormat numberFormat = numberFormatForProperty(propertyName, propertyDefinition);
 				renderer = new NumberRenderer<>((ValueProvider<T, Number>) propertyDefinition.getGetter(),
 						numberFormat);

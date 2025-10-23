@@ -56,7 +56,7 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	@JoinTable(name = "gx_folder_audit_log_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_audit_log", referencedColumnName = "oid"))
 	List<GxAuditLog> auditLogs = new ArrayList<>();
 
-	@ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "gx_file_tag_folder_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
 	Set<GxFileTag> fileTags = new HashSet<>();
 
@@ -115,6 +115,21 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 		return getFolder();
 	}
 
+	@Override
+	public String getRelativePath() {
+		if (getFolder() == null) {
+			return getGenericName();
+		}
+		return getFolder().getRelativePath() + "/" + getGenericName();
+	}
+
+	public String getGenericName() {
+		if (getName().matches("io.graphenee.system")) {
+			return "home";
+		}
+		return getName();
+	}
+
 	public GxDocument addDocument(GxDocument document) {
 		if (!documents.contains(document)) {
 			documents.add(document);
@@ -161,6 +176,11 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 
 	public String getName() {
 		return this.name;
+	}
+
+	@Override
+	public String getPath() {
+		return null;
 	}
 
 	public void setName(String name) {

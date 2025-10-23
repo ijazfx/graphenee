@@ -10,17 +10,17 @@ import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import io.graphenee.core.model.entity.*;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -31,6 +31,7 @@ import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -43,6 +44,13 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.model.entity.GxDocument;
+import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxDocumentFilter;
+import io.graphenee.core.model.entity.GxFileTag;
+import io.graphenee.core.model.entity.GxFolder;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.storage.FileStorage;
@@ -101,6 +109,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	private GxDocumentFilter filter;
 
+	private GxDocumentSearchList searchList = null;
+	private SplitLayout splitLayout = null;
+
 	public GxDocumentExplorer() {
 		super(GxDocumentExplorerItem.class);
 	}
@@ -147,7 +158,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		for (int i = 0; i < list.size(); i++) {
 			GxDocumentExplorerItem f = list.get(i);
 			if (i > 0) {
-				breadcrumbLayout.add(VaadinIcon.ANGLE_RIGHT.create());
+				Icon icon = VaadinIcon.CHEVRON_RIGHT_SMALL.create();
+				icon.setColor("var(--lumo-primary-text-color)");
+				icon.setSize("1rem");
+				breadcrumbLayout.add(icon);
 			}
 			Button button;
 			if (f.getParent() == null || f.equals(topFolder)) {
@@ -166,7 +180,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "fileTagsJoined", "size", "issueDate", "expiryDate", "expiryReminderInDays" };
+		return new String[] { "extension", "name", "version", "fileTagsJoined", "size", "issueDate", "expiryDate",
+				"expiryReminderInDays" };
 	}
 
 	@Override
@@ -218,8 +233,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	@Override
-	protected AbstractField<?, ?> columnFilterForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
-		if (propertyName.equalsIgnoreCase("fileTagsJoined")){
+	protected AbstractField<?, ?> columnFilterForProperty(String propertyName,
+			PropertyDefinition<GxDocumentExplorerItem, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
+		if (propertyName.equalsIgnoreCase("fileTagsJoined")) {
 			MultiSelectComboBox<GxFileTag> box = new MultiSelectComboBox<>();
 			box.setItems(tagRepository.findAll());
 			box.setClearButtonVisible(true);
@@ -387,11 +403,13 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		return "name";
 	}
 
-	public void initializeWithNamespaceAndStorage(GxNamespace namespace, FileStorage storage) {
+	public void initializeWithNamespaceAndStorageAndSearchListAndLayout(GxNamespace namespace, FileStorage storage, GxDocumentSearchList sList, SplitLayout sLayout) {
 		this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
 		this.selectedFolder = this.topFolder;
 		this.namespace = namespace;
 		this.storage = storage;
+		this.searchList = sList;
+		this.splitLayout = sLayout;
 		generateBreadcrumb(this.selectedFolder);
 		refresh();
 	}
@@ -427,7 +445,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		}
 	}
 
-	private void select(GxDocumentExplorerItem item) {
+	public void select(GxDocumentExplorerItem item) {
 		this.selectedFolder = (item instanceof GxDocument) ? (GxFolder) item.getParent() : (GxFolder) item;
 		generateBreadcrumb(item);
 		refresh();
@@ -444,7 +462,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		downloadButton.getStyle().set("margin", "0");
 		downloadButton.setInputStreamFactory(this::downloadFile);
 		downloadButton.setEnabled(false);
-		toolbarLayout.add(downloadButton);
+
+		Button searchButton = new Button(VaadinIcon.SEARCH.create());
+		searchButton.addClickListener(l -> {
+			splitLayout.setSplitterPosition(0);
+		});
+		toolbarLayout.add(downloadButton, searchButton);
 		super.decorateToolbarLayout(toolbarLayout);
 	}
 

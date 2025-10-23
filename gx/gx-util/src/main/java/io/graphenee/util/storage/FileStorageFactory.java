@@ -111,7 +111,12 @@ public class FileStorageFactory {
 			});
 		}
 
-		@Override
+        @Override
+        public String share(String filePath) throws FileSharingFailedException {
+            throw new UnsupportedOperationException("This feature is not yet implemented.");
+        }
+
+        @Override
 		public boolean exists(String resourcePath) {
 			if (StringUtils.isBlank(resourcePath))
 				return false;

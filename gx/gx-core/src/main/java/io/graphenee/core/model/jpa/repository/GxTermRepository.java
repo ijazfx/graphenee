@@ -32,10 +32,6 @@ import io.graphenee.core.model.jpa.GxJpaRepository;
 @Repository
 public interface GxTermRepository extends GxJpaRepository<GxTerm, Integer> {
 
-	List<GxTerm> findByTermKeyAndSupportedLocaleLocaleCodeStartingWith(String termKey, String localeCode);
-
-	GxTerm findTopByTermKeyAndSupportedLocaleLocaleCodeStartingWithOrderByOidDesc(String termKey, String localeCode);
-
 	List<GxTerm> findByTermKey(String termKey);
 
 	List<GxTerm> findByNamespace(GxNamespace namespace, Sort sort);
@@ -49,13 +45,5 @@ public interface GxTermRepository extends GxJpaRepository<GxTerm, Integer> {
 	Page<GxTerm> findByNamespaceOid(Pageable pageable, Integer oidNamespace);
 
 	List<GxTerm> findByNamespaceOid(Integer oidNamespace);
-
-	Page<GxTerm> findBySupportedLocaleOid(Pageable pageable, Integer oidSupportedLocale);
-
-	List<GxTerm> findBySupportedLocaleOid(Integer oidSupportedLocale);
-
-	Page<GxTerm> findByNamespaceOidAndSupportedLocaleOid(Pageable pageable, Integer oidNamespace, Integer oidSupportedLocale);
-
-	List<GxTerm> findByNamespaceOidAndSupportedLocaleOid(Integer oidNamespace, Integer oidSupportedLocale);
 
 }

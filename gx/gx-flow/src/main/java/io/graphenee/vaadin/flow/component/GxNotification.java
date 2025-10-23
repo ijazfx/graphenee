@@ -37,7 +37,7 @@ public class GxNotification {
 	}
 
 	public static void success(String text, int duration, Position position) {
-		show(text, duration, position, NotificationVariant.LUMO_SUCCESS);
+		show(text, duration, position, NotificationVariant.LUMO_CONTRAST);
 	}
 
 	public static void success(String text, int duration) {

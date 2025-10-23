@@ -1,5 +1,10 @@
 package io.graphenee.od;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.net.UrlEscapers;
+import io.graphenee.util.storage.FileSharingFailedException;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.util.storage.SaveFailedException;
@@ -10,10 +15,14 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.utils.URIUtils;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.jackrabbit.webdav.DavException;
@@ -29,9 +38,11 @@ import org.apache.jackrabbit.webdav.security.SecurityConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
@@ -47,10 +58,12 @@ public class OwnCloudFileStorage implements FileStorage {
 
     private HttpClient httpClient;
     private String rootFolder;
+    private String rootFolderPath;
 
     public OwnCloudFileStorage(String rootFolder, String webDevBaseUrl, String username, String password) {
 
         this.rootFolder = webDevBaseUrl;
+        this.rootFolderPath = rootFolder;
         String credentials = username + ":" + password;
         Collection<Header> defaultHeaders = List.of(
                 new BasicHeader(HttpHeaders.AUTHORIZATION,
@@ -70,7 +83,8 @@ public class OwnCloudFileStorage implements FileStorage {
     @Override
     public boolean exists(String fileName) {
         try {
-            HttpPropfind httpPropfind = new HttpPropfind(rootFolder + "/" + fileName,
+            HttpPropfind httpPropfind = new HttpPropfind(rootFolder + "/" +
+                    UrlEscapers.urlPathSegmentEscaper().escape(fileName).replace("%2F", "/"),
                     getPropertyNamesForFetch(),
                     DEPTH_0);
             HttpResponse response = httpClient.execute(httpPropfind);
@@ -135,7 +149,8 @@ public class OwnCloudFileStorage implements FileStorage {
     @Override
     public Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException {
         return Executors.newVirtualThreadPerTaskExecutor().submit(() -> {
-            String resourcePath = this.resourcePath(folder, fileName);
+            this.createDirectory(folder);
+            String resourcePath = this.resourcePath(folder, UrlEscapers.urlPathSegmentEscaper().escape(fileName));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
             int bytesRead;
@@ -155,7 +170,7 @@ public class OwnCloudFileStorage implements FileStorage {
                 InputStreamEntity entity = new InputStreamEntity(new ByteArrayInputStream(fileData), contentLength);
                 httpPut.setEntity(entity);
                 HttpResponse response = httpClient.execute(httpPut);
-                if (response.getStatusLine().getStatusCode() == 204) {
+                if (response.getStatusLine().getStatusCode() == 204 || response.getStatusLine().getStatusCode() == 201) {
                     long fileSize = fileData.length;
                     return new FileStorage.FileMetaData(resourcePath, fileName, Long.valueOf(fileSize).intValue(),
                             String.valueOf(checksum));
@@ -171,7 +186,8 @@ public class OwnCloudFileStorage implements FileStorage {
     public InputStream resolve(String resourcePath) throws ResolveFailedException {
         if (this.exists(resourcePath)) {
             try {
-                HttpGet httpGet = new HttpGet(this.rootFolder + "/" + resourcePath);
+                HttpGet httpGet = new HttpGet(this.rootFolder + "/" +
+                        UrlEscapers.urlPathSegmentEscaper().escape(resourcePath).replace("%2F", "/"));
 
                 // Execute the request and get the response.
                 HttpResponse response = httpClient.execute(httpGet);
@@ -188,6 +204,51 @@ public class OwnCloudFileStorage implements FileStorage {
             throw new ResolveFailedException("Failed to resolve resource " + resourcePath);
         }
         return null;
+    }
+
+    @Override
+    public String share(String filePath) throws FileSharingFailedException {
+        String fileSharingEndpoint = "/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json";
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String hostName = URIUtils.extractHost(new URI(rootFolder)).toURI();
+            FileSharingRequest fileSharingRequest = FileSharingRequest.builder()
+                    .shareType(3)
+                    .path("/" + rootFolderPath + "/" + filePath)
+                    .name("Grpahenee")
+                    .expireDate("")
+                    .permissions(1)
+                    .password("")
+                    .build();
+            HttpPost httpPost = new HttpPost(hostName + fileSharingEndpoint);
+            httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+            httpPost.setEntity(new StringEntity(objectMapper.writeValueAsString(fileSharingRequest)));
+            HttpResponse response = httpClient.execute(httpPost);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                OCSResponse<Response<FleSharingResponse>> fileSharingResponse =
+                        objectMapper.readValue(response.getEntity().getContent(), new TypeReference<OCSResponse<Response<FleSharingResponse>>>() {
+                        });
+                return fileSharingResponse.getOcs().getData().getUrl();
+            } else {
+                log.error("Creating file sharing link failed. Status code: {}", response.getStatusLine().getStatusCode());
+                throw new FileSharingFailedException("Creating file sharing link failed. Status code: " + response.getStatusLine().getStatusCode());
+            }
+        } catch (URISyntaxException e) {
+            log.error("OD Cloud Base URL not correct: " + e.getMessage());
+            throw new FileSharingFailedException("OD Cloud Base URL not correct: " + e.getMessage(), e.getCause());
+        } catch (UnsupportedEncodingException e) {
+            log.error("Encoded Exception: " + e.getMessage());
+            throw new FileSharingFailedException("Encoded Exception: " + e.getMessage(), e.getCause());
+        } catch (JsonProcessingException e) {
+            log.error("OD Cloud Response is not correct: " + e.getMessage());
+            throw new FileSharingFailedException("OD Cloud Response is not correct: " + e.getMessage(), e.getCause());
+        } catch (ClientProtocolException e) {
+            log.error("Connection failed: " + e.getMessage());
+            throw new FileSharingFailedException("Connection failed: " + e.getMessage(), e.getCause());
+        } catch (IOException e) {
+            log.error("IO Exception :" + e.getMessage());
+            throw new FileSharingFailedException("IO Exception :" + e.getMessage(), e.getCause());
+        }
     }
 
     private DavPropertyNameSet getPropertyNamesForFetch() {

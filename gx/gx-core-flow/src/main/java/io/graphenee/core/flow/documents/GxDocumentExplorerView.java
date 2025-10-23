@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.core.flow.documents;
 
+import com.vaadin.flow.component.splitlayout.SplitLayout;
+import io.graphenee.core.flow.email_template.GxEmailTemplateList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -37,6 +39,9 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 	@Autowired
 	GxDocumentExplorer list;
 
+	@Autowired
+	GxDocumentSearchList searchList;
+
 	@Autowired(required = false)
 	FileStorage storage;
 
@@ -46,6 +51,8 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 	@Autowired(required = false)
 	GxNamespace namespace;
 
+	SplitLayout layout = new SplitLayout();
+
 	@Override
 	protected String getCaption() {
 		return "Documents";
@@ -53,15 +60,26 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
-		rootLayout.add(list);
+		layout.addToPrimary(list);
+		layout.addToSecondary(searchList);
+		layout.setSizeFull();
+		layout.setSplitterPosition(100);
+		rootLayout.add(layout);
 	}
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
+		layout.addToPrimary(list);
+		layout.addToSecondary(searchList);
 		if (namespace == null) {
 			namespace = dataService.systemNamespace();
 		}
-		list.initializeWithNamespaceAndStorage(namespace, storage);
+		searchList.setSplitLayout(layout);
+		searchList.setStorage(storage);
+		searchList.setExplorer(list);
+		searchList.setEditable(false);
+		searchList.refresh();
+		list.initializeWithNamespaceAndStorageAndSearchListAndLayout(namespace, storage, searchList, layout);
 	}
 
 }

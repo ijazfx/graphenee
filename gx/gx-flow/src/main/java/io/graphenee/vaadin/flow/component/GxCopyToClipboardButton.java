@@ -13,7 +13,7 @@ public class GxCopyToClipboardButton extends Button {
 
 	public GxCopyToClipboardButton(Supplier<String> contentProvider) {
 		setIcon(VaadinIcon.COPY_O.create());
-		addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+		addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 		addClickListener(cl -> {
 			String content = contentProvider.get();
 			StringBuilder sb = new StringBuilder();

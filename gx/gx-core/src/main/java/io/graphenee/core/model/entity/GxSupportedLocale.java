@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_supported_locale")
-public class GxSupportedLocale extends GxMappedSuperclass implements Serializable {
+public class GxSupportedLocale extends GxMappedSuperclass {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,7 +40,7 @@ public class GxSupportedLocale extends GxMappedSuperclass implements Serializabl
 	private String localeName;
 
 	@OneToMany(mappedBy = "supportedLocale")
-	private List<GxTerm> terms = new ArrayList<>();
+	private List<GxTermTranslation> translations = new ArrayList<>();
 
 	@Override
 	public String toString() {
