@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,7 +20,6 @@ import io.graphenee.util.JpaSpecificationBuilder;
 import io.graphenee.util.TRCalendarUtil;
 
 @Service
-@DependsOn({ "flyway", "flywayInitializer" })
 @Transactional
 public class GxAuditLogDataServiceImpl implements GxAuditLogDataService {
 

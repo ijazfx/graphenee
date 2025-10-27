@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -95,7 +94,6 @@ import io.graphenee.util.TRCalendarUtil;
 import jakarta.annotation.PostConstruct;
 
 @Service
-@DependsOn({ "flyway", "flywayInitializer" })
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
 
