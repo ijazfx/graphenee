@@ -1,14 +1,12 @@
 package io.graphenee.vaadin.flow.component;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 import org.springframework.util.StreamUtils;
 
 import com.vaadin.flow.component.Component;
@@ -45,6 +43,10 @@ public class FileUploader extends CustomField<String> {
 	// 5MB
 	private int maxFileSize = 5048576;
 
+	private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt");
+	private static final Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv", "image/jpeg", "image/png", "image/gif");
+	private static final int MAX_HEADER_SIZE = 16 * 1024; // 16 KB for Tika detection
+
 	@Setter
 	@Getter
 	private String label;
@@ -56,9 +58,6 @@ public class FileUploader extends CustomField<String> {
 
 	@Getter
 	private String uploadedFileName;
-
-	@Getter
-	private String uploadedFileMimeType;
 
 	@Setter
 	@Getter
@@ -105,19 +104,37 @@ public class FileUploader extends CustomField<String> {
 
 			String desiredFileName = event.getFileName();
 
-			try {
-				File tempFile = File.createTempFile("uploaded", ext);
-				uploadedFilePath = tempFile.getAbsolutePath();
-				uploadedFileName = event.getFileName();
-				uploadedFileMimeType = event.getMIMEType();
+			try(InputStream is = buffer.getInputStream()) {
+				String lowerFileName = desiredFileName.toLowerCase();
+				if (ALLOWED_EXTENSIONS.stream().noneMatch(lowerFileName::endsWith)) {
+					throw new IllegalArgumentException("File extension not allowed: " + desiredFileName);
+				}
+				ByteArrayOutputStream headerOut = new ByteArrayOutputStream();
+				byte[] buf = new byte[4096];
+				int bytesRead, total = 0;
+				while ((bytesRead = is.read(buf)) != -1 && total < MAX_HEADER_SIZE) {
+					int toWrite = Math.min(bytesRead, MAX_HEADER_SIZE - total);
+					headerOut.write(buf, 0, toWrite);
+					total += toWrite;
+					if (total >= MAX_HEADER_SIZE) {
+						break;
+					}
+				}
+				byte[] headerBuffer = headerOut.toByteArray();
 
-				try (FileOutputStream os = new FileOutputStream(tempFile)) {
-					InputStream is = buffer.getInputStream();
-					StreamUtils.copy(is, os);
-				} catch (Exception e) {
-					e.printStackTrace();
+				Tika tika = new Tika();
+				String detectedMimeType = tika.detect(headerBuffer, desiredFileName);
+				if (detectedMimeType == null || !ALLOWED_MIME_TYPES.contains(detectedMimeType)) {
+					throw new IllegalArgumentException("Unsupported or suspicious file type: " + detectedMimeType);
 				}
 
+				File tempFile = File.createTempFile("uploaded", ext);
+				try (OutputStream os = new FileOutputStream(tempFile)) {
+					os.write(headerBuffer); // write initial header buffer
+					StreamUtils.copy(is, os); // write remaining content
+				}
+
+				uploadedFilePath = tempFile.getAbsolutePath();
 				File receivedFile = new File(uploadedFilePath);
 				File newFile = new File(receivedFile.getParent(), storageFileName);
 				receivedFile.renameTo(newFile);
@@ -134,9 +151,8 @@ public class FileUploader extends CustomField<String> {
 				}
 
 				setValue(uploadedFilePath);
-
 			} catch (IOException e) {
-				log.warn(e.getMessage());
+				throw new RuntimeException(e);
 			}
 
 		});

@@ -225,7 +225,7 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 				return false;
 			}).count() > 0;
 		}
-		return getFolder() == null || getFolder().isGranted(user);
+		return getFolder() != null && getFolder().isGranted(user);
 	}
 
 }

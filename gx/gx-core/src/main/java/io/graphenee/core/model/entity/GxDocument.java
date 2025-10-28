@@ -199,7 +199,7 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 				return false;
 			}).count() > 0;
 		}
-		return getFolder() == null || getFolder().isGranted(user);
+		return getFolder() != null && getFolder().isGranted(user);
 	}
 
 }

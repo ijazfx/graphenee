@@ -90,6 +90,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	GxFileUploadForm uploadForm;
 
 	@Autowired
+	GxFileUploadForm quickUploadForm;
+
+	@Autowired
 	GxFileUploadNewVersionForm uploadNewVersionForm;
 
 	@Autowired
@@ -181,7 +184,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "tagsJoined", "size", "issueDate", "expiryDate",
+		return new String[] { "extension", "name", "version", "owner.name", "tagsJoined", "size", "issueDate",
+				"expiryDate",
 				"expiryReminderInDays" };
 	}
 
@@ -194,6 +198,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		}
 		if (propertyName.matches("(tagsJoined)")) {
 			column.setHeader("Tags");
+			column.setWidth("13rem");
+		}
+		if (propertyName.matches("(owner.name)")) {
+			column.setHeader("Owner");
 			column.setWidth("13rem");
 		}
 	}
@@ -581,7 +589,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	public void uploadSingle(GxDocumentFilter filter, TRParamCallback<GxDocument> onChoose) {
-		GxFileUploadForm quickUploadForm = new GxFileUploadForm();
 		quickUploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
 			uploadedFiles.forEach(uploadedFile -> {
 				try {

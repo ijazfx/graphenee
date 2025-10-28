@@ -1,13 +1,12 @@
 package io.graphenee.core.flow.documents;
 
-import com.vaadin.flow.server.streams.FileFactory;
-import com.vaadin.flow.server.streams.UploadMetadata;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+
+import com.vaadin.flow.server.streams.FileFactory;
+import com.vaadin.flow.server.streams.UploadMetadata;
 
 public class GxFileFactory implements FileFactory {
     @Override

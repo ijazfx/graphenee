@@ -79,4 +79,6 @@ public interface GxDocumentExplorerItem {
 
 	boolean isGranted(GxAuthenticatedUser user);
 
+	GxUserAccount getOwner();
+
 }
