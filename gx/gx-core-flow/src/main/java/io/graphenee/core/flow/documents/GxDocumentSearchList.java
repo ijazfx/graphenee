@@ -1,13 +1,20 @@
 package io.graphenee.core.flow.documents;
 
-import ch.qos.logback.core.util.StringUtil;
-import com.vaadin.flow.component.Text;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.ItemClickEvent;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
@@ -19,28 +26,21 @@ import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
+
+import ch.qos.logback.core.util.StringUtil;
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
-import io.graphenee.core.model.entity.GxFileTag;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityLazyList;
-import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @SuppressWarnings("serial")
@@ -52,7 +52,7 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
     GxDocumentExplorerService documentService;
 
     @Autowired
-    GxFileTagRepository tagRepository;
+    GxDataService dataService;
 
     @Setter
     private SplitLayout splitLayout = null;
@@ -63,21 +63,24 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
     @Setter
     GxDocumentExplorer explorer = null;
 
+    private MultiSelectComboBox<GxTag> tagBox = new MultiSelectComboBox<>("Search by Tags");
+
     public GxDocumentSearchList() {
         super(GxDocumentExplorerItem.class);
     }
 
     @Override
     protected int getTotalCount(GxDocumentExplorerItem searchEntity) {
-        if (StringUtil.isNullOrEmpty(searchEntity.getName()) && searchEntity.getFileTags().isEmpty()) {
+        if (StringUtil.isNullOrEmpty(searchEntity.getName()) && searchEntity.getTags().isEmpty()) {
             return 0;
         }
         return documentService.countAll(searchEntity).intValue();
     }
 
     @Override
-    protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem searchEntity, List<QuerySortOrder> sortOrders) {
-        if (StringUtil.isNullOrEmpty(searchEntity.getName()) && searchEntity.getFileTags().isEmpty()) {
+    protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem searchEntity,
+            List<QuerySortOrder> sortOrders) {
+        if (StringUtil.isNullOrEmpty(searchEntity.getName()) && searchEntity.getTags().isEmpty()) {
             return Stream.empty();
         }
         return documentService.findAll(searchEntity).stream();
@@ -85,7 +88,7 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
 
     @Override
     protected String[] visibleProperties() {
-        return new String[]{"extension", "name", "fileTagsJoined"};
+        return new String[] { "extension", "name", "tagsJoined" };
     }
 
     @Override
@@ -120,7 +123,7 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
             column.setWidth("4.5rem");
             column.setTextAlign(ColumnTextAlign.CENTER);
         }
-        if (propertyName.matches("(fileTagsJoined)")) {
+        if (propertyName.matches("(tagsJoined)")) {
             column.setHeader("Tags");
             column.setWidth("13rem");
         }
@@ -140,7 +143,8 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
     }
 
     @Override
-    protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName, PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
+    protected Renderer<GxDocumentExplorerItem> rendererForProperty(String propertyName,
+            PropertyDefinition<GxDocumentExplorerItem, ?> propertyDefinition) {
         if (propertyName.equalsIgnoreCase("extension")) {
             return new ComponentRenderer<>(s -> {
                 Image image = null;
@@ -182,10 +186,8 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
             refresh();
         });
 
-        MultiSelectComboBox<GxFileTag> tagBox = new MultiSelectComboBox<>("Search by Tags");
-        tagBox.setItems(tagRepository.findAll());
         tagBox.addValueChangeListener(l -> {
-            getSearchEntity().setFileTags(l.getValue());
+            getSearchEntity().setTags(l.getValue());
             refresh();
         });
 
@@ -206,7 +208,7 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
         super.onGridItemClicked(icl);
         GxDocumentExplorerItem item = icl.getItem();
         explorer.select(item);
-//        explorer.refresh();
+        // explorer.refresh();
         splitLayout.setSplitterPosition(100);
     }
 
@@ -236,4 +238,10 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
 
         }
     }
+
+    public void initializeByNamespace(GxNamespace namespace) {
+        this.getSearchEntity().setNamespace(namespace);
+        tagBox.setItems(dataService.findTagByNamespace(namespace));
+    }
+
 }

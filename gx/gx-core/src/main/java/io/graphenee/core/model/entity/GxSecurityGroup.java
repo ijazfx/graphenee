@@ -15,14 +15,11 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
-import java.util.Comparator;
+import java.security.Principal;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -30,7 +27,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Entity
 @Table(name = "gx_security_group")
-public class GxSecurityGroup extends GxMappedSuperclass implements Serializable {
+public class GxSecurityGroup extends GxMappedSuperclass implements Principal {
 
 	private static final long serialVersionUID = 1L;
 
@@ -55,18 +51,30 @@ public class GxSecurityGroup extends GxMappedSuperclass implements Serializable 
 	private GxNamespace namespace;
 
 	@ManyToMany
-	@JoinTable(name = "gx_security_group_security_policy_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_security_policy") })
+	@JoinTable(name = "gx_security_group_security_policy_join", joinColumns = {
+			@JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_security_policy") })
 	private Set<GxSecurityPolicy> securityPolicies = new HashSet<>();
 
 	@ManyToMany
-	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_user_account") })
+	@JoinTable(name = "gx_user_account_security_group_join", joinColumns = {
+			@JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_user_account") })
 	private Set<GxUserAccount> userAccounts = new HashSet<>();
 
 	@ManyToMany
-	@JoinTable(name = "gx_access_key_security_group_join", joinColumns = { @JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
-			@JoinColumn(name = "oid_access_key") })
+	@JoinTable(name = "gx_access_key_security_group_join", joinColumns = {
+			@JoinColumn(name = "oid_security_group") }, inverseJoinColumns = {
+					@JoinColumn(name = "oid_access_key") })
 	private Set<GxAccessKey> accessKeys = new HashSet<>();
+
+	@Override
+	public String getName() {
+		return getSecurityGroupName();
+	}
+
+	public boolean isMember(GxAuthenticatedUser user) {
+		return userAccounts.contains(user);
+	}
 
 }

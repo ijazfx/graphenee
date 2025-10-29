@@ -2,6 +2,7 @@ package io.graphenee.documents;
 
 import java.util.List;
 
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxDocumentFilter;
@@ -36,9 +37,11 @@ public interface GxDocumentExplorerService {
 
 	void deleteDocument(List<GxDocument> documents);
 
-	Long countChildren(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter);
+	Long countChildren(GxAuthenticatedUser user, GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity,
+			GxDocumentFilter filter);
 
-	List<GxDocumentExplorerItem> findExplorerItem(GxDocumentExplorerItem parent, GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey);
+	List<GxDocumentExplorerItem> findExplorerItem(GxAuthenticatedUser user, GxDocumentExplorerItem parent,
+			GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey);
 
 	List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item);
 

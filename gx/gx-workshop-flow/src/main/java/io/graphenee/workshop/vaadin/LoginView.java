@@ -11,7 +11,6 @@ import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
 import io.graphenee.common.exception.PasswordChangeRequiredException;
 import io.graphenee.core.GxDataService;
-import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
@@ -57,7 +56,7 @@ public class LoginView extends GxAbstractLoginView {
         if (user.getIsPasswordChangeRequired()) {
             throw new PasswordChangeRequiredException();
         }
-        return new GxUserAccountDashboardUser(user);
+        return user;
     }
 
 }

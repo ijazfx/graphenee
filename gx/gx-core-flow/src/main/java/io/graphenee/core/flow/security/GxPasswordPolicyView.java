@@ -6,9 +6,9 @@ import com.twilio.rest.api.v2010.account.Notification;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
-import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxPasswordPolicy;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.component.GxNotification;
@@ -43,8 +43,8 @@ public class GxPasswordPolicyView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		if (loggedInUser() instanceof GxUserAccountDashboardUser) {
-			GxNamespace namespace = ((GxUserAccountDashboardUser) loggedInUser()).getUser().getNamespace();
+		if (loggedInUser() instanceof GxUserAccount) {
+			GxNamespace namespace = ((GxUserAccount) loggedInUser()).getNamespace();
 			GxPasswordPolicy policy = passwordPolicyDataService.findPasswordPolicyByNamespace(namespace);
 			if (policy == null) {
 				policy = new GxPasswordPolicy();

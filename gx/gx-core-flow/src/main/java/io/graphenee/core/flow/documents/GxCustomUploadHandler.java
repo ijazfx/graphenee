@@ -11,8 +11,13 @@ public class GxCustomUploadHandler extends AbstractFileUploadHandler<GxCustomUpl
     private FileUploadCallback gxSuccessCallback;
     private FileFactory gxFileFactory;
 
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt");
-    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv", "image/jpeg", "image/png", "image/gif");
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv",
+            ".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt");
+    private static final Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv",
+            "image/jpeg", "image/png", "image/gif");
     private static final int MAX_HEADER_SIZE = 16 * 1024; // 16 KB for Tika detection
 
     public GxCustomUploadHandler(FileUploadCallback successCallback, FileFactory fileFactory) {
@@ -34,8 +39,8 @@ public class GxCustomUploadHandler extends AbstractFileUploadHandler<GxCustomUpl
 
             file = gxFileFactory.createFile(metadata);
             try (InputStream inputStream = event.getInputStream();
-                 FileOutputStream outputStream = new FileOutputStream(
-                         file)) {
+                    FileOutputStream outputStream = new FileOutputStream(
+                            file)) {
 
                 ByteArrayOutputStream headerOut = new ByteArrayOutputStream();
                 byte[] buf = new byte[4096];
@@ -79,6 +84,5 @@ public class GxCustomUploadHandler extends AbstractFileUploadHandler<GxCustomUpl
             }
         });
     }
-
 
 }

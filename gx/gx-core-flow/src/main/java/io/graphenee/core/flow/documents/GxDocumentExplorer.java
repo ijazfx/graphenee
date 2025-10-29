@@ -2,16 +2,16 @@ package io.graphenee.core.flow.documents;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -36,6 +36,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -47,11 +48,13 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxDocumentFilter;
-import io.graphenee.core.model.entity.GxFileTag;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import io.graphenee.core.model.entity.GxTag;
+import io.graphenee.core.model.entity.GxUserAccount;
+import io.graphenee.core.model.jpa.repository.GxTagRepository;
 import io.graphenee.documents.GxDocumentExplorerService;
+import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
@@ -66,7 +69,6 @@ import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplorerItem> {
@@ -75,7 +77,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	GxDocumentExplorerService documentService;
 
 	@Autowired
-	GxFileTagRepository tagRepository;
+	GxTagRepository tagRepository;
 
 	@Autowired
 	GxDocumentExplorerItemForm form;
@@ -122,25 +124,26 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected int getChildCount(GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.countChildren(parent, getSearchEntity(), filter).intValue();
+			return documentService.countChildren(loggedInUser(), parent, getSearchEntity(), filter).intValue();
 		}
-		return documentService.countChildren(selectedFolder, getSearchEntity(), filter).intValue();
+		return documentService.countChildren(loggedInUser(), selectedFolder, getSearchEntity(), filter).intValue();
 	}
 
 	@Override
 	protected boolean hasChildren(GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.countChildren(parent, getSearchEntity(), filter) > 0;
+			return documentService.countChildren(loggedInUser(), parent, getSearchEntity(), filter) > 0;
 		}
-		return documentService.countChildren(selectedFolder, getSearchEntity(), filter) > 0;
+		return documentService.countChildren(loggedInUser(), selectedFolder, getSearchEntity(), filter) > 0;
 	}
 
 	@Override
 	protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.findExplorerItem(parent, getSearchEntity(), filter, "name").stream();
+			return documentService.findExplorerItem(loggedInUser(), parent, getSearchEntity(), filter, "name").stream();
 		}
-		return documentService.findExplorerItem(selectedFolder, getSearchEntity(), filter, "name").stream();
+		return documentService.findExplorerItem(loggedInUser(), selectedFolder, getSearchEntity(), filter, "name")
+				.stream();
 	}
 
 	private void generateBreadcrumb(GxDocumentExplorerItem parent) {
@@ -183,7 +186,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "fileTagsJoined", "size", "issueDate", "expiryDate",
+		return new String[] { "extension", "name", "version", "owner.name", "tagsJoined", "size", "issueDate",
+				"expiryDate",
 				"expiryReminderInDays" };
 	}
 
@@ -194,8 +198,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			column.setWidth("3rem");
 			column.setTextAlign(ColumnTextAlign.CENTER);
 		}
-		if (propertyName.matches("(fileTagsJoined)")) {
+		if (propertyName.matches("(tagsJoined)")) {
 			column.setHeader("Tags");
+			column.setWidth("13rem");
+		}
+		if (propertyName.matches("(owner.name)")) {
+			column.setHeader("Owner");
 			column.setWidth("13rem");
 		}
 	}
@@ -238,12 +246,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected AbstractField<?, ?> columnFilterForProperty(String propertyName,
 			PropertyDefinition<GxDocumentExplorerItem, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
-		if (propertyName.equalsIgnoreCase("fileTagsJoined")) {
-			MultiSelectComboBox<GxFileTag> box = new MultiSelectComboBox<>();
+		if (propertyName.equalsIgnoreCase("tagsJoined")) {
+			MultiSelectComboBox<GxTag> box = new MultiSelectComboBox<>();
 			box.setItems(tagRepository.findAll());
 			box.setClearButtonVisible(true);
 			box.addValueChangeListener(l -> {
-				getSearchEntity().setFileTags(l.getValue());
+				getSearchEntity().setTags(l.getValue());
 				refresh();
 			});
 			return box;
@@ -281,8 +289,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected void customizeAddMenuItem(MenuItem addMenuItem) {
 		addMenuItem.getSubMenu().addItem("Create Folder", cl -> {
+			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			GxFolder newFolder = new GxFolder();
 			newFolder.setNamespace(namespace);
+			newFolder.setOwner(user);
 			if (entityGrid().getSelectedItems().size() == 1) {
 				GxDocumentExplorerItem selectedContainer = entityGrid().getSelectedItems().iterator().next();
 				if (!selectedContainer.isFile()) {
@@ -325,20 +335,24 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		});
 
 		uploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
+			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
-					File file = uploadedFile.getFile();
-					Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-					FileMetaData metaData = savedFile.get();
 					GxDocument d = new GxDocument();
+					File file = uploadedFile.getFile();
+					FileInputStream fis = new FileInputStream(file);
+					String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+					Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+					FileMetaData metaData = savedFile.get();
+					d.setOwner(user);
 					d.setFolder(parentFolder);
 					d.setSize((long) metaData.getFileSize());
 					d.setNamespace(parentFolder.getNamespace());
 					d.setName(uploadedFile.getFileName());
 					d.setPath(metaData.getFileName());
 					d.setMimeType(uploadedFile.getMimeType());
-					if (uploadedFile.getFileTags() != null) {
-						d.getFileTags().addAll(uploadedFile.getFileTags());
+					if (uploadedFile.getTags() != null) {
+						d.getTags().addAll(uploadedFile.getTags());
 					}
 					documentService.saveDocument(parentFolder, List.of(d));
 				} catch (Exception ex) {
@@ -350,11 +364,15 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		});
 
 		uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
+			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			try {
-				File file = uploadedFile.getFile();
-				Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-				FileMetaData metaData = savedFile.get();
 				GxDocument d = new GxDocument();
+				File file = uploadedFile.getFile();
+				FileInputStream fis = new FileInputStream(file);
+				String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+				Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+				FileMetaData metaData = savedFile.get();
+				d.setOwner(user);
 				d.setSize((long) metaData.getFileSize());
 				d.setNamespace(parentDocument.getNamespace());
 				d.setName(uploadedFile.getFileName());
@@ -406,7 +424,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		return "name";
 	}
 
-	public void initializeWithNamespaceAndStorageAndSearchListAndLayout(GxNamespace namespace, FileStorage storage, GxDocumentSearchList sList, SplitLayout sLayout) {
+	public void initializeWithNamespaceAndStorageAndSearchListAndLayout(GxNamespace namespace, FileStorage storage,
+			GxDocumentSearchList sList, SplitLayout sLayout) {
 		this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
 		this.selectedFolder = this.topFolder;
 		this.namespace = namespace;
@@ -428,7 +447,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected GxDocumentExplorerItem initializeSearchEntity() {
-		return new GxDocument();
+		GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
+		GxDocument document = new GxDocument();
+		document.setGrants(Set.of(user));
+		return document;
 	}
 
 	@Override
@@ -476,7 +498,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	public InputStream downloadFile() {
 		if (!entityGrid().getSelectedItems().isEmpty()) {
-			GxDocumentExplorerItem d = entityGrid().getSelectedItems().iterator().next();
+			GxDocumentExplorerItem d = entityGrid().getSelectedItems().stream().iterator().next();
 			if (d.isFile()) {
 				GxDocument document = (GxDocument) d;
 				downloadButton.setDefaultFileName(d.getName());
@@ -498,7 +520,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected void onGridItemSelect(SelectionEvent<Grid<GxDocumentExplorerItem>, GxDocumentExplorerItem> event) {
 		if (!event.getAllSelectedItems().isEmpty() && event.getAllSelectedItems().size() == 1) {
-			GxDocumentExplorerItem d = entityGrid().getSelectedItems().iterator().next();
+			GxDocumentExplorerItem d = entityGrid().getSelectedItems().stream().iterator().next();
 			downloadButton.setEnabled(d.isFile());
 		} else {
 			downloadButton.setEnabled(false);
@@ -576,10 +598,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		quickUploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
-					File file = uploadedFile.getFile();
-					Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-					FileMetaData metaData = savedFile.get();
 					GxDocument d = new GxDocument();
+					File file = uploadedFile.getFile();
+					FileInputStream fis = new FileInputStream(file);
+					String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+					Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+					FileMetaData metaData = savedFile.get();
 					d.setFolder(parentFolder);
 					d.setSize((long) metaData.getFileSize());
 					d.setNamespace(parentFolder.getNamespace());

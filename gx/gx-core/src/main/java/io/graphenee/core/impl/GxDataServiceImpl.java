@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.graphenee.core.impl;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,7 @@ import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
+import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
@@ -85,6 +88,7 @@ import io.graphenee.core.model.jpa.repository.GxSecurityPolicyRepository;
 import io.graphenee.core.model.jpa.repository.GxSmsProviderRepository;
 import io.graphenee.core.model.jpa.repository.GxStateRepository;
 import io.graphenee.core.model.jpa.repository.GxSupportedLocaleRepository;
+import io.graphenee.core.model.jpa.repository.GxTagRepository;
 import io.graphenee.core.model.jpa.repository.GxTermRepository;
 import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.security.exception.GxPermissionException;
@@ -1269,6 +1273,21 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxAccessKey> findAccessKeyBySecurityPolicy(GxSecurityPolicy policy) {
 		return accessKeyRepo.findAllBySecurityPoliciesEquals(policy);
+	}
+
+	@Override
+	public List<Principal> findPrincipalActiveByNamespace(GxNamespace namespace) {
+		List<GxSecurityGroup> groups = findSecurityGroupByNamespaceActive(namespace);
+		List<GxUserAccount> users = findUserAccountByNamespace(namespace);
+		return Stream.concat(groups.stream(), users.stream()).map(p -> (Principal) p).toList();
+	}
+
+	@Autowired
+	GxTagRepository tagRepository;
+
+	@Override
+	public List<GxTag> findTagByNamespace(GxNamespace namespace) {
+		return tagRepository.findAllByNamespaceOrderByTag(namespace);
 	}
 
 }

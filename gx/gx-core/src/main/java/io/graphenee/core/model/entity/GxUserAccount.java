@@ -15,7 +15,6 @@
  *******************************************************************************/
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,6 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
+import com.google.common.base.Strings;
+
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.core.model.bean.GxSecurityPolicyStatement;
 import io.graphenee.security.GxSecurityPolicyParser;
@@ -50,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Entity
 @Table(name = "gx_user_account")
-public class GxUserAccount extends GxMappedSuperclass implements Serializable {
+public class GxUserAccount extends GxMappedSuperclass implements GxAuthenticatedUser {
 
 	private static final long serialVersionUID = 1L;
 
@@ -162,8 +164,6 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 		action = action.toLowerCase();
 		Map<String, GxSecurityPolicyStatement> grantActionSet = grantMap().get(resource);
 		Map<String, GxSecurityPolicyStatement> revokeActionSet = revokeMap().get(resource);
-
-		GxSecurityPolicyParser parser = GxSecurityPolicyParserFactory.defaultParser();
 
 		if (revokeActionSet != null && revokeActionSet.containsKey(action))
 			return false;
@@ -284,4 +284,25 @@ public class GxUserAccount extends GxMappedSuperclass implements Serializable {
 
 	}
 
+	public boolean isMember(GxSecurityGroup group) {
+		return securityGroups.contains(group);
+	}
+
+	@Override
+	public byte[] getProfilePhoto() {
+		return profileImage;
+	}
+
+	@Override
+	public String getMobileNumber() {
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		if (!Strings.isNullOrEmpty(getEmail())) {
+			return getEmail();
+		}
+		return getUsername();
+	}
 }
