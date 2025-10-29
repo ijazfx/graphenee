@@ -1,36 +1,36 @@
 package io.graphenee.core.flow.documents;
 
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import io.graphenee.core.model.entity.GxFileTag;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import java.security.Principal;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxFolder;
+import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 
 	@Autowired
-	GxFileTagRepository tagRepository;
+	GxDataService dataService;
 
 	TextField name;
 	TextArea note;
-	MultiSelectComboBox<GxFileTag> fileTags;
-
+	MultiSelectComboBox<GxTag> tags;
+	MultiSelectComboBox<Principal> grants;
 
 	public GxFolderForm() {
 		super(GxFolder.class);
@@ -41,37 +41,30 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 		name = new TextField("Folder Name");
 		note = new TextArea("Note");
 		note.setHeight("7rem");
-
-		fileTags = new MultiSelectComboBox<>("Add Tags");
-
-		fileTags.addCustomValueSetListener(l -> {
-			GxFileTag newTag = new GxFileTag();
+		tags = new MultiSelectComboBox<>("Add Tags");
+		tags.addCustomValueSetListener(l -> {
+			GxTag newTag = new GxTag();
 			newTag.setTag(l.getDetail());
-			newTag.setOid(null);
-
-			// Copy current value into a mutable set
-			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			newTag.setNamespace(getEntity().getNamespace());
+			tags.getListDataView().addItem(newTag);
+			Set<GxTag> updated = new HashSet<>(tags.getValue());
 			updated.add(newTag);
-
-			// Update items (so the combo knows this tag exists)
-			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
-			items.add(newTag);
-			fileTags.setItems(items);
-
-			// Set new value
-			fileTags.setValue(updated);
+			tags.setValue(updated);
+			tags.setOpened(false);
 		});
+		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
+		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(name, note, fileTags);
-
-		setColspan(fileTags, 2);
-
-		expand(name, note);
+		entityForm.add(name, note, tags, grants);
+		expand(name, note, tags, grants);
 	}
 
 	@Override
 	protected void preBinding(GxFolder entity) {
-		fileTags.setItems(tagRepository.findAll());
+		tags.clear();
+		grants.clear();
+		tags.setItems(dataService.findTagByNamespace(entity.getNamespace()));
+		grants.setItems(dataService.findPrincipalActiveByNamespace(entity.getNamespace()));
 	}
 
 	@Override
@@ -80,13 +73,18 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 	}
 
 	@Override
-	protected String formTitleProperty() {
-		return "name";
+	protected String dialogHeight() {
+		return "37.5rem";
 	}
 
 	@Override
-	protected String dialogHeight() {
-		return "400px";
+	protected String dialogWidth() {
+		return "50rem";
+	}
+
+	@Override
+	protected String formTitleProperty() {
+		return "name";
 	}
 
 }

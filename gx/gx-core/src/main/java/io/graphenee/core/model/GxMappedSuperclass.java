@@ -80,9 +80,9 @@ public class GxMappedSuperclass implements Serializable, GxSortable, GxAuditable
 		if (obj == null)
 			return false;
 		GxMappedSuperclass src = (GxMappedSuperclass) obj;
-		if (oid != null && src.oid != null)
-			return oid.equals(src.oid);
-		return uuid.equals(src.uuid);
+		if ((oid == null && src.oid == null) || !getClass().equals(obj.getClass()))
+			return uuid.equals(src.uuid);
+		return oid.equals(src.oid);
 	}
 
 	@Override

@@ -117,7 +117,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 				avatar.setImageHandler(dh);
 			}
 			avatar.getElement().addEventListener("click", e -> {
-				GxAbstractEntityForm<?> profileForm = getProfileForm(user);
+				GxAbstractEntityForm<GxAuthenticatedUser> profileForm = getProfileForm(user);
 				if (profileForm != null) {
 					showProfileDialog(profileForm);
 				}
@@ -161,12 +161,12 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 
 	}
 
-	private <T> void showProfileDialog(GxAbstractEntityForm<T> profileForm) {
-		T entity = profileForm.getEntity();
+	private <T> void showProfileDialog(GxAbstractEntityForm<GxAuthenticatedUser> profileForm) {
+		GxAuthenticatedUser entity = profileForm.getEntity();
 		profileForm.showInDialog(entity);
-		profileForm.setDelegate(new GxAbstractEntityForm.EntityFormDelegate<T>() {
+		profileForm.setDelegate(new GxAbstractEntityForm.EntityFormDelegate<GxAuthenticatedUser>() {
 			@Override
-			public void onSave(T entity) {
+			public void onSave(GxAuthenticatedUser entity) {
 				saveProfile(entity);
 
 			}
@@ -186,7 +186,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 	 *
 	 * @param user The user for form.
 	 */
-	protected GxAbstractEntityForm<?> getProfileForm(GxAuthenticatedUser user) {
+	protected <T extends GxAuthenticatedUser> GxAbstractEntityForm<T> getProfileForm(T user) {
 		return null;
 	}
 
@@ -195,7 +195,7 @@ public abstract class GxAbstractAppLayout extends AppLayout implements LocaleCha
 	 *
 	 * @param user The user to save.
 	 */
-	protected void saveProfile(Object user) {
+	protected void saveProfile(GxAuthenticatedUser user) {
 	}
 
 	private boolean canDoAction(GxAuthenticatedUser user, String action, GxMenuItem mi) {

@@ -2,6 +2,7 @@ package io.graphenee.core.flow.documents;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.documents.GxDocumentExplorerService;
+import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
@@ -141,10 +143,12 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 	protected void postBuild() {
 		uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
 			try {
-				File file = uploadedFile.getFile();
-				Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-				FileMetaData metaData = savedFile.get();
 				GxDocument d = new GxDocument();
+				File file = uploadedFile.getFile();
+				FileInputStream fis = new FileInputStream(file);
+				String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+				Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+				FileMetaData metaData = savedFile.get();
 				d.setSize((long) metaData.getFileSize());
 				d.setNamespace(parentDocument.getNamespace());
 				d.setName(uploadedFile.getFileName());

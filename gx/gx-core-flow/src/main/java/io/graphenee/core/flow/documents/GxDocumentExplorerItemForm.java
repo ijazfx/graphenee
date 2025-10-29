@@ -1,5 +1,6 @@
 package io.graphenee.core.flow.documents;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,17 +18,18 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
-import io.graphenee.core.model.entity.GxFileTag;
-import io.graphenee.core.model.jpa.repository.GxFileTagRepository;
+import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 
+@SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
 public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentExplorerItem> {
 
 	@Autowired
-	GxFileTagRepository tagRepository;
+	GxDataService dataService;
 
 	TextField name;
 	TextArea note;
@@ -35,7 +37,8 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 	DatePicker expiryDate;
 	IntegerField expiryReminderInDays;
 	DatePicker reminderDate;
-	MultiSelectComboBox<GxFileTag> fileTags;
+	MultiSelectComboBox<GxTag> tags;
+	MultiSelectComboBox<Principal> grants;
 
 	public GxDocumentExplorerItemForm() {
 		super(GxDocumentExplorerItem.class);
@@ -51,47 +54,47 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		expiryDate = new DatePicker("Expiry Date");
 		expiryReminderInDays = new IntegerField("Expiry Reminder (in Days)");
 		expiryReminderInDays.setMin(0);
-
 		reminderDate = new DatePicker("Reminder Date");
-
-		fileTags = new MultiSelectComboBox<>("Add Tags");
-
-		fileTags.addCustomValueSetListener(l -> {
-			GxFileTag newTag = new GxFileTag();
+		tags = new MultiSelectComboBox<>("Add Tags");
+		tags.addCustomValueSetListener(l -> {
+			GxTag newTag = new GxTag();
 			newTag.setTag(l.getDetail());
 			newTag.setOid(null);
 
 			// Copy current value into a mutable set
-			Set<GxFileTag> updated = new HashSet<>(fileTags.getValue());
+			Set<GxTag> updated = new HashSet<>(tags.getValue());
 			updated.add(newTag);
 
 			// Update items (so the combo knows this tag exists)
-			List<GxFileTag> items = new ArrayList<>(fileTags.getListDataView().getItems().toList());
+			List<GxTag> items = new ArrayList<>(tags.getListDataView().getItems().toList());
 			items.add(newTag);
-			fileTags.setItems(items);
+			tags.setItems(items);
 
 			// Set new value
-			fileTags.setValue(updated);
+			tags.setValue(updated);
 		});
+		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
+		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, fileTags);
+		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags, grants);
 
-		setColspan(fileTags, 2);
-
-		expand(name, note);
+		expand(name, note, tags, grants);
 	}
 
 	@Override
 	protected void bindFields(Binder<GxDocumentExplorerItem> dataBinder) {
 		dataBinder.forMemberField(name).asRequired();
-		dataBinder.forMemberField(issueDate); //.withConverter(new TimestampToDateConverter());
-		dataBinder.forMemberField(expiryDate); //.withConverter(new TimestampToDateConverter());
-		dataBinder.forMemberField(reminderDate); //.withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(issueDate); // .withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(expiryDate); // .withConverter(new TimestampToDateConverter());
+		dataBinder.forMemberField(reminderDate); // .withConverter(new TimestampToDateConverter());
 	}
 
 	@Override
 	protected void preBinding(GxDocumentExplorerItem entity) {
-		fileTags.setItems(tagRepository.findAll());
+		tags.clear();
+		grants.clear();
+		tags.setItems(dataService.findTagByNamespace(entity.getNamespace()));
+		grants.setItems(dataService.findPrincipalActiveByNamespace(entity.getNamespace()));
 	}
 
 	@Override
@@ -121,7 +124,12 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 
 	@Override
 	protected String dialogHeight() {
-		return "550px";
+		return "50rem";
+	}
+
+	@Override
+	protected String dialogWidth() {
+		return "50rem";
 	}
 
 }

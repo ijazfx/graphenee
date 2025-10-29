@@ -1,8 +1,11 @@
 package io.graphenee.core.model.entity;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+
+import io.graphenee.common.GxAuthenticatedUser;
 
 public interface GxDocumentExplorerItem {
 
@@ -20,11 +23,11 @@ public interface GxDocumentExplorerItem {
 
 	String getRelativePath();
 
-	Set<GxFileTag> getFileTags();
+	Set<GxTag> getTags();
 
-	String getFileTagsJoined();
+	String getTagsJoined();
 
-	void setFileTags(Set<GxFileTag> tags);
+	void setTags(Set<GxTag> tags);
 
 	void setName(String name);
 
@@ -64,5 +67,17 @@ public interface GxDocumentExplorerItem {
 	void setExpiryDate(LocalDate expiryDate);
 
 	void setExpiryReminderInDays(Integer expiryReminderInDays);
+
+	GxNamespace getNamespace();
+
+	void setNamespace(GxNamespace namespace);
+
+	Set<Principal> getGrants();
+
+	void setGrants(Set<Principal> grants);
+
+	boolean isGranted(GxAuthenticatedUser user);
+
+	GxUserAccount getOwner();
 
 }

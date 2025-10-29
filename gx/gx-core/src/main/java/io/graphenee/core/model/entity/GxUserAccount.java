@@ -28,6 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 
+import com.google.common.base.Strings;
+
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.core.model.bean.GxSecurityPolicyStatement;
 import io.graphenee.security.GxSecurityPolicyParser;
@@ -49,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Entity
 @Table(name = "gx_user_account")
-public class GxUserAccount extends GxMappedSuperclass {
+public class GxUserAccount extends GxMappedSuperclass implements GxAuthenticatedUser {
 
 	private LocalDateTime accountActivationDate;
 	private Integer countLoginFailed = 0;
@@ -279,4 +282,25 @@ public class GxUserAccount extends GxMappedSuperclass {
 
 	}
 
+	public boolean isMember(GxSecurityGroup group) {
+		return securityGroups.contains(group);
+	}
+
+	@Override
+	public byte[] getProfilePhoto() {
+		return profileImage;
+	}
+
+	@Override
+	public String getMobileNumber() {
+		return null;
+	}
+
+	@Override
+	public String getName() {
+		if (!Strings.isNullOrEmpty(getEmail())) {
+			return getEmail();
+		}
+		return getUsername();
+	}
 }
