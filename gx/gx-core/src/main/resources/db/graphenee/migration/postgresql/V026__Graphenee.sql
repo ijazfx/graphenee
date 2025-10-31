@@ -32,9 +32,9 @@ alter table gx_document add constraint gx_document_oid_owner_fkey foreign key(oi
 alter table gx_folder add column oid_owner integer;
 alter table gx_folder add constraint gx_folder_oid_owner_fkey foreign key(oid_owner) references gx_user_account(oid) on delete set null on update cascade;
 
-drop table gx_file_tag cascade constraints;
-drop table gx_file_tag_document_join cascade constraints;
-drop table gx_file_tag_folder_join cascade constraints;
+drop table gx_file_tag cascade;
+drop table gx_file_tag_document_join cascade;
+drop table gx_file_tag_folder_join cascade;
 
 create table gx_tag (
 	oid serial primary key,
