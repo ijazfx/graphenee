@@ -44,10 +44,11 @@ public abstract class GxAbstractFlowSetup {
 
 	/**
 	 * The method returns the host header for the incoming request.
+	 * 
 	 * @return value of the Host header
 	 */
 	protected String host() {
 		return ServletUtil.host(VaadinServletRequest.getCurrent());
 	}
-	
+
 }

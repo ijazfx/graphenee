@@ -56,9 +56,31 @@ public interface GxDataService {
 
 	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
 
+	/**
+	 * The method returns app logo in following sequence:
+	 * if domain.appLogo is set then returns domain.appLogo else
+	 * domain.namespace.appLogo
+	 * 
+	 * @param host
+	 * @return can be null
+	 */
+	byte[] appLogoByHost(String host);
+
+	/**
+	 * The method returns app title in following sequence:
+	 * if domain.appTitle is set then returns domain.appTitle else
+	 * domain.namespace.appTitle
+	 * 
+	 * @param host
+	 * @return can be null
+	 */
+	String appTitleByHost(String host);
+
 	List<GxDomain> findAllDomains();
 
 	List<GxDomain> findDomainsByNamespace(GxNamespace namespace);
+
+	GxDomain findDomainActiveAndVerifiedByHost(String host);
 
 	Optional<GxNamespace> findNamespaceByHost(String host);
 

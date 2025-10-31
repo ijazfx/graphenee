@@ -20,10 +20,13 @@ public class GxDomain extends GxMappedSuperclass {
 
     public static final Pattern DNS_PATTERN = Pattern.compile("^([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$");
 
-    String dns;
-    Boolean isActive = true;
-    Boolean isVerified = false;
-    String txtRecord = RandomStringUtils.secureStrong().nextAlphanumeric(32);
+    private String dns;
+    private Boolean isActive = true;
+    private Boolean isVerified = false;
+    private String txtRecord = RandomStringUtils.secureStrong().nextAlphanumeric(32);
+
+    private String appTitle;
+    private byte[] appLogo;
 
     @ManyToOne
     @JoinColumn(name = "oid_namespace")
@@ -37,10 +40,9 @@ public class GxDomain extends GxMappedSuperclass {
     public boolean isDnsValid() {
         return dns != null && DNS_PATTERN.matcher(dns).matches();
     }
-    
+
     public static boolean isDnsValid(String dns) {
         return dns != null && DNS_PATTERN.matcher(dns).matches();
     }
-
 
 }

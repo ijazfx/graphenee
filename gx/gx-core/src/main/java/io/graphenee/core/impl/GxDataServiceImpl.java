@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +38,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.enums.AccessTypeStatus;
@@ -62,7 +60,6 @@ import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
-import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
@@ -97,10 +94,7 @@ import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.security.exception.GxPermissionException;
 import io.graphenee.util.CryptoUtil;
 import io.graphenee.util.JpaSpecificationBuilder;
-import io.graphenee.util.TRCalendarUtil;
-import jakarta.annotation.PostConstruct;
 
-@DependsOnDatabaseInitialization
 @Service
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
@@ -993,7 +987,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount findUserAccountByUsernameAndPassword(String username, String password) {
-		GxUserAccount userAccount =findUserAccountByUsername(username);
+		GxUserAccount userAccount = findUserAccountByUsername(username);
 		if (userAccount == null)
 			return null;
 		String encryptedPassword = CryptoUtil.createPasswordHash(password);
@@ -1036,45 +1030,6 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxUserAccount> findUserAccountInactive() {
 		return userAccountRepo.findAllByIsActive(false, Sort.by("username"));
-	}
-
-	@PostConstruct
-	public void initialize() {
-		TransactionTemplate tran = new TransactionTemplate(transactionManager);
-		tran.execute(status -> {
-			GxNamespace namespace = systemNamespace();
-			GxSecurityGroup adminGroup = findOrCreateSecurityGroup("Admin", namespace);
-			GxSecurityPolicy adminPolicy = findOrCreateSecurityPolicy("Admin Policy", namespace);
-			GxSecurityPolicyDocument document = adminPolicy.defaultDocument();
-			if (document == null) {
-				document = new GxSecurityPolicyDocument();
-				document.setIsDefault(true);
-				document.setDocumentJson("grant all on all;");
-				document.setTag(TRCalendarUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
-				adminPolicy.addSecurityPolicyDocument(document);
-				save(adminPolicy);
-			}
-			if (!adminGroup.getSecurityPolicies().contains(adminPolicy)) {
-				adminGroup.getSecurityPolicies().add(adminPolicy);
-				save(adminGroup);
-			}
-			GxUserAccount admin = findUserAccountByUsernameAndNamespace("admin", namespace);
-			if (admin == null) {
-				admin = new GxUserAccount();
-				admin.setUsername("admin");
-				admin.setPassword("change_on_install");
-				admin.setIsActive(true);
-				admin.setIsProtected(true);
-				admin.setNamespace(namespace);
-				save(admin);
-			}
-			if (!admin.getSecurityGroups().contains(adminGroup)) {
-				admin.getSecurityGroups().add(adminGroup);
-				save(admin);
-			}
-
-			return null;
-		});
 	}
 
 	@Override
@@ -1322,6 +1277,12 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxDomain findDomainActiveAndVerifiedByHost(String host) {
+		Optional<GxDomain> record = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(host);
+		return record.orElse(null);
+	}
+
+	@Override
 	public GxDomain save(GxDomain domain) {
 		Optional<GxDomain> record = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(domain.getDns());
 		if (record.isPresent()) {
@@ -1352,6 +1313,28 @@ public class GxDataServiceImpl implements GxDataService {
 			return Optional.of(domain.get().getNamespace());
 		}
 		return Optional.empty();
+	}
+
+	@Override
+	public byte[] appLogoByHost(String host) {
+		GxDomain domain = findDomainActiveAndVerifiedByHost(host);
+		if (domain != null) {
+			if (domain.getAppLogo() != null)
+				return domain.getAppLogo();
+			return domain.getNamespace().getAppLogo();
+		}
+		return null;
+	}
+
+	@Override
+	public String appTitleByHost(String host) {
+		GxDomain domain = findDomainActiveAndVerifiedByHost(host);
+		if (domain != null) {
+			if (domain.getAppTitle() != null)
+				return domain.getAppTitle();
+			return domain.getNamespace().getAppTitle();
+		}
+		return null;
 	}
 
 }
