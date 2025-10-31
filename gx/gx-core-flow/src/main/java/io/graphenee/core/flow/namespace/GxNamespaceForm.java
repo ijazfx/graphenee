@@ -52,6 +52,11 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
     }
 
     @Override
+    protected void postBinding(GxNamespace entity) {
+        properties.initializeWithNamespace(entity);
+    }
+
+    @Override
     protected String formTitle() {
         return "Namespace";
     }

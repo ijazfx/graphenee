@@ -61,4 +61,9 @@ public class GxNamespace extends GxMappedSuperclass implements Serializable {
 		property.setNamespace(null);
 	}
 
+	@Override
+	public String toString() {
+		return namespace;
+	}
+
 }

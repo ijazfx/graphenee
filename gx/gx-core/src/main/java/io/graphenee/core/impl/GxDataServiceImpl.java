@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +52,7 @@ import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxCity;
 import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxCurrency;
+import io.graphenee.core.model.entity.GxDomain;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -74,6 +76,7 @@ import io.graphenee.core.model.jpa.repository.GxAuditLogRepository;
 import io.graphenee.core.model.jpa.repository.GxCityRepository;
 import io.graphenee.core.model.jpa.repository.GxCountryRepository;
 import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
+import io.graphenee.core.model.jpa.repository.GxDomainRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespacePropertyRepository;
@@ -97,9 +100,13 @@ import io.graphenee.util.JpaSpecificationBuilder;
 import io.graphenee.util.TRCalendarUtil;
 import jakarta.annotation.PostConstruct;
 
+@DependsOnDatabaseInitialization
 @Service
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
+
+	@Autowired
+	GxDomainRepository domainRepo;
 
 	@Autowired
 	GxGenderRepository genderRepo;
@@ -976,7 +983,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount findUserAccountByUsername(String username) {
-		return userAccountRepo.findByUsername(username);
+		return userAccountRepo.findByUsername(username).get();
 	}
 
 	@Override
@@ -986,7 +993,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount findUserAccountByUsernameAndPassword(String username, String password) {
-		GxUserAccount userAccount = userAccountRepo.findByUsername(username);
+		GxUserAccount userAccount =findUserAccountByUsername(username);
 		if (userAccount == null)
 			return null;
 		String encryptedPassword = CryptoUtil.createPasswordHash(password);
@@ -1237,6 +1244,20 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount save(GxUserAccount entity) {
+		Optional<GxUserAccount> record = userAccountRepo.findByUsername(entity.getUsername());
+		if (record.isPresent()) {
+			GxUserAccount found = record.get();
+			if (!found.getNamespace().equals(entity.getNamespace()))
+				throw new RuntimeException(
+						"This username is already in use by another account.");
+		}
+		record = userAccountRepo.findAllByNamespace(entity.getNamespace()).stream()
+				.filter(f -> f.getUsername().equals(entity.getUsername())).findFirst();
+		if (record.isPresent()) {
+			GxUserAccount found = record.get();
+			if (!found.equals(entity))
+				throw new RuntimeException("This username is already in use by another account.");
+		}
 		if (!Strings.isBlank(entity.getConfirmPassword())) {
 			String encryptedPassword = CryptoUtil.createPasswordHash(entity.getConfirmPassword());
 			entity.setPassword(encryptedPassword);
@@ -1288,6 +1309,49 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxTag> findTagByNamespace(GxNamespace namespace) {
 		return tagRepository.findAllByNamespaceOrderByTag(namespace);
+	}
+
+	@Override
+	public List<GxDomain> findAllDomains() {
+		return domainRepo.findAll();
+	}
+
+	@Override
+	public List<GxDomain> findDomainsByNamespace(GxNamespace namespace) {
+		return domainRepo.findAllByNamespaceOrderByDns(namespace);
+	}
+
+	@Override
+	public GxDomain save(GxDomain domain) {
+		Optional<GxDomain> record = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(domain.getDns());
+		if (record.isPresent()) {
+			GxDomain found = record.get();
+			if (!found.getNamespace().equals(domain.getNamespace()))
+				throw new RuntimeException(
+						"This domain cannot be used because it's already in use by another namespace.");
+		}
+		record = domainRepo.findAllByNamespaceOrderByDns(domain.getNamespace()).stream()
+				.filter(f -> f.getDns().equals(domain.getDns())).findFirst();
+		if (record.isPresent()) {
+			GxDomain found = record.get();
+			if (!found.equals(domain))
+				throw new RuntimeException("This domain is already defined.");
+		}
+		return domainRepo.save(domain);
+	}
+
+	@Override
+	public void delete(GxDomain domain) {
+		domainRepo.delete(domain);
+	}
+
+	@Override
+	public Optional<GxNamespace> findNamespaceByHost(String host) {
+		Optional<GxDomain> domain = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(host);
+		if (domain.isPresent()) {
+			return Optional.of(domain.get().getNamespace());
+		}
+		return Optional.empty();
 	}
 
 }

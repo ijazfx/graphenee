@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,7 @@ import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxCity;
 import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxCurrency;
+import io.graphenee.core.model.entity.GxDomain;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -53,6 +55,16 @@ import io.graphenee.security.exception.GxPermissionException;
 public interface GxDataService {
 
 	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
+
+	List<GxDomain> findAllDomains();
+
+	List<GxDomain> findDomainsByNamespace(GxNamespace namespace);
+
+	Optional<GxNamespace> findNamespaceByHost(String host);
+
+	GxDomain save(GxDomain domain);
+
+	void delete(GxDomain domain);
 
 	GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent,
 			GxUserAccount userAccount);

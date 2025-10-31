@@ -35,9 +35,6 @@ public class LoginView extends GxAbstractLoginView {
         return flowSetup;
     }
 
-    @Autowired
-    GxNamespace namespace;
-
     @Override
     protected GxAuthenticatedUser onLogin(LoginEvent event)
             throws AuthenticationFailedException, PasswordChangeRequiredException {

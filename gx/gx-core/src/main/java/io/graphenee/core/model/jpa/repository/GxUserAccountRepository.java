@@ -16,6 +16,7 @@
 package io.graphenee.core.model.jpa.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Sort;
@@ -46,7 +47,9 @@ public interface GxUserAccountRepository extends GxJpaRepository<GxUserAccount, 
 
 	GxUserAccount findByUsernameAndNamespace(String username, GxNamespace namespace);
 
-	GxUserAccount findByUsername(String username);
+	Optional<GxUserAccount> findByUsername(String username);
+
+	List<GxUserAccount> findAllByNamespace(GxNamespace namespace);
 
 	GxUserAccount findByAccessKeysAccessKeyAndAccessKeysIsActiveTrue(UUID accessKey);
 
