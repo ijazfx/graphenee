@@ -2,9 +2,7 @@ package io.graphenee.vaadin.flow.component;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.server.StreamResource;
-
-import lombok.Setter;
+import com.vaadin.flow.server.streams.DownloadHandler;
 
 /**
  * An audio player component.
@@ -12,9 +10,6 @@ import lombok.Setter;
 @SuppressWarnings("serial")
 @Tag("audio")
 public class AudioPlayer extends Component {
-
-	@Setter
-	private StreamResource resource;
 
 	/**
 	 * Creates a new instance of this component.
@@ -25,6 +20,7 @@ public class AudioPlayer extends Component {
 
 	/**
 	 * Creates a new instance of this component.
+	 * 
 	 * @param src The source of the audio.
 	 */
 	public AudioPlayer(String src) {
@@ -34,12 +30,20 @@ public class AudioPlayer extends Component {
 
 	/**
 	 * Creates a new instance of this component.
-	 * @param resource The resource of the audio.
+	 * 
+	 * @param downloadHandler The resource of the audio.
 	 */
-	public AudioPlayer(StreamResource resource) {
+	public AudioPlayer(DownloadHandler downloadHandler) {
 		this();
-		this.resource = resource;
-		getElement().setAttribute("src", resource);
+		getElement().setAttribute("src", downloadHandler);
+	}
+
+	public void setSrc(String src) {
+		getElement().setAttribute("src", src);
+	}
+
+	public void setSrc(DownloadHandler downloadHandler) {
+		getElement().setAttribute("src", downloadHandler);
 	}
 
 }

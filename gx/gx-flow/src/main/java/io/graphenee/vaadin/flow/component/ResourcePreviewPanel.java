@@ -1,5 +1,8 @@
 package io.graphenee.vaadin.flow.component;
 
+import java.io.InputStream;
+import java.util.function.Supplier;
+
 import com.vaadin.componentfactory.pdfviewer.PdfViewer;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.UI;
@@ -9,34 +12,30 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 
 import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.vaadin.flow.GxAbstractDialog;
 import io.graphenee.vaadin.flow.utils.IconUtils;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @SuppressWarnings("serial")
 @Slf4j
 public class ResourcePreviewPanel extends GxAbstractDialog {
 
-	@Setter
-	@Getter
 	private String fileName;
+	private String mimeType;
+	private Supplier<InputStream> inputStreamProvider;
 
-	@Setter
-	@Getter
-	private StreamResource resource;
-
-	public ResourcePreviewPanel(String fileName, StreamResource resource) {
+	public ResourcePreviewPanel(String fileName, Supplier<InputStream> inputStreamProvider) {
 		setSizeFull();
 		setMargin(false);
 		setPadding(false);
 		setSpacing(false);
 		this.fileName = fileName;
-		this.resource = resource;
+		this.mimeType = TRFileContentUtil.getMimeType(fileName);
+		this.inputStreamProvider = inputStreamProvider;
 	}
 
 	@Override
@@ -53,29 +52,36 @@ public class ResourcePreviewPanel extends GxAbstractDialog {
 		// bodyLayout.setSpacing(false);
 		// bodyLayout.setPadding(true);
 		scroller.setContent(bodyLayout);
-		String mimeType = TRFileContentUtil.getMimeType(fileName);
-		if (mimeType == null)
-			mimeType = "application/octat-stream";
-		resource.setContentType(mimeType);
 		try {
 			if (mimeType.startsWith("image")) {
 				Image image = new Image();
 				// image.setHeightFull();
-				image.getElement().setAttribute("src", resource);
+				image.setSrc(DownloadHandler.fromInputStream(de -> {
+					return new DownloadResponse(inputStreamProvider.get(), fileName, mimeType, -1);
+				}));
 				bodyLayout.add(image);
 			} else if (mimeType.startsWith("audio")) {
-				resource.setContentType(mimeType);
-				AudioPlayer audioPlayer = new AudioPlayer(resource);
+				AudioPlayer audioPlayer = new AudioPlayer();
+				audioPlayer.setSrc(DownloadHandler.fromInputStream(de -> {
+					return new DownloadResponse(inputStreamProvider.get(), fileName, mimeType, -1);
+				}));
 				bodyLayout.add(audioPlayer);
-
 			} else if (mimeType.startsWith("video")) {
-				resource.setContentType(mimeType);
-				VideoPlayer videoPlayer = new VideoPlayer(resource);
+				VideoPlayer videoPlayer = new VideoPlayer();
+				videoPlayer.setSrc(DownloadHandler.fromInputStream(de -> {
+					return new DownloadResponse(inputStreamProvider.get(), fileName, mimeType, -1);
+				}));
 				bodyLayout.add(videoPlayer);
 			} else if (mimeType.contains("pdf")) {
 				PdfViewer pdfPreview = new PdfViewer();
 				pdfPreview.setSizeFull();
-				pdfPreview.setSrc(resource);
+				pdfPreview.setAddPrintButton(true);
+				pdfPreview.setAddRotateClockwiseButton(true);
+				pdfPreview.setAddRotateCounterClockwiseButton(true);
+				pdfPreview.setCustomTitle("PDF Viewer");
+				pdfPreview.setSrc(DownloadHandler.fromInputStream(de -> {
+					return new DownloadResponse(inputStreamProvider.get(), fileName, mimeType, -1);
+				}));
 				bodyLayout.add(pdfPreview);
 				UI.getCurrent().access(() -> {
 					pdfPreview.openThumbnailsView();
@@ -97,7 +103,9 @@ public class ResourcePreviewPanel extends GxAbstractDialog {
 		Button downloadButton = new Button("Download");
 		downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 		Anchor download = new Anchor("", "");
-		download.setHref(resource);
+		download.setHref(DownloadHandler.fromInputStream(de -> {
+			return new DownloadResponse(inputStreamProvider.get(), fileName, mimeType, -1);
+		}));
 		download.setId("download");
 		download.getElement().setAttribute("download", true);
 		download.add(downloadButton);

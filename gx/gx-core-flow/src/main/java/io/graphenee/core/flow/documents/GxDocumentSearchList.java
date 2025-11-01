@@ -1,12 +1,9 @@
 package io.graphenee.core.flow.documents;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -24,7 +21,6 @@ import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import ch.qos.logback.core.util.StringUtil;
@@ -213,27 +209,24 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
     }
 
     public void previewDocument(GxDocumentExplorerItem s) {
-        // TODO Auto-generated method stub
         GxDocument document = (GxDocument) s;
         String mimeType = s.getMimeType();
         String extension = s.getExtension();
         if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
                 || mimeType.startsWith("video")) {
             try {
-                InputStream stream = null;
                 String src = document.getPath();
                 String resourcePath = storage.resourcePath("documents", src);
-                try {
-                    stream = storage.resolve(resourcePath);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                byte[] bytes = IOUtils.toByteArray(stream);
-                StreamResource resource = new StreamResource(document.getName(), () -> new ByteArrayInputStream(bytes));
-                ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(s.getName(), resource);
+                ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(s.getName(), () -> {
+                    try {
+                        return storage.resolve(resourcePath);
+                    } catch (Exception ex) {
+                        return null;
+                    }
+                });
                 resourcePreviewPanel.showInDialog();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Failed to resolve file from storage", e);
             }
 
         }

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.graphenee.sms;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -22,6 +24,10 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
 import io.graphenee.core.GxDataService;
@@ -31,6 +37,7 @@ import io.graphenee.sms.impl.AwsSmsServiceImpl;
 import io.graphenee.sms.impl.EoceanSmsServiceImpl;
 import io.graphenee.sms.impl.TwilioSmsServiceImpl;
 
+@EnableScheduling
 @Configuration
 @ConditionalOnClass(GrapheneeCoreConfiguration.class)
 @ComponentScan(GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE)

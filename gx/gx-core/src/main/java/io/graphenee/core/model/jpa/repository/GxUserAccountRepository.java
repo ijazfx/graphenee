@@ -39,15 +39,17 @@ public interface GxUserAccountRepository extends GxJpaRepository<GxUserAccount, 
 
 	List<GxUserAccount> findAllBySecurityGroupsEquals(GxSecurityGroup securityGroup, Sort sort);
 
-	List<GxUserAccount> findAllBySecurityGroupsEqualsAndIsActive(GxSecurityGroup securityGroup, Boolean isActive, Sort sort);
+	List<GxUserAccount> findAllBySecurityGroupsEqualsAndIsActive(GxSecurityGroup securityGroup, Boolean isActive,
+			Sort sort);
 
 	List<GxUserAccount> findAllBySecurityPoliciesEquals(GxSecurityPolicy securityPolicy, Sort sort);
 
-	List<GxUserAccount> findAllBySecurityPoliciesEqualsAndIsActive(GxSecurityPolicy securityPolicy, Boolean isActive, Sort sort);
+	List<GxUserAccount> findAllBySecurityPoliciesEqualsAndIsActive(GxSecurityPolicy securityPolicy, Boolean isActive,
+			Sort sort);
 
 	GxUserAccount findByUsernameAndNamespace(String username, GxNamespace namespace);
 
-	Optional<GxUserAccount> findByUsername(String username);
+	Optional<GxUserAccount> findByUsernameAndNamespaceIsNotNull(String username);
 
 	List<GxUserAccount> findAllByNamespace(GxNamespace namespace);
 

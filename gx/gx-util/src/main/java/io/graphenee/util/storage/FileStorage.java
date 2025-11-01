@@ -31,21 +31,22 @@ public interface FileStorage {
 	/**
 	 * The default implementation of method returns "folder/fileName"
 	 * 
-	 * @param folder - must be a valid folder path where file needs to upload.
+	 * @param folder   - must be a valid folder path where file needs to upload.
 	 * @param filePath - file to upload.
 	 * @return - depends on implementation and should return logical resource
-	 * path.
+	 *         path.
 	 */
 	default String resourcePath(String folder, String filePath) {
-		if (folder == null || filePath == null) {
+		if (filePath == null) {
 			return filePath;
 		}
 		File file = new File(filePath);
-		return folder + "/" + file.getName();
+		return (folder != null ? folder : "") + "/" + file.getName();
 	}
 
 	/**
 	 * Resolves a resource path to an input stream.
+	 * 
 	 * @param resourcePath The resource path.
 	 * @return The input stream.
 	 * @throws ResolveFailedException If the resource cannot be resolved.
@@ -61,6 +62,7 @@ public interface FileStorage {
 
 	/**
 	 * Checks if a resource exists.
+	 * 
 	 * @param resourcePath The resource path.
 	 * @return True if the resource exists, false otherwise.
 	 */
@@ -68,7 +70,8 @@ public interface FileStorage {
 
 	/**
 	 * Checks if a resource exists.
-	 * @param folder The folder.
+	 * 
+	 * @param folder   The folder.
 	 * @param filePath The file path.
 	 * @return True if the resource exists, false otherwise.
 	 */
@@ -78,6 +81,7 @@ public interface FileStorage {
 
 	/**
 	 * Resolves a resource path to a URI.
+	 * 
 	 * @param resourcePath The resource path.
 	 * @return The URI.
 	 * @throws ResolveFailedException If the resource cannot be resolved.
@@ -93,7 +97,8 @@ public interface FileStorage {
 
 	/**
 	 * Saves a file.
-	 * @param folder The folder to save the file in.
+	 * 
+	 * @param folder     The folder to save the file in.
 	 * @param fileToSave The file to save.
 	 * @return The file metadata.
 	 * @throws SaveFailedException If the file cannot be saved.
@@ -111,36 +116,40 @@ public interface FileStorage {
 		throw new SaveFailedException(fileToSave + " is not a file");
 	}
 
-    /**
-     * Create Directory.
-     * @param directoryPath Directory name i.e. ABC
-     */
-    void createDirectory(String directoryPath);
+	/**
+	 * Create Directory.
+	 * 
+	 * @param directoryPath Directory name i.e. ABC
+	 */
+	void createDirectory(String directoryPath);
 
-    /**
+	/**
 	 * Saves a file.
-	 * @param folder The folder to save the file in.
-	 * @param fileName The name of the file.
+	 * 
+	 * @param folder      The folder to save the file in.
+	 * @param fileName    The name of the file.
 	 * @param inputStream The input stream of the file.
 	 * @return The file metadata.
 	 * @throws SaveFailedException If the file cannot be saved.
 	 */
 	Future<FileMetaData> save(String folder, String fileName, InputStream inputStream) throws SaveFailedException;
 
-    /**
-     * Creating file sharing path.
-     * @param filePath file name with complete path
-     * @return shared url.
-     * @throws FileSharingFailedException
-     */
-    String share(String filePath) throws FileSharingFailedException;
+	/**
+	 * Creating file sharing path.
+	 * 
+	 * @param filePath file name with complete path
+	 * @return shared url.
+	 * @throws FileSharingFailedException
+	 */
+	String share(String filePath) throws FileSharingFailedException;
 
-    /**
+	/**
 	 * A delegate for file storage.
 	 */
 	public static interface FileStorageDelegate {
 		/**
 		 * Called when a file is saved.
+		 * 
 		 * @param fileMetaData The file metadata.
 		 */
 		void onComplete(FileMetaData fileMetaData);
@@ -157,10 +166,11 @@ public interface FileStorage {
 
 		/**
 		 * Creates a new instance of this class.
+		 * 
 		 * @param resourcePath The resource path.
-		 * @param fileName The file name.
-		 * @param fileSize The file size.
-		 * @param checksum The checksum.
+		 * @param fileName     The file name.
+		 * @param fileSize     The file size.
+		 * @param checksum     The checksum.
 		 */
 		public FileMetaData(String resourcePath, String fileName, int fileSize, String checksum) {
 			this.resourcePath = resourcePath;
@@ -171,6 +181,7 @@ public interface FileStorage {
 
 		/**
 		 * Gets the resource path.
+		 * 
 		 * @return The resource path.
 		 */
 		public String getResourcePath() {
@@ -179,6 +190,7 @@ public interface FileStorage {
 
 		/**
 		 * Gets the file name.
+		 * 
 		 * @return The file name.
 		 */
 		public String getFileName() {
@@ -187,6 +199,7 @@ public interface FileStorage {
 
 		/**
 		 * Sets the file name.
+		 * 
 		 * @param fileName The file name.
 		 */
 		public void setFileName(String fileName) {
@@ -195,6 +208,7 @@ public interface FileStorage {
 
 		/**
 		 * Gets the file size.
+		 * 
 		 * @return The file size.
 		 */
 		public int getFileSize() {
@@ -203,6 +217,7 @@ public interface FileStorage {
 
 		/**
 		 * Sets the file size.
+		 * 
 		 * @param fileSize The file size.
 		 */
 		public void setFileSize(int fileSize) {
@@ -211,6 +226,7 @@ public interface FileStorage {
 
 		/**
 		 * Gets the checksum.
+		 * 
 		 * @return The checksum.
 		 */
 		public String getChecksum() {

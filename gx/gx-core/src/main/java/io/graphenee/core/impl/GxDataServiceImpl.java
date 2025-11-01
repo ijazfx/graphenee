@@ -977,7 +977,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount findUserAccountByUsername(String username) {
-		return userAccountRepo.findByUsername(username).get();
+		return userAccountRepo.findByUsernameAndNamespaceIsNotNull(username).get();
 	}
 
 	@Override
@@ -1199,7 +1199,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount save(GxUserAccount entity) {
-		Optional<GxUserAccount> record = userAccountRepo.findByUsername(entity.getUsername());
+		Optional<GxUserAccount> record = userAccountRepo.findByUsernameAndNamespaceIsNotNull(entity.getUsername());
 		if (record.isPresent()) {
 			GxUserAccount found = record.get();
 			if (!found.getNamespace().equals(entity.getNamespace()))
