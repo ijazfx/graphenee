@@ -15,7 +15,6 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.server.streams.FileUploadCallback;
-import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
@@ -43,7 +42,7 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 	@Override
 	protected void decorateForm(HasComponents entityForm) {
 		upload = new Upload();
-		upload.setUploadHandler(UploadHandler.toFile(new FileUploadCallback() {
+		GxCustomUploadHandler gxFileUploadHandler = new GxCustomUploadHandler(new FileUploadCallback() {
 
 			@Override
 			public void complete(UploadMetadata uploadMetadata, File file) throws IOException {
@@ -57,8 +56,8 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 				uploadedFiles.add(uploadedFile);
 			}
 
-		}, new GxFileFactory()));
-
+		}, new GxFileFactory());
+		upload.setUploadHandler(gxFileUploadHandler);
 		upload.setMaxFiles(10);
 		upload.setMaxFileSize(1024000000);
 

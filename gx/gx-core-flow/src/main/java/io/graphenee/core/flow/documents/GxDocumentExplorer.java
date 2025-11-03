@@ -2,6 +2,7 @@ package io.graphenee.core.flow.documents;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -53,6 +54,7 @@ import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.repository.GxTagRepository;
 import io.graphenee.documents.GxDocumentExplorerService;
+import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
@@ -88,6 +90,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Autowired
 	GxFileUploadForm uploadForm;
+
+	@Autowired
+	GxFileUploadForm quickUploadForm;
 
 	@Autowired
 	GxFileUploadNewVersionForm uploadNewVersionForm;
@@ -181,7 +186,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "tagsJoined", "size", "issueDate", "expiryDate",
+		return new String[] { "extension", "name", "version", "owner.name", "tagsJoined", "size", "issueDate",
+				"expiryDate",
 				"expiryReminderInDays" };
 	}
 
@@ -194,6 +200,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		}
 		if (propertyName.matches("(tagsJoined)")) {
 			column.setHeader("Tags");
+			column.setWidth("13rem");
+		}
+		if (propertyName.matches("(owner.name)")) {
+			column.setHeader("Owner");
 			column.setWidth("13rem");
 		}
 	}
@@ -328,10 +338,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
-					File file = uploadedFile.getFile();
-					Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-					FileMetaData metaData = savedFile.get();
 					GxDocument d = new GxDocument();
+					File file = uploadedFile.getFile();
+					FileInputStream fis = new FileInputStream(file);
+					String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+					Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+					FileMetaData metaData = savedFile.get();
 					d.setOwner(user);
 					d.setFolder(parentFolder);
 					d.setSize((long) metaData.getFileSize());
@@ -354,10 +366,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
 			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			try {
-				File file = uploadedFile.getFile();
-				Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-				FileMetaData metaData = savedFile.get();
 				GxDocument d = new GxDocument();
+				File file = uploadedFile.getFile();
+				FileInputStream fis = new FileInputStream(file);
+				String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+				Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+				FileMetaData metaData = savedFile.get();
 				d.setOwner(user);
 				d.setSize((long) metaData.getFileSize());
 				d.setNamespace(parentDocument.getNamespace());
@@ -581,14 +595,15 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	public void uploadSingle(GxDocumentFilter filter, TRParamCallback<GxDocument> onChoose) {
-		GxFileUploadForm quickUploadForm = new GxFileUploadForm();
 		quickUploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
-					File file = uploadedFile.getFile();
-					Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-					FileMetaData metaData = savedFile.get();
 					GxDocument d = new GxDocument();
+					File file = uploadedFile.getFile();
+					FileInputStream fis = new FileInputStream(file);
+					String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+					Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+					FileMetaData metaData = savedFile.get();
 					d.setFolder(parentFolder);
 					d.setSize((long) metaData.getFileSize());
 					d.setNamespace(parentFolder.getNamespace());

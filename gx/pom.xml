@@ -41,6 +41,9 @@
 		<version.maven.resources.plugin>3.3.1</version.maven.resources.plugin>
 		<version.maven.javadoc.plugin>3.6.2</version.maven.javadoc.plugin>
 		<version.maven.sonatype.plugin>1.7.0</version.maven.sonatype.plugin>
+		<version.maven.central.plugin>0.6.0</version.maven.central.plugin>
+		<version.maven.protobuf.plugin>3.10.1</version.maven.protobuf.plugin>
+		<version.maven.reactor.grpc>1.2.4</version.maven.reactor.grpc>
 		<version.springboot>3.5.4</version.springboot>
 		<version.hibernate>1.0.2.Final</version.hibernate>
 		<version.twilio>9.14.1</version.twilio>
@@ -48,21 +51,22 @@
 		<version.scrypt>1.4.0</version.scrypt>
 		<version.zxing>3.5.2</version.zxing>
 		<version.guava>32.1.3-jre</version.guava>
-		<version.json>20230227</version.json>
+		<version.json>20250517</version.json>
 		<version.itextpdf>5.5.13.3</version.itextpdf>
 		<version.lombok>1.18.30</version.lombok>
 		<version.gson>2.10.1</version.gson>
 		<version.pdfbox>3.0.1</version.pdfbox>
 		<version.poi>5.4.0</version.poi>
 		<version.retrofit>2.9.0</version.retrofit>
-		<version.protobuf>4.0.0-rc-2</version.protobuf>
-		<version.commons.beanutils>1.9.4</version.commons.beanutils>
+		<version.protobuf>4.32.1</version.protobuf>
+		<version.commons.beanutils>1.11.0</version.commons.beanutils>
 		<version.commons.io>2.15.1</version.commons.io>
 		<version.jasper>6.21.0</version.jasper>
 		<version.grpc>1.59.1</version.grpc>
 		<version.firebase.admin>9.2.0</version.firebase.admin>
 		<version.rxjava>3.1.8</version.rxjava>
-        <version.webdav>2.22.2</version.webdav>
+    	<version.webdav>2.22.2</version.webdav>
+		<version.tika>3.2.3</version.tika>
 	</properties>
 
 	<!-- Dependency Management -->
@@ -247,11 +251,16 @@
 				<artifactId>rxjava</artifactId>
 				<version>${version.rxjava}</version>
 			</dependency>
-            <dependency>
-                <groupId>org.apache.jackrabbit</groupId>
-                <artifactId>jackrabbit-webdav</artifactId>
-                <version>${version.webdav}</version>
-            </dependency>
+      <dependency>
+        <groupId>org.apache.jackrabbit</groupId>
+        <artifactId>jackrabbit-webdav</artifactId>
+        <version>${version.webdav}</version>
+      </dependency>
+			<dependency>
+				<groupId>org.apache.tika</groupId>
+				<artifactId>tika-core</artifactId>
+				<version>${version.tika}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -318,7 +327,12 @@
 						<plugin>
 							<groupId>org.sonatype.central</groupId>
 							<artifactId>central-publishing-maven-plugin</artifactId>
-							<version>0.6.0</version>
+							<version>${version.maven.central.publishing}</version>
+						</plugin>
+						<plugin>
+							<groupId>io.github.ascopes</groupId>
+							<artifactId>protobuf-maven-plugin</artifactId>
+							<version>${version.maven.protobuf}</version>
 						</plugin>
 					</plugins>
 				</pluginManagement>
