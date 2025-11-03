@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -29,6 +30,7 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 
 	TextField name;
 	TextArea note;
+	PasswordField uniqueId;
 	MultiSelectComboBox<GxTag> tags;
 	MultiSelectComboBox<Principal> grants;
 
@@ -41,6 +43,8 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 		name = new TextField("Folder Name");
 		note = new TextArea("Note");
 		note.setHeight("7rem");
+		uniqueId = new PasswordField("Folder ID");
+
 		tags = new MultiSelectComboBox<>("Add Tags");
 		tags.addCustomValueSetListener(l -> {
 			GxTag newTag = new GxTag();
@@ -55,8 +59,8 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
 		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(name, note, tags, grants);
-		expand(name, note, tags, grants);
+		entityForm.add(name, uniqueId, note, tags, grants);
+		expand(note, tags, grants);
 	}
 
 	@Override

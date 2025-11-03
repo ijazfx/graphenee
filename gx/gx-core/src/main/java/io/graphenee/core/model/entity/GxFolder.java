@@ -228,4 +228,9 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 		return getFolder() == null || getFolder().isGranted(user);
 	}
 
+	@Override
+	public String getUniqueId() {
+		return folderId.toString();
+	}
+
 }

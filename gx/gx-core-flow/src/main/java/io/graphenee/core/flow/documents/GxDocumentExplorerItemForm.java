@@ -13,6 +13,7 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -34,6 +35,7 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 
 	TextField name;
 	TextArea note;
+	PasswordField uniqueId;
 	DatePicker issueDate;
 	DatePicker expiryDate;
 	IntegerField expiryReminderInDays;
@@ -50,6 +52,8 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		name = new TextField("Folder Name");
 		note = new TextArea("Note");
 		note.setHeight("100px");
+
+		uniqueId = new PasswordField("Document ID");
 
 		issueDate = new DatePicker("Issue Date");
 		expiryDate = new DatePicker("Expiry Date");
@@ -77,9 +81,9 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
 		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags, grants);
+		entityForm.add(name, uniqueId, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags, grants);
 
-		expand(name, note, tags, grants);
+		expand(note, tags, grants);
 	}
 
 	@Override
