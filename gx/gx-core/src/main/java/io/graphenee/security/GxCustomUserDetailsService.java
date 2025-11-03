@@ -8,9 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import io.graphenee.core.GxDataService;
-import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class GxCustomUserDetailsService implements UserDetailsService {
 
@@ -19,23 +20,18 @@ public class GxCustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String usernameAndNamespace) throws UsernameNotFoundException {
-        String[] userData = usernameAndNamespace.split("@");
 
-        String name = userData[0];
-        String namespaceName = userData[1];
-
-        GxNamespace namespace = gxDataService.findNamespace(namespaceName);
-
-        GxUserAccount user = gxDataService.findUserAccountByUsernameAndNamespace(name, namespace);
-
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+        try {
+            GxUserAccount user = gxDataService.findUserAccountByUsernameAndNamespace(usernameAndNamespace);
+            return User.withUsername(user.getUsername())
+                    .password(user.getPassword()) // already encrypted
+                    .roles("USER")
+                    .build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
         }
 
-        return User.withUsername(user.getUsername())
-                .password(user.getPassword()) // already encrypted
-                .roles("USER")
-                .build();
     }
 
 }
