@@ -25,10 +25,9 @@ import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.security.GxPasswordPolicyDataService;
-import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxTabItem;
-import io.graphenee.vaadin.flow.component.FileUploader;
+import io.graphenee.vaadin.flow.component.GxImageUploader;
 
 @SpringComponent
 @Scope("prototype")
@@ -48,7 +47,7 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
     private Checkbox isPasswordChangeRequired;
     private PasswordField newPassword;
     private PasswordField confirmPassword;
-    private FileUploader imageUploader;
+    private GxImageUploader profileImage;
     private TwinColGrid<GxSecurityPolicy> securityPolicies;
     private TwinColGrid<GxSecurityGroup> securityGroups;
 
@@ -57,9 +56,6 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
 
     @Autowired
     GxDataService dataService;
-
-    @Autowired
-    private FileStorage storage;
 
     @Autowired
     GxPasswordPolicyDataService passwordPolicyService;
@@ -105,18 +101,13 @@ public class GxUserAccountForm extends GxAbstractEntityForm<GxUserAccount> {
             confirmPassword.setEnabled(vcl.getValue().length() > 0);
         });
 
-        imageUploader = new FileUploader("Profile Image");
-        imageUploader.setStorage(storage);
-        // imageUploader.setAllowedFileTypes("image/png", "image/jpg", "image/jpeg");
-        imageUploader.addValueChangeListener(event -> {
-            System.err.println(event.getValue());
-        });
+        profileImage = new GxImageUploader("Profile Image");
 
         entityForm.add(group("group0", firstName, lastName), email,
                 group("group1", isActive, isLocked, isPasswordChangeRequired),
                 username, group("group2", newPassword,
                         confirmPassword),
-                imageUploader);
+                profileImage);
 
         expand("group0", "group1", "group2");
 

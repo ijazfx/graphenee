@@ -154,6 +154,9 @@ public class GxUserAccount extends GxMappedSuperclass implements GxAuthenticated
 	}
 
 	public boolean canDoAction(String resource, String action, Map<String, Object> keyValueMap, boolean forceRefresh) {
+		if(resource.equals("namespaces") && !namespace.getNamespace().equals(GxNamespace.SYSTEM))
+			return false;
+
 		if (keyValueMap == null)
 			keyValueMap = new HashMap<>();
 		if (forceRefresh) {

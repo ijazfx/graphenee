@@ -4,7 +4,7 @@
   "type": "module",
   "dependencies": {
     "@polymer/polymer": "3.5.2",
-    "@vaadin-component-factory/vcf-pdf-viewer": "2.0.1",
+    "@vaadin-component-factory/vcf-pdf-viewer": "3.1.0",
     "@vaadin/bundles": "24.8.4",
     "@vaadin/common-frontend": "0.0.19",
     "@vaadin/polymer-legacy-adapter": "24.8.4",
@@ -49,7 +49,7 @@
   "vaadin": {
     "dependencies": {
       "@polymer/polymer": "3.5.2",
-      "@vaadin-component-factory/vcf-pdf-viewer": "2.0.1",
+      "@vaadin-component-factory/vcf-pdf-viewer": "3.1.0",
       "@vaadin/bundles": "24.8.4",
       "@vaadin/common-frontend": "0.0.19",
       "@vaadin/polymer-legacy-adapter": "24.8.4",
@@ -91,7 +91,7 @@
       "workbox-core": "7.3.0",
       "workbox-precaching": "7.3.0"
     },
-    "hash": "b69cd0007ea875fd900d8ba470755a2f27999afe4f4aa71dd116fe4af4baa3f7"
+    "hash": "23623f309c9bd5253a3f9b86d5409a0869cca99398231661768ffd7574558f39"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",

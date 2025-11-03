@@ -27,7 +27,6 @@ import io.graphenee.i18n.LocalizerService;
 
 @Service
 @ConditionalOnClass(GrapheneeI18nConfiguration.class)
-//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
 public class LocalizerServiceImpl implements LocalizerService {
 
 	@Autowired

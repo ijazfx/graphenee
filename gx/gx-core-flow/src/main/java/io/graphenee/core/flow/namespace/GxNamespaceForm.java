@@ -13,6 +13,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.component.GxImageUploader;
 
 @SuppressWarnings("serial")
 @SpringComponent
@@ -21,6 +22,10 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
 
     TextField namespace;
     TextArea namespaceDescription;
+
+    TextField appTitle;
+    GxImageUploader appLogo;
+
     Checkbox isActive;
 
     @Autowired
@@ -34,10 +39,14 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
     protected void decorateForm(HasComponents form) {
         namespace = new TextField("Namespace");
         namespaceDescription = new TextArea("Description");
+
+        appTitle = new TextField("Application Title");
+        appLogo = new GxImageUploader("Application Logo");
+
         isActive = new Checkbox("Is Active?");
-        form.add(namespace, namespaceDescription, isActive);
-        expand(namespace);
-        expand(namespaceDescription);
+
+        form.add(namespace, namespaceDescription, appTitle, appLogo, isActive);
+        expand(namespace, namespaceDescription, appTitle, appLogo, isActive);
 
         Details propertiesDetails = new Details("Namespace Properties");
         propertiesDetails.setOpened(true);
@@ -52,13 +61,18 @@ public class GxNamespaceForm extends GxAbstractEntityForm<GxNamespace> {
     }
 
     @Override
+    protected void postBinding(GxNamespace entity) {
+        properties.initializeWithNamespace(entity);
+    }
+
+    @Override
     protected String formTitle() {
         return "Namespace";
     }
 
     @Override
     protected String dialogHeight() {
-        return "400px";
+        return "50rem";
     }
 
 }

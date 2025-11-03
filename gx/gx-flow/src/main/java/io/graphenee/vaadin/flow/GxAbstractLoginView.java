@@ -19,11 +19,14 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.RouteConfiguration;
+import com.vaadin.flow.server.VaadinRequest;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
 import io.graphenee.common.exception.PasswordChangeRequiredException;
+import io.graphenee.util.ServletUtil;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 import jakarta.annotation.PostConstruct;
 
@@ -154,6 +157,14 @@ public abstract class GxAbstractLoginView extends FlexLayout implements HasUrlPa
 	public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
 		if (parameter != null && !parameter.startsWith("login"))
 			this.lastRoute = parameter;
+	}
+
+	/**
+	 * The method returns the host header for the incoming request.
+	 * @return value of the Host header
+	 */
+	protected String host() {
+		return ServletUtil.host(VaadinServletRequest.getCurrent());
 	}
 
 }

@@ -42,7 +42,6 @@ import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
@@ -114,7 +113,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	private GxDocumentFilter filter;
 
-	private GxDocumentSearchList searchList = null;
 	private SplitLayout splitLayout = null;
 
 	public GxDocumentExplorer() {
@@ -260,27 +258,25 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	public void previewDocument(GxDocumentExplorerItem s) {
-		// TODO Auto-generated method stub
 		GxDocument document = (GxDocument) s;
 		String mimeType = s.getMimeType();
 		String extension = s.getExtension();
 		if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
 				|| mimeType.startsWith("video")) {
 			try {
-				InputStream stream = null;
 				String src = document.getPath();
 				String resourcePath = storage.resourcePath("documents", src);
-				try {
-					stream = storage.resolve(resourcePath);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				byte[] bytes = IOUtils.toByteArray(stream);
-				StreamResource resource = new StreamResource(document.getName(), () -> new ByteArrayInputStream(bytes));
-				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(s.getName(), resource);
+				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(s.getName(),
+						() -> {
+							try {
+								return storage.resolve(resourcePath);
+							} catch (Exception ex) {
+								return null;
+							}
+						});
 				resourcePreviewPanel.showInDialog();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("Failed to resolve file from storage", e);
 			}
 
 		}
@@ -430,7 +426,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		this.selectedFolder = this.topFolder;
 		this.namespace = namespace;
 		this.storage = storage;
-		this.searchList = sList;
 		this.splitLayout = sLayout;
 		generateBreadcrumb(this.selectedFolder);
 		refresh();

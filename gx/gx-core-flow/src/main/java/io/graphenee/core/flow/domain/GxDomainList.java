@@ -1,4 +1,4 @@
-package io.graphenee.core.flow.security;
+package io.graphenee.core.flow.domain;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -7,21 +7,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.PropertyDefinition;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
-import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.GxAuditLogDataService;
 import io.graphenee.core.GxDataService;
+import io.graphenee.core.model.entity.GxDomain;
 import io.graphenee.core.model.entity.GxNamespace;
-import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.component.GxCopyToClipboardWrapper;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 
 @SpringComponent
 @Scope("prototype")
-public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroup> {
+public class GxDomainList extends GxAbstractEntityList<GxDomain> {
     private static final long serialVersionUID = 1L;
 
     @Autowired
@@ -31,52 +35,63 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroup> {
     GxDataService dataService;
 
     @Autowired
-    GxSecurityGroupForm entityForm;
+    GxDomainForm entityForm;
 
     private GxNamespace namespace = null;
 
-    public GxSecurityGroupList() {
-        super(GxSecurityGroup.class);
+    public GxDomainList() {
+        super(GxDomain.class);
     }
 
     @Override
-    protected Stream<GxSecurityGroup> getData() {
+    protected Stream<GxDomain> getData() {
         if (namespace == null)
-            return dataService.findSecurityGroup().stream();
-        return dataService.findSecurityGroupByNamespace(namespace).stream();
+            return dataService.findAllDomains().stream();
+        return dataService.findDomainsByNamespace(namespace).stream();
     }
 
     @Override
     protected String[] visibleProperties() {
-        return new String[] { "securityGroupName", "priority", "isActive" };
+        return new String[] { "dns", "isActive", "isVerified", "txtRecord" };
     }
 
     @Override
-    protected GxAbstractEntityForm<GxSecurityGroup> getEntityForm(GxSecurityGroup entity) {
+    protected GxAbstractEntityForm<GxDomain> getEntityForm(GxDomain entity) {
         return entityForm;
     }
 
     @Override
-    protected void onSave(GxSecurityGroup entity) {
+    protected void onSave(GxDomain entity) {
         dataService.save(entity);
     }
 
     @Override
-    protected void onDelete(Collection<GxSecurityGroup> entities) {
-        for (GxSecurityGroup entity : entities) {
+    protected void onDelete(Collection<GxDomain> entities) {
+        for (GxDomain entity : entities) {
             dataService.delete(entity);
         }
     }
 
     @Override
-    protected void preEdit(GxSecurityGroup entity) {
+    protected void preEdit(GxDomain entity) {
         if (entity.getOid() == null) {
             entity.setNamespace(namespace);
         }
     }
 
     @Override
-    protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxSecurityGroup> searchBinder) {
+    protected Renderer<GxDomain> rendererForProperty(String propertyName,
+            PropertyDefinition<GxDomain, ?> propertyDefinition) {
+        if(propertyName.matches("txtRecord")) {
+            return new ComponentRenderer<>(s -> {
+                return new GxCopyToClipboardWrapper(new Span(s.getTxtRecord()));
+            });
+        }
+        return super.rendererForProperty(propertyName, propertyDefinition);
+    }
+
+    @Override
+    protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxDomain> searchBinder) {
         ComboBox<GxNamespace> namespaceComboBox = new ComboBox<>("Namespace");
         namespaceComboBox.setItemLabelGenerator(GxNamespace::getNamespace);
         namespaceComboBox.setClearButtonVisible(true);
@@ -95,19 +110,6 @@ public class GxSecurityGroupList extends GxAbstractEntityList<GxSecurityGroup> {
     public void initializeWithNamespace(GxNamespace namespace) {
         this.namespace = namespace;
         refresh();
-    }
-
-    @Override
-    protected boolean isAuditLogEnabled() {
-        return true;
-    }
-
-    @Override
-    protected void auditLog(GxAuthenticatedUser user, String remoteAddress, String auditEvent, String auditEntity,
-            Collection<GxSecurityGroup> entities) {
-        entities.forEach(e -> {
-            auditService.log(user, remoteAddress, auditEvent, e.getSecurityGroupName(), auditEntity, e.getOid());
-        });
     }
 
 }
