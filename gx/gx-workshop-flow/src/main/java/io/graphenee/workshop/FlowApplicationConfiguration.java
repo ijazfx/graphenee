@@ -51,9 +51,4 @@ public class FlowApplicationConfiguration {
 		};
 	}
 
-	@Bean
-	GxNamespace namespace(GxDataService dataService) {
-		return dataService.systemNamespace();
-	}
-
 }

@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.streams.DownloadEvent;
 import com.vaadin.flow.server.streams.DownloadHandler;
@@ -31,6 +32,7 @@ import com.vaadin.flow.server.streams.InputStreamDownloadCallback;
 import com.vaadin.flow.server.streams.InputStreamDownloadHandler;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.util.ServletUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
 
@@ -321,6 +323,14 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		default void onLogout(UI ui) {
 			ui.navigate("/");
 		}
+	}
+
+	/**
+	 * The method returns the host header for the incoming request.
+	 * @return value of the Host header
+	 */
+	protected String host() {
+		return ServletUtil.host(VaadinServletRequest.getCurrent());
 	}
 
 }

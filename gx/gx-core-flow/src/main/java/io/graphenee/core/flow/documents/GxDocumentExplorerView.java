@@ -72,14 +72,11 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		GxNamespace namespace;
-		if (loggedInUser() instanceof GxUserAccount) {
-			namespace = ((GxUserAccount) loggedInUser()).getNamespace();
-		} else {
-			namespace = dataService.systemNamespace();
+		if(loggedInUser() instanceof GxUserAccount) {
+			GxNamespace namespace = ((GxUserAccount) loggedInUser()).getNamespace();
+			searchList.refresh();
+			list.initializeWithNamespaceAndStorageAndSearchListAndLayout(namespace, storage, searchList, layout);
 		}
-		searchList.refresh();
-		list.initializeWithNamespaceAndStorageAndSearchListAndLayout(namespace, storage, searchList, layout);
 	}
 
 }

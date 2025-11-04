@@ -1,4 +1,4 @@
-package io.graphenee.core.flow.device_mgmt;
+package io.graphenee.core.flow.domain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -9,14 +9,14 @@ import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxSecuredView;
 import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
-@GxSecuredView(GxRegisteredDeviceListView.VIEW_NAME)
-public class GxRegisteredDeviceListView extends GxVerticalLayoutView {
+@GxSecuredView(GxDomainListView.VIEW_NAME)
+public class GxDomainListView extends GxVerticalLayoutView {
 	private static final long serialVersionUID = 1L;
 
-	public static final String VIEW_NAME = "registered-devices";
+	public static final String VIEW_NAME = "domains";
 
 	@Autowired
-	private GxRegisteredDeviceList list;
+	GxDomainList list;
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
@@ -32,6 +32,7 @@ public class GxRegisteredDeviceListView extends GxVerticalLayoutView {
 
 	@Override
 	protected String getCaption() {
-		return "Registered Device";
+		return "Domains";
 	}
+
 }

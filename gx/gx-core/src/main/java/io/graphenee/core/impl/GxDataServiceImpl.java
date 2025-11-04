@@ -38,7 +38,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.enums.AccessTypeStatus;
@@ -51,6 +50,7 @@ import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxCity;
 import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxCurrency;
+import io.graphenee.core.model.entity.GxDomain;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -60,7 +60,6 @@ import io.graphenee.core.model.entity.GxResource;
 import io.graphenee.core.model.entity.GxSavedQuery;
 import io.graphenee.core.model.entity.GxSecurityGroup;
 import io.graphenee.core.model.entity.GxSecurityPolicy;
-import io.graphenee.core.model.entity.GxSecurityPolicyDocument;
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
@@ -74,6 +73,7 @@ import io.graphenee.core.model.jpa.repository.GxAuditLogRepository;
 import io.graphenee.core.model.jpa.repository.GxCityRepository;
 import io.graphenee.core.model.jpa.repository.GxCountryRepository;
 import io.graphenee.core.model.jpa.repository.GxCurrencyRepository;
+import io.graphenee.core.model.jpa.repository.GxDomainRepository;
 import io.graphenee.core.model.jpa.repository.GxEmailTemplateRepository;
 import io.graphenee.core.model.jpa.repository.GxGenderRepository;
 import io.graphenee.core.model.jpa.repository.GxNamespacePropertyRepository;
@@ -94,12 +94,13 @@ import io.graphenee.core.model.jpa.repository.GxUserAccountRepository;
 import io.graphenee.security.exception.GxPermissionException;
 import io.graphenee.util.CryptoUtil;
 import io.graphenee.util.JpaSpecificationBuilder;
-import io.graphenee.util.TRCalendarUtil;
-import jakarta.annotation.PostConstruct;
 
 @Service
 @Transactional
 public class GxDataServiceImpl implements GxDataService {
+
+	@Autowired
+	GxDomainRepository domainRepo;
 
 	@Autowired
 	GxGenderRepository genderRepo;
@@ -976,7 +977,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount findUserAccountByUsername(String username) {
-		return userAccountRepo.findByUsername(username);
+		return userAccountRepo.findByUsernameAndNamespaceIsNotNull(username).get();
 	}
 
 	@Override
@@ -986,7 +987,7 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount findUserAccountByUsernameAndPassword(String username, String password) {
-		GxUserAccount userAccount = userAccountRepo.findByUsername(username);
+		GxUserAccount userAccount = findUserAccountByUsername(username);
 		if (userAccount == null)
 			return null;
 		String encryptedPassword = CryptoUtil.createPasswordHash(password);
@@ -1029,45 +1030,6 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxUserAccount> findUserAccountInactive() {
 		return userAccountRepo.findAllByIsActive(false, Sort.by("username"));
-	}
-
-	@PostConstruct
-	public void initialize() {
-		TransactionTemplate tran = new TransactionTemplate(transactionManager);
-		tran.execute(status -> {
-			GxNamespace namespace = systemNamespace();
-			GxSecurityGroup adminGroup = findOrCreateSecurityGroup("Admin", namespace);
-			GxSecurityPolicy adminPolicy = findOrCreateSecurityPolicy("Admin Policy", namespace);
-			GxSecurityPolicyDocument document = adminPolicy.defaultDocument();
-			if (document == null) {
-				document = new GxSecurityPolicyDocument();
-				document.setIsDefault(true);
-				document.setDocumentJson("grant all on all;");
-				document.setTag(TRCalendarUtil.yyyyMMddHHmmssFormatter.format(new Timestamp(0)));
-				adminPolicy.addSecurityPolicyDocument(document);
-				save(adminPolicy);
-			}
-			if (!adminGroup.getSecurityPolicies().contains(adminPolicy)) {
-				adminGroup.getSecurityPolicies().add(adminPolicy);
-				save(adminGroup);
-			}
-			GxUserAccount admin = findUserAccountByUsernameAndNamespace("admin", namespace);
-			if (admin == null) {
-				admin = new GxUserAccount();
-				admin.setUsername("admin");
-				admin.setPassword("change_on_install");
-				admin.setIsActive(true);
-				admin.setIsProtected(true);
-				admin.setNamespace(namespace);
-				save(admin);
-			}
-			if (!admin.getSecurityGroups().contains(adminGroup)) {
-				admin.getSecurityGroups().add(adminGroup);
-				save(admin);
-			}
-
-			return null;
-		});
 	}
 
 	@Override
@@ -1237,6 +1199,20 @@ public class GxDataServiceImpl implements GxDataService {
 
 	@Override
 	public GxUserAccount save(GxUserAccount entity) {
+		Optional<GxUserAccount> record = userAccountRepo.findByUsernameAndNamespaceIsNotNull(entity.getUsername());
+		if (record.isPresent()) {
+			GxUserAccount found = record.get();
+			if (!found.getNamespace().equals(entity.getNamespace()))
+				throw new RuntimeException(
+						"This username is already in use by another account.");
+		}
+		record = userAccountRepo.findAllByNamespace(entity.getNamespace()).stream()
+				.filter(f -> f.getUsername().equals(entity.getUsername())).findFirst();
+		if (record.isPresent()) {
+			GxUserAccount found = record.get();
+			if (!found.equals(entity))
+				throw new RuntimeException("This username is already in use by another account.");
+		}
 		if (!Strings.isBlank(entity.getConfirmPassword())) {
 			String encryptedPassword = CryptoUtil.createPasswordHash(entity.getConfirmPassword());
 			entity.setPassword(encryptedPassword);
@@ -1288,6 +1264,77 @@ public class GxDataServiceImpl implements GxDataService {
 	@Override
 	public List<GxTag> findTagByNamespace(GxNamespace namespace) {
 		return tagRepository.findAllByNamespaceOrderByTag(namespace);
+	}
+
+	@Override
+	public List<GxDomain> findAllDomains() {
+		return domainRepo.findAll();
+	}
+
+	@Override
+	public List<GxDomain> findDomainsByNamespace(GxNamespace namespace) {
+		return domainRepo.findAllByNamespaceOrderByDns(namespace);
+	}
+
+	@Override
+	public GxDomain findDomainActiveAndVerifiedByHost(String host) {
+		Optional<GxDomain> record = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(host);
+		return record.orElse(null);
+	}
+
+	@Override
+	public GxDomain save(GxDomain domain) {
+		Optional<GxDomain> record = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(domain.getDns());
+		if (record.isPresent()) {
+			GxDomain found = record.get();
+			if (!found.getNamespace().equals(domain.getNamespace()))
+				throw new RuntimeException(
+						"This domain cannot be used because it's already in use by another namespace.");
+		}
+		record = domainRepo.findAllByNamespaceOrderByDns(domain.getNamespace()).stream()
+				.filter(f -> f.getDns().equals(domain.getDns())).findFirst();
+		if (record.isPresent()) {
+			GxDomain found = record.get();
+			if (!found.equals(domain))
+				throw new RuntimeException("This domain is already defined.");
+		}
+		return domainRepo.save(domain);
+	}
+
+	@Override
+	public void delete(GxDomain domain) {
+		domainRepo.delete(domain);
+	}
+
+	@Override
+	public Optional<GxNamespace> findNamespaceByHost(String host) {
+		Optional<GxDomain> domain = domainRepo.findByDnsAndIsActiveTrueAndIsVerifiedTrue(host);
+		if (domain.isPresent()) {
+			return Optional.of(domain.get().getNamespace());
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public byte[] appLogoByHost(String host) {
+		GxDomain domain = findDomainActiveAndVerifiedByHost(host);
+		if (domain != null) {
+			if (domain.getAppLogo() != null)
+				return domain.getAppLogo();
+			return domain.getNamespace().getAppLogo();
+		}
+		return null;
+	}
+
+	@Override
+	public String appTitleByHost(String host) {
+		GxDomain domain = findDomainActiveAndVerifiedByHost(host);
+		if (domain != null) {
+			if (domain.getAppTitle() != null)
+				return domain.getAppTitle();
+			return domain.getNamespace().getAppTitle();
+		}
+		return null;
 	}
 
 }

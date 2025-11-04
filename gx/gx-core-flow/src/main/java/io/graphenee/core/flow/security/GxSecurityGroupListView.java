@@ -27,7 +27,9 @@ public class GxSecurityGroupListView extends GxVerticalLayoutView {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		list.initializeWithNamespace(getNamespace());
+		if(loggedInUser() instanceof GxUserAccount) {
+			list.initializeWithNamespace(((GxUserAccount) loggedInUser()).getNamespace());
+		}
 	}
 
 	@Override
@@ -35,11 +37,4 @@ public class GxSecurityGroupListView extends GxVerticalLayoutView {
 		return "Security Groups";
 	}
 
-	public GxNamespace getNamespace() {
-		GxAuthenticatedUser user = loggedInUser();
-		if (user instanceof GxUserAccount) {
-			return ((GxUserAccount) user).getNamespace();
-		}
-		return null;
-	}
 }

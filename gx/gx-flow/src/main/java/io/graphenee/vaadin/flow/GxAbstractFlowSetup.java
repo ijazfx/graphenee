@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.VaadinServletRequest;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.util.ServletUtil;
 import io.graphenee.vaadin.flow.utils.DashboardUtils;
 
 public abstract class GxAbstractFlowSetup {
@@ -38,6 +40,15 @@ public abstract class GxAbstractFlowSetup {
 		Image i = new Image();
 		i.setSrc("frontend/images/graphenee.png");
 		return i;
+	}
+
+	/**
+	 * The method returns the host header for the incoming request.
+	 * 
+	 * @return value of the Host header
+	 */
+	protected String host() {
+		return ServletUtil.host(VaadinServletRequest.getCurrent());
 	}
 
 }

@@ -17,7 +17,9 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.server.VaadinServletRequest;
 
+import io.graphenee.util.ServletUtil;
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import jakarta.annotation.PostConstruct;
@@ -198,5 +200,13 @@ public abstract class GxAbstractResetPasswordView extends FlexLayout {
 
 	protected abstract void changePassword(String username, String password, TRVoidCallback success,
 			TRErrorCallback error);
+
+	/**
+	 * The method returns the host header for the incoming request.
+	 * @return value of the Host header
+	 */
+	protected String host() {
+		return ServletUtil.host(VaadinServletRequest.getCurrent());
+	}
 
 }
