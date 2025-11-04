@@ -3,13 +3,13 @@ package ${package};
 import java.io.File;
 
 import org.flywaydb.core.Flyway;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import io.graphenee.core.GrapheneeMigration;
-import io.graphenee.core.GxDataService;
-import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorageFactory;
 

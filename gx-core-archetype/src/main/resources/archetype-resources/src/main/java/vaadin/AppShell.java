@@ -1,12 +1,15 @@
 package ${package}.vaadin;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.component.page.LoadingIndicatorConfiguration;
 import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.server.ServiceInitEvent;
+import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.shared.communication.PushMode;
 import com.vaadin.flow.shared.ui.Transport;
 
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
-public class AppShell implements AppShellConfigurator {
+public class AppShell implements AppShellConfigurator, VaadinServiceInitListener {
 
     @Override
     public void serviceInit(ServiceInitEvent event) {
@@ -28,5 +31,5 @@ public class AppShell implements AppShellConfigurator {
             conf.setThirdDelay(15000); // 5000ms is the default
         });
     }
-    
+
 }

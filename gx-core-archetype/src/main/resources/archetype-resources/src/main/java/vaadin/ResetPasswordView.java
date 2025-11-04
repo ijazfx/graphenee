@@ -1,11 +1,15 @@
 package ${package}.vaadin;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 
+import io.graphenee.common.exception.ChangePasswordFailedException;
+import io.graphenee.core.GxDataService;
+import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;

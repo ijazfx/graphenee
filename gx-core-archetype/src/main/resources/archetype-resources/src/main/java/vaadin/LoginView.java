@@ -1,5 +1,7 @@
 package ${package}.vaadin;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -11,7 +13,6 @@ import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
 import io.graphenee.common.exception.PasswordChangeRequiredException;
 import io.graphenee.core.GxDataService;
-import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
