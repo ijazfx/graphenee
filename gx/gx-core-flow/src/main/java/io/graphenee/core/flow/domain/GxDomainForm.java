@@ -1,10 +1,15 @@
 package io.graphenee.core.flow.domain;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationResult;
@@ -14,6 +19,7 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDomain;
+import io.graphenee.util.DnsUtils;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.component.GxImageUploader;
 
@@ -45,14 +51,38 @@ public class GxDomainForm extends GxAbstractEntityForm<GxDomain> {
         txtRecord = new TextField("TXT Record");
         txtRecord.setHelperText("Create a TXT Record with this value for verification");
         isVerified = new Checkbox("Is Verified?");
+        Button verifyDomain = new Button("Verify Domain");
+        verifyDomain.addClickListener(cl -> {
+            Set<String> entries = DnsUtils.dnsTxtRecord(dns.getValue());
+            Span verificationMessage = new Span();
+            verificationMessage.getStyle().setColor("var(--lumo-secondary-color)");
+            if (entries.contains(txtRecord.getValue())) {
+                isVerified.setValue(true);
+                verificationMessage.setText("Domain is verified");
+                dns.setHelperComponent(verificationMessage);
+            } else {
+                isVerified.setValue(false);
+                verificationMessage.setText("Domain could not be verified");
+                dns.setHelperComponent(verificationMessage);
+            }
+        });
+
+        dns.addValueChangeListener(vcl -> {
+            isVerified.setValue(false);
+        });
 
         appTitle = new TextField("Application Title");
         appLogo = new GxImageUploader("Application Logo");
 
         isActive = new Checkbox("Is Active?");
 
-        entityForm.add(dns, txtRecord, isVerified, appTitle, appLogo, isActive);
-        expand(dns, txtRecord, isVerified, appTitle, appLogo, isActive);
+        HorizontalLayout verificationLayout = new HorizontalLayout();
+        verificationLayout.add(txtRecord, verifyDomain, isVerified);
+        verificationLayout.setAlignItems(Alignment.BASELINE);
+        verificationLayout.expand(txtRecord);
+
+        entityForm.add(dns, verificationLayout, appTitle, appLogo, isActive);
+        expand(dns, verificationLayout, appTitle, appLogo, isActive);
     }
 
     @Override
@@ -73,6 +103,7 @@ public class GxDomainForm extends GxAbstractEntityForm<GxDomain> {
     protected void postBinding(GxDomain entity) {
         txtRecord.setReadOnly(true);
         isVerified.setReadOnly(true);
+        dns.setHelperComponent(null);
     }
 
 }
