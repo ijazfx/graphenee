@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 import io.graphenee.core.GrapheneeMigration;
-import io.graphenee.core.GxDataService;
-import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorageFactory;
 
@@ -31,7 +29,8 @@ public class FlowApplicationConfiguration {
 				break;
 			case "local":
 			default:
-				String fsPath = env.getProperty("gx.fs-path", System.getProperty("user.home") + File.separatorChar + ".graphenee");
+				String fsPath = env.getProperty("gx.fs-path",
+						System.getProperty("user.home") + File.separatorChar + ".graphenee");
 				storage = FileStorageFactory.createLocalFileStorage(new File(fsPath));
 				break;
 		}
