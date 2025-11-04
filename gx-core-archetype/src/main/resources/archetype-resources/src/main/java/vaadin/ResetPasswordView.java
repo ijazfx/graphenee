@@ -21,11 +21,11 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
     @Autowired
     GxAbstractFlowSetup flowSetup;
 
-    // @Autowired
-    // GxDataService dataService;
-    //
-    // @Autowired
-    // GxPasswordPolicyDataService passwordService;
+    @Autowired
+    GxDataService dataService;
+
+    @Autowired
+    GxPasswordPolicyDataService passwordService;
 
     @Override
     protected GxAbstractFlowSetup flowSetup() {
@@ -41,14 +41,13 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
 
     @Override
     protected void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error) {
-        System.out.println("Password changed");
-        // try {
-        // passwordService.changePassword(dataService.systemNamespace(), username,
-        // password);
-        success.execute();
-        // } catch (ChangePasswordFailedException e) {
-        // error.execute(e);
-        // }
+        try {
+            passwordService.changePassword(dataService.systemNamespace(), username,
+            password);
+            success.execute();
+        } catch (ChangePasswordFailedException e) {
+            error.execute(e);
+        }
     }
 
 }

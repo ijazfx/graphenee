@@ -40,10 +40,15 @@ public class LoginView extends GxAbstractLoginView {
             throws AuthenticationFailedException, PasswordChangeRequiredException {
         String username = event.getUsername();
         String password = event.getPassword();
-        GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);
-        if (user == null) {
-            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password,
-                    dataService.systemNamespace());
+        Optional<GxNamespace> namespace = dataService.findNamespaceByHost(host());
+        GxUserAccount user = null;
+        if (namespace.isPresent()) {
+            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace.get());
+        } else {
+            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, dataService.systemNamespace());
+            if(user == null) {
+                user = dataService.findUserAccountByUsernameAndPassword(username, password);
+            }
         }
         if (user == null) {
             throw new AuthenticationFailedException("Invalid credentials, please try again.");
@@ -54,7 +59,7 @@ public class LoginView extends GxAbstractLoginView {
         if (user.getIsPasswordChangeRequired()) {
             throw new PasswordChangeRequiredException();
         }
-        return new GxUserAccountDashboardUser(user);
+        return user;
     }
 
 }
