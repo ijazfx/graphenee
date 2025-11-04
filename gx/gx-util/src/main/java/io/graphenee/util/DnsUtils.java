@@ -77,4 +77,33 @@ public class DnsUtils {
 
     }
 
+    public static boolean domainExists(String domainToLookup) {
+        NioEventLoopGroup elg = new NioEventLoopGroup();
+        DnsNameResolver resolver = new DnsNameResolverBuilder(elg.next())
+                .datagramChannelType(NioDatagramChannel.class)
+                .build();
+
+        boolean exists = false;
+
+        try {
+            AddressedEnvelope<DnsResponse, InetSocketAddress> envelope = resolver
+                    .query(new DefaultDnsQuestion(domainToLookup, DnsRecordType.CNAME)).get();
+
+            exists = envelope.content().count(DnsSection.ANSWER) > 0;
+            envelope.release();
+        } catch (Exception ex) {
+            log.error("Failed to check CNAME record for {}", domainToLookup, ex);
+        } finally {
+            try {
+                elg.awaitTermination(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                log.error("Failed to complete DNS query", e);
+            } finally {
+                elg.close();
+            }
+        }
+
+        return exists;
+    }
+
 }

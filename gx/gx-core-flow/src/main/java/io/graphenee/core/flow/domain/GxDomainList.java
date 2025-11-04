@@ -133,9 +133,16 @@ public class GxDomainList extends GxAbstractEntityList<GxDomain> {
                     onSave(domain);
                     GxNotification.success(domain.getDns() + " has been verified.");
                 } else {
-                    domain.setIsVerified(false);
-                    onSave(domain);
-                    GxNotification.error(domain.getDns() + " could not be verified.");
+                    if (DnsUtils.domainExists(domain.getDns())) {
+                        domain.setIsVerified(true);
+                        onSave(domain);
+                        GxNotification.error(domain.getDns()
+                                + " domain is partially verified because it exists but does not contain the matching TXT record.");
+                    } else {
+                        domain.setIsVerified(false);
+                        onSave(domain);
+                        GxNotification.error(domain.getDns() + " could not be verified.");
+                    }
                 }
             });
             getUI().ifPresent(ui -> {
