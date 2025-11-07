@@ -12,6 +12,7 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -30,6 +31,7 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
 	TextField name;
 	TextArea note;
+	PasswordField uniqueId;
 	DateTimePicker issueDate;
 	DateTimePicker expiryDate;
 	IntegerField expiryReminderInDays;
@@ -49,6 +51,8 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 
 		note = new TextArea("Note");
 		note.setHeight("7rem");
+
+		uniqueId = new PasswordField("Document ID");
 
 		issueDate = new DateTimePicker("Issue Date");
 		expiryDate = new DateTimePicker("Expiry Date");
@@ -77,10 +81,10 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 			tags.setValue(updated);
 		});
 
-		entityForm.add(name, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags);
+		entityForm.add(name, uniqueId, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags);
 
 		setColspan(tags, 2);
-		setColspan(name, 2);
+		// setColspan(name, 2);
 		setColspan(note, 2);
 	}
 

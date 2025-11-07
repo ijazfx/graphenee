@@ -22,6 +22,8 @@ public interface GxDocumentExplorerItem {
 
 	String getPath();
 
+	String getUniqueId();
+
 	String getRelativePath();
 
 	Set<GxTag> getTags();

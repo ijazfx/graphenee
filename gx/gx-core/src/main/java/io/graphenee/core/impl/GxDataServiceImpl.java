@@ -986,6 +986,28 @@ public class GxDataServiceImpl implements GxDataService {
 	}
 
 	@Override
+	public GxUserAccount findUserAccountByUsernameAndNamespace(String usernameAndNamespace) throws Exception {
+		String[] userData = usernameAndNamespace.split("@");
+
+		String name = userData[0];
+		String namespaceName = userData[1];
+
+		GxNamespace namespace = findNamespace(namespaceName);
+
+		if (namespace == null) {
+			throw new Exception("Namespace not found");
+		}
+
+		GxUserAccount user = findUserAccountByUsernameAndNamespace(name, namespace);
+
+		if (user == null) {
+			throw new Exception("User not found");
+		}
+
+		return user;
+	}
+
+	@Override
 	public GxUserAccount findUserAccountByUsernameAndPassword(String username, String password) {
 		GxUserAccount userAccount = findUserAccountByUsername(username);
 		if (userAccount == null)

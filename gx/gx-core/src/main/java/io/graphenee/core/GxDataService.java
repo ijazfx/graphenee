@@ -341,6 +341,8 @@ public interface GxDataService {
 	GxUserAccount findUserAccountByUsername(String username);
 
 	GxUserAccount findUserAccountByUsernameAndNamespace(String username, GxNamespace namespace);
+	
+	GxUserAccount findUserAccountByUsernameAndNamespace(String usernameAndNamespace) throws Exception;
 
 	GxUserAccount findUserAccountByUsernameAndPassword(String username, String password);
 
