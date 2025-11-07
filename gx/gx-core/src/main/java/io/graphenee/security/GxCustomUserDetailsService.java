@@ -23,7 +23,7 @@ public class GxCustomUserDetailsService implements UserDetailsService {
 
         try {
             GxUserAccount user = gxDataService.findUserAccountByUsernameAndNamespace(usernameAndNamespace);
-            return User.withUsername(user.getUsername())
+            return User.withUsername(usernameAndNamespace)
                     .password(user.getPassword()) // already encrypted
                     .roles("USER")
                     .build();
