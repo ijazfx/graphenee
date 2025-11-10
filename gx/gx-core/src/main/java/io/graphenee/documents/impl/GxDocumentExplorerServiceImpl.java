@@ -209,6 +209,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		newDocument.setName(parentDocument.getName());
 		newDocument.setVersionNo(maxVersion + 1);
 		newDocument.setDocument(parentDocument);
+        newDocument.setFolder(parentDocument.getFolder());
 		return docRepo.save(newDocument);
 	}
 
@@ -228,10 +229,11 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			GxDocumentFilter filter) {
 		List<Integer> tagIds = searchEntity.getTags().stream().map(GxTag::getOid).toList();
 		if (parent.isFile()) {
-			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-			dsb.eq("document", parent);
-			dsb.join("tags", "oid", tagIds);
-			return docRepo.count(dsb.build());
+            return 0L;
+//			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+//			dsb.eq("document", parent);
+//			dsb.join("tags", "oid", tagIds);
+//			return docRepo.count(dsb.build());
 		}
 		Long count = 0L;
 
@@ -247,13 +249,16 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
 		dsb.join("tags", "oid", tagIds);
-		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().filter(f -> f.isGranted(user)).distinct()
-				.toList();
+		// find all docs, then filter for the highest version of each name.
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
+				.collect(Collectors.groupingBy(GxDocument::getName, Collectors.collectingAndThen(Collectors.maxBy(java.util.Comparator.comparing(GxDocument::getVersionNo)),
+						opt -> opt.orElse(null))))
+				.values().stream().filter(d -> d != null).collect(Collectors.toList());
 
 		if (filter != null) {
 			count = count + docs.stream().filter(f -> filter.test(f)).count();
 		} else {
-			count = count + docs.stream().count();
+			count = count + docs.size();
 		}
 
 		return count;
@@ -265,21 +270,22 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		List<Integer> tagIds = searchEntity.getTags().stream().map(GxTag::getOid).toList();
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 		if (parent.isFile()) {
-			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-			dsb.like("name", searchEntity.getName());
-			dsb.eq("document", parent);
-			dsb.join("tags", "oid", tagIds);
-			List<GxDocument> docs;
-			if (filter != null) {
-				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct()
-						.filter(f -> f.isGranted(user) && filter.test(f)).collect(Collectors.toList());
-			} else {
-				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct().filter(f -> f.isGranted(user))
-						.collect(Collectors.toList());
-			}
-			if (!docs.isEmpty()) {
-				items.addAll(docs);
-			}
+            return items;
+//			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+//			dsb.like("name", searchEntity.getName());
+//			dsb.eq("document", parent);
+//			dsb.join("tags", "oid", tagIds);
+//			List<GxDocument> docs;
+//			if (filter != null) {
+//				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct()
+//						.filter(f -> f.isGranted(user) && filter.test(f)).collect(Collectors.toList());
+//			} else {
+//				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct().filter(f -> f.isGranted(user))
+//						.collect(Collectors.toList());
+//			}
+//			if (!docs.isEmpty()) {
+//				items.addAll(docs);
+//			}
 		} else {
 			GxFolder folder = (GxFolder) parent;
 			JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
@@ -295,14 +301,16 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("folder", folder);
 			dsb.join("tags", "oid", tagIds);
-			List<GxDocument> docs;
+			// find all docs, then filter for the highest version of each name.
+			List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
+					.collect(Collectors.groupingBy(GxDocument::getName, Collectors.collectingAndThen(Collectors.maxBy(java.util.Comparator.comparing(GxDocument::getVersionNo)),
+							opt -> opt.orElse(null))))
+					.values().stream().filter(d -> d != null).collect(Collectors.toList());
+
 			if (filter != null) {
-				docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user) && filter.test(f))
-						.collect(Collectors.toList());
-			} else {
-				docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
-						.collect(Collectors.toList());
+				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
 			}
+
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
 			}
