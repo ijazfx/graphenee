@@ -8,6 +8,7 @@ import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxDocumentFilter;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxUserAccount;
 
 public interface GxDocumentExplorerService {
 
@@ -32,6 +33,8 @@ public interface GxDocumentExplorerService {
 	GxDocument createDocumentVersion(GxDocument parent, GxDocument newDocument);
 
 	void deleteExplorerItem(List<GxDocumentExplorerItem> items);
+	
+	void deleteExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user);
 
 	void deleteFolder(List<GxFolder> folders);
 
@@ -52,5 +55,7 @@ public interface GxDocumentExplorerService {
 	void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
 
 	void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem parent);
+	
+	void save(GxDocument document);
 
 }
