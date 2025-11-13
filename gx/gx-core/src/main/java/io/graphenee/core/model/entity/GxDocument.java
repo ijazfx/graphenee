@@ -2,6 +2,7 @@ package io.graphenee.core.model.entity;
 
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -11,10 +12,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.data.annotation.LastModifiedDate;
+
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.util.TRCalendarUtil;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -48,6 +52,10 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 	Integer expiryReminderInDays = 30;
 	Date issueDate;
 	Date expiryDate;
+
+	@LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
 	@ManyToOne
 	@JoinColumn(name = "oid_document")
@@ -88,6 +96,9 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 		GxAuditLog log = new GxAuditLog();
 		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
 		log.setAuditEvent(event);
+		log.setDetail(event + " : " + name);
+		log.setAuditEntity(this.getClass().getSimpleName());
+		log.setOidAuditEntity(this.getOid());
 		log.setUserAccount(user);
 		auditLogs.add(log);
 	}

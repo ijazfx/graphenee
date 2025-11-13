@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.qos.logback.core.util.StringUtil;
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.core.GxAuditLogDataService;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxDocumentFilter;
@@ -53,6 +54,9 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 
 	@Autowired
 	GxSecurityGroupRepository securityGroupRepo;
+
+	@Autowired
+	GxAuditLogDataService auditLogDataService;
 
 	@PersistenceContext
 	private EntityManager em;
@@ -160,6 +164,9 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 					folder.getGroups().addAll(groups);
 				}
 			}
+			if (folder.getOid() == null) {
+				folder.audit(folder.getOwner(), "SAVED_FOLDER");
+			}
 		});
 		return folderRepo.saveAll(folders);
 	}
@@ -193,6 +200,9 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 					document.getGroups().addAll(groups);
 				}
 			}
+			if (document.getOid() == null) {
+				document.audit(document.getOwner(), "UPLOADED_DOCUMENT");
+			}
 		});
 		return docRepo.saveAll(documents);
 	}
@@ -209,6 +219,8 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		newDocument.setName(parentDocument.getName());
 		newDocument.setVersionNo(maxVersion + 1);
 		newDocument.setDocument(parentDocument);
+		newDocument.setFolder(parentDocument.getFolder());
+		newDocument.audit(newDocument.getOwner(), "UPLOADED_NEW_VERSION_DOCUMENT");
 		return docRepo.save(newDocument);
 	}
 
@@ -228,10 +240,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			GxDocumentFilter filter) {
 		List<Integer> tagIds = searchEntity.getTags().stream().map(GxTag::getOid).toList();
 		if (parent.isFile()) {
-			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-			dsb.eq("document", parent);
-			dsb.join("tags", "oid", tagIds);
-			return docRepo.count(dsb.build());
+			return 0L;
 		}
 		Long count = 0L;
 
@@ -247,13 +256,24 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
 		dsb.join("tags", "oid", tagIds);
-		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().filter(f -> f.isGranted(user)).distinct()
-				.toList();
+		// find all docs, then filter for the highest version of each.
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
+				.collect(Collectors.groupingBy(d -> {
+					GxDocument root = d;
+					while (root.getDocument() != null) {
+						root = root.getDocument();
+					}
+					return root;
+				},
+						Collectors.collectingAndThen(
+								Collectors.maxBy(java.util.Comparator.comparing(GxDocument::getVersionNo)),
+								opt -> opt.orElse(null))))
+				.values().stream().filter(d -> d != null).collect(Collectors.toList());
 
 		if (filter != null) {
 			count = count + docs.stream().filter(f -> filter.test(f)).count();
 		} else {
-			count = count + docs.stream().count();
+			count = count + docs.size();
 		}
 
 		return count;
@@ -265,21 +285,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		List<Integer> tagIds = searchEntity.getTags().stream().map(GxTag::getOid).toList();
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 		if (parent.isFile()) {
-			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
-			dsb.like("name", searchEntity.getName());
-			dsb.eq("document", parent);
-			dsb.join("tags", "oid", tagIds);
-			List<GxDocument> docs;
-			if (filter != null) {
-				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct()
-						.filter(f -> f.isGranted(user) && filter.test(f)).collect(Collectors.toList());
-			} else {
-				docs = docRepo.findAll(dsb.build(), Sort.by(sortKey)).stream().distinct().filter(f -> f.isGranted(user))
-						.collect(Collectors.toList());
-			}
-			if (!docs.isEmpty()) {
-				items.addAll(docs);
-			}
+			return items;
 		} else {
 			GxFolder folder = (GxFolder) parent;
 			JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
@@ -295,14 +301,24 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("folder", folder);
 			dsb.join("tags", "oid", tagIds);
-			List<GxDocument> docs;
+			// find all docs, then filter for the highest version of each.
+			List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
+					.collect(Collectors.groupingBy(d -> {
+						GxDocument root = d;
+						while (root.getDocument() != null) {
+							root = root.getDocument();
+						}
+						return root;
+					},
+							Collectors.collectingAndThen(
+									Collectors.maxBy(java.util.Comparator.comparing(GxDocument::getVersionNo)),
+									opt -> opt.orElse(null))))
+					.values().stream().filter(d -> d != null).collect(Collectors.toList());
+
 			if (filter != null) {
-				docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user) && filter.test(f))
-						.collect(Collectors.toList());
-			} else {
-				docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
-						.collect(Collectors.toList());
+				docs = docs.stream().filter(f -> filter.test(f)).collect(Collectors.toList());
 			}
+
 			if (!docs.isEmpty()) {
 				items.addAll(docs);
 			}
@@ -456,6 +472,28 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			p = p.getParent();
 		}
 		return false;
+	}
+
+	@Override
+	public void save(GxDocument document) {
+		docRepo.save(document);
+	}
+
+	@Override
+	public void deleteExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user) {
+		if (items != null) {
+			for (GxDocumentExplorerItem item : items) {
+				if (item.isFile()) {
+					GxDocument document = (GxDocument) item;
+					auditLogDataService.log(user, "", "DELETED", "DELETED" + " : " + document.getName(), "GxDocument", document.getOid());
+					deleteDocument(List.of(document));
+				} else {
+					GxFolder folder = (GxFolder) item;
+					auditLogDataService.log(user, "", "DELETED", "DELETED" + " : " + folder.getName(), "GxFolder", folder.getOid());
+					deleteFolder(List.of(folder));
+				}
+			}
+		}
 	}
 
 }

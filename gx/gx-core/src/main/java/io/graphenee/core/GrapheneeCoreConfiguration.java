@@ -24,6 +24,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import io.graphenee.core.model.entity.GxNamespace;
@@ -38,6 +39,7 @@ import io.graphenee.sms.GrapheneeSmsConfiguration;
 import io.graphenee.util.TRCalendarUtil;
 
 @Configuration
+@EnableJpaAuditing
 @EnableJpaRepositories({ GrapheneeCoreConfiguration.JPA_REPOSITORIES_BASE_PACKAGE })
 @EntityScan({ GrapheneeCoreConfiguration.ENTITY_SCAN_BASE_PACKAGE })
 @ComponentScan({ GrapheneeCoreConfiguration.COMPONENT_SCAN_BASE_PACKAGE,

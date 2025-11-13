@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
@@ -27,12 +28,19 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.ItemDoubleClickEvent;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
+import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
 import com.vaadin.flow.component.grid.dnd.GridDragStartEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropEvent;
 import com.vaadin.flow.component.grid.dnd.GridDropLocation;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -58,12 +66,14 @@ import io.graphenee.util.callback.TRParamCallback;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityTreeList;
 import io.graphenee.vaadin.flow.component.DialogFactory;
 import io.graphenee.vaadin.flow.component.GxDownloadButton;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 import io.graphenee.vaadin.flow.component.GxNotification;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
+import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,6 +110,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	GxDocumentVersionList versionList;
 
 	FileStorage storage;
+
+	GxUserAccount loggedInUser;
 
 	private GxNamespace namespace;
 
@@ -186,7 +198,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	protected String[] visibleProperties() {
 		return new String[] { "extension", "name", "version", "owner.name", "tagsJoined", "size", "issueDate",
 				"expiryDate",
-				"expiryReminderInDays" };
+				"expiryReminderInDays", "updatedAt" };
 	}
 
 	@Override
@@ -405,7 +417,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		int count = 0;
 		for (GxDocumentExplorerItem e : entities) {
 			try {
-				documentService.deleteExplorerItem(List.of(e));
+				documentService.deleteExplorerItem(List.of(e), loggedInUser);
 			} catch (DataIntegrityViolationException ex) {
 				count++;
 			}
@@ -420,13 +432,15 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		return "name";
 	}
 
-	public void initializeWithNamespaceAndStorageAndSearchListAndLayout(GxNamespace namespace, FileStorage storage,
-			GxDocumentSearchList sList, SplitLayout sLayout) {
+	public void initializeWithNamespaceAndStorageAndSearchListAndLayoutAndUser(GxNamespace namespace,
+			FileStorage storage,
+			GxDocumentSearchList sList, SplitLayout sLayout, GxUserAccount currentUser) {
 		this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
 		this.selectedFolder = this.topFolder;
 		this.namespace = namespace;
 		this.storage = storage;
 		this.splitLayout = sLayout;
+		this.loggedInUser = currentUser;
 		generateBreadcrumb(this.selectedFolder);
 		refresh();
 	}
@@ -472,6 +486,44 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	@Override
+	protected boolean shouldShowContextMenu() {
+		return true;
+	}
+
+	@Override
+	protected void decorateContextMenu(GridContextMenu<GxDocumentExplorerItem> contextMenu) {
+		super.decorateContextMenu(contextMenu);
+		GridMenuItem<GxDocumentExplorerItem> renameItem = contextMenu
+				.addItem(new Span(VaadinIcon.EDIT.create(), new Text("Rename")));
+
+		renameItem.addMenuItemClickListener(
+				new TRDelayMenuClickListener<GxDocumentExplorerItem, GridMenuItem<GxDocumentExplorerItem>>() {
+
+					@Override
+					public void onClick(GridContextMenuItemClickEvent<GxDocumentExplorerItem> event) {
+						try {
+							GxDocumentExplorerItem item = event.getItem().get();
+							form.showInDialog(item);
+							form.setDelegate(new EntityFormDelegate<GxDocumentExplorerItem>() {
+
+								@Override
+								public void onSave(GxDocumentExplorerItem entity) {
+									documentService.saveExplorerItem(selectedFolder, List.of(entity));
+									refresh();
+								}
+
+							});
+						} catch (Throwable e) {
+							log.warn(e.getMessage(), e);
+							Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+									.addThemeVariants(NotificationVariant.LUMO_ERROR);
+						}
+					}
+
+				});
+	}
+
+	@Override
 	protected void decorateSearchForm(GxFormLayout searchForm, Binder<GxDocumentExplorerItem> searchBinder) {
 		searchForm.add(breadcrumbLayout, 10);
 	}
@@ -503,6 +555,8 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					String resourcePath = storage.resourcePath("documents", src);
 					stream = storage.resolve(resourcePath);
 					byte[] bytes = IOUtils.toByteArray(stream);
+					document.audit(loggedInUser, "DOWNLOADED");
+					documentService.save(document);
 					return new ByteArrayInputStream(bytes);
 				} catch (Exception e) {
 					e.printStackTrace();

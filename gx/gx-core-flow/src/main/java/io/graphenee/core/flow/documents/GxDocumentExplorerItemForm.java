@@ -107,8 +107,10 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		super.postBinding(entity);
 		if (getEntity().isFile()) {
 			setColspan(expiryReminderInDays, 1);
+			name.setLabel("File Name");
 		} else {
 			setColspan(expiryReminderInDays, 2);
+			name.setLabel("Folder Name");
 		}
 	}
 
