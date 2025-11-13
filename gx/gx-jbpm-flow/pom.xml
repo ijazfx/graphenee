@@ -10,7 +10,7 @@
 	<!-- Parent -->
 	<parent>
 		<groupId>com.trigsoft.graphenee</groupId>
-		<version>4.1.0</version>
+		<version>4.1.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 		<artifactId>gx</artifactId>
 	</parent>

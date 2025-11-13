@@ -6,7 +6,7 @@
 	<groupId>com.trigsoft.graphenee</groupId>
 	<artifactId>gx</artifactId>
 	<packaging>pom</packaging>
-	<version>4.1.0</version>
+	<version>4.1.1-SNAPSHOT</version>
 	<name>Graphenee Parent</name>
 	<description>Graphenee Parent Project</description>
 	<url>https://github.com/ijazfx/graphenee</url>
