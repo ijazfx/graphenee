@@ -50,6 +50,7 @@ import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
@@ -69,12 +70,14 @@ import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm.EntityFormDelegate;
 import io.graphenee.vaadin.flow.GxAbstractEntityTreeList;
 import io.graphenee.vaadin.flow.component.DialogFactory;
+import io.graphenee.vaadin.flow.component.GxCopyToClipboardButton;
 import io.graphenee.vaadin.flow.component.GxDownloadButton;
 import io.graphenee.vaadin.flow.component.GxFormLayout;
 import io.graphenee.vaadin.flow.component.GxNotification;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 import io.graphenee.vaadin.flow.event.TRDelayMenuClickListener;
 import io.graphenee.vaadin.flow.utils.IconUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -216,6 +219,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			column.setHeader("Owner");
 			column.setWidth("13rem");
 		}
+		if (propertyName.matches("(updatedAt)")) {
+			column.setAutoWidth(true);
+		}
 	}
 
 	@Override
@@ -292,6 +298,56 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			}
 
 		}
+	}
+
+	@Override
+	protected void decorateGrid(Grid<GxDocumentExplorerItem> dataGrid) {
+		super.decorateGrid(dataGrid);
+		dataGrid.addComponentColumn(item -> {
+			if (!item.isFile()) {
+				return null;
+			}
+			GxCopyToClipboardButton copyButton = new GxCopyToClipboardButton(() -> {
+				try {
+					GxDocument document = (GxDocument) item;
+					String docID = document.getDocumentId().toString();
+					String shareKey = document.getShareKey().toString();
+					String shareLink = getBaseUrl() + "/api/gx/dms/v1/shared-document?documentId=" + docID
+							+ "&shareKey=" + shareKey;
+					log.info("File link: {}", shareLink);
+
+					GxNotification.success("Link Copied!");
+					return shareLink;
+
+				} catch (Exception e) {
+					log.error("Error while getting file link: {}", e.getMessage());
+					GxNotification.error(String.format("Error while getting file link: {}", e.getMessage()));
+				}
+				return "";
+			});
+			return copyButton;
+		}).setFrozenToEnd(true).setAutoWidth(true).setFlexGrow(0);
+	}
+
+	public String getBaseUrl() {
+		VaadinServletRequest vaadinRequest = VaadinServletRequest.getCurrent();
+		if (vaadinRequest == null) {
+			throw new IllegalStateException("No Vaadin request available");
+		}
+
+		HttpServletRequest request = vaadinRequest.getHttpServletRequest();
+		String scheme = request.getScheme(); // http or https
+		String serverName = request.getServerName();
+		int port = request.getServerPort();
+
+		String baseUrl = scheme + "://" + serverName;
+
+		// Include port only if it's non-standard
+		if ((scheme.equals("http") && port != 80) || (scheme.equals("https") && port != 443)) {
+			baseUrl += ":" + port;
+		}
+
+		return baseUrl;
 	}
 
 	@Override
