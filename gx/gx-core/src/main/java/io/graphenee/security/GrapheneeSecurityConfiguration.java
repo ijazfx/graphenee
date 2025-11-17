@@ -45,7 +45,7 @@ public class GrapheneeSecurityConfiguration {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/gx/authenticate", "/**").permitAll()
+						.requestMatchers("/api/gx/authenticate", "/api/gx/dms/v1/shared-document").permitAll()
 						.requestMatchers("/api/gx/**").authenticated()
 						.anyRequest().permitAll())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

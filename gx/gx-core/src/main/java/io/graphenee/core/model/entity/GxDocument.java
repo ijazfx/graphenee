@@ -44,6 +44,7 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 	Long size;
 
 	UUID documentId = UUID.randomUUID();
+	UUID shareKey = UUID.randomUUID();
 
 	Integer versionNo = 0;
 	String path;
