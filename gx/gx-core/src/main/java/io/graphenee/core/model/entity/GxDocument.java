@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
+import com.google.common.base.Strings;
+
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
 import io.graphenee.util.TRCalendarUtil;
@@ -217,6 +219,17 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 	@Override
 	public String getUniqueId() {
 		return documentId.toString();
+	}
+
+	@Override
+	public String getOwnerName() {
+		if (owner == null) {
+			return null;
+		}
+		if (!Strings.isNullOrEmpty(owner.getName())) {
+			return owner.getName();
+		}
+		return null;
 	}
 
 }

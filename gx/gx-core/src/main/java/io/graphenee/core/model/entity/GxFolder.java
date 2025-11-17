@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
+import com.google.common.base.Strings;
+
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
 import jakarta.persistence.CascadeType;
@@ -242,6 +244,17 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 	@Override
 	public String getUniqueId() {
 		return folderId.toString();
+	}
+
+	@Override
+	public String getOwnerName() {
+		if (owner == null) {
+			return null;
+		}
+		if (!Strings.isNullOrEmpty(owner.getName())) {
+			return owner.getName();
+		}
+		return null;
 	}
 
 }

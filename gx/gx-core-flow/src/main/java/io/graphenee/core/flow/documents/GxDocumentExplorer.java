@@ -199,7 +199,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "owner.name", "tagsJoined", "size", "issueDate",
+		return new String[] { "extension", "name", "version", "ownerName", "tagsJoined", "size", "issueDate",
 				"expiryDate",
 				"expiryReminderInDays", "updatedAt" };
 	}
@@ -215,7 +215,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			column.setHeader("Tags");
 			column.setWidth("13rem");
 		}
-		if (propertyName.matches("(owner.name)")) {
+		if (propertyName.matches("(ownerName)")) {
 			column.setHeader("Owner");
 			column.setWidth("13rem");
 		}
