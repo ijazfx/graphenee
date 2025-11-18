@@ -31,6 +31,8 @@ public interface GxDocumentExplorerItem {
 
 	String getTagsJoined();
 
+	String getOwnerName();
+
 	void setTags(Set<GxTag> tags);
 
 	void setName(String name);
