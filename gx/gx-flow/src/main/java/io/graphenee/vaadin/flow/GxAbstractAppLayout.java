@@ -244,8 +244,9 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			if (mi.hasChildren()) {
 				i.addClassName("gx-nav-menuitem-parent");
 				int count = generateMenuItems(i, mi, user);
-				if (count > 0 && !added)
+				if (count > 0 && !added) {
 					drawer.addItem(i);
+				}
 			}
 		}
 	}
@@ -273,9 +274,11 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			}
 			if (mi.hasChildren()) {
 				i.addClassName("gx-nav-menuitem-parent");
-				count = generateMenuItems(i, mi, user);
-				if (count > 0 && !added)
+				int childCount = generateMenuItems(i, mi, user);
+				if (childCount > 0 && !added) {
 					parent.addItem(i);
+					count++;
+				}
 			}
 		}
 		return count;
@@ -327,6 +330,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	/**
 	 * The method returns the host header for the incoming request.
+	 * 
 	 * @return value of the Host header
 	 */
 	protected String host() {
