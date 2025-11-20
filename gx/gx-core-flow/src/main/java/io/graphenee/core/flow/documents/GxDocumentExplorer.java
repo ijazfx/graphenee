@@ -53,6 +53,7 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxDocumentFilter;
@@ -60,7 +61,6 @@ import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.core.model.entity.GxUserAccount;
-import io.graphenee.core.model.jpa.repository.GxTagRepository;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.callback.TRParamCallback;
@@ -89,7 +89,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	GxDocumentExplorerService documentService;
 
 	@Autowired
-	GxTagRepository tagRepository;
+	GxDataService gxDataService;
 
 	@Autowired
 	GxDocumentExplorerItemForm form;
@@ -145,17 +145,17 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected boolean hasChildren(GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.countChildren(loggedInUser(), parent, getSearchEntity(), filter) > 0;
+			return documentService.countChildren(loggedInUser, parent, getSearchEntity(), filter) > 0;
 		}
-		return documentService.countChildren(loggedInUser(), selectedFolder, getSearchEntity(), filter) > 0;
+		return documentService.countChildren(loggedInUser, selectedFolder, getSearchEntity(), filter) > 0;
 	}
 
 	@Override
 	protected Stream<GxDocumentExplorerItem> getData(int pageNumber, int pageSize, GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.findExplorerItem(loggedInUser(), parent, getSearchEntity(), filter, "name").stream();
+			return documentService.findExplorerItem(loggedInUser, parent, getSearchEntity(), filter, "name").stream();
 		}
-		return documentService.findExplorerItem(loggedInUser(), selectedFolder, getSearchEntity(), filter, "name")
+		return documentService.findExplorerItem(loggedInUser, selectedFolder, getSearchEntity(), filter, "name")
 				.stream();
 	}
 
@@ -264,7 +264,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			PropertyDefinition<GxDocumentExplorerItem, Object> propertyDefinition, AbstractField<?, ?> defaultFilter) {
 		if (propertyName.equalsIgnoreCase("tagsJoined")) {
 			MultiSelectComboBox<GxTag> box = new MultiSelectComboBox<>();
-			box.setItems(tagRepository.findAll());
+			box.setItems(gxDataService.findTagByNamespace(namespace));
 			box.setClearButtonVisible(true);
 			box.addValueChangeListener(l -> {
 				getSearchEntity().setTags(l.getValue());
@@ -398,7 +398,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			folderForm.dismiss();
 		});
 
-		uploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
+		uploadForm.initializeWithFileUploadHandlerAndUser((parentFolder, uploadedFiles) -> {
 			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
@@ -425,9 +425,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				refresh();
 			});
 			refresh();
-		});
+		}, loggedInUser);
 
-		uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
+		uploadNewVersionForm.initializeWithFileUploadHandlerAndUser((parentDocument, uploadedFile) -> {
 			GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
 			try {
 				GxDocument d = new GxDocument();
@@ -447,7 +447,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				log.error(ex.getMessage(), ex);
 			}
 			refresh();
-		});
+		}, loggedInUser);
 	}
 
 	@Override
@@ -462,24 +462,24 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected void onDelete(Collection<GxDocumentExplorerItem> entities) {
-		deleteMultiple(entities);
+		archiveMultiple(entities);
 	}
 
 	public void delete(GxDocumentExplorerItem entity) {
-		deleteMultiple(List.of(entity));
+		archiveMultiple(List.of(entity));
 	}
 
-	public void deleteMultiple(Collection<GxDocumentExplorerItem> entities) {
+	public void archiveMultiple(Collection<GxDocumentExplorerItem> entities) {
 		int count = 0;
 		for (GxDocumentExplorerItem e : entities) {
 			try {
-				documentService.deleteExplorerItem(List.of(e), loggedInUser);
+				documentService.archiveExplorerItem(List.of(e), loggedInUser);
 			} catch (DataIntegrityViolationException ex) {
 				count++;
 			}
 		}
 		if (count > 0) {
-			GxNotification.error("Some document(s) are in use hence cannot be removed.");
+			GxNotification.error("Some document(s) are in use hence cannot be moved to trash.");
 		}
 	}
 
@@ -612,7 +612,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					stream = storage.resolve(resourcePath);
 					byte[] bytes = IOUtils.toByteArray(stream);
 					document.audit(loggedInUser, "DOWNLOADED");
-					documentService.save(document);
+					documentService.saveDocument(document);
 					return new ByteArrayInputStream(bytes);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -700,7 +700,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	public void uploadSingle(GxDocumentFilter filter, TRParamCallback<GxDocument> onChoose) {
-		quickUploadForm.initializeWithFileUploadHandler((parentFolder, uploadedFiles) -> {
+		quickUploadForm.initializeWithFileUploadHandlerAndUser((parentFolder, uploadedFiles) -> {
 			uploadedFiles.forEach(uploadedFile -> {
 				try {
 					GxDocument d = new GxDocument();
@@ -723,7 +723,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 					log.error(ex.getMessage(), ex);
 				}
 			});
-		});
+		}, loggedInUser);
 		quickUploadForm.showInDialog(selectedFolder);
 	}
 

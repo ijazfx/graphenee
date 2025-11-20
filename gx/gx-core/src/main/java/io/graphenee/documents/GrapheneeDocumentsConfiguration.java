@@ -18,10 +18,12 @@ package io.graphenee.documents;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import io.graphenee.core.GrapheneeCoreConfiguration;
 
 @Configuration
+@EnableScheduling
 @AutoConfigureAfter(GrapheneeCoreConfiguration.class)
 @ComponentScan(GrapheneeDocumentsConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
 public class GrapheneeDocumentsConfiguration {

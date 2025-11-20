@@ -65,6 +65,7 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 			GxTag newTag = new GxTag();
 			newTag.setTag(l.getDetail());
 			newTag.setOid(null);
+			newTag.setNamespace(getEntity().getNamespace());
 
 			// Copy current value into a mutable set
 			Set<GxTag> updated = new HashSet<>(tags.getValue());

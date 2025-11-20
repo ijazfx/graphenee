@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.qos.logback.core.util.StringUtil;
 import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.GxAuditLogDataService;
 import io.graphenee.core.model.entity.GxDocument;
@@ -129,9 +128,11 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	@Override
 	public List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey) {
 		JpaSpecificationBuilder<GxDocument> sb = JpaSpecificationBuilder.get();
-		sb.eq("document", document);
+		sb.eq("document", document).and().eq("isArchived", false);
 		List<GxDocument> versions = docRepo.findAll(sb.build(), Sort.by(sortKey).descending());
-		versions.add(document);
+		if (!document.getIsArchived()) {
+			versions.add(document);
+		}
 		return versions;
 	}
 
@@ -249,12 +250,14 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
 		fsb.like("name", searchEntity.getName());
 		fsb.eq("folder", folder);
+		fsb.eq("isArchived", false);
 		fsb.join("tags", "oid", tagIds);
 		count = folderRepo.findAll(fsb.build()).stream().filter(f -> f.isGranted(user)).count();
 
 		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 		dsb.like("name", searchEntity.getName());
 		dsb.eq("folder", folder);
+		dsb.eq("isArchived", false);
 		dsb.join("tags", "oid", tagIds);
 		// find all docs, then filter for the highest version of each.
 		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
@@ -291,6 +294,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
 			fsb.like("name", searchEntity.getName());
 			fsb.eq("folder", folder);
+			fsb.eq("isArchived", false);
 			fsb.join("tags", "oid", tagIds);
 			List<GxFolder> folders = folderRepo.findAll(fsb.build(), Sort.by(sortKey));
 			if (!folders.isEmpty()) {
@@ -300,6 +304,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 			dsb.like("name", searchEntity.getName());
 			dsb.eq("folder", folder);
+			dsb.eq("isArchived", false);
 			dsb.join("tags", "oid", tagIds);
 			// find all docs, then filter for the highest version of each.
 			List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().distinct().filter(f -> f.isGranted(user))
@@ -328,48 +333,113 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item) {
+	public List<GxDocumentExplorerItem> findFolderItems(GxAuthenticatedUser user, GxFolder folder) {
+		List<GxDocumentExplorerItem> items = new ArrayList<>();
+
+		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+		fsb.eq("folder", folder);
+		List<GxFolder> folders = folderRepo.findAll(fsb.build());
+		if (!folders.isEmpty()) {
+			items.addAll(folders.stream().filter(f -> f.isGranted(user)).toList());
+		}
+
+		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+		dsb.eq("folder", folder);
+		List<GxDocument> docs = docRepo.findAll(dsb.build());
+		if (!docs.isEmpty()) {
+			items.addAll(docs.stream().filter(f -> f.isGranted(user)).toList());
+		}
+
+		items.sort((a, b) -> b.isFile().compareTo(a.isFile()));
+		return items;
+	}
+
+	@Override
+	public List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item, GxFolder rootFolder, GxUserAccount user) {
 		List<GxDocumentExplorerItem> items = new ArrayList<>();
 
 		List<Integer> tagIds = item.getTags().stream().map(GxTag::getOid).toList();
 
 		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 		dsb.like("name", item.getName());
+		dsb.eq("isArchived", false);
 		dsb.join("tags", "oid", tagIds);
 		List<GxDocument> docs = docRepo.findAll(dsb.build());
+		items.addAll(docs.stream().filter(f -> f.isGranted(user)).toList());
+
+		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+		fsb.like("name", item.getName());
+		fsb.eq("isArchived", false);
+		fsb.join("tags", "oid", tagIds);
+		List<GxFolder> folders = folderRepo.findAll(fsb.build());
+		items.addAll(folders.stream().filter(f -> f.isGranted(user) && f.getOid() != rootFolder.getOid()).toList());
+
+		return items;
+	}
+
+	@Override
+	public int countAll(GxDocumentExplorerItem item, GxFolder rootFolder, GxUserAccount user) {
+
+		List<Integer> tagIds = item.getTags().stream().map(GxTag::getOid).toList();
+
+		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+		dsb.like("name", item.getName());
+		dsb.eq("isArchived", false);
+		dsb.join("tags", "oid", tagIds);
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().filter(f -> f.isGranted(user)).toList();
+
+		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
+		fsb.like("name", item.getName());
+		fsb.eq("isArchived", false);
+		fsb.join("tags", "oid", tagIds);
+		List<GxFolder> folders = folderRepo.findAll(fsb.build()).stream().filter(f -> f.isGranted(user) && f.getOid() != rootFolder.getOid()).toList();
+
+		return docs.size() + folders.size();
+	}
+
+	@Override
+	public List<GxDocumentExplorerItem> findAllArchivedItems(GxAuthenticatedUser user, GxDocumentExplorerItem item,
+			GxFolder topFolder, GxNamespace namespace) {
+		List<GxDocumentExplorerItem> items = new ArrayList<>();
+
+		List<Integer> tagIds = item.getTags().stream().map(GxTag::getOid).toList();
+
+		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
+		dsb.eq("isArchived", true);
+		dsb.like("name", item.getName());
+		dsb.eq("namespace", namespace);
+		dsb.join("tags", "oid", tagIds);
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().filter(d -> d.isGranted(user)).toList();
 		items.addAll(docs);
 
 		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
-		if (StringUtil.notNullNorEmpty(item.getName())) {
-			fsb.like("name", item.getName());
-		} else {
-			fsb.ne("name", "io.graphenee.system");
-		}
+		fsb.eq("isArchived", true);
+		fsb.eq("namespace", namespace);
 		fsb.join("tags", "oid", tagIds);
-		List<GxFolder> folders = folderRepo.findAll(fsb.build());
+		List<GxFolder> folders = folderRepo.findAll(fsb.build()).stream().filter(f -> f.isGranted(user)).toList();
 		items.addAll(folders);
 
 		return items;
 	}
 
 	@Override
-	public Long countAll(GxDocumentExplorerItem item) {
+	public int countAllArchivedItems(GxAuthenticatedUser user, GxDocumentExplorerItem item, GxFolder topFolder,
+			GxNamespace namespace) {
 		List<Integer> tagIds = item.getTags().stream().map(GxTag::getOid).toList();
 
 		JpaSpecificationBuilder<GxDocument> dsb = JpaSpecificationBuilder.get();
 		dsb.like("name", item.getName());
 		dsb.join("tags", "oid", tagIds);
-		Long docCount = docRepo.count(dsb.build());
+		dsb.eq("isArchived", true);
+		dsb.eq("namespace", namespace);
+		List<GxDocument> docs = docRepo.findAll(dsb.build()).stream().filter(d -> d.isGranted(user)).toList();
 
 		JpaSpecificationBuilder<GxFolder> fsb = JpaSpecificationBuilder.get();
-		if (StringUtil.notNullNorEmpty(item.getName())) {
-			fsb.like("name", item.getName());
-		} else {
-			fsb.ne("name", "io.graphenee.system");
-		}
+		fsb.eq("isArchived", true);
+		fsb.eq("namespace", namespace);
 		fsb.join("tags", "oid", tagIds);
-		Long folderCount = folderRepo.count(fsb.build());
-		return docCount + folderCount;
+		List<GxFolder> folders = folderRepo.findAll(fsb.build()).stream().filter(f -> f.isGranted(user)).toList();
+		return docs.size() + folders.size();
 	}
 
 	@Override
@@ -475,8 +545,13 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 	}
 
 	@Override
-	public void save(GxDocument document) {
+	public void saveDocument(GxDocument document) {
 		docRepo.save(document);
+	}
+
+	@Override
+	public void saveFolder(GxFolder folder) {
+		folderRepo.save(folder);
 	}
 
 	@Override
@@ -485,15 +560,86 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 			for (GxDocumentExplorerItem item : items) {
 				if (item.isFile()) {
 					GxDocument document = (GxDocument) item;
-					auditLogDataService.log(user, "", "DELETED", "DELETED" + " : " + document.getName(), "GxDocument", document.getOid());
 					deleteDocument(List.of(document));
+					auditLogDataService.log(user, "", "DELETED", "DELETED" + " : " + document.getName(), "GxDocument",
+							document.getOid());
 				} else {
 					GxFolder folder = (GxFolder) item;
-					auditLogDataService.log(user, "", "DELETED", "DELETED" + " : " + folder.getName(), "GxFolder", folder.getOid());
 					deleteFolder(List.of(folder));
+					auditLogDataService.log(user, "", "DELETED", "DELETED" + " : " + folder.getName(), "GxFolder",
+							folder.getOid());
 				}
 			}
 		}
+	}
+
+	@Override
+	public void archiveExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user) {
+		if (items != null) {
+			for (GxDocumentExplorerItem item : items) {
+				if (item.isFile()) {
+					GxDocument document = (GxDocument) item;
+					while (document.getDocument() != null) {
+						document = document.getDocument();
+					}
+					List<GxDocument> versions = findDocumentVersion(document);
+					versions.forEach(dv -> {
+						dv.setIsArchived(true);
+						saveDocument(dv);
+						auditLogDataService.log(user, "", "TRASHED",
+								"TRASHED" + " : " + dv.getName() + " - " + dv.getVersionNo().toString(),
+								"GxDocument",
+								dv.getOid());
+					});
+				} else {
+					GxFolder folder = (GxFolder) item;
+					folder.setIsArchived(true);
+					saveFolder(folder);
+					auditLogDataService.log(user, "", "TRASHED", "TRASHED" + " : " + folder.getName(), "GxFolder",
+							folder.getOid());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void restoreExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user) {
+		if (items != null) {
+			for (GxDocumentExplorerItem item : items) {
+				if (item.isFile()) {
+					GxDocument document = (GxDocument) item;
+					document.setIsArchived(false);
+					saveDocument(document);
+					auditLogDataService.log(user, "", "RESTORED",
+							"RESTORED" + " : " + document.getName() + " - " + document.getVersionNo().toString(),
+							"GxDocument",
+							document.getOid());
+				} else {
+					GxFolder folder = (GxFolder) item;
+					folder.setIsArchived(false);
+					saveFolder(folder);
+					auditLogDataService.log(user, "", "RESTORED", "RESTORED" + " : " + folder.getName(), "GxFolder",
+							folder.getOid());
+				}
+			}
+		}
+	}
+
+	@Override
+	public void archiveDocumentVersion(List<GxDocument> documents, GxUserAccount user) {
+		documents.forEach(d -> {
+			d.setIsArchived(true);
+			saveDocument(d);
+			auditLogDataService.log(user, "", "TRASHED",
+					"TRASHED" + " : " + d.getName() + " - " + d.getVersionNo().toString(),
+					"GxDocument",
+					d.getOid());
+		});
+	}
+
+	@Override
+	public GxDocument alreadyExistsDocument(GxFolder parent, GxUserAccount owner, String documentName) {
+		return docRepo.findTop1ByFolderAndNameAndOwnerAndIsArchivedFalse(parent, documentName, owner).orElse(null);
 	}
 
 }

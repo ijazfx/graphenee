@@ -12,6 +12,10 @@ import io.graphenee.util.TRCalendarUtil;
 public interface GxDocumentExplorerItem {
 
 	Boolean isFile();
+	
+	Boolean getIsArchived();
+	
+	void setIsArchived(Boolean isArchived);
 
 	String getMimeType();
 

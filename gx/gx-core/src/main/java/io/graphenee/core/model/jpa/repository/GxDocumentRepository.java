@@ -1,5 +1,7 @@
 package io.graphenee.core.model.jpa.repository;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -9,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import io.graphenee.core.model.entity.GxDocument;
+import io.graphenee.core.model.entity.GxFolder;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.core.model.jpa.GxJpaRepository;
 
 public interface GxDocumentRepository extends GxJpaRepository<GxDocument, Integer>, JpaSpecificationExecutor<GxDocument> {
@@ -23,5 +27,11 @@ public interface GxDocumentRepository extends GxJpaRepository<GxDocument, Intege
 	Integer countByOidFolder(@Param("oidFolder") Integer oidFolder);
 
 	Optional<GxDocument> findTop1ByDocumentId(UUID documentId);
+	
+	Optional<GxDocument> findTop1ByFolderAndNameAndOwnerAndIsArchivedFalse(GxFolder folder, String name, GxUserAccount owner);
+
+	List<GxDocument> findAllByIsArchivedTrueAndUpdatedAtBefore(LocalDateTime sevenDaysAgo);
+
+	List<GxDocument> findAllByExpiryDateBefore(Date now);
 
 }

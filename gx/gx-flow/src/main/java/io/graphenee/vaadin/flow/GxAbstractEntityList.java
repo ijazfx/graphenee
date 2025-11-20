@@ -293,15 +293,15 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			customMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 			columnMenuBar.addThemeVariants(MenuBarVariant.LUMO_ICON);
 
-			addMenuItem = crudMenuBar.addItem(VaadinIcon.FILE_ADD.create());
+			addMenuItem = crudMenuBar.addItem(VaadinIcon.FILE_ADD.create(), "Add new record");
 			customizeAddMenuItem(addMenuItem);
 
-			deleteMenuItem = crudMenuBar.addItem(VaadinIcon.FILE_REMOVE.create());
+			deleteMenuItem = crudMenuBar.addItem(VaadinIcon.FILE_REMOVE.create(), "Delete selected record(s)");
 			customizeDeleteMenuItem(deleteMenuItem);
 
 			MenuItem optionsMenuItem = columnMenuBar.addItem(VaadinIcon.ELLIPSIS_DOTS_H.create());
 
-			exportDataMenuItem = optionsMenuItem.getSubMenu().addItem("Export to Excel...");
+			exportDataMenuItem = optionsMenuItem.getSubMenu().addItem("Export to Excel");
 			exportDataMenuItem.setVisible(shouldShowExportDataMenu());
 			exportDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
@@ -341,8 +341,8 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				}
 			});
 
-			importDataMenuItem = optionsMenuItem.getSubMenu().addItem("Import from Excel...");
-			importDataMenuItem.setVisible(shouldShowExportDataMenu());
+			importDataMenuItem = optionsMenuItem.getSubMenu().addItem("Import from Excel");
+			importDataMenuItem.setVisible(shouldShowImportDataMenu());
 			importDataMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
 
 				private static final long serialVersionUID = 1L;
@@ -366,7 +366,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			decorateMenuBar(customMenuBar);
 
-			columnsDialogMenuItem = optionsMenuItem.getSubMenu().addItem("Customize Grid...");
+			columnsDialogMenuItem = optionsMenuItem.getSubMenu().addItem("Customize Columns");
 			decorateColumnMenuBar(columnMenuBar);
 
 			columnsDialogMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
@@ -399,7 +399,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 				}
 			});
 
-			deleteMenuItem.setEnabled(false);
+			deleteMenuItem.setEnabled(true);
 
 			GxFormLayout searchForm = new GxFormLayout(5);
 			searchForm.addClassName("gx-grid-search-layout");
@@ -527,7 +527,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			dataGrid.addSelectionListener(sl -> {
 				int selected = sl.getAllSelectedItems().size();
-				deleteMenuItem.setEnabled(selected > 0);
+				// deleteMenuItem.setEnabled(selected > 0);
 				if (onSelection != null) {
 					Boolean value = onSelection.apply(sl.getAllSelectedItems());
 					if (value != null && value) {
@@ -680,6 +680,10 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean shouldShowExportDataMenu() {
+		return true;
+	}
+
+	protected boolean shouldShowImportDataMenu() {
 		return true;
 	}
 
@@ -928,7 +932,9 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 
 			@Override
 			public void onClick(ClickEvent<MenuItem> event) {
-				deleteRows(dataGrid.getSelectedItems());
+				if (!dataGrid.getSelectedItems().isEmpty()) {
+					deleteRows(dataGrid.getSelectedItems());
+				}
 			}
 
 		});
@@ -948,7 +954,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 						l.onEvent(GxEntityListEvent.DELETE, dataGrid.getSelectedItems());
 					});
 					refresh();
-					deleteMenuItem.setEnabled(false);
+					// deleteMenuItem.setEnabled(false);
 					dataGrid.deselectAll();
 				} catch (Exception e) {
 					log.warn(e.getMessage(), e);
