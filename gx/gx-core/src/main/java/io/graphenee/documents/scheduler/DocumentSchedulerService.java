@@ -35,7 +35,7 @@ public class DocumentSchedulerService {
     @Autowired
     private GxAuditLogDataService auditLogDataService;
 
-    @Scheduled(cron = "0 0 1 * * ?") // Runs every day at 1 AM
+    @Scheduled(cron = "${dms.scheduler.archived-job-cron}")
     @Transactional
     public void deleteArchivedDocumentsAndFolders() {
         log.info("Finding archived documents and folders older than 7 days...");
@@ -67,7 +67,7 @@ public class DocumentSchedulerService {
 
     }
 
-    @Scheduled(cron = "0 0 2 * * ?") // Runs every day at 2 AM
+    @Scheduled(cron = "${dms.scheduler.expired-job-cron}")
     @Transactional
     public void handleExpiredDocuments() {
         log.info("Finding expired documents...");
