@@ -280,25 +280,23 @@ public class GxDocumentArchivedList extends GxAbstractEntityLazyList<GxDocumentE
     @Override
     protected void decorateMenuBar(MenuBar menuBar) {
         restoreMenuItem = menuBar.addItem(VaadinIcon.REFRESH.create(), l -> {
-            schedulerService.deleteArchivedDocumentsAndFolders();
-            schedulerService.handleExpiredDocuments();
-            // List<GxDocumentExplorerItem> items = entityGrid().getSelectedItems().stream().toList();
+            List<GxDocumentExplorerItem> items = entityGrid().getSelectedItems().stream().toList();
 
-            // if (!items.isEmpty()) {
-            //     DialogFactory.questionDialog("Confirmation", "Are you sure to restore selected record(s)?", dlg -> {
-            //         try {
-            //             documentService.restoreExplorerItem(items, loggedInUser);
-            //             refresh();
-            //         } catch (Exception e) {
-            //             log.warn(e.getMessage(), e);
-            //             Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
-            //                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
-            //         }
-            //     }).open();
-            // }
+            if (!items.isEmpty()) {
+                DialogFactory.questionDialog("Confirmation", "Are you sure to restore selected record(s)?", dlg -> {
+                    try {
+                        documentService.restoreExplorerItem(items, loggedInUser);
+                        refresh();
+                    } catch (Exception e) {
+                        log.warn(e.getMessage(), e);
+                        Notification.show(e.getMessage(), 10000, Position.BOTTOM_CENTER)
+                                .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    }
+                }).open();
+            }
 
         });
-        // restoreMenuItem.setEnabled(false);
+        restoreMenuItem.setEnabled(false);
     }
 
     @Override
@@ -322,7 +320,6 @@ public class GxDocumentArchivedList extends GxAbstractEntityLazyList<GxDocumentE
 
     public void initializeWithNamespaceAndStorageAndSearchListAndLayoutAndUser(GxNamespace namespace,
             FileStorage storage, GxUserAccount currentUser) {
-        // tagBox.setItems(dataService.findTagByNamespace(namespace));
         this.topFolder = documentService.findOrCreateNamespaceFolder(namespace);
         this.namespace = namespace;
         this.storage = storage;
