@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@ConditionalOnProperty(name = "dms.scheduler.enabled", havingValue = "true", matchIfMissing = false)
 public class DocumentSchedulerService {
 
     @Autowired
