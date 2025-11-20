@@ -367,6 +367,7 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			decorateMenuBar(customMenuBar);
 
 			columnsDialogMenuItem = optionsMenuItem.getSubMenu().addItem("Customize Columns");
+			columnsDialogMenuItem.setVisible(shouldShowCustomizeColumnDataMenu());
 			decorateColumnMenuBar(columnMenuBar);
 
 			columnsDialogMenuItem.addClickListener(new TRDelayEventListener<ClickEvent<MenuItem>>() {
@@ -684,7 +685,11 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 	}
 
 	protected boolean shouldShowImportDataMenu() {
-		return true;
+		return false;
+	}
+
+	protected boolean shouldShowCustomizeColumnDataMenu() {
+		return false;
 	}
 
 	private void addInlineEditColumn(Column<T> column, PropertyDefinition<T, Object> propertyDefinition) {

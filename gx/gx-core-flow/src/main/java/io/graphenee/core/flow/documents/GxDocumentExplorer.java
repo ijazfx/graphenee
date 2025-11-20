@@ -547,11 +547,6 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	}
 
 	@Override
-	protected boolean shouldShowImportDataMenu() {
-		return false;
-	}
-
-	@Override
 	protected void decorateContextMenu(GridContextMenu<GxDocumentExplorerItem> contextMenu) {
 		super.decorateContextMenu(contextMenu);
 		GridMenuItem<GxDocumentExplorerItem> renameItem = contextMenu
