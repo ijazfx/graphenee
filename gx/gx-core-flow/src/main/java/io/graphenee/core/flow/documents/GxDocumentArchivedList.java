@@ -65,9 +65,6 @@ public class GxDocumentArchivedList extends GxAbstractEntityLazyList<GxDocumentE
     @Autowired
     GxTagRepository tagRepository;
 
-    @Autowired
-    DocumentSchedulerService schedulerService;
-
     FileStorage storage;
 
     GxUserAccount loggedInUser;
