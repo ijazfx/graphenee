@@ -18,10 +18,15 @@ import com.vaadin.flow.server.streams.FileUploadCallback;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.GxDataService;
+import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxTag;
+import io.graphenee.core.model.entity.GxUserAccount;
+import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.component.GxNotification;
 
 @SpringComponent
 @Scope("prototype")
@@ -29,6 +34,11 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 
 	@Autowired
 	GxDataService dataService;
+
+	@Autowired
+	GxDocumentExplorerService documentExplorerService;
+
+	private GxUserAccount loggedInUser;
 
 	Upload upload;
 	MultiSelectComboBox<GxTag> tags;
@@ -46,6 +56,13 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 
 			@Override
 			public void complete(UploadMetadata uploadMetadata, File file) throws IOException {
+				GxDocument alreadyExistsDocument = documentExplorerService.alreadyExistsDocument(getEntity(),
+						loggedInUser,
+						uploadMetadata.fileName());
+				if (alreadyExistsDocument != null) {
+					GxNotification.error(
+							"Document with this name already exists in this folder: " + uploadMetadata.fileName());
+				}
 				GxUploadedFile uploadedFile = new GxUploadedFile();
 				uploadedFile.setFile(file);
 				uploadedFile.setFileName(uploadMetadata.fileName());
@@ -57,12 +74,14 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 			}
 
 		}, new GxFileFactory());
+		upload.addFileRemovedListener(event -> {
+			uploadedFiles.removeIf(f -> f.getFileName().equals(event.getFileName()));
+		});
 		upload.setUploadHandler(gxFileUploadHandler);
 		upload.setMaxFiles(10);
 		upload.setMaxFileSize(1024000000);
 
 		tags = new MultiSelectComboBox<>("Add Tags");
-
 		tags.addValueChangeListener(l -> {
 			if (l.getValue() == null) {
 				uploadedFiles.forEach(f -> f.setTags(null));
@@ -88,7 +107,8 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 		expand(upload, tags, grants);
 	}
 
-	public void initializeWithFileUploadHandler(GxFileUploadHandler handler) {
+	public void initializeWithFileUploadHandlerAndUser(GxFileUploadHandler handler, GxUserAccount user) {
+		this.loggedInUser = user;
 		setDelegate(dlg -> {
 			handler.onSave(dlg, uploadedFiles);
 		});

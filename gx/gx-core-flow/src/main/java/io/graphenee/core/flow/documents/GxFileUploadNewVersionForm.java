@@ -22,7 +22,10 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxTag;
+import io.graphenee.core.model.entity.GxUserAccount;
+import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
+import io.graphenee.vaadin.flow.component.GxNotification;
 
 @SpringComponent
 @Scope("prototype")
@@ -30,6 +33,11 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 
 	@Autowired
 	GxDataService dataService;
+
+	@Autowired
+	GxDocumentExplorerService documentExplorerService;
+
+	private GxUserAccount loggedInUser;
 
 	Upload upload;
 	MultiSelectComboBox<GxTag> tags;
@@ -47,6 +55,13 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 
 			@Override
 			public void complete(UploadMetadata uploadMetadata, File file) throws IOException {
+				GxDocument alreadyExistsDocument = documentExplorerService.alreadyExistsDocument(
+						getEntity().getFolder(), loggedInUser,
+						uploadMetadata.fileName());
+				if (alreadyExistsDocument != null) {
+					GxNotification.error(
+							"Document with this name already exists in this folder: " + uploadMetadata.fileName());
+				}
 				GxUploadedFile uploadedFile = new GxUploadedFile();
 				uploadedFile.setFile(file);
 				uploadedFile.setFileName(uploadMetadata.fileName());
@@ -58,6 +73,9 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 			}
 
 		}, new GxFileFactory()));
+		upload.addFileRemovedListener(event -> {
+			uploadedFiles.removeIf(f -> f.getFileName().equals(event.getFileName()));
+		});
 		upload.setMaxFiles(1);
 		upload.setMaxFileSize(1024000000);
 		tags = new MultiSelectComboBox<>("Add Tags");
@@ -86,7 +104,8 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 		expand(upload, tags, grants);
 	}
 
-	public void initializeWithFileUploadHandler(GxFileUploadNewVersionHandler handler) {
+	public void initializeWithFileUploadHandlerAndUser(GxFileUploadNewVersionHandler handler, GxUserAccount user) {
+		this.loggedInUser = user;
 		setDelegate(dlg -> {
 			GxUploadedFile uploadedFile = !uploadedFiles.isEmpty() ? uploadedFiles.get(0) : null;
 			handler.onSave(dlg, uploadedFile);

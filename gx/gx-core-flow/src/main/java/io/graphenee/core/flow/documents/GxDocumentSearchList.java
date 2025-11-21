@@ -27,8 +27,10 @@ import ch.qos.logback.core.util.StringUtil;
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxDocumentExplorerItem;
+import io.graphenee.core.model.entity.GxFolder;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxTag;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
@@ -59,6 +61,12 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
     @Setter
     GxDocumentExplorer explorer = null;
 
+    GxNamespace namespace = null;
+
+    GxUserAccount loggedInUser = null;
+
+    GxFolder rootFolder = null;
+
     private MultiSelectComboBox<GxTag> tagBox = new MultiSelectComboBox<>("Search by Tags");
 
     public GxDocumentSearchList() {
@@ -70,7 +78,7 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
         if (StringUtil.isNullOrEmpty(searchEntity.getName()) && searchEntity.getTags().isEmpty()) {
             return 0;
         }
-        return documentService.countAll(searchEntity).intValue();
+        return documentService.countAll(searchEntity, rootFolder, loggedInUser);
     }
 
     @Override
@@ -79,7 +87,7 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
         if (StringUtil.isNullOrEmpty(searchEntity.getName()) && searchEntity.getTags().isEmpty()) {
             return Stream.empty();
         }
-        return documentService.findAll(searchEntity).stream();
+        return documentService.findAll(searchEntity, rootFolder, loggedInUser).stream();
     }
 
     @Override
@@ -232,9 +240,13 @@ public class GxDocumentSearchList extends GxAbstractEntityLazyList<GxDocumentExp
         }
     }
 
-    public void initializeByNamespace(GxNamespace namespace) {
+    public void initializeByNamespaceAndUser(GxNamespace namespace, GxUserAccount user) {
         this.getSearchEntity().setNamespace(namespace);
         tagBox.setItems(dataService.findTagByNamespace(namespace));
+        this.namespace = namespace;
+        this.loggedInUser = user;
+        this.rootFolder = documentService.findOrCreateNamespaceFolder(namespace);
+        refresh();
     }
 
 }

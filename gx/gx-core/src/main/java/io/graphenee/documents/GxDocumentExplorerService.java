@@ -22,6 +22,8 @@ public interface GxDocumentExplorerService {
 
 	List<GxDocument> findDocument(GxFolder parent, String... sortKey);
 
+	GxDocument alreadyExistsDocument(GxFolder parent, GxUserAccount owner, String documentName);
+
 	List<GxDocument> findDocumentVersion(GxDocument document, String... sortKey);
 
 	List<GxDocumentExplorerItem> saveExplorerItem(GxDocumentExplorerItem parent, List<GxDocumentExplorerItem> item);
@@ -33,8 +35,14 @@ public interface GxDocumentExplorerService {
 	GxDocument createDocumentVersion(GxDocument parent, GxDocument newDocument);
 
 	void deleteExplorerItem(List<GxDocumentExplorerItem> items);
-	
+
 	void deleteExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user);
+
+	void archiveExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user);
+
+	void restoreExplorerItem(List<GxDocumentExplorerItem> items, GxUserAccount user);
+
+	void archiveDocumentVersion(List<GxDocument> document, GxUserAccount user);
 
 	void deleteFolder(List<GxFolder> folders);
 
@@ -46,16 +54,26 @@ public interface GxDocumentExplorerService {
 	List<GxDocumentExplorerItem> findExplorerItem(GxAuthenticatedUser user, GxDocumentExplorerItem parent,
 			GxDocumentExplorerItem searchEntity, GxDocumentFilter filter, String... sortKey);
 
-	List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item);
+	List<GxDocumentExplorerItem> findAll(GxDocumentExplorerItem item, GxFolder rootFolder, GxUserAccount user);
 
-	Long countAll(GxDocumentExplorerItem item);
+	List<GxDocumentExplorerItem> findFolderItems(GxAuthenticatedUser user, GxFolder parent);
+
+	List<GxDocumentExplorerItem> findAllArchivedItems(GxAuthenticatedUser user, GxDocumentExplorerItem item,
+			GxFolder topFolder, GxNamespace namespace);
+
+	int countAllArchivedItems(GxAuthenticatedUser user, GxDocumentExplorerItem item, GxFolder topFolder,
+			GxNamespace namespace);
+
+	int countAll(GxDocumentExplorerItem item, GxFolder rootFolder, GxUserAccount user);
 
 	void positionBefore(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
 
 	void positionAfter(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem targetItem);
 
 	void changeParent(List<GxDocumentExplorerItem> items, GxDocumentExplorerItem parent);
-	
-	void save(GxDocument document);
+
+	void saveDocument(GxDocument document);
+
+	void saveFolder(GxFolder folder);
 
 }

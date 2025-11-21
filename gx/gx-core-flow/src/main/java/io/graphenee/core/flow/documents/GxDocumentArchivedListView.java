@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
 import io.graphenee.core.GxDataService;
@@ -30,17 +29,14 @@ import io.graphenee.vaadin.flow.GxSecuredView;
 import io.graphenee.vaadin.flow.GxVerticalLayoutView;
 
 @SuppressWarnings("serial")
-@GxSecuredView(GxDocumentExplorerView.VIEW_NAME)
+@GxSecuredView(GxDocumentArchivedListView.VIEW_NAME)
 @Scope("prototype")
-public class GxDocumentExplorerView extends GxVerticalLayoutView {
+public class GxDocumentArchivedListView extends GxVerticalLayoutView {
 
-	public static final String VIEW_NAME = "documents";
-
-	@Autowired
-	GxDocumentExplorer list;
+	public static final String VIEW_NAME = "trash-documents";
 
 	@Autowired
-	GxDocumentSearchList searchList;
+	GxDocumentArchivedList list;
 
 	@Autowired(required = false)
 	FileStorage storage;
@@ -48,26 +44,15 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 	@Autowired
 	GxDataService dataService;
 
-	SplitLayout layout = new SplitLayout();
-
 	@Override
 	protected String getCaption() {
-		return "Documents";
+		return "Trash";
 	}
 
 	@Override
 	protected void decorateLayout(HasComponents rootLayout) {
-		layout.addToPrimary(list);
-		layout.addToSecondary(searchList);
-		layout.setSizeFull();
-		layout.setSplitterPosition(100);
-
-		searchList.setSplitLayout(layout);
-		searchList.setStorage(storage);
-		searchList.setExplorer(list);
-		searchList.setEditable(false);
-
-		rootLayout.add(layout);
+		list.setEditable(false);
+		rootLayout.add(list);
 	}
 
 	@Override
@@ -75,9 +60,8 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 		if (loggedInUser() instanceof GxUserAccount) {
 			GxUserAccount user = ((GxUserAccount) loggedInUser());
 			GxNamespace namespace = user.getNamespace();
-			searchList.initializeByNamespaceAndUser(namespace, user);
-			list.initializeWithNamespaceAndStorageAndSearchListAndLayoutAndUser(namespace, storage, searchList, layout,
-					user);
+			list.initializeByNamespace(namespace);
+			list.initializeWithNamespaceAndStorageAndSearchListAndLayoutAndUser(namespace, storage, user);
 		}
 	}
 

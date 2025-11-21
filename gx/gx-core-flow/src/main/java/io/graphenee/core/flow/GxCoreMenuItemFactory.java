@@ -3,6 +3,7 @@ package io.graphenee.core.flow;
 import com.vaadin.flow.component.icon.VaadinIcon;
 
 import io.graphenee.core.flow.device_mgmt.GxRegisteredDeviceListView;
+import io.graphenee.core.flow.documents.GxDocumentArchivedListView;
 import io.graphenee.core.flow.documents.GxDocumentExplorerView;
 import io.graphenee.core.flow.domain.GxDomainListView;
 import io.graphenee.core.flow.email_template.GxEmailTemplateListView;
@@ -55,7 +56,9 @@ public class GxCoreMenuItemFactory {
 	}
 
 	public static GxMenuItem documentsMenuItem() {
-		GxMenuItem menu = GxMenuItem.create("Documents", VaadinIcon.FOLDER_O.create(), GxDocumentExplorerView.class);
+		GxMenuItem menu = GxMenuItem.create("Documents", VaadinIcon.FOLDER_O.create());
+		menu.add(GxMenuItem.create("Home", VaadinIcon.HOME.create(), GxDocumentExplorerView.class));
+		menu.add(GxMenuItem.create("Trash", VaadinIcon.TRASH.create(), GxDocumentArchivedListView.class));
 		return menu;
 	}
 
