@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -37,6 +38,8 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 	IntegerField expiryReminderInDays;
 	DateTimePicker reminderDate;
 	MultiSelectComboBox<GxTag> tags;
+		Checkbox isReadOnly;
+
 
 	public GxDocumentForm() {
 		super(GxDocument.class);
@@ -82,10 +85,13 @@ public class GxDocumentForm extends GxAbstractEntityForm<GxDocument> {
 			tags.setValue(updated);
 		});
 
-		entityForm.add(name, uniqueId, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags);
+				isReadOnly = new Checkbox("Is Read Only ?");
+
+
+		entityForm.add(name, uniqueId, isReadOnly, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags);
 
 		setColspan(tags, 2);
-		// setColspan(name, 2);
+		setColspan(isReadOnly, 2);
 		setColspan(note, 2);
 	}
 
