@@ -89,8 +89,8 @@ html {
     display: flex;
     justify-content: end;
     > img {
-        max-height: 3rem;
-        max-width: 9rem;
+        max-height: 5rem;
+        max-width: 10rem;
     }
 }
 

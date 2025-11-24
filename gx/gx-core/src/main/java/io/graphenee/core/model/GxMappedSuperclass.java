@@ -19,6 +19,9 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,6 +33,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public class GxMappedSuperclass implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -49,7 +53,7 @@ public class GxMappedSuperclass implements Serializable {
 		if (obj == null)
 			return false;
 		GxMappedSuperclass src = (GxMappedSuperclass) obj;
-		if (oid == null && src.oid == null)
+		if ((oid == null && src.oid == null) || !getClass().equals(obj.getClass()))
 			return uuid.equals(src.uuid);
 		return oid.equals(src.oid);
 	}

@@ -46,6 +46,9 @@ public class GxNamespace extends GxMappedSuperclass implements Serializable {
 	private String namespace;
 	private String namespaceDescription;
 
+	private String appTitle;
+	private byte[] appLogo;
+
 	@OneToMany(mappedBy = "namespace", cascade = CascadeType.ALL, orphanRemoval = true)
 	List<GxNamespaceProperty> properties = new ArrayList<>();
 
@@ -59,6 +62,11 @@ public class GxNamespace extends GxMappedSuperclass implements Serializable {
 	public void removeFromProperty(GxNamespaceProperty property) {
 		properties.remove(property);
 		property.setNamespace(null);
+	}
+
+	@Override
+	public String toString() {
+		return namespace;
 	}
 
 }

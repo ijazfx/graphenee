@@ -169,7 +169,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 					@Override
 					public void onClick(ClickEvent<Button> event) {
-						if (dataBinder.hasChanges()) {
+						if (dataBinder.hasChanges() && shouldShowDismissButtonConfirmation()) {
 							DialogFactory.confirmDialog(
 									"You have unsaved changes which will be lost. Do you want to continue?", dlg -> {
 										dismiss();
@@ -339,6 +339,10 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	protected void customizeDismissButton(Button dismissButton) {
 	}
 
+	protected Boolean shouldShowDismissButtonConfirmation() {
+		return true;
+	}
+
 	protected void customizeResetButton(Button resetButton) {
 	}
 
@@ -388,8 +392,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	protected Component getFormComponent() {
 		FormLayout formLayout = new FormLayout();
 		formLayout.setAutoResponsive(false);
-		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new
-		ResponsiveStep("600px", 2)));
+		formLayout.setResponsiveSteps(List.of(new ResponsiveStep("320px", 1), new ResponsiveStep("600px", 2)));
 		formLayout.setSizeFull();
 		return formLayout;
 	}
@@ -404,7 +407,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	public void expand(String... name) {
 		List.of(name).forEach(n -> {
 			FlexLayout grouped = groupedMap.get(n);
-			if(grouped != null) {
+			if (grouped != null) {
 				expand(grouped);
 			}
 		});
@@ -413,7 +416,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	protected void shrink(String... name) {
 		List.of(name).forEach(n -> {
 			FlexLayout grouped = groupedMap.get(n);
-			if(grouped != null) {
+			if (grouped != null) {
 				shrink(grouped);
 			}
 		});
@@ -426,7 +429,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 	}
 
 	public FlexLayout group(String name, Component... c) {
-		if(groupedMap.containsKey(name))
+		if (groupedMap.containsKey(name))
 			throw new IllegalArgumentException(name + " is already assigned to another group.");
 		FlexLayout grouped = new FlexLayout(c);
 		groupedMap.put(name, grouped);
@@ -438,7 +441,7 @@ public abstract class GxAbstractEntityForm<T> extends VerticalLayout {
 
 	public List<Component> ungroup(String name) {
 		FlexLayout grouped = groupedMap.get(name);
-		if(grouped != null) {
+		if (grouped != null) {
 			groupedMap.remove(name);
 			List<Component> clist = new ArrayList<>();
 			clist.addAll(grouped.getChildren().toList());

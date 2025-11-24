@@ -30,7 +30,6 @@ import io.graphenee.i18n.GrapheneeI18nConfiguration;
 
 @Service
 @ConditionalOnClass(GrapheneeI18nConfiguration.class)
-//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
 public class LocalizerMapServiceImpl implements LocalizerMapService {
 
 	@Autowired

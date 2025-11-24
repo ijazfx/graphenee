@@ -27,7 +27,6 @@ import io.graphenee.util.TRCalendarUtil;
 
 @Service
 @ConditionalOnClass(GrapheneeSecurityConfiguration.class)
-//@ConditionalOnProperty(prefix = "graphenee", name = "modules.enabled", havingValue = "true")
 @Transactional
 public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataService {
 
@@ -56,7 +55,8 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 		if (maxHistory > 0) {
 			String passwordHash = CryptoUtil.createPasswordHash(password);
 			GxUserAccount userAccount = dataService.findUserAccountByUsernameAndNamespace(username, namespace);
-			List<GxPasswordHistory> history = passwordHistoryRepo.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
+			List<GxPasswordHistory> history = passwordHistoryRepo
+					.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
 			for (int i = 0; i < history.size() && i < maxHistory; i++) {
 				GxPasswordHistory passwordHistory = history.get(i);
 				if (passwordHistory.getHashedPassword().equals(passwordHash))
@@ -158,16 +158,21 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			return;
 		if (!entity.getIsActive())
 			return;
-		if (entity.getIsUserUsernameAllowed() && !findMaxUsernameExist(username, password, entity.getMaxAllowedMatchingUserName()))
-			throw new AssertionError("Password must not contain " + entity.getMaxAllowedMatchingUserName() + " or more consecutive characters from username.");
+		if (entity.getIsUserUsernameAllowed()
+				&& !findMaxUsernameExist(username, password, entity.getMaxAllowedMatchingUserName()))
+			throw new AssertionError("Password must not contain " + entity.getMaxAllowedMatchingUserName()
+					+ " or more consecutive characters from username.");
 		if (!findMinUpperCaseCharExist(password, entity.getMinUppercase()))
-			throw new AssertionError("Password must contain at least " + entity.getMinUppercase() + " upper case letter(s).");
+			throw new AssertionError(
+					"Password must contain at least " + entity.getMinUppercase() + " upper case letter(s).");
 		if (!findMinLowerCaseCharExist(password, entity.getMinLowercase()))
-			throw new AssertionError("Password must contain at least " + entity.getMinLowercase() + " lower case letter(s).");
+			throw new AssertionError(
+					"Password must contain at least " + entity.getMinLowercase() + " lower case letter(s).");
 		if (!findMinNumbersExist(password, entity.getMinNumbers()))
 			throw new AssertionError("Password must contain at least " + entity.getMinNumbers() + " digit(s).");
 		if (!findMinSpecialCharExist(password, entity.getMinSpecialCharacters()))
-			throw new AssertionError("Password must contain at least " + entity.getMinUppercase() + " special character(s).");
+			throw new AssertionError(
+					"Password must contain at least " + entity.getMinUppercase() + " special character(s).");
 		if (findPasswordAlreadyUsed(entity.getNamespace(), username, password, entity.getMaxHistory()))
 			throw new AssertionError("Password has already been used, set a different password.");
 		if (!findMinLengthExist(password, entity.getMinLength()))
@@ -198,15 +203,18 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 	}
 
 	@Override
-	public void changePassword(GxNamespace namespace, String username, String oldPassword, String newPassword) throws ChangePasswordFailedException {
-		GxUserAccount userAccount = dataService.findUserAccountByUsernamePasswordAndNamespace(username, oldPassword, namespace);
+	public void changePassword(GxNamespace namespace, String username, String oldPassword, String newPassword)
+			throws ChangePasswordFailedException {
+		GxUserAccount userAccount = dataService.findUserAccountByUsernamePasswordAndNamespace(username, oldPassword,
+				namespace);
 		if (userAccount == null)
 			throw new ChangePasswordFailedException("Current password did not match.");
 		changePassword(namespace, username, newPassword);
 	}
 
 	@Override
-	public void changePassword(GxNamespace namespace, String username, String newPassword) throws ChangePasswordFailedException {
+	public void changePassword(GxNamespace namespace, String username, String newPassword)
+			throws ChangePasswordFailedException {
 		GxUserAccount userAccount = dataService.findUserAccountByUsernameAndNamespace(username, namespace);
 		if (userAccount == null)
 			throw new ChangePasswordFailedException("Current password did not match.");
@@ -225,7 +233,7 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 			}
 			Integer maxHistory = passwordPolicy.getMaxHistory();
 			String encryptedPassword = CryptoUtil.createPasswordHash(newPassword);
-			userAccount = userAccountRepo.findByUsername(username);
+			userAccount = dataService.findUserAccountByUsername(username);
 			if (maxHistory > 0) {
 				// is password match with current password
 				if (userAccount.getPassword().equals(encryptedPassword)) {
@@ -233,7 +241,8 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 				}
 				if (maxHistory > 1) {
 					// is password match with histories passwords
-					List<GxPasswordHistory> histories = passwordHistoryRepo.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
+					List<GxPasswordHistory> histories = passwordHistoryRepo
+							.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
 					for (GxPasswordHistory history : histories) {
 						if (history.getHashedPassword().equals(encryptedPassword))
 							throw new ChangePasswordFailedException("Password has already been used before.");
@@ -271,10 +280,13 @@ public class GxPasswordPolicyDataServiceImpl implements GxPasswordPolicyDataServ
 		if (passwordPolicy == null)
 			return false;
 
-		List<GxPasswordHistory> passwordHistoryList = passwordHistoryRepo.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
+		List<GxPasswordHistory> passwordHistoryList = passwordHistoryRepo
+				.findAllByUserAccountOrderByPasswordDateDesc(userAccount);
 		Timestamp currentTime = TRCalendarUtil.getCurrentTimeStamp();
 		Long diff = 0L;
-		GxPasswordHistory passwordHistory = passwordHistoryList != null && !passwordHistoryList.isEmpty() ? passwordHistoryList.get(0) : null;
+		GxPasswordHistory passwordHistory = passwordHistoryList != null && !passwordHistoryList.isEmpty()
+				? passwordHistoryList.get(0)
+				: null;
 		if (passwordHistory != null && passwordHistory.getPasswordDate() != null) {
 			diff = TRCalendarUtil.daysBetween(passwordHistory.getPasswordDate(), currentTime);
 		} else if (userAccount.getAccountActivationDate() != null) {

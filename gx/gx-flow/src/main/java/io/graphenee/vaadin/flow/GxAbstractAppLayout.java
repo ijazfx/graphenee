@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.server.streams.DownloadEvent;
 import com.vaadin.flow.server.streams.DownloadHandler;
@@ -31,6 +32,7 @@ import com.vaadin.flow.server.streams.InputStreamDownloadCallback;
 import com.vaadin.flow.server.streams.InputStreamDownloadHandler;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.util.ServletUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.Setter;
 
@@ -116,7 +118,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 				avatar.setImageHandler(dh);
 			}
 			avatar.getElement().addEventListener("click", e -> {
-				GxAbstractEntityForm<?> profileForm = getProfileForm(user);
+				GxAbstractEntityForm<GxAuthenticatedUser> profileForm = getProfileForm(user);
 				if (profileForm != null) {
 					showProfileDialog(profileForm);
 				}
@@ -161,12 +163,12 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 
 	}
 
-	private <T> void showProfileDialog(GxAbstractEntityForm<T> profileForm) {
-		T entity = profileForm.getEntity();
+	private <T> void showProfileDialog(GxAbstractEntityForm<GxAuthenticatedUser> profileForm) {
+		GxAuthenticatedUser entity = profileForm.getEntity();
 		profileForm.showInDialog(entity);
-		profileForm.setDelegate(new GxAbstractEntityForm.EntityFormDelegate<T>() {
+		profileForm.setDelegate(new GxAbstractEntityForm.EntityFormDelegate<GxAuthenticatedUser>() {
 			@Override
-			public void onSave(T entity) {
+			public void onSave(GxAuthenticatedUser entity) {
 				saveProfile(entity);
 
 			}
@@ -186,7 +188,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	 *
 	 * @param user The user for form.
 	 */
-	protected GxAbstractEntityForm<?> getProfileForm(GxAuthenticatedUser user) {
+	protected <T extends GxAuthenticatedUser> GxAbstractEntityForm<T> getProfileForm(T user) {
 		return null;
 	}
 
@@ -195,7 +197,7 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 	 *
 	 * @param user The user to save.
 	 */
-	protected void saveProfile(Object user) {
+	protected void saveProfile(GxAuthenticatedUser user) {
 	}
 
 	private boolean canDoAction(GxAuthenticatedUser user, String action, GxMenuItem mi) {
@@ -242,8 +244,9 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			if (mi.hasChildren()) {
 				i.addClassName("gx-nav-menuitem-parent");
 				int count = generateMenuItems(i, mi, user);
-				if (count > 0 && !added)
+				if (count > 0 && !added) {
 					drawer.addItem(i);
+				}
 			}
 		}
 	}
@@ -271,9 +274,11 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 			}
 			if (mi.hasChildren()) {
 				i.addClassName("gx-nav-menuitem-parent");
-				count = generateMenuItems(i, mi, user);
-				if (count > 0 && !added)
+				int childCount = generateMenuItems(i, mi, user);
+				if (childCount > 0 && !added) {
 					parent.addItem(i);
+					count++;
+				}
 			}
 		}
 		return count;
@@ -321,6 +326,15 @@ public abstract class GxAbstractAppLayout extends AppLayout {
 		default void onLogout(UI ui) {
 			ui.navigate("/");
 		}
+	}
+
+	/**
+	 * The method returns the host header for the incoming request.
+	 * 
+	 * @return value of the Host header
+	 */
+	protected String host() {
+		return ServletUtil.host(VaadinServletRequest.getCurrent());
 	}
 
 }

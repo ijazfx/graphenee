@@ -15,10 +15,17 @@
  *******************************************************************************/
 package io.graphenee.sms;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -29,8 +36,8 @@ import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.sms.impl.AwsSmsServiceImpl;
 import io.graphenee.sms.impl.EoceanSmsServiceImpl;
 import io.graphenee.sms.impl.TwilioSmsServiceImpl;
-import jakarta.annotation.PostConstruct;
 
+@EnableScheduling
 @Configuration
 @ConditionalOnClass(GrapheneeCoreConfiguration.class)
 @ComponentScan(GrapheneeSmsConfiguration.COMPONENT_SCAN_BASE_PACKAGE)
@@ -41,49 +48,42 @@ public class GrapheneeSmsConfiguration {
 	@Autowired
 	GxDataService dataService;
 
-	@Autowired
-	PlatformTransactionManager transactionManager;
-
-	@PostConstruct
+	@EventListener(ApplicationReadyEvent.class)
+	@Order(200)
 	public void initialize() {
-		TransactionTemplate tran = new TransactionTemplate(transactionManager);
-		tran.execute(status -> {
-			// add sms providers...
-			GxSmsProvider provider = dataService.findSmsProviderByProvider(SmsProvider.AWS);
-			if (provider == null) {
-				provider = new GxSmsProvider();
-				provider.setConfigData(null);
-				provider.setImplementationClass(AwsSmsServiceImpl.class.getName());
-				provider.setIsActive(true);
-				provider.setIsPrimary(true);
-				provider.setProviderName(SmsProvider.AWS.getProviderName());
-				dataService.save(provider);
-			}
+		// add sms providers...
+		GxSmsProvider provider = dataService.findSmsProviderByProvider(SmsProvider.AWS);
+		if (provider == null) {
+			provider = new GxSmsProvider();
+			provider.setConfigData(null);
+			provider.setImplementationClass(AwsSmsServiceImpl.class.getName());
+			provider.setIsActive(true);
+			provider.setIsPrimary(true);
+			provider.setProviderName(SmsProvider.AWS.getProviderName());
+			dataService.save(provider);
+		}
 
-			provider = dataService.findSmsProviderByProvider(SmsProvider.EOCEAN);
-			if (provider == null) {
-				provider = new GxSmsProvider();
-				provider.setConfigData(null);
-				provider.setImplementationClass(EoceanSmsServiceImpl.class.getName());
-				provider.setIsActive(true);
-				provider.setIsPrimary(false);
-				provider.setProviderName(SmsProvider.EOCEAN.getProviderName());
-				dataService.save(provider);
-			}
+		provider = dataService.findSmsProviderByProvider(SmsProvider.EOCEAN);
+		if (provider == null) {
+			provider = new GxSmsProvider();
+			provider.setConfigData(null);
+			provider.setImplementationClass(EoceanSmsServiceImpl.class.getName());
+			provider.setIsActive(true);
+			provider.setIsPrimary(false);
+			provider.setProviderName(SmsProvider.EOCEAN.getProviderName());
+			dataService.save(provider);
+		}
 
-			provider = dataService.findSmsProviderByProvider(SmsProvider.TWILIO);
-			if (provider == null) {
-				provider = new GxSmsProvider();
-				provider.setConfigData(null);
-				provider.setImplementationClass(TwilioSmsServiceImpl.class.getName());
-				provider.setIsActive(true);
-				provider.setIsPrimary(false);
-				provider.setProviderName(SmsProvider.TWILIO.getProviderName());
-				dataService.save(provider);
-			}
-
-			return null;
-		});
+		provider = dataService.findSmsProviderByProvider(SmsProvider.TWILIO);
+		if (provider == null) {
+			provider = new GxSmsProvider();
+			provider.setConfigData(null);
+			provider.setImplementationClass(TwilioSmsServiceImpl.class.getName());
+			provider.setIsActive(true);
+			provider.setIsPrimary(false);
+			provider.setProviderName(SmsProvider.TWILIO.getProviderName());
+			dataService.save(provider);
+		}
 	}
 
 }

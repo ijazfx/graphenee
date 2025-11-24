@@ -15,16 +15,16 @@
  *******************************************************************************/
 package io.graphenee.core.flow.documents;
 
-import com.vaadin.flow.component.splitlayout.SplitLayout;
-import io.graphenee.core.flow.email_template.GxEmailTemplateList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxNamespace;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.vaadin.flow.GxSecuredView;
 import io.graphenee.vaadin.flow.GxVerticalLayoutView;
@@ -48,9 +48,6 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 	@Autowired
 	GxDataService dataService;
 
-	@Autowired(required = false)
-	GxNamespace namespace;
-
 	SplitLayout layout = new SplitLayout();
 
 	@Override
@@ -64,22 +61,24 @@ public class GxDocumentExplorerView extends GxVerticalLayoutView {
 		layout.addToSecondary(searchList);
 		layout.setSizeFull();
 		layout.setSplitterPosition(100);
+
+		searchList.setSplitLayout(layout);
+		searchList.setStorage(storage);
+		searchList.setExplorer(list);
+		searchList.setEditable(false);
+
 		rootLayout.add(layout);
 	}
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		layout.addToPrimary(list);
-		layout.addToSecondary(searchList);
-		if (namespace == null) {
-			namespace = dataService.systemNamespace();
+		if (loggedInUser() instanceof GxUserAccount) {
+			GxUserAccount user = ((GxUserAccount) loggedInUser());
+			GxNamespace namespace = user.getNamespace();
+			searchList.initializeByNamespaceAndUser(namespace, user);
+			list.initializeWithNamespaceAndStorageAndSearchListAndLayoutAndUser(namespace, storage, searchList, layout,
+					user);
 		}
-		searchList.setSplitLayout(layout);
-		searchList.setStorage(storage);
-		searchList.setExplorer(list);
-		searchList.setEditable(false);
-		searchList.refresh();
-		list.initializeWithNamespaceAndStorageAndSearchListAndLayout(namespace, storage, searchList, layout);
 	}
 
 }

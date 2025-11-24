@@ -3,16 +3,11 @@ package io.graphenee.vaadin.flow.component;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.server.StreamResource;
-
-import lombok.Setter;
+import com.vaadin.flow.server.streams.DownloadHandler;
 
 @SuppressWarnings("serial")
 @Tag("video")
 public class VideoPlayer extends Component implements HasSize {
-
-	@Setter
-	private StreamResource resource;
 
 	public VideoPlayer() {
 		setSizeFull();
@@ -24,10 +19,17 @@ public class VideoPlayer extends Component implements HasSize {
 		getElement().setAttribute("src", src);
 	}
 
-	public VideoPlayer(StreamResource resource) {
+	public VideoPlayer(DownloadHandler downloadHandler) {
 		this();
-		this.resource = resource;
-		getElement().setAttribute("src", resource);
+		getElement().setAttribute("src", downloadHandler);
+	}
+
+	public void setSrc(String src) {
+		getElement().setAttribute("src", src);
+	}
+
+	public void setSrc(DownloadHandler downloadHandler) {
+		getElement().setAttribute("src", downloadHandler);
 	}
 
 }

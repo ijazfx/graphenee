@@ -15,10 +15,12 @@
  *******************************************************************************/
 package io.graphenee.core;
 
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ import io.graphenee.core.model.entity.GxAuditLog;
 import io.graphenee.core.model.entity.GxCity;
 import io.graphenee.core.model.entity.GxCountry;
 import io.graphenee.core.model.entity.GxCurrency;
+import io.graphenee.core.model.entity.GxDomain;
 import io.graphenee.core.model.entity.GxEmailTemplate;
 import io.graphenee.core.model.entity.GxGender;
 import io.graphenee.core.model.entity.GxNamespace;
@@ -43,6 +46,7 @@ import io.graphenee.core.model.entity.GxSecurityPolicy;
 import io.graphenee.core.model.entity.GxSmsProvider;
 import io.graphenee.core.model.entity.GxState;
 import io.graphenee.core.model.entity.GxSupportedLocale;
+import io.graphenee.core.model.entity.GxTag;
 import io.graphenee.core.model.entity.GxTerm;
 import io.graphenee.core.model.entity.GxTermTranslation;
 import io.graphenee.core.model.entity.GxUserAccount;
@@ -51,6 +55,38 @@ import io.graphenee.security.exception.GxPermissionException;
 public interface GxDataService {
 
 	public static final String SYSTEM_NAMESPACE = "io.graphenee.system";
+
+	/**
+	 * The method returns app logo in following sequence:
+	 * if domain.appLogo is set then returns domain.appLogo else
+	 * domain.namespace.appLogo
+	 * 
+	 * @param host
+	 * @return can be null
+	 */
+	byte[] appLogoByHost(String host);
+
+	/**
+	 * The method returns app title in following sequence:
+	 * if domain.appTitle is set then returns domain.appTitle else
+	 * domain.namespace.appTitle
+	 * 
+	 * @param host
+	 * @return can be null
+	 */
+	String appTitleByHost(String host);
+
+	List<GxDomain> findAllDomains();
+
+	List<GxDomain> findDomainsByNamespace(GxNamespace namespace);
+
+	GxDomain findDomainActiveAndVerifiedByHost(String host);
+
+	Optional<GxNamespace> findNamespaceByHost(String host);
+
+	GxDomain save(GxDomain domain);
+
+	void delete(GxDomain domain);
 
 	GxAuditLog auditEntityEventByUser(String auditEntity, Integer oidAuditEntity, String auditEvent,
 			GxUserAccount userAccount);
@@ -281,7 +317,7 @@ public interface GxDataService {
 	List<GxSupportedLocale> findSupportedLocale();
 
 	List<GxTerm> findTermByNamespace(Integer page, Integer size, GxNamespace namespace);
-	
+
 	List<GxTerm> findTermByTermKey(String termKey);
 
 	List<GxTermTranslation> findTermTranslationByLocale(Locale locale);
@@ -305,6 +341,8 @@ public interface GxDataService {
 	GxUserAccount findUserAccountByUsername(String username);
 
 	GxUserAccount findUserAccountByUsernameAndNamespace(String username, GxNamespace namespace);
+	
+	GxUserAccount findUserAccountByUsernameAndNamespace(String usernameAndNamespace) throws Exception;
 
 	GxUserAccount findUserAccountByUsernameAndPassword(String username, String password);
 
@@ -382,5 +420,9 @@ public interface GxDataService {
 	List<GxAccessKey> findAccessKeyBySecurityGroup(GxSecurityGroup group);
 
 	List<GxAccessKey> findAccessKeyBySecurityPolicy(GxSecurityPolicy policy);
+
+	List<Principal> findPrincipalActiveByNamespace(GxNamespace namespace);
+
+	List<GxTag> findTagByNamespace(GxNamespace namespace);
 
 }

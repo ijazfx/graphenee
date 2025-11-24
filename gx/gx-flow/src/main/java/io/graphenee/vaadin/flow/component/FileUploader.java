@@ -1,11 +1,15 @@
 package io.graphenee.vaadin.flow.component;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.springframework.util.StreamUtils;
 
@@ -19,13 +23,14 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
+import com.vaadin.flow.server.streams.UploadHandler;
 
 import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.storage.FileStorage;
+import io.graphenee.util.storage.ResolveFailedException;
 import io.graphenee.vaadin.flow.utils.IconUtils;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,32 +48,28 @@ public class FileUploader extends CustomField<String> {
 	// 5MB
 	private int maxFileSize = 5048576;
 
-	private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv", ".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt");
-	private static final Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv", "image/jpeg", "image/png", "image/gif");
+	private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv",
+			".ppt", ".pptx", ".jpg", ".jpeg", ".png", ".gif", ".txt", ".mp3", ".mp4", ".m4a", ".mpeg");
+	private static final Set<String> ALLOWED_MIME_TYPES = Set.of("application/pdf", "application/msword",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel",
+			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint",
+			"application/vnd.openxmlformats-officedocument.presentationml.presentation", "text/plain", "text/csv",
+			"image/jpeg", "image/png", "image/gif", "audio/.*", "video/.*");
 	private static final int MAX_HEADER_SIZE = 16 * 1024; // 16 KB for Tika detection
 
 	@Setter
-	@Getter
 	private String label;
-
 	private Upload upload;
-
-	@Getter
 	private String uploadedFilePath;
-
-	@Getter
 	private String uploadedFileName;
 
 	@Setter
-	@Getter
 	private String rootFolder;
 
 	@Setter
-	@Getter
 	private FileStorage storage;
 
 	private Div output;
-	private MemoryBuffer buffer;
 
 	/**
 	 * Creates a new instance of this component.
@@ -79,6 +80,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Creates a new instance of this component.
+	 * 
 	 * @param label The label of the component.
 	 */
 	public FileUploader(String label) {
@@ -88,23 +90,13 @@ public class FileUploader extends CustomField<String> {
 
 	private void build() {
 		output = new Div();
-		buffer = new MemoryBuffer();
-		upload = new Upload(buffer);
-		upload.setDropLabel(new NativeLabel(dropFileLabel));
-
-		if (allowedFileTypes != null) {
-			upload.setAcceptedFileTypes(allowedFileTypes);
-		}
-
-		upload.setMaxFileSize(maxFileSize);
-
-		upload.addSucceededListener(event -> {
-			String ext = TRFileContentUtil.getExtensionFromFilename(event.getFileName());
+		upload = new Upload(UploadHandler.toTempFile((metadata, file) -> {
+			String ext = TRFileContentUtil.getExtensionFromFilename(metadata.fileName());
 			String storageFileName = UUID.randomUUID().toString() + "." + ext;
 
-			String desiredFileName = event.getFileName();
+			String desiredFileName = metadata.fileName();
 
-			try(InputStream is = buffer.getInputStream()) {
+			try (InputStream is = new FileInputStream(file)) {
 				String lowerFileName = desiredFileName.toLowerCase();
 				if (ALLOWED_EXTENSIONS.stream().noneMatch(lowerFileName::endsWith)) {
 					throw new IllegalArgumentException("File extension not allowed: " + desiredFileName);
@@ -124,7 +116,9 @@ public class FileUploader extends CustomField<String> {
 
 				Tika tika = new Tika();
 				String detectedMimeType = tika.detect(headerBuffer, desiredFileName);
-				if (detectedMimeType == null || !ALLOWED_MIME_TYPES.contains(detectedMimeType)) {
+
+				if (detectedMimeType == null || !ALLOWED_MIME_TYPES.stream().filter(mt -> detectedMimeType.matches(mt))
+						.findFirst().isPresent()) {
 					throw new IllegalArgumentException("Unsupported or suspicious file type: " + detectedMimeType);
 				}
 
@@ -154,8 +148,14 @@ public class FileUploader extends CustomField<String> {
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+		}));
+		upload.setDropLabel(new NativeLabel(dropFileLabel));
 
-		});
+		if (allowedFileTypes != null) {
+			upload.setAcceptedFileTypes(allowedFileTypes);
+		}
+
+		upload.setMaxFileSize(maxFileSize);
 
 		upload.addFileRejectedListener(event -> {
 			Paragraph component = new Paragraph();
@@ -176,6 +176,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the allowed file types.
+	 * 
 	 * @param fileTypes The allowed file types.
 	 */
 	public void setAllowedFileTypes(String... fileTypes) {
@@ -185,6 +186,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the maximum number of files.
+	 * 
 	 * @param maxFiles The maximum number of files.
 	 */
 	public void setMaxFiles(int maxFiles) {
@@ -193,6 +195,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the maximum file size.
+	 * 
 	 * @param maxFileSize The maximum file size.
 	 */
 	public void setMaxFileSize(int maxFileSize) {
@@ -202,6 +205,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets whether to auto upload.
+	 * 
 	 * @param autoUpload Whether to auto upload.
 	 */
 	public void setAutoUpload(Boolean autoUpload) {
@@ -211,6 +215,7 @@ public class FileUploader extends CustomField<String> {
 
 	/**
 	 * Sets the drop file label.
+	 * 
 	 * @param dropFileLabel The drop file label.
 	 */
 	public void setDropFileLabel(String dropFileLabel) {
@@ -236,28 +241,23 @@ public class FileUploader extends CustomField<String> {
 	private Component createComponent(String fileName) {
 		if (fileName != null) {
 			String mimeType = TRFileContentUtil.getMimeType(fileName);
-			Image image = null;
-
+			Image image = new Image();
+			image.setWidth("7rem");
+			image.setHeight("7rem");
+			String resourcePath = storage.resourcePath(rootFolder, fileName);
 			if (mimeType.startsWith("image")) {
 				try {
-					image = new Image();
-					image.setWidth("100px");
-					image.setHeight("100px");
-					InputStream stream = null;
-					String resourcePath = storage.resourcePath(getRootFolder(), fileName);
-					try {
-						stream = storage.resolve(resourcePath);
-					} catch (Exception e) {
-						stream = buffer.getInputStream();
-						fileName = buffer.getFileName();
-					}
-					byte[] bytes = IOUtils.toByteArray(stream);
 					String fileNameOnly = extractFileNameOnly(fileName);
-					StreamResource sr = new StreamResource(fileNameOnly, () -> new ByteArrayInputStream(bytes));
-					sr.setContentType(mimeType);
-					image.getElement().setAttribute("src", sr);
+					image.setSrc(DownloadHandler.fromInputStream(de -> {
+
+						try {
+							return new DownloadResponse(storage.resolve(resourcePath), fileNameOnly, mimeType, -1);
+						} catch (ResolveFailedException e) {
+							return new DownloadResponse(new FileInputStream(getValue()), fileNameOnly, mimeType, -1);
+						}
+					}));
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.error("Failed to resolve file from storage", e);
 				}
 			} else {
 				String extension = TRFileContentUtil.getExtensionFromFilename(fileName);
@@ -274,29 +274,16 @@ public class FileUploader extends CustomField<String> {
 				image.setHeight("48px");
 			}
 			image.addClickListener(listener -> {
-				try {
-					String src = getValue();
-					InputStream stream = null;
-					String resourcePath = storage.resourcePath(getRootFolder(), src);
+				String src = getValue();
+				String fileNameOnly = extractFileNameOnly(src);
+				ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(fileNameOnly, () -> {
 					try {
-						stream = storage.resolve(resourcePath);
-					} catch (Exception e) {
-						File file = new File(src);
-						src = file.getName();
-						stream = FileUtils.openInputStream(file);
+						return storage.resolve(resourcePath);
+					} catch (ResolveFailedException e) {
+						return null;
 					}
-					byte[] bytes = IOUtils.toByteArray(stream);
-					String fileNameOnly = extractFileNameOnly(src);
-					StreamResource streamResource = new StreamResource(fileNameOnly, () -> new ByteArrayInputStream(bytes));
-					try {
-						ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(src, streamResource);
-						resourcePreviewPanel.showInDialog();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				});
+				resourcePreviewPanel.showInDialog();
 			});
 			return image;
 		}
@@ -304,7 +291,7 @@ public class FileUploader extends CustomField<String> {
 	}
 
 	private String extractFileNameOnly(String fileName) {
-		int idx = fileName.lastIndexOf("/");
+		int idx = fileName.lastIndexOf(File.separator);
 		if (idx == -1)
 			idx = 0;
 		else

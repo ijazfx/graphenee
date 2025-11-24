@@ -18,9 +18,11 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
 
 import io.graphenee.common.GxAuthenticatedUser;
+import io.graphenee.util.ServletUtil;
 import io.graphenee.vaadin.flow.GxForbiddenView.ForbiddenException;
 import jakarta.annotation.PostConstruct;
 
@@ -145,6 +147,14 @@ public abstract class GxAbstractLayoutView extends FlexLayout implements BeforeE
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
+	}
+
+	/**
+	 * The method returns the host header for the incoming request.
+	 * @return value of the Host header
+	 */
+	protected String host() {
+		return ServletUtil.host(VaadinServletRequest.getCurrent());
 	}
 
 }

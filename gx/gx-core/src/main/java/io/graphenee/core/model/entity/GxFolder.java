@@ -1,16 +1,25 @@
 package io.graphenee.core.model.entity;
 
-import java.io.Serializable;
+import java.security.Principal;
 import java.sql.Timestamp;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.json.JSONObject;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import com.google.common.base.Strings;
+
+import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.model.GxMappedSuperclass;
-import io.graphenee.core.model.jpa.converter.GxStringToJsonConverter;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Convert;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -18,6 +27,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,18 +35,21 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "gx_folder")
-public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocumentExplorerItem {
+public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerItem {
 	private static final long serialVersionUID = 1L;
 
 	String name;
 
 	String note;
 	UUID folderId = UUID.randomUUID();
-
-	@Convert(converter = GxStringToJsonConverter.class)
-	JSONObject tags;
+	Boolean isArchived = false;
+	Boolean isReadOnly = false;
 
 	Integer sortOrder = 0;
+
+	@LastModifiedDate
+	@Column(name = "updated_at")
+	private LocalDateTime updatedAt;
 
 	@ManyToOne
 	@JoinColumn(name = "oid_folder")
@@ -57,13 +70,28 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	List<GxAuditLog> auditLogs = new ArrayList<>();
 
 	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "gx_file_tag_folder_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
-	Set<GxFileTag> fileTags = new HashSet<>();
+	@JoinTable(name = "gx_folder_tag_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_tag", referencedColumnName = "oid"))
+	Set<GxTag> tags = new HashSet<>();
+
+	@JoinTable(name = "gx_security_group_folder_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_security_group", referencedColumnName = "oid"))
+	@ManyToMany(cascade = CascadeType.ALL)
+	Set<GxSecurityGroup> groups = new HashSet<>();
+
+	@ManyToMany
+	@JoinTable(name = "gx_user_account_folder_join", joinColumns = @JoinColumn(name = "oid_folder", referencedColumnName = "oid"), inverseJoinColumns = @JoinColumn(name = "oid_user_account", referencedColumnName = "oid"))
+	Set<GxUserAccount> users = new HashSet<>();
+
+	@ManyToOne
+	@JoinColumn(name = "oid_owner")
+	GxUserAccount owner;
 
 	public void audit(GxUserAccount user, String event) {
 		GxAuditLog log = new GxAuditLog();
 		log.setAuditDate(new Timestamp(System.currentTimeMillis()));
 		log.setAuditEvent(event);
+		log.setDetail(event + " : " + name);
+		log.setAuditEntity(this.getClass().getSimpleName());
+		log.setOidAuditEntity(this.getOid());
 		log.setUserAccount(user);
 		auditLogs.add(log);
 	}
@@ -170,8 +198,8 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 	public void setExpiryReminderInDays(Integer expiryReminderInDays) {
 	}
 
-	public String getFileTagsJoined() {
-		return fileTags.stream().map(t -> t.getTag()).collect(Collectors.joining(", "));
+	public String getTagsJoined() {
+		return tags.stream().map(t -> t.getTag()).collect(Collectors.joining(", "));
 	}
 
 	public String getName() {
@@ -185,6 +213,50 @@ public class GxFolder extends GxMappedSuperclass implements Serializable, GxDocu
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Transient
+	private Set<Principal> grants;
+
+	public Set<Principal> getGrants() {
+		if (grants == null) {
+			grants = Stream.concat(groups.stream(), users.stream()).collect(Collectors.toSet());
+		}
+		return grants;
+	}
+
+	public boolean isGranted(GxAuthenticatedUser user) {
+		if (user.canDoAction("all", "all"))
+			return true;
+		if (owner != null && owner.equals(user))
+			return true;
+		if (getGrants().contains(user))
+			return true;
+		if (!getGrants().isEmpty()) {
+			return getGrants().stream().filter(i -> {
+				if (i instanceof GxSecurityGroup) {
+					return ((GxSecurityGroup) i).isMember(user);
+				}
+				return false;
+			}).count() > 0;
+		}
+		return getFolder() != null && getFolder().isGranted(user);
+	}
+
+	@Override
+	public String getUniqueId() {
+		return folderId.toString();
+	}
+
+	@Override
+	public String getOwnerName() {
+		if (owner == null) {
+			return null;
+		}
+		if (!Strings.isNullOrEmpty(owner.getName())) {
+			return owner.getName();
+		}
+		return null;
 	}
 
 }

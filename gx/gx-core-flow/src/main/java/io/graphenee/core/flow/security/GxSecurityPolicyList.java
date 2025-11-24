@@ -87,12 +87,12 @@ public class GxSecurityPolicyList extends GxAbstractEntityList<GxSecurityPolicy>
         });
         searchForm.add(namespaceComboBox);
         //Making the namespace filter visible to Super Admin only
-        Boolean flag = loggedInUser().canDoAction("namespace-filter","view",null);
+        Boolean flag = loggedInUser().canDoAction("namespaces","view",null);
         namespaceComboBox.setVisible(flag);
     }
 
     public void initializeWithNamespace(GxNamespace namespace) {
-        this.namespace = namespace != null ? namespace : dataService.systemNamespace();
+        this.namespace = namespace;
         refresh();
     }
 

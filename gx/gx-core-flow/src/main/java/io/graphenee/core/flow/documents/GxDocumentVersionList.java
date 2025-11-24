@@ -1,15 +1,13 @@
 package io.graphenee.core.flow.documents;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -21,17 +19,20 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
+import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.documents.GxDocumentExplorerService;
+import io.graphenee.util.TRFileContentUtil;
 import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @SuppressWarnings("serial")
 @SpringComponent
 @Scope("prototype")
@@ -98,22 +99,19 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
 								|| mimeType.startsWith("video")) {
 							try {
-								InputStream stream = null;
 								String src = document.getPath();
 								String resourcePath = storage.resourcePath("documents", src);
-								try {
-									stream = storage.resolve(resourcePath);
-								} catch (Exception e) {
-									e.printStackTrace();
-								}
-								byte[] bytes = IOUtils.toByteArray(stream);
-								StreamResource resource = new StreamResource(document.getName(),
-										() -> new ByteArrayInputStream(bytes));
 								ResourcePreviewPanel resourcePreviewPanel = new ResourcePreviewPanel(document.getName(),
-										resource);
+										() -> {
+											try {
+												return storage.resolve(resourcePath);
+											} catch (Exception ex) {
+												return null;
+											}
+										});
 								resourcePreviewPanel.showInDialog();
 							} catch (Exception e) {
-								e.printStackTrace();
+								log.error("Failed to resolve file from storage", e);
 							}
 
 						}
@@ -139,12 +137,16 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 
 	@Override
 	protected void postBuild() {
-		uploadNewVersionForm.initializeWithFileUploadHandler((parentDocument, uploadedFile) -> {
+		GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
+
+		uploadNewVersionForm.initializeWithFileUploadHandlerAndUser((parentDocument, uploadedFile) -> {
 			try {
-				File file = uploadedFile.getFile();
-				Future<FileMetaData> savedFile = storage.save("documents", file.getAbsolutePath());
-				FileMetaData metaData = savedFile.get();
 				GxDocument d = new GxDocument();
+				File file = uploadedFile.getFile();
+				FileInputStream fis = new FileInputStream(file);
+				String ext = TRFileContentUtil.getExtensionFromFilename(uploadedFile.getFileName());
+				Future<FileMetaData> savedFile = storage.save("documents", d.getDocumentId() + "." + ext, fis);
+				FileMetaData metaData = savedFile.get();
 				d.setSize((long) metaData.getFileSize());
 				d.setNamespace(parentDocument.getNamespace());
 				d.setName(uploadedFile.getFileName());
@@ -155,7 +157,7 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 				ex.printStackTrace();
 			}
 			refresh();
-		});
+		}, user);
 	}
 
 	@Override
@@ -171,7 +173,8 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 				documents.add(e);
 			}
 		});
-		documentService.deleteDocument(documents);
+		GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
+		documentService.archiveDocumentVersion(documents, user);
 	}
 
 	public void initializeWithDocumentAndStorage(GxDocument document, FileStorage storage) {

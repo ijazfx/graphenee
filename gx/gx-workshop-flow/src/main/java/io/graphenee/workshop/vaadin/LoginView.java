@@ -1,5 +1,7 @@
 package io.graphenee.workshop.vaadin;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -11,7 +13,6 @@ import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.common.exception.AuthenticationFailedException;
 import io.graphenee.common.exception.PasswordChangeRequiredException;
 import io.graphenee.core.GxDataService;
-import io.graphenee.core.flow.GxUserAccountDashboardUser;
 import io.graphenee.core.model.entity.GxNamespace;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
@@ -35,18 +36,20 @@ public class LoginView extends GxAbstractLoginView {
         return flowSetup;
     }
 
-    @Autowired
-    GxNamespace namespace;
-
     @Override
     protected GxAuthenticatedUser onLogin(LoginEvent event)
             throws AuthenticationFailedException, PasswordChangeRequiredException {
         String username = event.getUsername();
         String password = event.getPassword();
-        GxUserAccount user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace);
-        if (user == null) {
-            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password,
-                    dataService.systemNamespace());
+        Optional<GxNamespace> namespace = dataService.findNamespaceByHost(host());
+        GxUserAccount user = null;
+        if (namespace.isPresent()) {
+            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, namespace.get());
+        } else {
+            user = dataService.findUserAccountByUsernamePasswordAndNamespace(username, password, dataService.systemNamespace());
+            if(user == null) {
+                user = dataService.findUserAccountByUsernameAndPassword(username, password);
+            }
         }
         if (user == null) {
             throw new AuthenticationFailedException("Invalid credentials, please try again.");
@@ -57,7 +60,7 @@ public class LoginView extends GxAbstractLoginView {
         if (user.getIsPasswordChangeRequired()) {
             throw new PasswordChangeRequiredException();
         }
-        return new GxUserAccountDashboardUser(user);
+        return user;
     }
 
 }

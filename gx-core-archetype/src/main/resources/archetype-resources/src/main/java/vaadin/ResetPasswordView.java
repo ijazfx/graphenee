@@ -1,11 +1,15 @@
 package ${package}.vaadin;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 
+import io.graphenee.common.exception.ChangePasswordFailedException;
+import io.graphenee.core.GxDataService;
+import io.graphenee.security.GxPasswordPolicyDataService;
 import io.graphenee.util.callback.TRErrorCallback;
 import io.graphenee.util.callback.TRVoidCallback;
 import io.graphenee.vaadin.flow.GxAbstractFlowSetup;
@@ -21,11 +25,11 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
     @Autowired
     GxAbstractFlowSetup flowSetup;
 
-    // @Autowired
-    // GxDataService dataService;
-    //
-    // @Autowired
-    // GxPasswordPolicyDataService passwordService;
+    @Autowired
+    GxDataService dataService;
+
+    @Autowired
+    GxPasswordPolicyDataService passwordService;
 
     @Override
     protected GxAbstractFlowSetup flowSetup() {
@@ -41,14 +45,13 @@ public class ResetPasswordView extends GxAbstractResetPasswordView {
 
     @Override
     protected void changePassword(String username, String password, TRVoidCallback success, TRErrorCallback error) {
-        System.out.println("Password changed");
-        // try {
-        // passwordService.changePassword(dataService.systemNamespace(), username,
-        // password);
-        success.execute();
-        // } catch (ChangePasswordFailedException e) {
-        // error.execute(e);
-        // }
+        try {
+            passwordService.changePassword(dataService.systemNamespace(), username,
+            password);
+            success.execute();
+        } catch (ChangePasswordFailedException e) {
+            error.execute(e);
+        }
     }
 
 }
