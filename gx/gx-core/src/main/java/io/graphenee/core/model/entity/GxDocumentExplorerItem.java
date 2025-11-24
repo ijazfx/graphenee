@@ -14,6 +14,10 @@ public interface GxDocumentExplorerItem {
 	Boolean isFile();
 	
 	Boolean getIsArchived();
+
+	Boolean getIsReadOnly();
+	
+	void setIsReadOnly(Boolean isReadOnly);
 	
 	void setIsArchived(Boolean isArchived);
 

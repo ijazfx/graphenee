@@ -1,0 +1,3 @@
+ALTER TABLE gx_document ADD COLUMN is_read_only BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE gx_folder ADD COLUMN is_read_only BOOLEAN DEFAULT FALSE;

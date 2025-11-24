@@ -43,6 +43,7 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 	String note;
 	UUID folderId = UUID.randomUUID();
 	Boolean isArchived = false;
+	Boolean isReadOnly = false;
 
 	Integer sortOrder = 0;
 

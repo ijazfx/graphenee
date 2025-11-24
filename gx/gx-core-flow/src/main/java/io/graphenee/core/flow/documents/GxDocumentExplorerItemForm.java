@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -42,6 +43,7 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 	DatePicker reminderDate;
 	MultiSelectComboBox<GxTag> tags;
 	MultiSelectComboBox<Principal> grants;
+	Checkbox isReadOnly;
 
 	public GxDocumentExplorerItemForm() {
 		super(GxDocumentExplorerItem.class);
@@ -54,6 +56,7 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		note.setHeight("100px");
 
 		uniqueId = new PasswordField("Document ID");
+		isReadOnly = new Checkbox("Is Read Only ?");
 
 		issueDate = new DatePicker("Issue Date");
 		expiryDate = new DatePicker("Expiry Date");
@@ -82,9 +85,10 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
 		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(name, uniqueId, note, issueDate, expiryDate, expiryReminderInDays, reminderDate, tags, grants);
+		entityForm.add(name, uniqueId, isReadOnly, note, issueDate, expiryDate, expiryReminderInDays, reminderDate,
+				tags, grants);
 
-		expand(note, tags, grants);
+		expand(isReadOnly, note, tags, grants);
 	}
 
 	@Override
@@ -93,6 +97,11 @@ public class GxDocumentExplorerItemForm extends GxAbstractEntityForm<GxDocumentE
 		dataBinder.forMemberField(issueDate).withConverter(new TimestampToDateConverter());
 		dataBinder.forMemberField(expiryDate).withConverter(new TimestampToDateConverter());
 		dataBinder.forMemberField(reminderDate).withConverter(new TimestampToDateConverter());
+	}
+
+	@Override
+	protected Boolean shouldShowDismissButtonConfirmation() {
+		return isEditable();
 	}
 
 	@Override

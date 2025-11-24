@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.server.streams.FileUploadCallback;
@@ -43,6 +44,7 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 	MultiSelectComboBox<GxTag> tags;
 	MultiSelectComboBox<Principal> grants;
 	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
+	Checkbox isReadOnly;
 
 	public GxFileUploadNewVersionForm() {
 		super(GxDocument.class);
@@ -100,7 +102,9 @@ public class GxFileUploadNewVersionForm extends GxAbstractEntityForm<GxDocument>
 		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
 		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(upload, tags, grants);
+		isReadOnly = new Checkbox("Is Read Only ?");
+
+		entityForm.add(upload, tags, grants, isReadOnly);
 		expand(upload, tags, grants);
 	}
 

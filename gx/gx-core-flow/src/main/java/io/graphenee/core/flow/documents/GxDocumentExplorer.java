@@ -191,7 +191,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 				button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE, ButtonVariant.LUMO_SMALL);
 			}
 			button.addClickListener(cl -> {
-				initializeWithFolderAndStorage(f, storage);
+				this.selectedFolder = f.isFile() ? ((GxDocument) f).getFolder() : (GxFolder) f;
+				this.namespace = topFolder.getNamespace();
+				generateBreadcrumb(f);
+				refresh();
 			});
 			breadcrumbLayout.add(button);
 		}
@@ -199,9 +202,22 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 
 	@Override
 	protected String[] visibleProperties() {
-		return new String[] { "extension", "name", "version", "ownerName", "tagsJoined", "size", "issueDate",
+		return new String[] { "extension", "name", "version", "ownerName", "tagsJoined", "size", "isReadOnly",
 				"expiryDate",
 				"expiryReminderInDays", "updatedAt" };
+	}
+
+	@Override
+	protected void preEdit(GxDocumentExplorerItem entity) {
+		setEditable(canEdit(entity));
+	}
+
+	public Boolean canEdit(GxDocumentExplorerItem entity) {
+		GxUserAccount owner = entity.getOwner();
+		if (owner != null && owner.equals(loggedInUser)) {
+			return true;
+		}
+		return entity.getIsReadOnly().equals(Boolean.FALSE);
 	}
 
 	@Override
@@ -472,11 +488,17 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	public void archiveMultiple(Collection<GxDocumentExplorerItem> entities) {
 		int count = 0;
 		for (GxDocumentExplorerItem e : entities) {
-			try {
-				documentService.archiveExplorerItem(List.of(e), loggedInUser);
-			} catch (DataIntegrityViolationException ex) {
-				count++;
+			Boolean canEdit = canEdit(e);
+			if (canEdit) {
+				try {
+					documentService.archiveExplorerItem(List.of(e), loggedInUser);
+				} catch (DataIntegrityViolationException ex) {
+					count++;
+				}
+			} else {
+				GxNotification.error("Cannot trash this document due to limited access: " + e.getName());
 			}
+
 		}
 		if (count > 0) {
 			GxNotification.error("Some document(s) are in use hence cannot be moved to trash.");

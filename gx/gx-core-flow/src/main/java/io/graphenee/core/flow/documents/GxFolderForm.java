@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -33,6 +34,7 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 	PasswordField uniqueId;
 	MultiSelectComboBox<GxTag> tags;
 	MultiSelectComboBox<Principal> grants;
+	Checkbox isReadOnly;
 
 	public GxFolderForm() {
 		super(GxFolder.class);
@@ -59,7 +61,9 @@ public class GxFolderForm extends GxAbstractEntityForm<GxFolder> {
 		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
 		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(name, uniqueId, note, tags, grants);
+		isReadOnly = new Checkbox("Is Read Only ?");
+
+		entityForm.add(name, uniqueId, note, tags, grants, isReadOnly);
 		expand(note, tags, grants);
 	}
 

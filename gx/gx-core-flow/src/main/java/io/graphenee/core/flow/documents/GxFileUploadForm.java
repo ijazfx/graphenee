@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.server.streams.FileUploadCallback;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
-import io.graphenee.common.GxAuthenticatedUser;
 import io.graphenee.core.GxDataService;
 import io.graphenee.core.model.entity.GxDocument;
 import io.graphenee.core.model.entity.GxFolder;
@@ -44,6 +44,7 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 	MultiSelectComboBox<GxTag> tags;
 	MultiSelectComboBox<Principal> grants;
 	List<GxUploadedFile> uploadedFiles = new ArrayList<>();
+	Checkbox isReadOnly;
 
 	public GxFileUploadForm() {
 		super(GxFolder.class);
@@ -103,7 +104,9 @@ public class GxFileUploadForm extends GxAbstractEntityForm<GxFolder> {
 		grants = new MultiSelectComboBox<>("Grant Access (User/Group)");
 		grants.setItemLabelGenerator(i -> i.getName());
 
-		entityForm.add(upload, tags, grants);
+		isReadOnly = new Checkbox("Is Read Only ?");
+
+		entityForm.add(upload, tags, grants, isReadOnly);
 		expand(upload, tags, grants);
 	}
 
