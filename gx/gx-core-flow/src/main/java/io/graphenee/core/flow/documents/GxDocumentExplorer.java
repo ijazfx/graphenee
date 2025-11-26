@@ -295,7 +295,12 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		GxDocument document = (GxDocument) s;
 		String mimeType = s.getMimeType();
 		String extension = s.getExtension();
-		if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
+		if (mimeType.startsWith("image") || extension.equals("pdf")
+				|| mimeType.equals(
+						"application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+				|| mimeType.equals(
+						"application/vnd.ms-excel")
+				|| mimeType.startsWith("audio")
 				|| mimeType.startsWith("video")) {
 			try {
 				String src = document.getPath();

@@ -1,6 +1,7 @@
 package io.graphenee.core.model.entity;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +68,7 @@ public interface GxDocumentExplorerItem {
 
 	Date getExpiryDate();
 
-	LocalDateTime getUpdatedAt();
+	Timestamp getUpdatedAt();
 
 	Integer getExpiryReminderInDays();
 

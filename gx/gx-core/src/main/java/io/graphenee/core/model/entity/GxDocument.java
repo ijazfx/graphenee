@@ -2,7 +2,6 @@ package io.graphenee.core.model.entity;
 
 import java.security.Principal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -12,7 +11,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.google.common.base.Strings;
 
@@ -58,9 +57,9 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 	Date issueDate;
 	Date expiryDate;
 
-	@LastModifiedDate
+	@UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Timestamp updatedAt;
 
 	@ManyToOne
 	@JoinColumn(name = "oid_document")
