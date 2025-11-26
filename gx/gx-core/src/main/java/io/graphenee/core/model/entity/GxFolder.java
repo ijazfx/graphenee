@@ -2,6 +2,7 @@ package io.graphenee.core.model.entity;
 
 import java.security.Principal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import com.google.common.base.Strings;
 
@@ -46,9 +47,9 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 
 	Integer sortOrder = 0;
 
-	@UpdateTimestamp
+	@LastModifiedDate
 	@Column(name = "updated_at")
-	private Timestamp updatedAt;
+	private LocalDateTime updatedAt;
 
 	@ManyToOne
 	@JoinColumn(name = "oid_folder")
@@ -93,6 +94,13 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 		log.setOidAuditEntity(this.getOid());
 		log.setUserAccount(user);
 		auditLogs.add(log);
+	}
+
+	public Timestamp getUpdatedOn() {
+		if (updatedAt == null) {
+			return null;
+		}
+		return Timestamp.valueOf(updatedAt);
 	}
 
 	@Override

@@ -68,7 +68,9 @@ public interface GxDocumentExplorerItem {
 
 	Date getExpiryDate();
 
-	Timestamp getUpdatedAt();
+	LocalDateTime getUpdatedAt();
+	
+	Timestamp getUpdatedOn();
 
 	Integer getExpiryReminderInDays();
 
