@@ -70,8 +70,6 @@ public interface GxDocumentExplorerItem {
 
 	LocalDateTime getUpdatedAt();
 	
-	Timestamp getUpdatedOn();
-
 	Integer getExpiryReminderInDays();
 
 	default Date getReminderDate() {

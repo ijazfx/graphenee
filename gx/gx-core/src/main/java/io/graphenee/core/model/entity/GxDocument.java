@@ -108,13 +108,6 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 		auditLogs.add(log);
 	}
 
-	public Timestamp getUpdatedOn(){
-		if (updatedAt == null) {
-			return null;
-		}
-		return Timestamp.valueOf(updatedAt);
-	}
-
 	@Override
 	public Boolean isFile() {
 		return true;

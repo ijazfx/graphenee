@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1193,6 +1194,17 @@ public abstract class GxAbstractEntityList<T> extends FlexLayout implements Impo
 			}
 			if (renderer == null && propertyDefinition.getType().equals(Timestamp.class)) {
 				renderer = new GxDateRenderer<>((ValueProvider<T, Date>) propertyDefinition.getGetter(),
+						GxDateRenderer.GxDateResolution.DateTime);
+			}
+			if (renderer == null && propertyDefinition.getType().equals(LocalDateTime.class)) {
+				renderer = new GxDateRenderer<>(
+						(ValueProvider<T, Date>) item -> {
+							LocalDateTime ldt = (LocalDateTime) propertyDefinition.getGetter().apply(item);
+							if (ldt == null)
+								return null;
+
+							return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+						},
 						GxDateRenderer.GxDateResolution.DateTime);
 			}
 			if (renderer == null && (propertyDefinition.getType().equals(List.class)

@@ -204,7 +204,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	protected String[] visibleProperties() {
 		return new String[] { "extension", "name", "version", "ownerName", "tagsJoined", "size", "isReadOnly",
 				"expiryDate",
-				"expiryReminderInDays", "updatedOn" };
+				"expiryReminderInDays", "updatedAt" };
 	}
 
 	@Override

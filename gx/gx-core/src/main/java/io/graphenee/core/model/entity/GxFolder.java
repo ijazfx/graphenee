@@ -96,13 +96,6 @@ public class GxFolder extends GxMappedSuperclass implements GxDocumentExplorerIt
 		auditLogs.add(log);
 	}
 
-	public Timestamp getUpdatedOn() {
-		if (updatedAt == null) {
-			return null;
-		}
-		return Timestamp.valueOf(updatedAt);
-	}
-
 	@Override
 	public Boolean isFile() {
 		return false;
