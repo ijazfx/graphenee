@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -30,6 +29,7 @@ import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
+import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -87,16 +87,33 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 			PropertyDefinition<GxDocument, ?> propertyDefinition) {
 		if (propertyName.equals("extension")) {
 			return new ComponentRenderer<>(s -> {
-				Icon icon = null;
+				Image image = null;
+				String extension = s.getExtension();
+				String mimeType = s.getMimeType();
 				if (!s.isFile()) {
-					icon = VaadinIcon.FOLDER_O.create();
+					image = IconUtils.fileExtensionIconResource("folder");
 				} else {
-					icon = VaadinIcon.FILE_O.create();
-					icon.addClickListener(cl -> {
+					if (mimeType.startsWith("image")) {
+						image = IconUtils.fileExtensionIconResource("image");
+					} else if (mimeType.startsWith("audio")) {
+						image = IconUtils.fileExtensionIconResource("audio");
+					} else if (mimeType.startsWith("video")) {
+						image = IconUtils.fileExtensionIconResource("video");
+					} else {
+						image = IconUtils.fileExtensionIconResource(extension);
+					}
+					if (image == null) {
+						image = IconUtils.fileExtensionIconResource("bin");
+					}
+
+					image.addClickListener(cl -> {
 						GxDocument document = (GxDocument) s;
-						String extension = s.getExtension();
-						String mimeType = s.getMimeType();
-						if (mimeType.startsWith("image") || extension.equals("pdf") || mimeType.startsWith("audio")
+						if (mimeType.startsWith("image") || extension.equals("pdf")
+								|| mimeType.equals(
+										"application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+								|| mimeType.equals(
+										"application/vnd.ms-excel")
+								|| mimeType.startsWith("audio")
 								|| mimeType.startsWith("video")) {
 							try {
 								String src = document.getPath();
@@ -117,7 +134,8 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 						}
 					});
 				}
-				return icon;
+				image.setHeight("24px");
+				return image;
 			});
 		}
 		return super.rendererForProperty(propertyName, propertyDefinition);

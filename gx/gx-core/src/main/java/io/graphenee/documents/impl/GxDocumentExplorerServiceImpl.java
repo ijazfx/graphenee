@@ -217,7 +217,7 @@ public class GxDocumentExplorerServiceImpl implements GxDocumentExplorerService 
 		if (maxVersion == null) {
 			maxVersion = 0;
 		}
-		newDocument.setName(parentDocument.getName());
+		// newDocument.setName(parentDocument.getName());
 		newDocument.setVersionNo(maxVersion + 1);
 		newDocument.setDocument(parentDocument);
 		newDocument.setFolder(parentDocument.getFolder());
