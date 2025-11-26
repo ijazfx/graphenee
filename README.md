@@ -1,6 +1,9 @@
 # Graphenee
 Graphenee - Enterprise Application Development Framework
 
+![Maven Central](https://img.shields.io/maven-central/v/com.trigsoft.graphenee/gx?strategy=highestVersion
+)
+
 Graphenee word itself is a combination of Graphene and Enterprise Edition (ee). It is developed using Java, Spring Boot and Vaadin.
 
 The motivation behind this framework is to give developers an easy to use api to quickly build enterprise applications by focusing on business logic.
