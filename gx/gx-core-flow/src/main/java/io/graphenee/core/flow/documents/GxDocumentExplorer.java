@@ -137,9 +137,9 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 	@Override
 	protected int getChildCount(GxDocumentExplorerItem parent) {
 		if (parent != null) {
-			return documentService.countChildren(loggedInUser(), parent, getSearchEntity(), filter).intValue();
+			return documentService.countChildren(loggedInUser, parent, getSearchEntity(), filter).intValue();
 		}
-		return documentService.countChildren(loggedInUser(), selectedFolder, getSearchEntity(), filter).intValue();
+		return documentService.countChildren(loggedInUser, selectedFolder, getSearchEntity(), filter).intValue();
 	}
 
 	@Override
@@ -296,10 +296,10 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 		String mimeType = s.getMimeType();
 		String extension = s.getExtension();
 		if (mimeType.startsWith("image") || extension.equals("pdf")
-				|| mimeType.equals(
-						"application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-				|| mimeType.equals(
-						"application/vnd.ms-excel")
+				|| extension.startsWith(
+						"xls")
+				|| extension.startsWith(
+						"doc")
 				|| mimeType.startsWith("audio")
 				|| mimeType.startsWith("video")) {
 			try {
@@ -553,7 +553,7 @@ public class GxDocumentExplorer extends GxAbstractEntityTreeList<GxDocumentExplo
 			while (doc.getDocument() != null) {
 				doc = doc.getDocument();
 			}
-			versionList.initializeWithDocumentAndStorage(doc, storage);
+			versionList.initializeWithDocumentAndStorageAndUser(doc, storage, loggedInUser);
 			versionList.showInDialog("Manage Versions", () -> {
 				refresh();
 			});
