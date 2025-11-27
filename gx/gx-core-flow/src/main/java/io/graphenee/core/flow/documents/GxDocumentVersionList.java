@@ -120,7 +120,7 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 					documentService.saveDocument(document);
 					return new ByteArrayInputStream(bytes);
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.error("Error in download file: {}", e.getMessage(), e);
 				}
 			}
 		}
