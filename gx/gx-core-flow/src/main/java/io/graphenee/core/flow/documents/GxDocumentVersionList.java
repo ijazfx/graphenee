@@ -1,26 +1,33 @@
 package io.graphenee.core.flow.documents;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import io.graphenee.core.model.entity.GxDocument;
+import io.graphenee.core.model.entity.GxDocumentExplorerItem;
 import io.graphenee.core.model.entity.GxUserAccount;
 import io.graphenee.documents.GxDocumentExplorerService;
 import io.graphenee.util.TRFileContentUtil;
@@ -28,6 +35,7 @@ import io.graphenee.util.storage.FileStorage;
 import io.graphenee.util.storage.FileStorage.FileMetaData;
 import io.graphenee.vaadin.flow.GxAbstractEntityForm;
 import io.graphenee.vaadin.flow.GxAbstractEntityList;
+import io.graphenee.vaadin.flow.component.GxDownloadButton;
 import io.graphenee.vaadin.flow.component.ResourcePreviewPanel;
 import io.graphenee.vaadin.flow.utils.IconUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +61,10 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 	FileStorage storage;
 
 	private GxDocument selectedDocument;
+
+	private GxDownloadButton downloadButton;
+
+	GxUserAccount loggedInUser;
 
 	public GxDocumentVersionList() {
 		super(GxDocument.class);
@@ -83,6 +95,39 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 	}
 
 	@Override
+	protected void decorateToolbarLayout(HorizontalLayout toolbarLayout) {
+		downloadButton = new GxDownloadButton("Download");
+		downloadButton.getStyle().set("margin", "0");
+		downloadButton.setInputStreamFactory(this::downloadFile);
+		downloadButton.setEnabled(false);
+		toolbarLayout.add(downloadButton);
+		super.decorateToolbarLayout(toolbarLayout);
+	}
+
+	public InputStream downloadFile() {
+		if (!entityGrid().getSelectedItems().isEmpty()) {
+			GxDocumentExplorerItem d = entityGrid().getSelectedItems().stream().iterator().next();
+			if (d.isFile()) {
+				GxDocument document = (GxDocument) d;
+				downloadButton.setDefaultFileName(d.getName());
+				try {
+					InputStream stream = null;
+					String src = document.getPath();
+					String resourcePath = storage.resourcePath("documents", src);
+					stream = storage.resolve(resourcePath);
+					byte[] bytes = IOUtils.toByteArray(stream);
+					document.audit(loggedInUser, "DOWNLOADED");
+					documentService.saveDocument(document);
+					return new ByteArrayInputStream(bytes);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+
+	@Override
 	protected Renderer<GxDocument> rendererForProperty(String propertyName,
 			PropertyDefinition<GxDocument, ?> propertyDefinition) {
 		if (propertyName.equals("extension")) {
@@ -109,10 +154,10 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 					image.addClickListener(cl -> {
 						GxDocument document = (GxDocument) s;
 						if (mimeType.startsWith("image") || extension.equals("pdf")
-								|| mimeType.equals(
-										"application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-								|| mimeType.equals(
-										"application/vnd.ms-excel")
+								|| extension.startsWith(
+										"xls")
+								|| extension.startsWith(
+										"doc")
 								|| mimeType.startsWith("audio")
 								|| mimeType.startsWith("video")) {
 							try {
@@ -155,8 +200,6 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 
 	@Override
 	protected void postBuild() {
-		GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
-
 		uploadNewVersionForm.initializeWithFileUploadHandlerAndUser((parentDocument, uploadedFile) -> {
 			try {
 				GxDocument d = new GxDocument();
@@ -175,7 +218,12 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 				ex.printStackTrace();
 			}
 			refresh();
-		}, user);
+		}, loggedInUser);
+	}
+
+	@Override
+	protected void onGridItemSelect(SelectionEvent<Grid<GxDocument>, GxDocument> event) {
+		downloadButton.setEnabled(!event.getAllSelectedItems().isEmpty() && event.getAllSelectedItems().size() == 1);
 	}
 
 	@Override
@@ -191,13 +239,13 @@ public class GxDocumentVersionList extends GxAbstractEntityList<GxDocument> {
 				documents.add(e);
 			}
 		});
-		GxUserAccount user = (loggedInUser() instanceof GxUserAccount) ? ((GxUserAccount) loggedInUser()) : null;
-		documentService.archiveDocumentVersion(documents, user);
+		documentService.archiveDocumentVersion(documents, loggedInUser);
 	}
 
-	public void initializeWithDocumentAndStorage(GxDocument document, FileStorage storage) {
+	public void initializeWithDocumentAndStorageAndUser(GxDocument document, FileStorage storage, GxUserAccount user) {
 		this.selectedDocument = document;
 		this.storage = storage;
+		this.loggedInUser = user;
 		refresh();
 	}
 
