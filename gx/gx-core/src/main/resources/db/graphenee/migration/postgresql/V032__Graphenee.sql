@@ -1,0 +1,1 @@
+ALTER TABLE gx_document ALTER COLUMN share_key type varchar(50);
