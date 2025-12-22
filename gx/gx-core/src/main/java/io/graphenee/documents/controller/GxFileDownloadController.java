@@ -106,7 +106,7 @@ public class GxFileDownloadController {
         GxDocument doc = documentOptional.get();
 
         // 2. Validate Share Key
-        if (doc.getShareKey() == null || !doc.getShareKey().toString().equals(shareKey)) {
+        if (doc.getShareKey() == null || !doc.getShareKey().equals(shareKey)) {
             log.warn("Invalid shareKey provided for documentId: {}. Access denied.", documentId);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

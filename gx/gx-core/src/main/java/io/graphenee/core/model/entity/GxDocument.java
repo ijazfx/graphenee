@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.graphenee.core.utils.StringUtils;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.google.common.base.Strings;
@@ -46,7 +47,7 @@ public class GxDocument extends GxMappedSuperclass implements GxDocumentExplorer
 	Long size;
 
 	UUID documentId = UUID.randomUUID();
-	UUID shareKey = UUID.randomUUID();
+	String shareKey = StringUtils.generateStreamVersion(20);
 	Boolean isArchived = false;
 	Boolean isReadOnly = false;
 
