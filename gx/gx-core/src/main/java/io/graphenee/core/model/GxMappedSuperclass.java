@@ -50,19 +50,32 @@ public class GxMappedSuperclass implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		GxMappedSuperclass src = (GxMappedSuperclass) obj;
-		if ((oid == null && src.oid == null) || !getClass().equals(obj.getClass()))
-			return uuid.equals(src.uuid);
-		return oid.equals(src.oid);
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+
+		GxMappedSuperclass other = (GxMappedSuperclass) obj;
+
+		if (this.oid != null && other.oid != null) {
+			return this.oid.equals(other.oid);
+		}
+
+		if (this.uuid != null && other.uuid != null) {
+			return this.uuid.equals(other.uuid);
+		}
+
+		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		if (oid != null)
-			return Objects.hashCode(oid);
-		return Objects.hashCode(uuid);
+		if (oid != null) {
+			return oid.hashCode();
+		}
+		if (uuid != null) {
+			return uuid.hashCode();
+		}
+		return System.identityHashCode(this);
 	}
 
 }
