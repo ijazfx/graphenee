@@ -1,0 +1,36 @@
+{
+  "module": "gx-jbpm-embedded",
+  "description": "Embedded jBPM 6 workflow engine — runtime engine service, task lifecycle (complete/skip/assign), Spring Boot auto-config",
+  "internal_deps": ["gx-util", "gx-core"],
+  "external_deps": ["spring-boot-autoconfigure", "spring-data-jpa", "hibernate-jpa-2.1", "jbpm-flow", "jbpm-flow-builder", "jbpm-bpmn2", "jbpm-persistence-jpa", "jbpm-human-task-core", "jbpm-runtime-manager", "kie-spring"],
+  "packages": {
+    "io.graphenee.jbpm.embedded":       ["GrapheneeJbpmConfiguration", "GrapheneeJbpmProperties", "GxAssignee", "GxKieRuntimeEngineService", "GxKieService", "GxUserAccountAssigneeWrapper", "GxUserTask"],
+    "io.graphenee.jbpm.embedded.exception": ["GxTaskException", "GxAssignTaskException", "GxCompleteTaskException", "GxSkipTaskException"],
+    "io.graphenee.jbpm.embedded.impl":  ["GxKieRuntimeEngineServiceImpl", "GxKieServiceImpl"]
+  },
+  "nodes": {
+    "GrapheneeJbpmConfiguration":       { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GrapheneeJbpmConfiguration.java",         "type": "configuration", "summary": "Spring Boot auto-config bootstrapping jBPM with entity manager factory and Flyway" },
+    "GrapheneeJbpmProperties":          { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GrapheneeJbpmProperties.java",             "type": "class",         "summary": "Config properties: H2 database path and datasource init" },
+    "GxAssignee":                       { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GxAssignee.java",                          "type": "interface",     "summary": "Task assignee contract: username, full name, email" },
+    "GxKieRuntimeEngineService":        { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GxKieRuntimeEngineService.java",            "type": "interface",     "summary": "KIE runtime engine: singleton, per-request and per-process strategies" },
+    "GxKieService":                     { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GxKieService.java",                         "type": "interface",     "summary": "Type-safe process variable retrieval with default value support" },
+    "GxUserAccountAssigneeWrapper":     { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GxUserAccountAssigneeWrapper.java",         "type": "class",         "summary": "Wraps GxUserAccountBean for jBPM task assignment implementing GxAssignee" },
+    "GxUserTask":                       { "package": "io.graphenee.jbpm.embedded",           "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/GxUserTask.java",                           "type": "class",         "summary": "TaskSummary wrapper with complete, skip, assign and comment retrieval" },
+    "GxTaskException":                  { "package": "io.graphenee.jbpm.embedded.exception", "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/exception/GxTaskException.java",            "type": "exception",     "summary": "Base exception for jBPM task operations" },
+    "GxAssignTaskException":            { "package": "io.graphenee.jbpm.embedded.exception", "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/exception/GxAssignTaskException.java",      "type": "exception" },
+    "GxCompleteTaskException":          { "package": "io.graphenee.jbpm.embedded.exception", "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/exception/GxCompleteTaskException.java",    "type": "exception" },
+    "GxSkipTaskException":              { "package": "io.graphenee.jbpm.embedded.exception", "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/exception/GxSkipTaskException.java",        "type": "exception" },
+    "GxKieRuntimeEngineServiceImpl":    { "package": "io.graphenee.jbpm.embedded.impl",      "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/impl/GxKieRuntimeEngineServiceImpl.java",   "type": "class" },
+    "GxKieServiceImpl":                 { "package": "io.graphenee.jbpm.embedded.impl",      "path": "gx-jbpm-embedded/src/main/java/io/graphenee/jbpm/embedded/impl/GxKieServiceImpl.java",                "type": "class",         "summary": "Retrieves jBPM process instance variable values from audit logs" }
+  },
+  "edges": [
+    { "from": "GxKieRuntimeEngineServiceImpl", "to": "GxKieRuntimeEngineService", "relation": "implements" },
+    { "from": "GxKieServiceImpl",              "to": "GxKieService",              "relation": "implements" },
+    { "from": "GxUserAccountAssigneeWrapper",  "to": "GxAssignee",                "relation": "implements" },
+    { "from": "GxUserAccountAssigneeWrapper",  "to": "io.graphenee.core.model.entity.GxUserAccount", "relation": "wraps" },
+    { "from": "GxAssignTaskException",         "to": "GxTaskException",           "relation": "extends" },
+    { "from": "GxCompleteTaskException",       "to": "GxTaskException",           "relation": "extends" },
+    { "from": "GxSkipTaskException",           "to": "GxTaskException",           "relation": "extends" },
+    { "from": "GxUserTask",                    "to": "GxAssignee",                "relation": "uses" }
+  ]
+}

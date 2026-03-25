@@ -1,0 +1,17 @@
+{
+  "module": "gx-blockchain",
+  "description": "Sawtooth blockchain HTTP client with cryptographic transaction signing. Standalone — no internal Graphenee dependencies.",
+  "internal_deps": [],
+  "external_deps": ["retrofit2", "converter-gson", "converter-scalars", "converter-protobuf", "web3j", "sawtooth-sdk", "spring-boot-autoconfigure"],
+  "packages": {
+    "io.graphenee.blockchain.sawtooth": ["GrapheneeSawtoothConfiguration", "SawtoothClient", "SawtoothRestService"]
+  },
+  "nodes": {
+    "GrapheneeSawtoothConfiguration":   { "package": "io.graphenee.blockchain.sawtooth", "path": "gx-blockchain/src/main/java/io/graphenee/blockchain/sawtooth/GrapheneeSawtoothConfiguration.java", "type": "configuration", "summary": "Spring Boot configuration for Sawtooth blockchain integration" },
+    "SawtoothClient":                   { "package": "io.graphenee.blockchain.sawtooth", "path": "gx-blockchain/src/main/java/io/graphenee/blockchain/sawtooth/SawtoothClient.java",                  "type": "class",         "summary": "Retrofit-based HTTP client for submitting transactions with cryptographic signing" },
+    "SawtoothRestService":              { "package": "io.graphenee.blockchain.sawtooth", "path": "gx-blockchain/src/main/java/io/graphenee/blockchain/sawtooth/SawtoothRestService.java",              "type": "interface",     "summary": "Retrofit REST interface defining Sawtooth blockchain API endpoints" }
+  },
+  "edges": [
+    { "from": "SawtoothClient", "to": "SawtoothRestService", "relation": "uses" }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "module": "gx-jbpm-flow",
+  "description": "Vaadin Flow UI forms for jBPM task management: approve, reject, skip, assign",
+  "internal_deps": ["gx-util", "gx-core", "gx-flow", "gx-jbpm-embedded"],
+  "external_deps": ["spring-boot-autoconfigure", "spring-data-jpa", "jbpm", "kie-spring"],
+  "packages": {
+    "io.graphenee.jbpm.embedded.flow": ["GrapheneeJbpmFlowConfiguration", "GxSelectAssigneeForm", "GxUserTaskForm"]
+  },
+  "nodes": {
+    "GrapheneeJbpmFlowConfiguration":   { "package": "io.graphenee.jbpm.embedded.flow", "path": "gx-jbpm-flow/src/main/java/io/graphenee/jbpm/embedded/flow/GrapheneeJbpmFlowConfiguration.java", "type": "configuration", "summary": "Spring Boot config integrating jBPM with Vaadin Flow component scanning" },
+    "GxSelectAssigneeForm":             { "package": "io.graphenee.jbpm.embedded.flow", "path": "gx-jbpm-flow/src/main/java/io/graphenee/jbpm/embedded/flow/GxSelectAssigneeForm.java",           "type": "class",         "summary": "Form for selecting and assigning task users from a dropdown" },
+    "GxUserTaskForm":                   { "package": "io.graphenee.jbpm.embedded.flow", "path": "gx-jbpm-flow/src/main/java/io/graphenee/jbpm/embedded/flow/GxUserTaskForm.java",                 "type": "abstract-class","summary": "Abstract form for user task completion: approve, reject, skip, assign" }
+  },
+  "edges": [
+    { "from": "GxUserTaskForm",         "to": "io.graphenee.jbpm.embedded.GxUserTask",    "relation": "uses" },
+    { "from": "GxUserTaskForm",         "to": "GxSelectAssigneeForm",                     "relation": "uses" },
+    { "from": "GxUserTaskForm",         "to": "io.graphenee.vaadin.flow.GxAbstractDialog","relation": "extends" }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "module": "gx-workshop-flow",
+  "description": "Reference/demo Spring Boot application wiring all Graphenee modules. Not published to Maven Central.",
+  "internal_deps": ["gx-core-flow"],
+  "transitive_deps": ["gx-util", "gx-core", "gx-flow"],
+  "external_deps": ["spring-boot-starter", "spring-boot-starter-web", "vaadin-core", "flyway", "h2", "postgresql"],
+  "packages": {
+    "io.graphenee.workshop":        ["FlowApplication", "FlowApplicationConfiguration"],
+    "io.graphenee.workshop.vaadin": ["AppShell", "FlowSetup", "HomeView", "LoginView", "MainLayout", "NotFoundView", "ResetPasswordView"]
+  },
+  "nodes": {
+    "FlowApplication":              { "package": "io.graphenee.workshop",        "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/FlowApplication.java",                "type": "class",         "summary": "Spring Boot entry point extending SpringBootServletInitializer" },
+    "FlowApplicationConfiguration": { "package": "io.graphenee.workshop",       "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/FlowApplicationConfiguration.java",   "type": "configuration", "summary": "File storage beans: S3 and local filesystem" },
+    "AppShell":                     { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/AppShell.java",                 "type": "class",         "summary": "Vaadin AppShell with WebSocket push and loading indicator timing" },
+    "FlowSetup":                    { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/FlowSetup.java",                "type": "class",         "summary": "Spring component providing menu items and dynamic app config from database" },
+    "HomeView":                     { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/HomeView.java",                 "type": "class",         "summary": "Vaadin Flow home view route for authenticated users" },
+    "LoginView":                    { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/LoginView.java",                "type": "class",         "summary": "Login view with multi-tenant namespace support and user authentication" },
+    "MainLayout":                   { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/MainLayout.java",               "type": "class",         "summary": "Application shell extending GxAbstractAppLayout" },
+    "NotFoundView":                 { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/NotFoundView.java",             "type": "class",         "summary": "404 handler; redirects unauthenticated users to login" },
+    "ResetPasswordView":            { "package": "io.graphenee.workshop.vaadin", "path": "gx-workshop-flow/src/main/java/io/graphenee/workshop/vaadin/ResetPasswordView.java",        "type": "class",         "summary": "Password reset view with security pin generation and policy validation" }
+  },
+  "edges": [
+    { "from": "MainLayout",         "to": "io.graphenee.vaadin.flow.GxAbstractAppLayout",       "relation": "extends" },
+    { "from": "LoginView",          "to": "io.graphenee.vaadin.flow.GxAbstractLoginView",        "relation": "extends" },
+    { "from": "ResetPasswordView",  "to": "io.graphenee.vaadin.flow.GxAbstractResetPasswordView","relation": "extends" },
+    { "from": "FlowSetup",          "to": "io.graphenee.vaadin.flow.GxAbstractFlowSetup",        "relation": "extends" },
+    { "from": "FlowApplicationConfiguration", "to": "io.graphenee.util.storage.FileStorage",     "relation": "provides" }
+  ],
+  "config": {
+    "properties_file": "gx-workshop-flow/src/main/resources/application.properties",
+    "notes": "Database: PostgreSQL (default) or H2. Flyway migration enabled. File storage: local or S3 (configurable in application.properties)"
+  }
+}

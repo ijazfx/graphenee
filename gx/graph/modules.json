@@ -1,0 +1,75 @@
+{
+  "description": "Module-level dependency graph for the Graphenee framework. Edges are internal Graphenee dependencies only (Maven). To navigate into a module, read graph/<module-id>.json.",
+  "nodes": {
+    "gx-util": {
+      "type": "module",
+      "description": "Foundation utilities: hashing, storage, media conversion, callbacks, JPA specs, data faults",
+      "path": "gx-util",
+      "key_packages": ["io.graphenee.util", "io.graphenee.util.storage", "io.graphenee.util.hash", "io.graphenee.util.media", "io.graphenee.common"]
+    },
+    "gx-flow": {
+      "type": "module",
+      "description": "Vaadin Flow base UI components, charts, converters, event utilities — no domain knowledge",
+      "path": "gx-flow",
+      "key_packages": ["io.graphenee.vaadin.flow", "io.graphenee.vaadin.flow.component", "io.graphenee.vaadin.flow.chart", "io.graphenee.vaadin.flow.data"]
+    },
+    "gx-core": {
+      "type": "module",
+      "description": "Core domain model (JPA entities), services, security, DMS, SMS, i18n, AWS, OwnCloud",
+      "path": "gx-core",
+      "key_packages": ["io.graphenee.core", "io.graphenee.core.model.entity", "io.graphenee.documents", "io.graphenee.security", "io.graphenee.sms", "io.graphenee.i18n", "io.graphenee.aws"]
+    },
+    "gx-core-flow": {
+      "type": "module",
+      "description": "Vaadin Flow UI views and forms for all gx-core features (security, DMS, SMS, i18n, namespaces, domains)",
+      "path": "gx-core-flow",
+      "key_packages": ["io.graphenee.core.flow", "io.graphenee.core.flow.documents", "io.graphenee.core.flow.security", "io.graphenee.core.flow.sms"]
+    },
+    "gx-jbpm-embedded": {
+      "type": "module",
+      "description": "Embedded jBPM 6 workflow engine — runtime engine service, task lifecycle, Spring Boot auto-config",
+      "path": "gx-jbpm-embedded",
+      "key_packages": ["io.graphenee.jbpm.embedded", "io.graphenee.jbpm.embedded.impl"]
+    },
+    "gx-jbpm-flow": {
+      "type": "module",
+      "description": "Vaadin Flow UI forms for jBPM task management (approve, reject, skip, assign)",
+      "path": "gx-jbpm-flow",
+      "key_packages": ["io.graphenee.jbpm.embedded.flow"]
+    },
+    "gx-blockchain": {
+      "type": "module",
+      "description": "Sawtooth blockchain HTTP client with cryptographic transaction signing via Retrofit",
+      "path": "gx-blockchain",
+      "key_packages": ["io.graphenee.blockchain.sawtooth"]
+    },
+    "gx-workshop-flow": {
+      "type": "module",
+      "description": "Reference/demo Spring Boot application wiring all Graphenee modules together",
+      "path": "gx-workshop-flow",
+      "key_packages": ["io.graphenee.workshop", "io.graphenee.workshop.vaadin"]
+    }
+  },
+  "edges": [
+    { "from": "gx-flow",          "to": "gx-util",          "relation": "depends-on" },
+    { "from": "gx-core",          "to": "gx-util",          "relation": "depends-on" },
+    { "from": "gx-core-flow",     "to": "gx-util",          "relation": "depends-on" },
+    { "from": "gx-core-flow",     "to": "gx-core",          "relation": "depends-on" },
+    { "from": "gx-core-flow",     "to": "gx-flow",          "relation": "depends-on" },
+    { "from": "gx-jbpm-embedded", "to": "gx-util",          "relation": "depends-on" },
+    { "from": "gx-jbpm-embedded", "to": "gx-core",          "relation": "depends-on" },
+    { "from": "gx-jbpm-flow",     "to": "gx-util",          "relation": "depends-on" },
+    { "from": "gx-jbpm-flow",     "to": "gx-core",          "relation": "depends-on" },
+    { "from": "gx-jbpm-flow",     "to": "gx-flow",          "relation": "depends-on" },
+    { "from": "gx-jbpm-flow",     "to": "gx-jbpm-embedded", "relation": "depends-on" },
+    { "from": "gx-workshop-flow", "to": "gx-core-flow",     "relation": "depends-on" }
+  ],
+  "impact_notes": {
+    "gx-util":  "Changed by anything that breaks storage, hashing, or callback contracts — affects ALL other modules",
+    "gx-flow":  "UI-only changes; safe to modify without touching domain logic in gx-core",
+    "gx-core":  "Entity/service changes here ripple into gx-core-flow, gx-jbpm-embedded, gx-jbpm-flow",
+    "gx-core-flow": "UI changes only; breaking a form API may affect gx-workshop-flow",
+    "gx-jbpm-embedded": "Workflow engine changes ripple into gx-jbpm-flow",
+    "gx-blockchain": "Standalone — no internal dependents, safe to change independently"
+  }
+}
