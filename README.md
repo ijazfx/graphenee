@@ -22,7 +22,7 @@ Graphenee consists of following modules:
 * gx-jbpm-flow - UI components for gx-jbpm-embedded module such as listing processes and approval forms.
 * gx-blockchain - Basic functionality to interact with Hyperledger Sawtooth and Ethereum Blockchain network.
 
-Copyright &copy; Farrukh Ijaz, all rights reserved.
+Copyright &copy; 2015-2026 Farrukh Ijaz, all rights reserved.
 
 Join the team and contribute to make Graphenee a better product.
 
