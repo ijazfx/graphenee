@@ -51,7 +51,7 @@
 		<version.scrypt>1.4.0</version.scrypt>
 		<version.zxing>3.5.2</version.zxing>
 		<version.guava>32.1.3-jre</version.guava>
-		<version.json>20250517</version.json>
+		<version.json>20260719</version.json>
 		<version.itextpdf>5.5.13.3</version.itextpdf>
 		<version.lombok>1.18.30</version.lombok>
 		<version.gson>2.10.1</version.gson>
